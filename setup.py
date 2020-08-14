@@ -1,10 +1,13 @@
 import setuptools
 
+import versioneer
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="xcompact3d_toolbox",
+    version=versioneer.get_version(),
     author="Felipe N. Schuch",
     author_email="felipe.schuch@edu.pucrs.br",
     description="A set of tools for pre and postprocessing prepared for the high-order Navier-Stokes solver Xcompact3d",
