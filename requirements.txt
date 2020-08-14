@@ -1,0 +1,11 @@
+notebook
+numpy
+scipy
+traitlets
+ipywidgets
+matplotlib
+pandas
+xarray
+dask
+numba
+glob
