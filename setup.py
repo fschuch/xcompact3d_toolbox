@@ -5,7 +5,6 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="xcompact3d_toolbox",
-    version="0.0.1",
     author="Felipe N. Schuch",
     author_email="felipe.schuch@edu.pucrs.br",
     description="A set of tools for pre and postprocessing prepared for the high-order Navier-Stokes solver Xcompact3d",
@@ -17,6 +16,22 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GPL-3.0 License",
         "Operating System :: OS Independent",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering"
     ],
     python_requires='>=3.6',
+    install_requires=[
+        'notebook>=6.1',
+        'numpy>=1.19',
+        'scipy>=1.5'
+        'traitlets>=4.3'
+        'ipywidgets>=7.5'
+        'matplotlib>=3.2'
+        'pandas>=1.1'
+        'xarray>=0.16'
+        'dask>=2.22'
+        'numba>=0.50',
+        'plotly>=4.8'
+    ]
 )

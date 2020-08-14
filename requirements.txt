@@ -8,3 +8,4 @@ pandas
 xarray
 dask
 numba
+plotly
