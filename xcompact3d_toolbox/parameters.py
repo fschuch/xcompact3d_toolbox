@@ -621,7 +621,7 @@ class Parameters(traitlets.HasTraits):
         # Previous time-step if necessary
         if self.itimescheme in [3, 7]:
             count *= 3
-        elif elf.itimescheme == 2:
+        elif self.itimescheme == 2:
             count *= 2
         count  += 1 #pp
         count *= self.nx*self.ny*self.nz*prec*(self.ilast//self.icheckpoint - 1)
