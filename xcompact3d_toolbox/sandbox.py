@@ -283,3 +283,187 @@ class Geometry:
         dis = np.sqrt(dis)
 
         return self._data_array.where(dis > r, remp)
+
+    def ahmed_body(self, scale=1, angle=45.0, wheels=False, remp=True, **pos):
+
+        import math
+
+        s=scale/338 # adimensional and scale factor
+
+        for key in pos.keys():
+            if not key in self._data_array.dims:
+                raise KeyError(f'Invalid key for "pos", it should be a valid dimension')
+
+        if not 'x' in pos:
+            pos['x'] = 1.0
+        if not 'y' in pos:
+            pos['y'] = 0.0
+        if not 'z' in pos:
+            pos['z'] = 0.5 * self._data_array.z[-1].values - ((389*s) / 2)
+        else:
+            # That is because of the mirror in Z
+            raise NotImplementedError(
+                    "Unsupported: Body should be centered in Z")
+
+        if scale != 1:
+            raise NotImplementedError(
+            "Unsupported: Not prepared yet for scale != 1")
+
+        tmp = xr.zeros_like(self._data_array)
+        tmp2 = xr.zeros_like(self._data_array)
+
+
+        # the "corners" are the intersections between the cylinders
+
+        # horizontal
+
+        tmp = tmp.geo.cylinder(center={
+            'x': 100.00*s + pos['x'],
+            'y': 150.00*s + pos['y'],
+            'z':  97.25*s + pos['z']
+        },
+            axis='z',
+            r=100.00*s,
+            height=194.50*s)
+
+
+        tmp = tmp.geo.cylinder(center={
+            'x': 100.00*s + pos['x'],
+            'y': 238.00*s + pos['y'],
+            'z':  97.25*s + pos['z']
+        },
+            axis='z',
+            r=100.00*s,
+            height=194.50*s)
+
+        #vertical
+
+        tmp2 = tmp2.geo.cylinder(
+            center={
+                'x': 100.00*s + pos['x'],
+                'y': 194.00*s + pos['y'],
+                'z': 100.00*s + pos['z']
+            },
+            axis='y',
+            r=100.00*s,
+            height=288.00*s)
+
+        # get intersection
+        tmp = np.logical_and(tmp == True, tmp2 == True)
+
+        del tmp2
+
+        # now the regular cylinders
+
+        tmp = tmp.geo.cylinder(center={
+            'x': 100.00*s + pos['x'],
+            'y': 150.00*s + pos['y'],
+            'z': 147.25*s + pos['z']
+        },
+            axis='z',
+            r=100.00*s,
+            height=94.50*s)
+
+        tmp = tmp.geo.cylinder(center={
+            'x': 100.00*s + pos['x'],
+            'y': 238.00*s + pos['y'],
+            'z': 147.25*s + pos['z']
+        },
+            axis='z',
+            r=100.00*s,
+            height=94.50*s)
+
+        tmp = tmp.geo.cylinder(center={
+            'x': 100.00*s + pos['x'],
+            'y': 194.00*s + pos['y'],
+            'z': 100.00*s + pos['z']
+        },
+            axis='y',
+            r=100.00*s,
+            height=88.00*s)
+
+        if wheels:
+            tmp = tmp.geo.cylinder(center={
+                'x': 200.00*s + pos['x'],
+                'y':  25.00*s + pos['y'],
+                'z':  46.50*s + pos['z']
+            },
+                axis='y',
+                r=15.00*s,
+                height=50.00*s)
+
+            tmp = tmp.geo.cylinder(center={
+                'x': 725.00*s + pos['x'],
+                'y':  25.00*s + pos['y'],
+                'z':  46.50*s + pos['z']
+            },
+                axis='y',
+                r=15.00*s,
+                height=50.00*s)
+
+        # the boxes
+        tmp = tmp.geo.box(x=(           pos['x'],  200.00*s + pos['x']),
+                          y=(150.00*s + pos['y'],  238.00*s + pos['y']),
+                          z=(100.00*s + pos['z'],  194.50*s + pos['z']))
+
+        tmp = tmp.geo.box(x=(100.00*s + pos['x'], 1044.00*s + pos['x']),
+                          y=( 50.00*s + pos['y'],  338.00*s + pos['y']),
+                          z=(           pos['z'],  194.50*s + pos['z'] ))
+
+        # and finally a mirror
+        tmp = tmp.geo.mirror(dim='z')
+
+        # Angle in the back
+        hipo=(93.80/math.sin(math.radians(25)))*s
+        adj = math.cos(math.radians(angle)) * hipo
+        opo = math.sin(math.radians(angle)) * hipo
+
+        x = [1044.00*s - adj + pos['x'], 1044.00*s       + pos['x']]
+        y = [ 338.00*s       + pos['y'],  338.00*s - opo + pos['y']]
+
+        coef = np.polyfit(x, y, 1)
+
+        cut = self._data_array.x * coef[0] + coef[1]
+
+        tmp = tmp.where(self._data_array.y <= cut, False)
+
+        return self._data_array.where(np.logical_not(tmp), remp)
+
+    def mirror(self, dim='x'):
+        return self._data_array.where(
+            self._data_array[dim] <= self._data_array[dim][-1]/2., self._data_array[{
+                dim: slice(None, None, -1)
+            }].values)
+
+    def visual3d(self):
+
+        import plotly.graph_objects as go
+        import plotly.offline as pyo
+        import plotly.io as pio
+
+        pio.renderers.default = 'browser' #'jupyterlab', 'vscode', 'nteract', 'notebook_connected', 'png', 'jpeg', 'jpg', 'svg', 'pdf', 'browser', 'sphinx_gallery'
+
+        X, Y, Z = np.mgrid[0:self._data_array.x[-1].values:self._data_array.x.shape[0]*1j,
+                           0:self._data_array.y[-1].values:self._data_array.y.shape[0]*1j,
+                           0:self._data_array.z[-1].values:self._data_array.z.shape[0]*1j]
+
+        values = (self._data_array*1).values
+
+        fig = go.Figure()
+
+        #fig.add_scatter3d(x=X.flatten(), y=Y.flatten(), z=Z.flatten(), mode='markers',marker=dict(size=0.75))
+
+        fig.add_isosurface(x=X.flatten(),
+                           z=Y.flatten(),
+                           y=Z.flatten(),
+                           value=values.flatten(),
+                           isomin=0.99,
+                           isomax=1,
+                           colorscale='sunset',
+                           lighting=dict(ambient=0.4,
+                                         specular=1.0))
+
+        fig.update_layout(scene_aspectmode='data')
+        fig.update_traces(showscale=False)
+
+        fig.show()
