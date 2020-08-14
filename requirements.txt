@@ -8,4 +8,3 @@ pandas
 xarray
 dask
 numba
-glob
