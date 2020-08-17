@@ -378,7 +378,7 @@ class Parameters(traitlets.HasTraits):
     )
 
     # Auxiliar
-    filename = traitlets.Unicode().tag(
+    filename = traitlets.Unicode(default_value='input.i3d').tag(
         widget = widgets.Text(description='filename')
     )
 
@@ -400,7 +400,7 @@ class Parameters(traitlets.HasTraits):
     mx, my, mz = [traitlets.Int(default_value=1, min=1) for i in range(3)]
 
     dx, dy, dz = [
-        traitlets.Float(min=0.0).tag(
+        traitlets.Float(default_value=0.0625, min=0.0).tag(
             widget = widgets.BoundedFloatText(description=name, min=0.0, max=1e6)
         )
         for name in ['dx', 'dy', 'dz']
@@ -509,28 +509,28 @@ class Parameters(traitlets.HasTraits):
 
     @traitlets.observe('dx', 'nx', 'xlx', 'dy', 'ny', 'yly', 'dz', 'nz', 'zlz')
     def _observe_resolution(self, change):
+        # for name in 'name new old'.split():
+        #     print(f'    {name}:{change[name]}')
         #
         dim = change['name'][-1] # It will be x, y or z
         #
         if change['name'] == f'n{dim}':
             if getattr(self, f'ncl{dim}'):
-                setattr(self, f'm{dim}', getattr(self, f'n{dim}'))
+                setattr(self, f'm{dim}', change['new'])
             else:
-                setattr(self, f'm{dim}', getattr(self, f'n{dim}') - 1)
+                setattr(self, f'm{dim}', change['new'] - 1)
             setattr(
                 self, f'd{dim}',
                 getattr(self, f'{dim}l{dim}') / getattr(self, f'm{dim}')
             )
         if change['name'] == f'd{dim}':
-            setattr(
-                self, f'{dim}l{dim}',
-                getattr(self, f'd{dim}') * getattr(self, f'm{dim}')
-            )
-        if change['name'] == 'xlx':
-            setattr(
-                self, f'd{dim}',
-                getattr(self, f'{dim}l{dim}') / getattr(self, f'm{dim}')
-            )
+            new_l = change['new'] * getattr(self, f'm{dim}')
+            if new_l != getattr(self, f'{dim}l{dim}'):
+                setattr(self, f'{dim}l{dim}',new_l)
+        if change['name'] == f'{dim}l{dim}':
+            new_d = change['new'] / getattr(self, f'm{dim}')
+            if new_d != getattr(self, f'd{dim}'):
+                setattr(self, f'd{dim}', new_d)
 
     @traitlets.observe(
         'nclx1', 'nclxn', 'nclxS1', 'nclxSn',
@@ -679,14 +679,14 @@ class Parameters(traitlets.HasTraits):
                     print(f'Widget not linked for {name}')
 
         #
-        for dim in ['x', 'y', 'z']:
-            traitlets.link(
-                (self, f'_possible_mesh_{dim}'), (self.trait_metadata(f'n{dim}', 'widget'), 'options')
-            )
-        for name in ['p_row', 'p_col']:
-            traitlets.link(
-                (self, f'_possible_{name}'), (self.trait_metadata(f'{name}', 'widget'), 'options')
-            )
+        # for dim in ['x', 'y', 'z']:
+        #     traitlets.link(
+        #         (self, f'_possible_mesh_{dim}'), (self.trait_metadata(f'n{dim}', 'widget'), 'options')
+        #     )
+        # for name in ['p_row', 'p_col']:
+        #     traitlets.link(
+        #         (self, f'_possible_{name}'), (self.trait_metadata(f'{name}', 'widget'), 'options')
+        #     )
         #
         for name in self.trait_names():
             if name == 'numscalar':
@@ -716,7 +716,7 @@ def _validate_mesh(n, ncl, ncl1, ncln, dim):
     if n < pmin:
         # Because of the derivatives' stencil
         raise traitlets.TraitError(
-            f'Mesh points (n{dim}) should be larger than {pmin}')
+            f'{n} is invalid, n{dim} must be larger than {pmin}')
 
     if not ncl:
         n = n - 1
