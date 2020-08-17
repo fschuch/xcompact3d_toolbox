@@ -1,10 +1,13 @@
 import setuptools
 
+import versioneer
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="xcompact3d_toolbox",
+    version=versioneer.get_version(),
     author="Felipe N. Schuch",
     author_email="felipe.schuch@edu.pucrs.br",
     description="A set of tools for pre and postprocessing prepared for the high-order Navier-Stokes solver Xcompact3d",
@@ -14,7 +17,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GPL-3.0 License",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",

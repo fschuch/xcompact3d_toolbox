@@ -12,6 +12,14 @@ Data structure is provided by [xarray](http://xarray.pydata.org/en/stable/), tha
 
 Finally, Xcompact3d Toolbox is fully integrated with the new *Sandbox Flow Configuration* (see [fschuch/Xcompact3d](https://github.com/fschuch/Xcompact3d/)). The idea is to easily provide everything that X3d needs from a Python Jupyter Notebook, like initial conditions, solid geometry, boundary conditions, and the parameters. It makes life easier for beginners, that can run any new flow configuration without worrying about Fortran and [2decomp](http://www.2decomp.org/). For developers, it works as a rapid prototyping tool, to test concepts and then compare results to validate any future Fortran implementations.
 
+## Installation
+
+`pip install xcompact3d-toolbox`
+
+## Documentation
+
+Under preparation.
+
 ## Copyright and License
 
 (c) 2020 [Felipe N. Schuch](https://fschuch.github.io/). All content is under [GPL-3.0 License](https://github.com/fschuch/xcompact3d_toolbox/blob/master/LICENSE).
