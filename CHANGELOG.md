@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1] - 2020-08-17
+### Added
+- Unittest for observations and validations at [parameters.py](./xcompact3d_toolbox/parameters.py), by [@fschuch](https://github.com/fschuch).
+
+## Changed
+- Temporarily disabling the link between parameters and their widgets (see [#2](https://github.com/fschuch/xcompact3d_toolbox/issues/2)), by [@fschuch](https://github.com/fschuch).
+
 ## [0.0.0] - 2020-08-14
 ### Added
 - CHANGELOG.md by [@fschuch](https://github.com/fschuch).
@@ -18,4 +25,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ahmed body as benchmark geometry, mirror and plotting tools, by [@momba98](https://github.com/momba98).
 
 [Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.0.0...HEAD
-[0.0.1]: https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.0.0
+[0.0.0]: https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.0.0
