@@ -437,7 +437,7 @@ class Parameters(traitlets.HasTraits):
                 raise KeyError(f'There is no parameter named {key}!')
             setattr(self, key, arg)
 
-        self.link_widgets()
+        #self.link_widgets()
 
     def __call__(self, *args):
 
