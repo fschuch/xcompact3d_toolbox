@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="xcompact3d_toolbox",
-    version='0.1.2',
+    version='0.1.3',
     author="Felipe N. Schuch",
     author_email="felipe.schuch@edu.pucrs.br",
     description="A set of tools for pre and postprocessing prepared for the high-order Navier-Stokes solver Xcompact3d",
