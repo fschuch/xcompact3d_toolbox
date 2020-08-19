@@ -276,10 +276,10 @@ class Geometry:
             # Notice that r*10 is just to garantee that the values are larger than r
             # and consequently outside the cylinder
             dis = dis.where(
-                self._data_array[axis] <= center[axis] + height, radius * 10
+                self._data_array[axis] <= kwargs.get(axis, 0.0) + height, radius * 10
             )
             dis = dis.where(
-                self._data_array[axis] >= center[axis] - height, radius * 10
+                self._data_array[axis] >= kwargs.get(axis, 0.0) - height, radius * 10
             )
 
         return self._data_array.where(dis > radius, remp)
