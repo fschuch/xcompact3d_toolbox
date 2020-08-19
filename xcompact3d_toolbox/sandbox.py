@@ -124,7 +124,7 @@ def init_dataset(prm):
     :obj:`xarray.Dataset`
         Each variable is initialized with
         ``np.zeros(dtype=xcompact3d_toolbox.mytype)`` and wrapped into a
-        obj:`xarray.Dataset` with the proper size, dimensions, coordinates and
+        :obj:`xarray.Dataset` with the proper size, dimensions, coordinates and
         attributes, check them for more details. The variables are:
 
         * ``bxx1``, ``bxy1``, ``bxz1`` - Inflow boundary condition for ux, uy
