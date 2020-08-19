@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.abspath("../"))
 project = "Xcompact3d-toolbox"
 copyright = "2020, Felipe N. Schuch"
 author = "Felipe N. Schuch"
+master_doc = 'index'
 
 # -- Get version information and date from Git ----------------------------
 
