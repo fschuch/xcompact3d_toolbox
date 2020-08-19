@@ -12,7 +12,7 @@ See https://github.com/fschuch/Xcompact3d/ for more information.
 
 from .array import X3dDataArray, X3dDataset
 from .mesh import get_mesh
-from .param import param
+from .param import mytype
 import numpy as np
 import os.path
 import xarray as xr
@@ -24,7 +24,7 @@ def init_epsi(prm, dask=False):
 
     Parameters
     ----------
-    prm : :obj:`xcompact3d_toolbox.Parameters`
+    prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
         Contains the computational and physical parameters.
 
     dask : bool
@@ -36,10 +36,10 @@ def init_epsi(prm, dask=False):
     :obj:`dict` of :obj:`xarray.DataArray`
         A dictionary containing the epsi(s) array(s):
 
-        * epsi (nx, ny, nz) if iibm != 0;
-        * xepsi (nxraf, ny, nz) if iibm = 2;
-        * yepsi (nx, nyraf, nz) if iibm = 2;
-        * zepsi (nx, ny, nzraf) if iibm = 2.
+        * epsi (nx, ny, nz) if :obj:`iibm` != 0;
+        * xepsi (nxraf, ny, nz) if :obj:`iibm` = 2;
+        * yepsi (nx, nyraf, nz) if :obj:`iibm` = 2;
+        * zepsi (nx, ny, nzraf) if :obj:`iibm` = 2.
 
         Each one initialized with np.zeros(dtype=np.bool) and wrapped into a
         :obj:`xarray.DataArray` with the proper size, dimensions and coordinates.
@@ -48,6 +48,13 @@ def init_epsi(prm, dask=False):
         They should be set to one (True) at the solid points and stay
         zero (False) at the fluid points, some standard geometries are provided
         by the accessor xcompact3d_toolbox.sandbox.geo.
+
+    Examples
+    -------
+
+    >>> prm = x3dx.Parameters()
+    >>> epsi = x3d.sandbox.init_epsi(prm)
+
     """
 
     epsi = {}
@@ -109,14 +116,14 @@ def init_dataset(prm):
 
     Parameters
     ----------
-    prm : :obj:`xcompact3d_toolbox.Parameters`
+    prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
         Contains the computational and physical parameters.
 
     Returns
     -------
     :obj:`xarray.Dataset`
         Each variable is initialized with
-        ``np.zeros(dtype=xcompact3d_toolbox.param['mytype'])`` and wrapped into a
+        ``np.zeros(dtype=xcompact3d_toolbox.mytype)`` and wrapped into a
         obj:`xarray.Dataset` with the proper size, dimensions, coordinates and
         attributes, check them for more details. The variables are:
 
@@ -141,6 +148,12 @@ def init_dataset(prm):
         After setting all values for your flow configuration, the dataset can be
         written to disc with ``ds.x3d.write()``.
 
+    Examples
+    -------
+
+    >>> prm = x3dx.Parameters()
+    >>> dataset = x3d.sandbox.init_dataset(prm)
+
     """
 
     from os import makedirs
@@ -159,7 +172,7 @@ def init_dataset(prm):
     if prm.nclx1 == 2:
         for var in "bxx1 bxy1 bxz1 noise_mod_x1".split():
             ds[var] = xr.DataArray(
-                param["mytype"](0.0),
+                mytype(0.0),
                 dims=["y", "z"],
                 coords=[ds.y, ds.z],
                 attrs={"file_name": os.path.join("data", var)},
@@ -167,21 +180,21 @@ def init_dataset(prm):
     if prm.numscalar != 0:
         if prm.nclxS1 == 2:
             ds["bxphi1"] = xr.DataArray(
-                param["mytype"](0.0),
+                mytype(0.0),
                 dims=["n", "y", "z"],
                 coords=[ds.n, ds.y, ds.z],
                 attrs={"file_name": os.path.join("data", "bxphi1")},
             )
         if prm.nclyS1 == 2:
             ds["byphi1"] = xr.DataArray(
-                param["mytype"](0.0),
+                mytype(0.0),
                 dims=["n", "x", "z"],
                 coords=[ds.n, ds.x, ds.z],
                 attrs={"file_name": os.path.join("data", "byphi1")},
             )
         if prm.nclySn == 2:
             ds["byphin"] = xr.DataArray(
-                param["mytype"](0.0),
+                mytype(0.0),
                 dims=["n", "x", "z"],
                 coords=[ds.n, ds.x, ds.z],
                 attrs={"file_name": os.path.join("data", "byphin")},
@@ -189,14 +202,14 @@ def init_dataset(prm):
     # Initial Condition
     for var in ["ux", "uy", "uz"]:
         ds[var] = xr.DataArray(
-            param["mytype"](0.0),
+            mytype(0.0),
             dims=["x", "y", "z"],
             coords=[ds.x, ds.y, ds.z],
             attrs={"file_name": os.path.join("data", var)},
         )
     if prm.numscalar != 0:
         ds["phi"] = xr.DataArray(
-            param["mytype"](0.0),
+            mytype(0.0),
             dims=["n", "x", "y", "z"],
             coords=[ds.n, ds.x, ds.y, ds.z],
             attrs={"file_name": os.path.join("data", "phi")},
@@ -204,7 +217,7 @@ def init_dataset(prm):
     # Flowrate control
     if prm.nclx1 == 0 and prm.nclxn == 0:
         ds["vol_frc"] = xr.DataArray(
-            param["mytype"](0.0),
+            mytype(0.0),
             dims=["x", "y", "z"],
             coords=[ds.x, ds.y, ds.z],
             attrs={"file_name": os.path.join("data", "vol_frc")},
@@ -217,14 +230,15 @@ def init_dataset(prm):
 class Geometry:
     """An acessor with some standard geometries for :obj:`xarray.DataArray`.
     Use them in combination with the arrays initialized at
-    :obj:`xcompact3d_toolbox.sendbox.init_epsi`.
+    :obj:`xcompact3d_toolbox.sandbox.init_epsi` and the new
+    :obj:`xcompact3d_toolbox.genepsi.gene_epsi_3D`.
     """
 
     def __init__(self, data_array):
         self._data_array = data_array
 
     def cylinder(self, radius=0.5, axis="z", height=None, remp=True, **kwargs):
-        """Draws a cylinder.
+        """Draw a cylinder.
 
         Parameters
         ----------
@@ -254,7 +268,10 @@ class Geometry:
         Examples
         -------
 
-        >>> da.geo.cylinder(x=4, y=5)
+        >>> prm = x3d.Parameters()
+        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> for key in epsi.keys():
+        >>>     epsi[key] = epsi[key].geo.cylinder(x=4, y=5)
 
         """
 
@@ -285,7 +302,7 @@ class Geometry:
         return self._data_array.where(dis > radius, remp)
 
     def box(self, remp=True, **kwargs):
-        """Draws a box.
+        """Draw a box.
 
         Parameters
         ----------
@@ -308,7 +325,10 @@ class Geometry:
         Examples
         -------
 
-        >>> da.geo.box(x=[2,5], y=[0,1])
+        >>> prm = x3d.Parameters()
+        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> for key in epsi.keys():
+        >>>     epsi[key] = epsi[key].geo.box(x=[2,5], y=[0,1])
 
         """
 
@@ -327,7 +347,7 @@ class Geometry:
         return self._data_array.where(tmp, remp)
 
     def square(self, length=1.0, thickness=0.1, remp=True, **kwargs):
-        """Draws a squared frame.
+        """Draw a squared frame.
 
         Parameters
         ----------
@@ -354,7 +374,10 @@ class Geometry:
         Examples
         -------
 
-        >>> da.geo.square(x=5, y=2, z=1)
+        >>> prm = x3d.Parameters()
+        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> for key in epsi.keys():
+        >>>     epsi[key] = epsi[key].geo.square(x=5, y=2, z=1)
 
         """
         for key in kwargs.keys():
@@ -383,7 +406,7 @@ class Geometry:
         return self._data_array.where(tmp, remp)
 
     def sphere(self, radius=0.5, remp=True, **kwargs):
-        """Draws a sphere.
+        """Draw a sphere.
 
         Parameters
         ----------
@@ -408,7 +431,10 @@ class Geometry:
         Examples
         -------
 
-        >>> da.geo.sphere(x=1, y=1, z=1)
+        >>> prm = x3d.Parameters()
+        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> for key in epsi.keys():
+        >>>     epsi[key] = epsi[key].geo.sphere(x=1, y=1, z=1)
 
         """
         for key in kwargs.keys():
@@ -425,7 +451,7 @@ class Geometry:
         return self._data_array.where(dis > radius, remp)
 
     def ahmed_body(self, scale=1.0, angle=45.0, wheels=False, remp=True, **kwargs):
-        """Draws an Ahmed body.
+        """Draw an Ahmed body.
 
         Parameters
         ----------
@@ -456,7 +482,10 @@ class Geometry:
         Examples
         -------
 
-        >>> da.geo.ahmed_body(x=2)
+        >>> prm = x3d.Parameters()
+        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> for key in epsi.keys():
+        >>>     epsi[key] = epsi[key].geo.ahmed_body(x=2)
 
         """
 
@@ -637,7 +666,10 @@ class Geometry:
         Examples
         -------
 
-        >>> da.geo.mirror('x')
+        >>> prm = x3d.Parameters()
+        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> for key in epsi.keys():
+        >>>     epsi[key] = epsi[key].geo.cylinder(x=4, y=5).geo.mirror("x")
 
         """
         return self._data_array.where(

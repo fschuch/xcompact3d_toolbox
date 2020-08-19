@@ -1,4 +1,4 @@
-from .param import param
+from .param import mytype
 import scipy.sparse as sp
 
 def SecondDerivative(n, d, ncl1=2, ncln=2, npaire=1):
@@ -8,7 +8,7 @@ def SecondDerivative(n, d, ncl1=2, ncln=2, npaire=1):
     rhs = sp.diags([-1., 16., -30., 16., -1.],
                   offsets=[-2, -1, 0, 1, 2],
                   shape=(n,n),
-                  dtype=param['mytype'],
+                  dtype=mytype,
                   format="lil")
 
     # Boundary Conditions at i = 0
@@ -92,7 +92,7 @@ def FirstDerivative(n, d, ncl1=2, ncln=2, npaire=1):
     rhs = sp.diags([1., -8., 8., -1],
                   offsets=[-2, -1, 1, 2],
                   shape=(n,n),
-                  dtype=param['mytype'],
+                  dtype=mytype,
                   format="lil")
 
     # Boundary Conditions at i = 0

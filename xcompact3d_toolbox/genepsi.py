@@ -22,15 +22,15 @@ import numpy as np
 import xarray as xr
 from .array import X3dDataArray, X3dDataset
 from .mesh import get_mesh
-from .param import param
+from .param import mytype
 
 
 def gene_epsi_3D(epsi_in_dict, prm):
     """This function generates all the auxiliar files necessary for our
     customize IBM, based on Lagrange reconstructions. The arrays can be
-    initialized with ``xcompact3d_toolbox.sandbox.init_epsi()``, then, some
+    initialized with :obj:`xcompact3d_toolbox.sandbox.init_epsi()`, then, some
     standard geometries are provided by the accessor
-    ``xcompact3d_toolbox.sandbox.geo``.
+    :obj:`xcompact3d_toolbox.sandbox.geo`.
     Notice that you can apply our own routines for your own objects.
     The main outputs of the function are written to disc at files obj-x.csv,
     obj-y.csv and obj-z.csv, they will be used by Xcompact3d and the sandbox
@@ -43,7 +43,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
     ----------
     epsi_in_dict : :obj:`dict` of :obj:`xarray.DataArray`
         A dictionary containing the epsi(s) array(s).
-    prm : :obj:`xcompact3d_toolbox.Parameters`
+    prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
         Contains the computational and physical parameters.
 
     Returns
@@ -51,6 +51,15 @@ def gene_epsi_3D(epsi_in_dict, prm):
     :obj:`xarray.Dataset`
         All computed variables are returned in a Data set, but just for
         reference, since all the relevant values are written to the disc.
+
+    Examples
+    -------
+
+    >>> prm = x3d.Parameters()
+    >>> epsi = x3d.sandbox.init_epsi(prm)
+    >>> for key in epsi.keys():
+    >>>     epsi[key] = epsi[key].geo.cylinder(x=4, y=5)
+    >>> x3d.gene_epsi_3D(epsi, prm)
 
     """
 

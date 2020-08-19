@@ -18,7 +18,7 @@ and :obj:`xarray.Dataset`, all the details are described bellow.
     http://xarray.pydata.org/en/stable/
 """
 
-from .param import param
+from .param import mytype
 from .derive import FirstDerivative, SecondDerivative
 import xarray as xr
 import numpy as np
@@ -46,7 +46,7 @@ class X3dDataset:
 
         Parameters
         ----------
-        prm : :obj:`xcompact3d_toolbox.Parameters`
+        prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
             Contains the computational and physical parameters.
 
         Examples
@@ -90,7 +90,7 @@ class X3dDataset:
             input_core_dims=[[dim]],
             output_core_dims=[[dim]],
             dask="parallelized",
-            output_dtypes=[param["mytype"]],
+            output_dtypes=[mytype],
             kwargs={"x": self._data_set[dim], "axis": -1, "initial": 0.0},
         )
 
@@ -122,14 +122,14 @@ class X3dDataset:
             self._data_set,
             input_core_dims=[[dim]],
             dask="parallelized",
-            output_dtypes=[param["mytype"]],
+            output_dtypes=[mytype],
             kwargs={"x": self._data_set[dim], "axis": -1},
         )
 
     def pencil_decomp(self, dim=None, chunks=None):
         """Coerce all arrays in this dataset into dask arrays.
 
-        It applies ``chunk=-1`` for all coordinates listed in ``dim``, with means
+        It applies ``chunk=-1`` for all coordinates listed in ``dim``, which means
         no decompositon, and ``'auto'`` to the others, resulting in a pencil
         decomposition for parallel evaluation.
 
@@ -197,7 +197,7 @@ class X3dDataArray:
 
         Parameters
         ----------
-        prm : :obj:`xcompact3d_toolbox.Parameters`
+        prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
             Contains the computational and physical parameters.
         filename : str, optional
             Filename for binary file (default is :obj:`None`).
@@ -230,7 +230,7 @@ class X3dDataArray:
                 align = []
                 for i in reversed(sorted(self._data_array.dims)):
                     align.append(self._data_array.get_axis_num(i))
-                self._data_array.values.astype(param["mytype"]).transpose(align).tofile(
+                self._data_array.values.astype(mytype).transpose(align).tofile(
                     filename + ".bin"
                 )
 
@@ -286,7 +286,7 @@ class X3dDataArray:
     def pencil_decomp(self, dim=None, chunks=None):
         """Coerce the array into dask array.
 
-        It applies ``chunk=-1`` for all coordinates listed in ``dim``, with means
+        It applies ``chunk=-1`` for all coordinates listed in ``dim``, which means
         no decompositon, and ``'auto'`` to the others, resulting in a pencil
         decomposition for parallel evaluation.
 
@@ -356,7 +356,7 @@ class X3dDataArray:
 
         Notes
         -----
-        The **atribute** ``BC`` is automaticaly defined for ``ux``, ``uy``,
+        The **atribute** ``BC`` is automatically defined for ``ux``, ``uy``,
         ``uz``, ``pp`` and ``phi`` when read from the disc with
         :obj:`xcompact3d_toolbox.io.readfield`.
         """
@@ -380,7 +380,7 @@ class X3dDataArray:
             output_core_dims=[[dim]],
             dask="parallelized",
             vectorize=True,
-            output_dtypes=[param["mytype"]],
+            output_dtypes=[mytype],
         )
 
     def second_derivative(self, dim):
@@ -423,7 +423,7 @@ class X3dDataArray:
 
         Notes
         -----
-        The **atribute** ``BC`` is automaticaly defined for ``ux``, ``uy``,
+        The **atribute** ``BC`` is automatically defined for ``ux``, ``uy``,
         ``uz``, ``pp`` and ``phi`` when read from the disc with
         :obj:`xcompact3d_toolbox.io.readfield`.
         """
@@ -446,5 +446,5 @@ class X3dDataArray:
             output_core_dims=[[dim]],
             dask="parallelized",
             vectorize=True,
-            output_dtypes=[param["mytype"]],
+            output_dtypes=[mytype],
         )

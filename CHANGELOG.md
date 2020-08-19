@@ -25,5 +25,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ahmed body as benchmark geometry, mirror and plotting tools, by [@momba98](https://github.com/momba98).
 
 [Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.3...HEAD
-[0.1.3]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.0.0...v0.1.3
+[0.1.3]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.0.0...v0.1.3
 [0.0.0]: https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.0.0

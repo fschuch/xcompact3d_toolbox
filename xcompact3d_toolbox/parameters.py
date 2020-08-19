@@ -6,7 +6,7 @@ import numpy as np
 import math
 import traitlets
 import ipywidgets as widgets
-from .param import param
+from .param import mytype
 from .mesh import get_mesh
 from .io import i3d_to_dict, dict_to_i3d
 
@@ -189,7 +189,7 @@ def divisorGenerator(n):
     """Yelds the possibles divisors for ``n``.
 
     Especially useful to compute the possible values for :obj:`p_row` and :obj:`p_col`
-    as functions of the number of computational cores available (:obj`ncores`).
+    as functions of the number of computational cores available (:obj:`ncores`).
     Zero is also included in the case of auto-tunning, i.e., ``p_row=p_col=0``.
 
     Parameters
@@ -224,7 +224,7 @@ class Parameters(traitlets.HasTraits):
 
     It is a framework that lets Python classes have attributes with type checking,
     dynamically calculated default values, and ‘on change’ callbacks.
-    In addition, there are `ipywidgets`_ for an user friendly interface.
+    In addition, there are `ipywidgets`_ for a friendly user interface.
 
     .. warning:: There is a bug reported affecting the widgets `#2`_,
         they are not working properly at the moment.
@@ -835,7 +835,7 @@ class Parameters(traitlets.HasTraits):
             ],
         ),
     )
-    """int: Chooses LES mode, they are:
+    """int: Chooses LES model, they are:
 
     * 0 - No model (DNS);
     * 1 - Phys Smag;
@@ -1297,7 +1297,7 @@ class Parameters(traitlets.HasTraits):
                     return "%3.1f %s" % (num, x)
                 num /= step_unit
 
-        prec = 4 if param["mytype"] == np.float32 else 8
+        prec = 4 if mytype == np.float32 else 8
 
         # Restart Size from tools.f90
         count = 3 + self.numscalar  # ux, uy, uz, phi
@@ -1469,14 +1469,14 @@ class Parameters(traitlets.HasTraits):
 
         Returns
         -------
-        dict
+        :obj:`dict` of :obj:`numpy.ndarray`
             It contains the mesh point locations at three dictionary keys,
-            for **x**, **y** and **z**. The values are stored as :obj:`numpy.ndarray`.
+            for **x**, **y** and **z**.
 
         Examples
         -------
 
-        >>> prm = xcompact3d_toolbox.Parameters(filename = 'example.i3d')
+        >>> prm = xcompact3d_toolbox.Parameters()
         >>> prm.get_mesh()
 
         """

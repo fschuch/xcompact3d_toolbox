@@ -1,11 +1,28 @@
+# -*- coding: utf-8 -*-
 """
-.. module:: io
-    :synopsis: Handles binary files from Xcompact3d, writting and reading from
-               disc. A xdmf writer for visualization on external tools.
-.. moduleauthor:: Felipe N. Schuch <felipe.schuch@edu.purcs.br>
+Usefull functions to read binary fields from the disc.
+
+Notes
+----
+
+* Writing is handled by the methods at :obj:`xcompact3d_toolbox.array`;
+
+* The parameters file ``.i3d`` is handled by the methods at :obj:`xcompact3d_toolbox.parameters.Parameters`.
+
+* The integration with Xcompact3d is in prerelease as well (see `fschuch/Xcompact3d`_).
+  `#3`_ was proposed in order to increase the synergy between Xcompact3d and this
+  Python Package. Following the new folder structure makes it possible to
+  automatically obtain the shape and timestamp for each file.
+
+.. _#3:
+    https://github.com/fschuch/Xcompact3d/issues/3
+
+.. _fschuch/Xcompact3d:
+    https://github.com/fschuch/Xcompact3d
+
 """
 
-from .param import param, boundary_condition
+from .param import mytype, boundary_condition
 import numpy as np
 import xarray as xr
 import os.path
@@ -13,32 +30,36 @@ import glob
 
 
 def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
-    """This functions reads a binary field from Xcompact3d with numpy.fromfile
-    and wraps it into a xarray.DataArray with the appropriate dimensions,
-    coordinates and attributes. The properties are automaticaly inferted if the
+    """This functions reads a binary field from Xcompact3d with :obj:`numpy.fromfile`
+    and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
+    coordinates and attributes.
+
+    The properties are automatically inferted if the
     file is inside Xcompact3d's output folders structure, i.e.:
-        - 3d_snapshots (nx, ny, nz);
-        - xy_planes (nx, ny);
-        - xz_planes (nx, nz);
-        - yz_planes (ny, nz).
+
+    * 3d_snapshots (nx, ny, nz);
+    * xy_planes (nx, ny);
+    * xz_planes (nx, nz);
+    * yz_planes (ny, nz).
+
     Attributes include the proper boundary conditions for derivatives if the
-    file prefix is 'ux', 'uy', 'uz', 'phi' or 'pp'. Data type is defined by
-    xcompact3d_toolbox.param['mytype'].
+    file prefix is ``ux``, ``uy``, ``uz``, ``phi`` or ``pp``. Data type is
+    defined by :obj:`xcompact3d_toolbox.mytype`.
 
     Parameters
     ----------
     filename : str
         Name of the file to be read.
-    prm : Class xcompact3d_toolbox.Parameters
+    prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
         Contains the computational and physical parameters.
     dims : 'auto' or hashable or sequence of hashable
         Name(s) of the data dimension(s). Must be either a hashable
         (only for 1D data) or a sequence of hashables with length equal to the
-        number of dimensions (see xarray.DataArray). If dims='auto' (default),
+        number of dimensions (see :obj:`xarray.DataArray`). If dims='auto' (default),
         dimensions are inferted from the folder structure.
     coords : sequence or dict of array_like objects, optional
         Coordinates (tick labels) to use for indexing along each dimension (see
-        xarray.DataArray). If dims='auto' (default), coordinates are inferred
+        :obj:`xarray.DataArray`). If dims='auto' (default), coordinates are inferred
         from the folder structure.
     name : str or None, optional
         Name of this array. If dims='auto' (default), name is inferred
@@ -49,9 +70,33 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
 
     Returns
     -------
-    xarray.DataArray
-        Data array containing values read from disc.
+    :obj:`xarray.DataArray`
+        Data array containing values read from the disc.
 
+    Examples
+    -------
+
+    >>> prm = x3d.Parameters()
+
+    >>> xcompact3d_toolbox.mytype = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
+    >>> xcompact3d_toolbox.mytype = np.float32 # otherwise
+
+    In the following cases, coordinates and dimensions are infered from the
+    folder containing the file:
+
+    >>> ux = x3d.readfield('./data/3d_snapshots/ux-00000400.bin', prm)
+    >>> uy = x3d.readfield('./data/xy_planes/uy-00000400.bin', prm)
+    >>> uz = x3d.readfield('./data/xz_planes/uz-00000400.bin', prm)
+
+    It is possible to handle the filenames from previous X3d's versions by
+    setting coordinates manually:
+
+    >>> ux = x3d.readfield(
+    ...     './data/ux0010',
+    ...     prm,
+    ...     dims = ["x", "y", "z"],
+    ...     coords = prm.get_mesh()
+    ... )
     """
 
     if dims.lower() == "auto":
@@ -92,7 +137,7 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
             shape.append(value.size)
 
     return xr.DataArray(
-        np.fromfile(filename, dtype=param["mytype"]).reshape(shape, order="F"),
+        np.fromfile(filename, dtype=mytype).reshape(shape, order="F"),
         dims=dims,
         coords=coords,
         name=name,
@@ -101,20 +146,39 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
 
 
 def read_all(filename_pattern, prm):
-    """Reads all files matching the filename_pattern with
-    xcompact3d_toolbox.readfield and concatenates them into a time series.
+    """Reads all files matching the ``filename_pattern`` with
+    :obj:`xcompact3d_toolbox.io.readfield` and concatenates them into a time series.
+
+    .. note:: Make sure to have enough memory to load all files at same time.
 
     Parameters
     ----------
-    filename_pattern : string
+    filename_pattern : str
         A specified pattern according to the rules used by the Unix shell.
-    prm : Class xcompact3d_toolbox.Parameters
+    prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
         Contains the computational and physical parameters.
+    **kwargs :
+        Arguments to send to :obj:`xcompact3d_toolbox.readfield`.
 
     Returns
     -------
-    xarra.DataArray
-        Data array containing values read from disc.
+    :obj:`xarray.DataArray`
+        Data array containing values read from the disc.
+
+    Examples
+    -------
+
+    >>> prm = x3d.Parameters()
+
+    >>> x3d.mytype = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
+    >>> x3d.mytype = np.float32 # otherwise
+
+    In the following cases, coordinates and dimensions are infered from the
+    folder containing the file and time from the filenames:
+
+    >>> ux = x3d.read_all('./data/3d_snapshots/ux-*.bin', prm)
+    >>> uy = x3d.read_all('./data/xy_planes/uy-*.bin', prm)
+    >>> uz = x3d.read_all('./data/xz_planes/uz-0000??00.bin', prm)
 
     """
 
@@ -123,10 +187,10 @@ def read_all(filename_pattern, prm):
     dt = prm.dt
     t = dt * np.array(
         [
-            param["mytype"](os.path.basename(file).split("-")[-1].split(".")[0])
+            mytype(os.path.basename(file).split("-")[-1].split(".")[0])
             for file in filenames
         ],
-        dtype=param["mytype"],
+        dtype=mytype,
     )
 
     # numscalar = prm.dict['BasicParam'].get('numscalar', 0)
@@ -143,7 +207,28 @@ def read_all(filename_pattern, prm):
 
 
 def write_xdmf(prm):
+    """Writes four xdmf files:
 
+    * ``./data/3d_snapshots.xdmf`` for 3D snapshots in ``./data/3d_snapshots/*``;
+    * ``./data/xy_planes.xdmf`` for planes in ``./data/xy_planes/*``;
+    * ``./data/xz_planes.xdmf`` for planes in ``./data/xz_planes/*``;
+    * ``./data/yz_planes.xdmf`` for planes in ``./data/yz_planes/*``.
+
+    Shape and time are inferted from folder structure and filenames.
+    File list is obtained automatically with :obj:`glob`.
+
+    Parameters
+    ----------
+    prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
+        Contains the computational and physical parameters.
+
+    Examples
+    -------
+
+    >>> prm = x3d.Parameters()
+    >>> x3d.write_xdmf(prm)
+
+    """
     from tqdm.notebook import tqdm as tqdm
 
     for folder in ["3d_snapshots", "xy_planes", "xz_planes", "yz_planes"]:
@@ -181,7 +266,7 @@ def write_xdmf(prm):
         elif folder == "yz_planes":
             nx, dx = 0, 0
 
-        prec = 8 if param["mytype"] == np.float64 else 4
+        prec = 8 if mytype == np.float64 else 4
 
         ibm_flag = "ibm" in prefixes
 
@@ -252,10 +337,6 @@ def write_xdmf(prm):
 
 
 def i3d_to_dict(filename="input.i3d"):
-    """
-    This function reads the .i3d file from Xcompact3d and
-    returns it into a Python dictionary
-    """
 
     f = open(filename)
 
