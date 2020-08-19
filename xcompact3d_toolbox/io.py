@@ -11,7 +11,8 @@ import xarray as xr
 import os.path
 import glob
 
-def readfield(filename, prm, dims='auto', coords=None, name=None, attrs=None):
+
+def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
     """This functions reads a binary field from Xcompact3d with numpy.fromfile
     and wraps it into a xarray.DataArray with the appropriate dimensions,
     coordinates and attributes. The properties are automaticaly inferted if the
@@ -53,25 +54,25 @@ def readfield(filename, prm, dims='auto', coords=None, name=None, attrs=None):
 
     """
 
-    if dims.lower() == 'auto':
+    if dims.lower() == "auto":
 
         path, file = os.path.split(filename)
         path = os.path.basename(path)
 
-        name = os.path.basename(file).split('-')[0]
-        if 'phi' in name:
-            name = 'phi'
+        name = os.path.basename(file).split("-")[0]
+        if "phi" in name:
+            name = "phi"
 
-        mesh = prm.mesh.copy()
+        mesh = prm.get_mesh()
 
-        if path == '3d_snapshots':
+        if path == "3d_snapshots":
             pass
-        elif path == 'xy_planes':
-            del mesh['z']
-        elif path == 'xz_planes':
-            del mesh['y']
-        elif path == 'yz_planes':
-            del mesh['x']
+        elif path == "xy_planes":
+            del mesh["z"]
+        elif path == "xz_planes":
+            del mesh["y"]
+        elif path == "yz_planes":
+            del mesh["x"]
 
         shape = []
         for key, value in mesh.items():
@@ -83,7 +84,7 @@ def readfield(filename, prm, dims='auto', coords=None, name=None, attrs=None):
         # Setting BC
         if attrs == None:
             attrs = {}
-        attrs['BC'] = boundary_condition(prm, name)
+        attrs["BC"] = boundary_condition(prm, name)
 
     else:
         shape = []
@@ -91,12 +92,13 @@ def readfield(filename, prm, dims='auto', coords=None, name=None, attrs=None):
             shape.append(value.size)
 
     return xr.DataArray(
-        np.fromfile(filename, dtype=param['mytype']).reshape(shape, order='F'),
+        np.fromfile(filename, dtype=param["mytype"]).reshape(shape, order="F"),
         dims=dims,
         coords=coords,
         name=name,
-        attrs=attrs
+        attrs=attrs,
     )
+
 
 def read_all(filename_pattern, prm):
     """Reads all files matching the filename_pattern with
@@ -119,40 +121,51 @@ def read_all(filename_pattern, prm):
     filenames = sorted(glob.glob(filename_pattern))
 
     dt = prm.dt
-    t = dt*np.array([param['mytype'](os.path.basename(file).split('-')[-1].split('.')[0]) for file in filenames], dtype=param['mytype'])
+    t = dt * np.array(
+        [
+            param["mytype"](os.path.basename(file).split("-")[-1].split(".")[0])
+            for file in filenames
+        ],
+        dtype=param["mytype"],
+    )
 
-        #numscalar = prm.dict['BasicParam'].get('numscalar', 0)
+    # numscalar = prm.dict['BasicParam'].get('numscalar', 0)
 
-        #if numscalar > 1:
-        #    mesh['n'] = [int(os.path.basename(file).split('-')[0][-1])]
+    # if numscalar > 1:
+    #    mesh['n'] = [int(os.path.basename(file).split('-')[0][-1])]
 
     from tqdm.notebook import tqdm as tqdm
 
     return xr.concat(
         [readfield(file, prm) for file in tqdm(filenames, desc=filename_pattern)],
-        dim='t'
-    ).assign_coords(coords={'t': t})
+        dim="t",
+    ).assign_coords(coords={"t": t})
+
 
 def write_xdmf(prm):
 
     from tqdm.notebook import tqdm as tqdm
 
-    for folder in ['3d_snapshots', 'xy_planes', 'xz_planes', 'yz_planes']:
+    for folder in ["3d_snapshots", "xy_planes", "xz_planes", "yz_planes"]:
 
-        xdmf = os.path.join('data', f'{folder}.xdmf')
-        filepath = os.path.join('data', folder, '*')
+        xdmf = os.path.join("data", f"{folder}.xdmf")
+        filepath = os.path.join("data", folder, "*")
 
         filenames = glob.glob(filepath)
         if len(filenames) == 0:
             continue
 
         prefixes = sorted(
-            set([os.path.basename(file).split('-')[0] for file in filenames]))
+            set([os.path.basename(file).split("-")[0] for file in filenames])
+        )
         suffixes = sorted(
-            set([
-                os.path.basename(file).split('-')[-1].split('.')[0]
-                for file in filenames
-            ]))
+            set(
+                [
+                    os.path.basename(file).split("-")[-1].split(".")[0]
+                    for file in filenames
+                ]
+            )
+        )
 
         mesh = prm.mesh
 
@@ -161,38 +174,38 @@ def write_xdmf(prm):
 
         dt = prm.dt * (float(suffixes[1]) - float(suffixes[0]))
 
-        if folder == 'xy_planes':
+        if folder == "xy_planes":
             nz, dz = 0, 0
-        elif folder == 'xz_planes':
+        elif folder == "xz_planes":
             ny, dy = 0, 0
-        elif folder == 'yz_planes':
+        elif folder == "yz_planes":
             nx, dx = 0, 0
 
-        prec = 8 if param['mytype'] == np.float64 else 4
+        prec = 8 if param["mytype"] == np.float64 else 4
 
-        ibm_flag = 'ibm' in prefixes
+        ibm_flag = "ibm" in prefixes
 
-        with open(xdmf, 'w') as f:
+        with open(xdmf, "w") as f:
             f.write('<?xml version="1.0" ?>\n')
             f.write(' <!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>\n')
             f.write(
                 ' <Xdmf xmlns:xi="http://www.w3.org/2001/XInclude" Version="2.0">\n'
             )
-            f.write(' <Domain>\n')
+            f.write(" <Domain>\n")
             f.write('     <Topology name="topo" TopologyType="3DCoRectMesh"\n')
             f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
-            f.write('     </Topology>\n')
+            f.write("     </Topology>\n")
             f.write('     <Geometry name="geo" Type="ORIGIN_DXDYDZ">\n')
-            f.write('         <!-- Origin -->\n')
+            f.write("         <!-- Origin -->\n")
             f.write('         <DataItem Format="XML" Dimensions="3">\n')
-            f.write('         0.0 0.0 0.0\n')
-            f.write('         </DataItem>\n')
-            f.write('         <!-- DxDyDz -->\n')
+            f.write("         0.0 0.0 0.0\n")
+            f.write("         </DataItem>\n")
+            f.write("         <!-- DxDyDz -->\n")
             f.write('         <DataItem Format="XML" Dimensions="3">\n')
-            f.write(f'           {dz}  {dy}  {dx}\n')
-            f.write('         </DataItem>\n')
-            f.write('     </Geometry>\n')
-            f.write('\n')
+            f.write(f"           {dz}  {dy}  {dx}\n")
+            f.write("         </DataItem>\n")
+            f.write("     </Geometry>\n")
+            f.write("\n")
             f.write(
                 '     <Grid Name="TimeSeries" GridType="Collection" CollectionType="Temporal">\n'
             )
@@ -200,13 +213,13 @@ def write_xdmf(prm):
             f.write(
                 '             <DataItem Format="XML" NumberType="Float" Dimensions="3">\n'
             )
-            f.write('             <!--Start, Stride, Count-->\n')
-            f.write(f'             0.0 {dt}\n')
-            f.write('             </DataItem>\n')
-            f.write('         </Time>\n')
+            f.write("             <!--Start, Stride, Count-->\n")
+            f.write(f"             0.0 {dt}\n")
+            f.write("             </DataItem>\n")
+            f.write("         </Time>\n")
             for suffix in tqdm(suffixes, desc=xdmf):
-                f.write('\n')
-                f.write('\n')
+                f.write("\n")
+                f.write("\n")
                 f.write(f'         <Grid Name="{suffix}" GridType="Uniform">\n')
                 f.write(
                     '             <Topology Reference="/Xdmf/Domain/Topology[1]"/>\n'
@@ -215,34 +228,34 @@ def write_xdmf(prm):
                     '             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>\n'
                 )
                 for prefix in prefixes:
-                    f.write(
-                        f'             <Attribute Name="{prefix}" Center="Node">\n')
+                    f.write(f'             <Attribute Name="{prefix}" Center="Node">\n')
                     f.write('                <DataItem Format="Binary"\n')
                     f.write(
                         f'                 DataType="Float" Precision="{prec}" Endian="little" Seek="0" \n'
                     )
                     f.write(f'                 Dimensions="{nz} {ny} {nx}">\n')
-                    if ibm_flag and prefix == 'ibm':
+                    if ibm_flag and prefix == "ibm":
                         f.write(
-                            f'                   ./{folder}/{prefix}-{suffixes[0]}.bin\n'
+                            f"                   ./{folder}/{prefix}-{suffixes[0]}.bin\n"
                         )
                     else:
                         f.write(
-                            f'                   ./{folder}/{prefix}-{suffix}.bin\n'
+                            f"                   ./{folder}/{prefix}-{suffix}.bin\n"
                         )
-                    f.write('                </DataItem>\n')
-                    f.write('             </Attribute>\n')
-                f.write('         </Grid>\n')
-            f.write('\n')
-            f.write('     </Grid>\n')
-            f.write(' </Domain>\n')
-            f.write('</Xdmf>')
+                    f.write("                </DataItem>\n")
+                    f.write("             </Attribute>\n")
+                f.write("         </Grid>\n")
+            f.write("\n")
+            f.write("     </Grid>\n")
+            f.write(" </Domain>\n")
+            f.write("</Xdmf>")
 
-def i3d_to_dict(filename='input.i3d'):
-    '''
+
+def i3d_to_dict(filename="input.i3d"):
+    """
     This function reads the .i3d file from Xcompact3d and
     returns it into a Python dictionary
-    '''
+    """
 
     f = open(filename)
 
@@ -250,35 +263,35 @@ def i3d_to_dict(filename='input.i3d'):
 
     for line in f:
         # Remove comments
-        line = line.partition('!')[0].replace(' ', '')
+        line = line.partition("!")[0].replace(" ", "")
         # Remove spaces
         line = " ".join(line.split())
 
-        if line == '':  # Cycle if line is empty
+        if line == "":  # Cycle if line is empty
             continue
 
         # Beginning of a new group
-        if line[0] == '&':
+        if line[0] == "&":
             key = line[1:]
             dict_inner = {}
             continue
 
         # End of the group
-        if line.lower() == '/end':
+        if line.lower() == "/end":
             dict_outer[key] = dict_inner
             continue
 
         # Get variable's name and value
-        param = line.partition('=')[0]
-        value = line.partition('=')[-1]
+        param = line.partition("=")[0]
+        value = line.partition("=")[-1]
 
         try:
             # Converting from string according to datatype
             if value[0] == "'" and value[-1] == "'":  # String
                 value = value[1:-1]
-            elif value.lower() == '.false.':  # Bool
+            elif value.lower() == ".false.":  # Bool
                 value = False
-            elif value.lower() == '.true.':  # Bool
+            elif value.lower() == ".true.":  # Bool
                 value = True
             elif "." in value:  # Float
                 value = float(value)
@@ -289,7 +302,7 @@ def i3d_to_dict(filename='input.i3d'):
             continue
 
         if "(" in param and ")" == param[-1]:  # Param is a list
-            param = param.split('(')[0]
+            param = param.split("(")[0]
             if param not in dict_inner:
                 dict_inner[param] = []
             dict_inner[param].append(value)
@@ -300,33 +313,34 @@ def i3d_to_dict(filename='input.i3d'):
 
     return dict_outer
 
-def dict_to_i3d(dict, filename='input.i3d'):
-    try:
-        with open(filename, 'w') as file:
 
-            file.write('! -*- mode: f90 -*-\n')
+def dict_to_i3d(dict, filename="input.i3d"):
+    try:
+        with open(filename, "w") as file:
+
+            file.write("! -*- mode: f90 -*-\n")
 
             for blockkey, block in dict.items():
-                if blockkey == 'auxiliar':
+                if blockkey == "auxiliar":
                     continue
 
-                file.write('\n')
-                file.write('!===================\n')
-                file.write('&' + blockkey + '\n')
-                file.write('!===================\n')
-                file.write('\n')
+                file.write("\n")
+                file.write("!===================\n")
+                file.write("&" + blockkey + "\n")
+                file.write("!===================\n")
+                file.write("\n")
 
                 for paramkey, param in block.items():
                     # Check if param is a list or not
                     if isinstance(param, list):
                         for n, p in enumerate(param):
-                            file.write(f'{paramkey}({n+1}) = {p}\n')
+                            file.write(f"{paramkey}({n+1}) = {p}\n")
                     elif isinstance(param, str):
-                        file.write(f'{paramkey} = \'{param}\'\n')
+                        file.write(f"{paramkey} = '{param}'\n")
                     else:
-                        file.write(f'{paramkey} = {param}\n')
-                file.write('\n')
-                file.write('/End\n')
+                        file.write(f"{paramkey} = {param}\n")
+                file.write("\n")
+                file.write("/End\n")
 
     except IOError as e:
         print("Couldn't open or write to file (%s)." % e)

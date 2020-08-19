@@ -1,8 +1,15 @@
 # Xcompact3d Toolbox
 
+![Build Status](https://github.com/fschuch/xcompact3d_toolbox/workflows/Python%20package/badge.svg)
+[![PyPI version](https://badge.fury.io/py/xcompact3d-toolbox.svg)](https://badge.fury.io/py/xcompact3d-toolbox)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 It is a Python package designed to handle the pre and postprocessing of
 the high-order Navier-Stokes solver Xcompact3d. It aims to help users and
 code developers with a set of tools and automated processes.
+
+**Xcompact3d Toolbox** is still in pre-release, be aware that new features are
+going to be added to it and the current features may change with no further notice.
 
 The physical and computational parameters are built on top of [traitlets](https://traitlets.readthedocs.io/en/stable/index.html),
 a framework that lets Python classes have attributes with type checking, dynamically calculated default values, and ‘on change’ callbacks.

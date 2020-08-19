@@ -1,8 +1,13 @@
-"""
-.. module:: sandbox
-    :synopsis: Initializes and provides to the user all variables that are
-               expected by Xcompact3d and the new sandbox flow configuration.
-.. moduleauthor:: Felipe N. Schuch <felipe.schuch@edu.purcs.br>
+# -*- coding: utf-8 -*-
+"""The new **Sandbox Flow Configuration** aims to break many of the
+barriers to entry in a Navier-Stokes solver.
+The idea is to easily provide everything that X3d needs from a Python Jupyter
+Notebook, like initial conditions, solid geometry, boundary conditions, and the
+parameters. For students in computational fluid dynamics, it provides a
+direct hands-on experience and a safe place for practicing and learning, while
+for advanced users and code developers, it works as a rapid prototyping tool.
+
+See https://github.com/fschuch/Xcompact3d/ for more information.
 """
 
 from .array import X3dDataArray, X3dDataset
@@ -12,35 +17,37 @@ import numpy as np
 import os.path
 import xarray as xr
 
+
 def init_epsi(prm, dask=False):
-    """Initilizes the arrays that defines the solid geometry that is going to be
-    inserted into the Navier-Stokes solver.
+    """Initilizes the :math:`\\epsilon` arrays that define the solid geometry
+    for the Immersed Boundary Method.
 
     Parameters
     ----------
-    prm : Class xcompact3d_toolbox.Parameters
+    prm : :obj:`xcompact3d_toolbox.Parameters`
         Contains the computational and physical parameters.
+
     dask : bool
         Defines the lazy parallel execution with dask arrays.
-        See xarray.x3d.pencil_decomp().
+        See :obj:`xcompact3d_toolbox.x3d.pencil_decomp()`.
 
     Returns
     -------
-    dict
+    :obj:`dict` of :obj:`xarray.DataArray`
         A dictionary containing the epsi(s) array(s):
-            - epsi (nx, ny, nz) if iibm != 0;
-            - xepsi (nxraf, ny, nz) if iibm = 2;
-            - yepsi (nx, nyraf, nz) if iibm = 2;
-            - zepsi (nx, ny, nzraf) if iibm = 2.
+
+        * epsi (nx, ny, nz) if iibm != 0;
+        * xepsi (nxraf, ny, nz) if iibm = 2;
+        * yepsi (nx, nyraf, nz) if iibm = 2;
+        * zepsi (nx, ny, nzraf) if iibm = 2.
+
         Each one initialized with np.zeros(dtype=np.bool) and wrapped into a
-        xarray.DataArray with the proper size, dimensions and coordinates.
+        :obj:`xarray.DataArray` with the proper size, dimensions and coordinates.
         They are used to define the object(s) that is(are) going to be inserted
         into the cartesiann domain by the Immersed Boundary Method (IBM).
         They should be set to one (True) at the solid points and stay
         zero (False) at the fluid points, some standard geometries are provided
         by the accessor xcompact3d_toolbox.sandbox.geo.
-        Then, send them to xcompact3d_toolbox.gene_epsi_3d().
-
     """
 
     epsi = {}
@@ -50,23 +57,21 @@ def init_epsi(prm, dask=False):
 
     from os import makedirs
 
-    makedirs(os.path.join('data', 'geometry'), exist_ok=True)
+    makedirs(os.path.join("data", "geometry"), exist_ok=True)
 
     mesh = get_mesh(prm)
 
     # the epsi array in the standard mesh (nx, ny, nz)
-    fields = {
-        'epsi': (mesh['x'], mesh['y'], mesh['z'])
-    }
+    fields = {"epsi": (mesh["x"], mesh["y"], mesh["z"])}
 
     if prm.iibm == 2:
         # Getting refined mesh
-        mesh_raf = get_mesh(prm, raf = True)
+        mesh_raf = get_mesh(prm, raf=True)
         # Three additional versions are needed if iibm = 2,
         # each one refined in one dimension by a factor nraf
-        fields['xepsi'] = (mesh_raf['x'], mesh['y'], mesh['z'])
-        fields['yepsi'] = (mesh['x'], mesh_raf['y'], mesh['z'])
-        fields['zepsi'] = (mesh['x'], mesh['y'], mesh_raf['z'])
+        fields["xepsi"] = (mesh_raf["x"], mesh["y"], mesh["z"])
+        fields["yepsi"] = (mesh["x"], mesh_raf["y"], mesh["z"])
+        fields["zepsi"] = (mesh["x"], mesh["y"], mesh_raf["z"])
 
     # Data type defined to boolean for simplicity, since epsi should be zero at
     # the fluid points and one at the solid points. The algorithm should work
@@ -74,23 +79,21 @@ def init_epsi(prm, dask=False):
     for key, (x, y, z) in fields.items():
         epsi[key] = xr.DataArray(
             np.zeros((x.size, y.size, z.size), dtype=np.bool),
-            dims=['x', 'y', 'z'],
-            coords={'x': x, 'y': y, 'z': z},
-            name = key
+            dims=["x", "y", "z"],
+            coords={"x": x, "y": y, "z": z},
+            name=key,
         )
 
     # With 'file_name' attribute, we make sure that epsi will be written to disc,
     # while the refined versions are not needed
-    epsi['epsi'].attrs={
-        'file_name': os.path.join('data', 'geometry', 'epsilon')
-    }
+    epsi["epsi"].attrs = {"file_name": os.path.join("data", "geometry", "epsilon")}
 
     # Turns on lazy parallel execution with dask arrays
     if dask == True:
         for key in epsi.keys():
-            if key == 'epsi':
+            if key == "epsi":
                 # Decomposition in any direction would work for epsi
-                epsi[key] = epsi[key].x3d.pencil_decomp('x')
+                epsi[key] = epsi[key].x3d.pencil_decomp("x")
             else:
                 # notice that key[0] will be x, y and z for
                 # xepsi, yepsi and zepsi, respectively
@@ -98,255 +101,429 @@ def init_epsi(prm, dask=False):
 
     return epsi
 
+
 def init_dataset(prm):
-    """This function initializes a xarray.Dataset in addition to all variables
+    """This function initializes a :obj:`xarray.Dataset` including all variables
     that should be provided to Xcompact3d and the sandbox flow configuration,
     according to the provided computational and physical parameters.
 
     Parameters
     ----------
-    prm : Class xcompact3d_toolbox.Parameters
+    prm : :obj:`xcompact3d_toolbox.Parameters`
         Contains the computational and physical parameters.
 
     Returns
     -------
-    xarray.Dataset
+    :obj:`xarray.Dataset`
         Each variable is initialized with
-        np.zeros(dtype=xcompact3d_toolbox.param['mytype']) and wrapped into a
-        xarray.Dataset with the proper size, dimensions, coordinates and
+        ``np.zeros(dtype=xcompact3d_toolbox.param['mytype'])`` and wrapped into a
+        obj:`xarray.Dataset` with the proper size, dimensions, coordinates and
         attributes, check them for more details. The variables are:
-            - bxx1, bxy1, bxz1: Inflow boundary condition for ux, uy and uz,
-              respectively (if nclx1 = 2);
-            - bxphi1: Inflow boundary condition for scalar field(s)
-              (if nclx1 = 2 and numscalar > 0);
-            - byphi1: Bottom boundary condition for scalar field(s)
-              (if nclyS1 = 2, numscalar > 0 and uset = 0);
-            - byphin: Top boundary condition for scalar field(s)
-              (if nclySn = 2, numscalar > 0 and uset = 0);
-            - ux, uy, uz: Initial condition for velocity field;
-            - phi: Initial condition for scalar field(s) (if numscalar > 0);
-            - vol_frc: Integral operator employed for flow rate control in case
-              of periodicity in x direction (nclx1 = 0 and nclxn = 0).
-              Xcompact3d will compute the volumetric integration as
-              I = sum(vol_frc * ux) and them will correct streamwise velocity
-              as ux = ux / I, so, set vol_frc properly.
+
+        * ``bxx1``, ``bxy1``, ``bxz1`` - Inflow boundary condition for ux, uy
+          and uz, respectively (if nclx1 = 2);
+        * ``noise_mod_x1`` - for random noise modulation at inflow boudary
+          condition (if nclx1 = 2);
+        * ``bxphi1`` - Inflow boundary condition for scalar field(s)
+          (if nclx1 = 2 and numscalar > 0);
+        * ``byphi1`` - Bottom boundary condition for scalar field(s)
+          (if nclyS1 = 2, numscalar > 0 and uset = 0);
+        * ``byphin`` - Top boundary condition for scalar field(s)
+          (if nclySn = 2, numscalar > 0 and uset = 0);
+        * ``ux``, ``uy``, ``uz`` - Initial condition for velocity field;
+        * ``phi`` - Initial condition for scalar field(s) (if numscalar > 0);
+        * ``vol_frc`` - Integral operator employed for flow rate control in case
+          of periodicity in x direction (nclx1 = 0 and nclxn = 0).
+          Xcompact3d will compute the volumetric integration as
+          I = sum(vol_frc * ux) and them will correct streamwise velocity
+          as ux = ux / I, so, set ``vol_frc`` properly.
+
         After setting all values for your flow configuration, the dataset can be
-        written to disc with xarray.Dataset.x3d.write().
+        written to disc with ``ds.x3d.write()``.
 
     """
 
     from os import makedirs
 
-    makedirs(os.path.join('data'), exist_ok=True)
+    makedirs(os.path.join("data"), exist_ok=True)
 
-    #Init dataset
-    ds = xr.Dataset(coords=get_mesh(prm)).assign_coords(
-        {'n': range(prm.numscalar)}
-    )
+    # Init dataset
+    ds = xr.Dataset(coords=get_mesh(prm)).assign_coords({"n": range(prm.numscalar)})
 
-    ds.x.attrs = {'name': 'Streamwise coordinate', 'long_name': r'$x_1$'}
-    ds.y.attrs = {'name': 'Vertical coordinate', 'long_name': r'$x_2$'}
-    ds.z.attrs = {'name': 'Spanwise coordinate', 'long_name': r'$x_3$'}
-    ds.n.attrs = {'name': 'Scalar fraction', 'long_name': r'$\ell$'}
+    ds.x.attrs = {"name": "Streamwise coordinate", "long_name": r"$x_1$"}
+    ds.y.attrs = {"name": "Vertical coordinate", "long_name": r"$x_2$"}
+    ds.z.attrs = {"name": "Spanwise coordinate", "long_name": r"$x_3$"}
+    ds.n.attrs = {"name": "Scalar fraction", "long_name": r"$\ell$"}
 
-    #Boundary conditions
+    # Boundary conditions
     if prm.nclx1 == 2:
-        for var in 'bxx1 bxy1 bxz1 noise_mod_x1'.split():
+        for var in "bxx1 bxy1 bxz1 noise_mod_x1".split():
             ds[var] = xr.DataArray(
-                param['mytype'](0.0),
-                dims=['y', 'z'],
+                param["mytype"](0.0),
+                dims=["y", "z"],
                 coords=[ds.y, ds.z],
-                attrs={
-                    'file_name': os.path.join('data', var)
-                }
+                attrs={"file_name": os.path.join("data", var)},
             )
     if prm.numscalar != 0:
         if prm.nclxS1 == 2:
-            ds['bxphi1'] = xr.DataArray(
-                param['mytype'](0.0),
-                dims=['n', 'y', 'z'],
+            ds["bxphi1"] = xr.DataArray(
+                param["mytype"](0.0),
+                dims=["n", "y", "z"],
                 coords=[ds.n, ds.y, ds.z],
-                attrs={
-                    'file_name': os.path.join('data', 'bxphi1')
-                }
+                attrs={"file_name": os.path.join("data", "bxphi1")},
             )
         if prm.nclyS1 == 2:
-            ds['byphi1'] = xr.DataArray(
-                param['mytype'](0.0),
-                dims=['n', 'x', 'z'],
+            ds["byphi1"] = xr.DataArray(
+                param["mytype"](0.0),
+                dims=["n", "x", "z"],
                 coords=[ds.n, ds.x, ds.z],
-                attrs={
-                    'file_name': os.path.join('data', 'byphi1')
-                }
+                attrs={"file_name": os.path.join("data", "byphi1")},
             )
         if prm.nclySn == 2:
-            ds['byphin'] = xr.DataArray(
-                param['mytype'](0.0),
-                dims=['n', 'x', 'z'],
+            ds["byphin"] = xr.DataArray(
+                param["mytype"](0.0),
+                dims=["n", "x", "z"],
                 coords=[ds.n, ds.x, ds.z],
-                attrs={
-                    'file_name': os.path.join('data', 'byphin')
-                }
+                attrs={"file_name": os.path.join("data", "byphin")},
             )
-    #Initial Condition
-    for var in ['ux', 'uy', 'uz']:
+    # Initial Condition
+    for var in ["ux", "uy", "uz"]:
         ds[var] = xr.DataArray(
-            param['mytype'](0.0),
-            dims=['x', 'y', 'z'],
+            param["mytype"](0.0),
+            dims=["x", "y", "z"],
             coords=[ds.x, ds.y, ds.z],
-            attrs={
-                'file_name': os.path.join('data', var)
-            }
+            attrs={"file_name": os.path.join("data", var)},
         )
     if prm.numscalar != 0:
-        ds['phi'] = xr.DataArray(
-            param['mytype'](0.0),
-            dims=['n', 'x', 'y', 'z'],
+        ds["phi"] = xr.DataArray(
+            param["mytype"](0.0),
+            dims=["n", "x", "y", "z"],
             coords=[ds.n, ds.x, ds.y, ds.z],
-            attrs={
-                'file_name': os.path.join('data', 'phi')
-            }
+            attrs={"file_name": os.path.join("data", "phi")},
         )
     # Flowrate control
     if prm.nclx1 == 0 and prm.nclxn == 0:
-        ds['vol_frc'] = xr.DataArray(
-            param['mytype'](0.0),
-            dims=['x', 'y', 'z'],
+        ds["vol_frc"] = xr.DataArray(
+            param["mytype"](0.0),
+            dims=["x", "y", "z"],
             coords=[ds.x, ds.y, ds.z],
-            attrs={
-                'file_name': os.path.join('data', 'vol_frc')
-            }
+            attrs={"file_name": os.path.join("data", "vol_frc")},
         )
 
     return ds
 
+
 @xr.register_dataarray_accessor("geo")
 class Geometry:
+    """An acessor with some standard geometries for :obj:`xarray.DataArray`.
+    Use them in combination with the arrays initialized at
+    :obj:`xcompact3d_toolbox.sendbox.init_epsi`.
+    """
+
     def __init__(self, data_array):
         self._data_array = data_array
 
-    def cylinder(self, center=dict(x=0, y=0, z=0), r=0.5, axis='z', height=None, remp=True):
+    def cylinder(self, radius=0.5, axis="z", height=None, remp=True, **kwargs):
+        """Draws a cylinder.
+
+        Parameters
+        ----------
+        radius : float
+            Cylinder's radius (the default is 0.5).
+        axis : str
+            Cylinder's axis (the default is "z").
+        height : float or None
+            Cylinder's height (the default is None), if None, it will occupates
+            the entire axis, otherwise :math:`\pm h/2` is considered from the center.
+        remp : bool
+            Adds the geometry to the :obj:`xarray.DataArray` if True and removes
+            it if False (the default is True).
+        **kwargs : float
+            Cylinder's center point.
+
+        Returns
+        -------
+        :obj:`xarray.DataArray`
+            Array with(out) the cylinder
+
+        Raises
+        -------
+        KeyError
+            Center coordinates must be valid dimensions
+
+        Examples
+        -------
+
+        >>> da.geo.cylinder(x=4, y=5)
+
+        """
+
+        for key in kwargs.keys():
+            if not key in self._data_array.dims:
+                raise KeyError(
+                    f'Invalid key for "kwargs", it should be a valid dimension'
+                )
 
         dis = 0.0
         for d in self._data_array.dims:
             if d == axis:
                 continue
-            dis = dis + (self._data_array[d] - center[d])**2.0
+            dis = dis + (self._data_array[d] - kwargs.get(d, 0.0)) ** 2.0
         dis = np.sqrt(dis)
 
         if height != None:
-            height /= 2.
+            height /= 2.0
             # Notice that r*10 is just to garantee that the values are larger than r
             # and consequently outside the cylinder
-            dis = dis.where(self._data_array[axis] <= center[axis] + height, r*10)
-            dis = dis.where(self._data_array[axis] >= center[axis] - height, r*10)
+            dis = dis.where(
+                self._data_array[axis] <= center[axis] + height, radius * 10
+            )
+            dis = dis.where(
+                self._data_array[axis] >= center[axis] - height, radius * 10
+            )
 
-        return self._data_array.where(dis > r, remp)
+        return self._data_array.where(dis > radius, remp)
 
-    def box(self, remp=True, **boundaries):
+    def box(self, remp=True, **kwargs):
+        """Draws a box.
 
-        for key in boundaries.keys():
+        Parameters
+        ----------
+        remp : bool
+            Adds the geometry to the :obj:`xarray.DataArray` if True and removes
+            it if False (the default is True).
+        **kwargs : float
+            Box's boundaries.
+
+        Returns
+        -------
+        :obj:`xarray.DataArray`
+            Array with(out) the box
+
+        Raises
+        -------
+        KeyError
+            Boundaries coordinates must be valid dimensions
+
+        Examples
+        -------
+
+        >>> da.geo.box(x=[2,5], y=[0,1])
+
+        """
+
+        for key in kwargs.keys():
             if not key in self._data_array.dims:
-                raise KeyError(f'Invalid key for "boundaries", it should be a valid dimension')
+                raise KeyError(
+                    f'Invalid key for "kwargs", it should be a valid dimension'
+                )
 
         tmp = xr.zeros_like(self._data_array)
 
-        for key, value in boundaries.items():
+        for key, value in kwargs.items():
             tmp = tmp.where(self._data_array[key] >= value[0], True)
             tmp = tmp.where(self._data_array[key] <= value[1], True)
 
         return self._data_array.where(tmp, remp)
 
-    def square(self, center=dict(x=0, y=0, z=0), length=1.0, thickness=0.1, remp=True):
+    def square(self, length=1.0, thickness=0.1, remp=True, **kwargs):
+        """Draws a squared frame.
+
+        Parameters
+        ----------
+        length : float
+            Frame's external length (the default is 1).
+        thickness : float
+            Frames's tickness (the default is 0.1).
+        remp : bool
+            Adds the geometry to the :obj:`xarray.DataArray` if True and removes
+            it if False (the default is True).
+        **kwargs : float
+            Frames's center.
+
+        Returns
+        -------
+        :obj:`xarray.DataArray`
+            Array with(out) the squared frame
+
+        Raises
+        -------
+        KeyError
+            Center coordinates must be valid dimensions
+
+        Examples
+        -------
+
+        >>> da.geo.square(x=5, y=2, z=1)
+
+        """
+        for key in kwargs.keys():
+            if not key in self._data_array.dims:
+                raise KeyError(
+                    f'Invalid key for "kwargs", it should be a valid dimension'
+                )
+
+        center = {kwargs.get(key, 0.0) for key in self._data_array.dims}
+
         boundaries1 = {
-            'x': (center['x'] - 0.5 * thickness, center['x'] + 0.5 * thickness),
-            'y': (center['y'] - 0.5 * length, center['y'] + 0.5 * length),
-            'z': (center['z'] - 0.5 * length, center['z'] + 0.5 * length)
+            "x": (center["x"] - 0.5 * thickness, center["x"] + 0.5 * thickness),
+            "y": (center["y"] - 0.5 * length, center["y"] + 0.5 * length),
+            "z": (center["z"] - 0.5 * length, center["z"] + 0.5 * length),
         }
         tmp = self._data_array.geo.box(**boundaries1, remp=True)
         #
         length -= 2 * thickness
         boundaries2 = {
-            'x': (center['x'] - 0.5 * thickness, center['x'] + 0.5 * thickness),
-            'y': (center['y'] - 0.5 * length, center['y'] + 0.5 * length),
-            'z': (center['z'] - 0.5 * length, center['z'] + 0.5 * length)
+            "x": (center["x"] - 0.5 * thickness, center["x"] + 0.5 * thickness),
+            "y": (center["y"] - 0.5 * length, center["y"] + 0.5 * length),
+            "z": (center["z"] - 0.5 * length, center["z"] + 0.5 * length),
         }
         tmp = tmp.geo.box(**boundaries2, remp=False)
         #
         return self._data_array.where(tmp, remp)
 
-    def sphere(self, center=dict(x=0, y=0, z=0), r=0.5, remp=True):
+    def sphere(self, radius=0.5, remp=True, **kwargs):
+        """Draws a sphere.
+
+        Parameters
+        ----------
+        radius : float
+            Sphere's radius (the default is 0.5).
+        remp : bool
+            Adds the geometry to the :obj:`xarray.DataArray` if True and removes
+            it if False (the default is True).
+        **kwargs : float
+            Sphere's center.
+
+        Returns
+        -------
+        :obj:`xarray.DataArray`
+            Array with(out) the sphere
+
+        Raises
+        -------
+        KeyError
+            Center coordinates must be valid dimensions
+
+        Examples
+        -------
+
+        >>> da.geo.sphere(x=1, y=1, z=1)
+
+        """
+        for key in kwargs.keys():
+            if not key in self._data_array.dims:
+                raise KeyError(
+                    f'Invalid key for "kwargs", it should be a valid dimension'
+                )
 
         dis = 0.0
         for d in self._data_array.dims:
-            dis = dis + (self._data_array[d] - center[d])**2.0
+            dis = dis + (self._data_array[d] - kwargs.get(d, 0.0)) ** 2.0
         dis = np.sqrt(dis)
 
-        return self._data_array.where(dis > r, remp)
+        return self._data_array.where(dis > radius, remp)
 
-    def ahmed_body(self, scale=1, angle=45.0, wheels=False, remp=True, **pos):
+    def ahmed_body(self, scale=1.0, angle=45.0, wheels=False, remp=True, **kwargs):
+        """Draws an Ahmed body.
+
+        Parameters
+        ----------
+        scale : float
+            Ahmed body's scale (the default is 1).
+        angle : float
+            Ahmed body's angle at the back, in degrees (the default is 45).
+        wheel : bool
+            Draw "wheels" if True (the default is False).
+        remp : bool
+            Adds the geometry to the :obj:`xarray.DataArray` if True and removes
+            it if False (the default is True).
+        **kwargs : float
+            Ahmed body's center.
+
+        Returns
+        -------
+        :obj:`xarray.DataArray`
+            Array with(out) the Ahmed body
+
+        Raises
+        -------
+        KeyError
+            Center coordinates must be valid dimensions.
+        NotImplementedError
+            Body must be centered in ``z``.
+
+        Examples
+        -------
+
+        >>> da.geo.ahmed_body(x=2)
+
+        """
 
         import math
 
-        s=scale/338 # adimensional and scale factor
+        s = scale / 338.0  # adimensional and scale factor
 
-        for key in pos.keys():
+        for key in kwargs.keys():
             if not key in self._data_array.dims:
-                raise KeyError(f'Invalid key for "pos", it should be a valid dimension')
+                raise KeyError(
+                    f'Invalid key for "kwargs", it should be a valid dimension'
+                )
 
-        if not 'x' in pos:
-            pos['x'] = 1.0
-        if not 'y' in pos:
-            pos['y'] = 0.0
-        if not 'z' in pos:
-            pos['z'] = 0.5 * self._data_array.z[-1].values - ((389*s) / 2)
+        if not "x" in kwargs:
+            kwargs["x"] = 1.0
+        if not "y" in kwargs:
+            kwargs["y"] = 0.0
+        if not "z" in kwargs:
+            kwargs["z"] = 0.5 * self._data_array.z[-1].values - ((389 * s) / 2)
         else:
             # That is because of the mirror in Z
-            raise NotImplementedError(
-                    "Unsupported: Body should be centered in Z")
+            raise NotImplementedError("Unsupported: Body must be centered in Z")
 
         if scale != 1:
-            raise NotImplementedError(
-            "Unsupported: Not prepared yet for scale != 1")
+            raise NotImplementedError("Unsupported: Not prepared yet for scale != 1")
 
         tmp = xr.zeros_like(self._data_array)
         tmp2 = xr.zeros_like(self._data_array)
-
 
         # the "corners" are the intersections between the cylinders
 
         # horizontal
 
-        tmp = tmp.geo.cylinder(center={
-            'x': 100.00*s + pos['x'],
-            'y': 150.00*s + pos['y'],
-            'z':  97.25*s + pos['z']
-        },
-            axis='z',
-            r=100.00*s,
-            height=194.50*s)
+        tmp = tmp.geo.cylinder(
+            center={
+                "x": 100.00 * s + kwargs["x"],
+                "y": 150.00 * s + kwargs["y"],
+                "z": 97.25 * s + kwargs["z"],
+            },
+            axis="z",
+            r=100.00 * s,
+            height=194.50 * s,
+        )
 
+        tmp = tmp.geo.cylinder(
+            center={
+                "x": 100.00 * s + kwargs["x"],
+                "y": 238.00 * s + kwargs["y"],
+                "z": 97.25 * s + kwargs["z"],
+            },
+            axis="z",
+            r=100.00 * s,
+            height=194.50 * s,
+        )
 
-        tmp = tmp.geo.cylinder(center={
-            'x': 100.00*s + pos['x'],
-            'y': 238.00*s + pos['y'],
-            'z':  97.25*s + pos['z']
-        },
-            axis='z',
-            r=100.00*s,
-            height=194.50*s)
-
-        #vertical
+        # vertical
 
         tmp2 = tmp2.geo.cylinder(
             center={
-                'x': 100.00*s + pos['x'],
-                'y': 194.00*s + pos['y'],
-                'z': 100.00*s + pos['z']
+                "x": 100.00 * s + kwargs["x"],
+                "y": 194.00 * s + kwargs["y"],
+                "z": 100.00 * s + kwargs["z"],
             },
-            axis='y',
-            r=100.00*s,
-            height=288.00*s)
+            axis="y",
+            r=100.00 * s,
+            height=288.00 * s,
+        )
 
         # get intersection
         tmp = np.logical_and(tmp == True, tmp2 == True)
@@ -355,71 +532,85 @@ class Geometry:
 
         # now the regular cylinders
 
-        tmp = tmp.geo.cylinder(center={
-            'x': 100.00*s + pos['x'],
-            'y': 150.00*s + pos['y'],
-            'z': 147.25*s + pos['z']
-        },
-            axis='z',
-            r=100.00*s,
-            height=94.50*s)
+        tmp = tmp.geo.cylinder(
+            center={
+                "x": 100.00 * s + kwargs["x"],
+                "y": 150.00 * s + kwargs["y"],
+                "z": 147.25 * s + kwargs["z"],
+            },
+            axis="z",
+            r=100.00 * s,
+            height=94.50 * s,
+        )
 
-        tmp = tmp.geo.cylinder(center={
-            'x': 100.00*s + pos['x'],
-            'y': 238.00*s + pos['y'],
-            'z': 147.25*s + pos['z']
-        },
-            axis='z',
-            r=100.00*s,
-            height=94.50*s)
+        tmp = tmp.geo.cylinder(
+            center={
+                "x": 100.00 * s + kwargs["x"],
+                "y": 238.00 * s + kwargs["y"],
+                "z": 147.25 * s + kwargs["z"],
+            },
+            axis="z",
+            r=100.00 * s,
+            height=94.50 * s,
+        )
 
-        tmp = tmp.geo.cylinder(center={
-            'x': 100.00*s + pos['x'],
-            'y': 194.00*s + pos['y'],
-            'z': 100.00*s + pos['z']
-        },
-            axis='y',
-            r=100.00*s,
-            height=88.00*s)
+        tmp = tmp.geo.cylinder(
+            center={
+                "x": 100.00 * s + kwargs["x"],
+                "y": 194.00 * s + kwargs["y"],
+                "z": 100.00 * s + kwargs["z"],
+            },
+            axis="y",
+            r=100.00 * s,
+            height=88.00 * s,
+        )
 
         if wheels:
-            tmp = tmp.geo.cylinder(center={
-                'x': 200.00*s + pos['x'],
-                'y':  25.00*s + pos['y'],
-                'z':  46.50*s + pos['z']
-            },
-                axis='y',
-                r=15.00*s,
-                height=50.00*s)
+            tmp = tmp.geo.cylinder(
+                center={
+                    "x": 200.00 * s + kwargs["x"],
+                    "y": 25.00 * s + kwargs["y"],
+                    "z": 46.50 * s + kwargs["z"],
+                },
+                axis="y",
+                r=15.00 * s,
+                height=50.00 * s,
+            )
 
-            tmp = tmp.geo.cylinder(center={
-                'x': 725.00*s + pos['x'],
-                'y':  25.00*s + pos['y'],
-                'z':  46.50*s + pos['z']
-            },
-                axis='y',
-                r=15.00*s,
-                height=50.00*s)
+            tmp = tmp.geo.cylinder(
+                center={
+                    "x": 725.00 * s + kwargs["x"],
+                    "y": 25.00 * s + kwargs["y"],
+                    "z": 46.50 * s + kwargs["z"],
+                },
+                axis="y",
+                r=15.00 * s,
+                height=50.00 * s,
+            )
 
         # the boxes
-        tmp = tmp.geo.box(x=(           pos['x'],  200.00*s + pos['x']),
-                          y=(150.00*s + pos['y'],  238.00*s + pos['y']),
-                          z=(100.00*s + pos['z'],  194.50*s + pos['z']))
+        tmp = tmp.geo.box(
+            x=(kwargs["x"], 200.00 * s + kwargs["x"]),
+            y=(150.00 * s + kwargs["y"], 238.00 * s + kwargs["y"]),
+            z=(100.00 * s + kwargs["z"], 194.50 * s + kwargs["z"]),
+        )
 
-        tmp = tmp.geo.box(x=(100.00*s + pos['x'], 1044.00*s + pos['x']),
-                          y=( 50.00*s + pos['y'],  338.00*s + pos['y']),
-                          z=(           pos['z'],  194.50*s + pos['z'] ))
+        tmp = tmp.geo.box(
+            x=(100.00 * s + kwargs["x"], 1044.00 * s + kwargs["x"]),
+            y=(50.00 * s + kwargs["y"], 338.00 * s + kwargs["y"]),
+            z=(kwargs["z"], 194.50 * s + kwargs["z"]),
+        )
 
         # and finally a mirror
-        tmp = tmp.geo.mirror(dim='z')
+        tmp = tmp.geo.mirror(dim="z")
 
         # Angle in the back
-        hipo=(93.80/math.sin(math.radians(25)))*s
+        hipo = (93.80 / math.sin(math.radians(25))) * s
         adj = math.cos(math.radians(angle)) * hipo
         opo = math.sin(math.radians(angle)) * hipo
 
-        x = [1044.00*s - adj + pos['x'], 1044.00*s       + pos['x']]
-        y = [ 338.00*s       + pos['y'],  338.00*s - opo + pos['y']]
+        x = [1044.00 * s - adj + kwargs["x"], 1044.00 * s + kwargs["x"]]
+        y = [338.00 * s + kwargs["y"], 338.00 * s - opo + kwargs["y"]]
 
         coef = np.polyfit(x, y, 1)
 
@@ -429,11 +620,30 @@ class Geometry:
 
         return self._data_array.where(np.logical_not(tmp), remp)
 
-    def mirror(self, dim='x'):
+    def mirror(self, dim="x"):
+        """Mirror the :math:`\\epsilon` array with respect to the central plane
+        in the direction ``dim``.
+
+        Parameters
+        ----------
+        dim : str
+            Reference for the mirror (the default is ``x``).
+
+        Returns
+        -------
+        :obj:`xarray.DataArray`
+            Mirrored array
+
+        Examples
+        -------
+
+        >>> da.geo.mirror('x')
+
+        """
         return self._data_array.where(
-            self._data_array[dim] <= self._data_array[dim][-1]/2., self._data_array[{
-                dim: slice(None, None, -1)
-            }].values)
+            self._data_array[dim] <= self._data_array[dim][-1] / 2.0,
+            self._data_array[{dim: slice(None, None, -1)}].values,
+        )
 
     def visual3d(self):
 
@@ -441,29 +651,32 @@ class Geometry:
         import plotly.offline as pyo
         import plotly.io as pio
 
-        pio.renderers.default = 'browser' #'jupyterlab', 'vscode', 'nteract', 'notebook_connected', 'png', 'jpeg', 'jpg', 'svg', 'pdf', 'browser', 'sphinx_gallery'
+        pio.renderers.default = "browser"  #'jupyterlab', 'vscode', 'nteract', 'notebook_connected', 'png', 'jpeg', 'jpg', 'svg', 'pdf', 'browser', 'sphinx_gallery'
 
-        X, Y, Z = np.mgrid[0:self._data_array.x[-1].values:self._data_array.x.shape[0]*1j,
-                           0:self._data_array.y[-1].values:self._data_array.y.shape[0]*1j,
-                           0:self._data_array.z[-1].values:self._data_array.z.shape[0]*1j]
+        X, Y, Z = np.mgrid[
+            0 : self._data_array.x[-1].values : self._data_array.x.shape[0] * 1j,
+            0 : self._data_array.y[-1].values : self._data_array.y.shape[0] * 1j,
+            0 : self._data_array.z[-1].values : self._data_array.z.shape[0] * 1j,
+        ]
 
-        values = (self._data_array*1).values
+        values = (self._data_array * 1).values
 
         fig = go.Figure()
 
-        #fig.add_scatter3d(x=X.flatten(), y=Y.flatten(), z=Z.flatten(), mode='markers',marker=dict(size=0.75))
+        # fig.add_scatter3d(x=X.flatten(), y=Y.flatten(), z=Z.flatten(), mode='markers',marker=dict(size=0.75))
 
-        fig.add_isosurface(x=X.flatten(),
-                           z=Y.flatten(),
-                           y=Z.flatten(),
-                           value=values.flatten(),
-                           isomin=0.99,
-                           isomax=1,
-                           colorscale='sunset',
-                           lighting=dict(ambient=0.4,
-                                         specular=1.0))
+        fig.add_isosurface(
+            x=X.flatten(),
+            z=Y.flatten(),
+            y=Z.flatten(),
+            value=values.flatten(),
+            isomin=0.99,
+            isomax=1,
+            colorscale="sunset",
+            lighting=dict(ambient=0.4, specular=1.0),
+        )
 
-        fig.update_layout(scene_aspectmode='data')
+        fig.update_layout(scene_aspectmode="data")
         fig.update_traces(showscale=False)
 
         fig.show()
