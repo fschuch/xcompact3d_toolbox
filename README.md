@@ -25,7 +25,7 @@ Finally, Xcompact3d Toolbox is fully integrated with the new *Sandbox Flow Confi
 
 ## Documentation
 
-Under preparation.
+https://xcompact3d-toolbox.readthedocs.io/
 
 ## Copyright and License
 
