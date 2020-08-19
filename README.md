@@ -1,6 +1,7 @@
 # Xcompact3d Toolbox
 
 ![Build Status](https://github.com/fschuch/xcompact3d_toolbox/workflows/Python%20package/badge.svg)
+[![Documentation Status](https://readthedocs.org/projects/xcompact3d-toolbox/badge/?version=latest)](https://xcompact3d-toolbox.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/xcompact3d-toolbox.svg)](https://badge.fury.io/py/xcompact3d-toolbox)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
