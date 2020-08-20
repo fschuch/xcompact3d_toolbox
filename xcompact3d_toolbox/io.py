@@ -157,8 +157,6 @@ def read_all(filename_pattern, prm):
         A specified pattern according to the rules used by the Unix shell.
     prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
         Contains the computational and physical parameters.
-    **kwargs :
-        Arguments to send to :obj:`xcompact3d_toolbox.readfield`.
 
     Returns
     -------
