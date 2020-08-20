@@ -40,12 +40,10 @@ Useful links
 ------------
 
 * `View on GitHub`_;
-* `Documentation`_;
 * `Suggestions for new features and bug report`_;
 * `See what is coming next (Project page)`_.
 
 .. _`View on GitHub`: https://github.com/fschuch/xcompact3d_toolbox
-.. _`Documentation`: https://xcompact3d-toolbox.readthedocs.io/
 .. _`Suggestions for new features and bug report`: https://github.com/fschuch/xcompact3d_toolbox/issues
 .. _`See what is coming next (Project page)`: https://github.com/fschuch/xcompact3d_toolbox/projects/1
 
