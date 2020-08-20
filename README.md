@@ -16,17 +16,21 @@ The physical and computational parameters are built on top of [traitlets](https:
 a framework that lets Python classes have attributes with type checking, dynamically calculated default values, and ‘on change’ callbacks.
 In addition to [ipywidgets](https://ipywidgets.readthedocs.io/en/latest/) for an user friendly interface.
 
-Data structure is provided by [xarray](http://xarray.pydata.org/en/stable/), that introduces labels in the form of dimensions, coordinates and attributes on top of raw [NumPy](https://numpy.org/)-like arrays, which allows for a more intuitive, more concise, and less error-prone developer experience. It integrates tightly with [dask](https://dask.org/) for parallel computing.
+Data structure is provided by [xarray](http://xarray.pydata.org/en/stable/) (see [Why xarray?](http://xarray.pydata.org/en/stable/why-xarray.html)), that introduces labels in the form of dimensions, coordinates and attributes on top of raw [NumPy](https://numpy.org/)-like arrays, which allows for a more intuitive, more concise, and less error-prone developer experience. It integrates tightly with [dask](https://dask.org/) for parallel computing.
 
-Finally, Xcompact3d Toolbox is fully integrated with the new *Sandbox Flow Configuration* (see [fschuch/Xcompact3d](https://github.com/fschuch/Xcompact3d/)). The idea is to easily provide everything that X3d needs from a Python Jupyter Notebook, like initial conditions, solid geometry, boundary conditions, and the parameters. It makes life easier for beginners, that can run any new flow configuration without worrying about Fortran and [2decomp](http://www.2decomp.org/). For developers, it works as a rapid prototyping tool, to test concepts and then compare results to validate any future Fortran implementations.
+Finally, Xcompact3d Toolbox is fully integrated with the new *Sandbox Flow Configuration* (see [fschuch/Xcompact3d](https://github.com/fschuch/Xcompact3d/)). The idea is to easily provide everything that X3d needs from a [Jupyter Notebook](https://jupyter.org/), like initial conditions, solid geometry, boundary conditions, and the parameters ([see examples](https://xcompact3d-toolbox.readthedocs.io/en/latest/tutorial.html#sandbox-examples)). It makes life easier for beginners, that can run any new flow configuration without worrying about Fortran and [2decomp](http://www.2decomp.org/). For developers, it works as a rapid prototyping tool, to test concepts and then compare results to validate any future Fortran implementations.
 
 ## Installation
 
 `pip install xcompact3d-toolbox`
 
-## Documentation
+## Useful links
 
-https://xcompact3d-toolbox.readthedocs.io/
+* [Documentation](https://xcompact3d-toolbox.readthedocs.io/);
+* [Suggestions for new features and bug report](https://github.com/fschuch/xcompact3d_toolbox/issues);
+* [See what is coming next (Project page)](https://github.com/fschuch/xcompact3d_toolbox/projects/1);
+* [Xcompact3d's repository](https://github.com/xcompact3d/Incompact3d);
+* [My fork from Xcompact3d's repository](https://github.com/fschuch/Xcompact3d/);
 
 ## Copyright and License
 
