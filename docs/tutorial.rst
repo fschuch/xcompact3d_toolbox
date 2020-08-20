@@ -1,8 +1,14 @@
-Tutorial
+Tutorials
 -----------------
 
 .. toctree::
 
    tutorial/parameters.ipynb
-   tutorial/Cylinder.ipynb
-   tutorial/Axisymmetric_flow.ipynb
+
+Sandbox Examples
+-----------------
+
+.. toctree::
+
+   examples/Axisymmetric_flow.ipynb
+   examples/Cylinder.ipynb
