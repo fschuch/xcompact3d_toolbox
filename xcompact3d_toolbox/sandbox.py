@@ -168,51 +168,82 @@ def init_dataset(prm):
     ds.z.attrs = {"name": "Spanwise coordinate", "long_name": r"$x_3$"}
     ds.n.attrs = {"name": "Scalar fraction", "long_name": r"$\ell$"}
 
+    description = {0: "Streamwise", 1: "Vertical", 2: "Spanwise"}
+
     # Boundary conditions
     if prm.nclx1 == 2:
-        for var in "bxx1 bxy1 bxz1 noise_mod_x1".split():
+        for i, var in enumerate("bxx1 bxy1 bxz1 noise_mod_x1".split()):
             ds[var] = xr.DataArray(
                 mytype(0.0),
                 dims=["y", "z"],
                 coords=[ds.y, ds.z],
-                attrs={"file_name": os.path.join("data", var)},
+                attrs={
+                    "file_name": os.path.join("data", var),
+                    "name": f"Inflow Plane for {description.get(i,'')} Velocity",
+                    "long_name": fr"$u_{i+1} (x_1=0,x_2,x_3)$",
+                },
             )
+        ds.noise_mod_x1.attrs[
+            "name"
+        ] = "Modulation function for Random Numbers at Inflow Plane"
+        # ds.noise_mod_x1.attrs["long_name"] = r"$\text{mod} (x_1=0,x_2,x_3)$"
+        #
     if prm.numscalar != 0:
         if prm.nclxS1 == 2:
             ds["bxphi1"] = xr.DataArray(
                 mytype(0.0),
                 dims=["n", "y", "z"],
                 coords=[ds.n, ds.y, ds.z],
-                attrs={"file_name": os.path.join("data", "bxphi1")},
+                attrs={
+                    "file_name": os.path.join("data", "bxphi1"),
+                    "name": "Inflow Plane for Scalar field(s)",
+                    "long_name": r"$\varphi (x_1=0,x_2,x_3,n)$",
+                },
             )
         if prm.nclyS1 == 2:
             ds["byphi1"] = xr.DataArray(
                 mytype(0.0),
                 dims=["n", "x", "z"],
                 coords=[ds.n, ds.x, ds.z],
-                attrs={"file_name": os.path.join("data", "byphi1")},
+                attrs={
+                    "file_name": os.path.join("data", "byphi1"),
+                    "name": "Bottom Boundary Condition for Scalar field(s)",
+                    "long_name": r"$\varphi (x_1,x_2=0,x_3,n)$",
+                },
             )
         if prm.nclySn == 2:
             ds["byphin"] = xr.DataArray(
                 mytype(0.0),
                 dims=["n", "x", "z"],
                 coords=[ds.n, ds.x, ds.z],
-                attrs={"file_name": os.path.join("data", "byphin")},
+                attrs={
+                    "file_name": os.path.join("data", "byphin"),
+                    "name": "Top Boundary Condition for Scalar field(s)",
+                    "long_name": r"$\varphi (x_1,x_2=L_2,x_3,n)$",
+                },
             )
     # Initial Condition
-    for var in ["ux", "uy", "uz"]:
+    for i, var in enumerate(["ux", "uy", "uz"]):
         ds[var] = xr.DataArray(
             mytype(0.0),
             dims=["x", "y", "z"],
             coords=[ds.x, ds.y, ds.z],
-            attrs={"file_name": os.path.join("data", var)},
+            attrs={
+                "file_name": os.path.join("data", var),
+                "name": f"Initial Condition for {description.get(i,'')} Velocity",
+                "long_name": fr"$u_{str(i+1)} (x_1,x_2,x_3,t=0)$",
+            },
         )
     if prm.numscalar != 0:
         ds["phi"] = xr.DataArray(
             mytype(0.0),
             dims=["n", "x", "y", "z"],
             coords=[ds.n, ds.x, ds.y, ds.z],
-            attrs={"file_name": os.path.join("data", "phi")},
+            attrs={
+                "file_name": os.path.join("data", "phi"),
+                "name": "Initial Condition for Scalar field(s)",
+                "long_name": r"$\varphi (x_1,x_2,x_3,n,t=0)$",
+            },
         )
     # Flowrate control
     if prm.nclx1 == 0 and prm.nclxn == 0:
@@ -220,7 +251,10 @@ def init_dataset(prm):
             mytype(0.0),
             dims=["x", "y", "z"],
             coords=[ds.x, ds.y, ds.z],
-            attrs={"file_name": os.path.join("data", "vol_frc")},
+            attrs={
+                "file_name": os.path.join("data", "vol_frc"),
+                "name": "Integral Operator for Flow Rate Control",
+            },
         )
 
     return ds
