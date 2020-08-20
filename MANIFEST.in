@@ -1,0 +1,2 @@
+include versioneer.py
+include xcompact3d_toolbox/_version.py
