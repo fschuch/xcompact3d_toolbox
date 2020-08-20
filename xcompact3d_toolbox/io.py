@@ -13,6 +13,9 @@ Notes
   `#3`_ was proposed in order to increase the synergy between Xcompact3d and this
   Python Package. Following the new folder structure makes it possible to
   automatically obtain the shape and timestamp for each file.
+  If necessary, the conversion is exemplified in `convert_filenames_x3d_toolbox`_.
+
+.. _`convert_filenames_x3d_toolbox`: https://gist.github.com/fschuch/5a05b8d6e9787d76655ecf25760e7289
 
 .. _#3:
     https://github.com/fschuch/Xcompact3d/issues/3
@@ -151,6 +154,11 @@ def read_all(filename_pattern, prm):
 
     .. note:: Make sure to have enough memory to load all files at same time.
 
+    .. note:: This is only compatible with the new filename structure,
+        the conversion is exemplified in `convert_filenames_x3d_toolbox`_.
+
+    .. _`convert_filenames_x3d_toolbox`: https://gist.github.com/fschuch/5a05b8d6e9787d76655ecf25760e7289
+
     Parameters
     ----------
     filename_pattern : str
@@ -214,6 +222,11 @@ def write_xdmf(prm):
 
     Shape and time are inferted from folder structure and filenames.
     File list is obtained automatically with :obj:`glob`.
+
+    .. note:: This is only compatible with the new filename structure,
+        the conversion is exemplified in `convert_filenames_x3d_toolbox`_.
+
+    .. _`convert_filenames_x3d_toolbox`: https://gist.github.com/fschuch/5a05b8d6e9787d76655ecf25760e7289
 
     Parameters
     ----------
