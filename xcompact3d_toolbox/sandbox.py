@@ -554,37 +554,31 @@ class Geometry:
         # horizontal
 
         tmp = tmp.geo.cylinder(
-            center={
-                "x": 100.00 * s + kwargs["x"],
-                "y": 150.00 * s + kwargs["y"],
-                "z": 97.25 * s + kwargs["z"],
-            },
+            x=100.00 * s + kwargs["x"],
+            y=150.00 * s + kwargs["y"],
+            z=97.25 * s + kwargs["z"],
             axis="z",
-            r=100.00 * s,
+            radius=100.00 * s,
             height=194.50 * s,
         )
 
         tmp = tmp.geo.cylinder(
-            center={
-                "x": 100.00 * s + kwargs["x"],
-                "y": 238.00 * s + kwargs["y"],
-                "z": 97.25 * s + kwargs["z"],
-            },
+            x=100.00 * s + kwargs["x"],
+            y=238.00 * s + kwargs["y"],
+            z=97.25 * s + kwargs["z"],
             axis="z",
-            r=100.00 * s,
+            radius=100.00 * s,
             height=194.50 * s,
         )
 
         # vertical
 
         tmp2 = tmp2.geo.cylinder(
-            center={
-                "x": 100.00 * s + kwargs["x"],
-                "y": 194.00 * s + kwargs["y"],
-                "z": 100.00 * s + kwargs["z"],
-            },
+            x=100.00 * s + kwargs["x"],
+            y=194.00 * s + kwargs["y"],
+            z=100.00 * s + kwargs["z"],
             axis="y",
-            r=100.00 * s,
+            radius=100.00 * s,
             height=288.00 * s,
         )
 
@@ -596,58 +590,48 @@ class Geometry:
         # now the regular cylinders
 
         tmp = tmp.geo.cylinder(
-            center={
-                "x": 100.00 * s + kwargs["x"],
-                "y": 150.00 * s + kwargs["y"],
-                "z": 147.25 * s + kwargs["z"],
-            },
+            x=100.00 * s + kwargs["x"],
+            y=150.00 * s + kwargs["y"],
+            z=147.25 * s + kwargs["z"],
             axis="z",
-            r=100.00 * s,
+            radius=100.00 * s,
             height=94.50 * s,
         )
 
         tmp = tmp.geo.cylinder(
-            center={
-                "x": 100.00 * s + kwargs["x"],
-                "y": 238.00 * s + kwargs["y"],
-                "z": 147.25 * s + kwargs["z"],
-            },
+            x=100.00 * s + kwargs["x"],
+            y=238.00 * s + kwargs["y"],
+            z=147.25 * s + kwargs["z"],
             axis="z",
-            r=100.00 * s,
+            radius=100.00 * s,
             height=94.50 * s,
         )
 
         tmp = tmp.geo.cylinder(
-            center={
-                "x": 100.00 * s + kwargs["x"],
-                "y": 194.00 * s + kwargs["y"],
-                "z": 100.00 * s + kwargs["z"],
-            },
+            x=100.00 * s + kwargs["x"],
+            y=194.00 * s + kwargs["y"],
+            z=100.00 * s + kwargs["z"],
             axis="y",
-            r=100.00 * s,
+            radius=100.00 * s,
             height=88.00 * s,
         )
 
         if wheels:
             tmp = tmp.geo.cylinder(
-                center={
-                    "x": 200.00 * s + kwargs["x"],
-                    "y": 25.00 * s + kwargs["y"],
-                    "z": 46.50 * s + kwargs["z"],
-                },
+                x=200.00 * s + kwargs["x"],
+                y=25.00 * s + kwargs["y"],
+                z=46.50 * s + kwargs["z"],
                 axis="y",
-                r=15.00 * s,
+                radius=15.00 * s,
                 height=50.00 * s,
             )
 
             tmp = tmp.geo.cylinder(
-                center={
-                    "x": 725.00 * s + kwargs["x"],
-                    "y": 25.00 * s + kwargs["y"],
-                    "z": 46.50 * s + kwargs["z"],
-                },
+                x=725.00 * s + kwargs["x"],
+                y=25.00 * s + kwargs["y"],
+                z=46.50 * s + kwargs["z"],
                 axis="y",
-                r=15.00 * s,
+                radius=15.00 * s,
                 height=50.00 * s,
             )
 
