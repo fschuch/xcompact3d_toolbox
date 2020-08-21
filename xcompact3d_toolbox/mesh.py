@@ -33,12 +33,12 @@ def get_mesh(prm, raf=False, staggered=False):
                 num=m[d],
                 endpoint=not ncl[d],
             )
-    # #
-    # #stretching
-    # #
-    # istret = prm.istret
-    # beta = prm.beta
-    # #
+    #
+    #stretching
+    #
+    istret = prm.istret
+    beta = prm.beta
+    #
     if istret != 0:
         raise NotImplementedError("Unsupported: Not prepared yet for istret != 0")
 
