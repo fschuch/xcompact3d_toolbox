@@ -914,7 +914,8 @@ class Parameters(traitlets.HasTraits):
     """
 
     _possible_p_row, _possible_p_col = [
-        traitlets.List(trait=traitlets.Int(), default_value=[0]) for i in range(2)
+        traitlets.List(trait=traitlets.Int(), default_value=list(divisorGenerator(4)))
+        for i in range(2)
     ]
     """:obj:`list` of :obj:`int`: Auxiliar variable for parallel domain decomposition,
         it stores the avalilable options according to :obj:`ncores`.
@@ -1175,9 +1176,9 @@ class Parameters(traitlets.HasTraits):
 
     @traitlets.observe("dx", "nx", "xlx", "dy", "ny", "yly", "dz", "nz", "zlz")
     def _observe_resolution(self, change):
-        # for name in 'name new old'.split():
-        #     print(f'    {name}:{change[name]}')
-        #
+        # for name in "name new old".split():
+        #     print(f"    {name:>5} : {change[name]}")
+
         dim = change["name"][-1]  # It will be x, y or z
         #
         if change["name"] == f"n{dim}":
@@ -1430,16 +1431,17 @@ class Parameters(traitlets.HasTraits):
                 if not silence:
                     print(f"Widget not linked for {name}")
 
-        #
-        # for dim in ['x', 'y', 'z']:
-        #     traitlets.link(
-        #         (self, f'_possible_mesh_{dim}'), (self.trait_metadata(f'n{dim}', 'widget'), 'options')
-        #     )
-        # for name in ['p_row', 'p_col']:
-        #     traitlets.link(
-        #         (self, f'_possible_{name}'), (self.trait_metadata(f'{name}', 'widget'), 'options')
-        #     )
-        #
+        for dim in ["x", "y", "z"]:
+            traitlets.link(
+                (self, f"_possible_mesh_{dim}"),
+                (self.trait_metadata(f"n{dim}", "widget"), "options"),
+            )
+        for name in ["p_row", "p_col"]:
+            traitlets.link(
+                (self, f"_possible_{name}"),
+                (self.trait_metadata(f"{name}", "widget"), "options"),
+            )
+
         for name in self.trait_names():
             if name == "numscalar":
                 continue
