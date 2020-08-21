@@ -129,6 +129,7 @@ dmypy.json
 .pyre/
 
 # Xcompact3d's files
+xcompact3d
 *.bin
 *.o
 *.mod
