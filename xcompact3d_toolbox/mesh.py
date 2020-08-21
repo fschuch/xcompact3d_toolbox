@@ -7,7 +7,7 @@ def get_mesh(prm, raf=False, staggered=False):
     dim = ["x", "y", "z"]
     #
     n = {d: getattr(prm, f"n{d}") for d in dim}
-    m = n.copy()
+    m = {d: getattr(prm, f"_m{d}") for d in dim}
     #
     l = {d: getattr(prm, f"{d}l{d}") for d in dim}
     #
@@ -39,8 +39,7 @@ def get_mesh(prm, raf=False, staggered=False):
     # istret = prm.istret
     # beta = prm.beta
     # #
-    # if istret != 0:
-    #     raise NotImplementedError(
-    #             "Unsupported: Not prepared yet for istret != 0")
+    if istret != 0:
+        raise NotImplementedError("Unsupported: Not prepared yet for istret != 0")
 
     return mesh
