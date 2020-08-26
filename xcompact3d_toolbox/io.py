@@ -263,12 +263,15 @@ def write_xdmf(prm):
             )
         )
 
-        mesh = prm.mesh
+        mesh = prm.get_mesh
 
         nx, ny, nz = [mesh[d].size for d in mesh.keys()]
         dx, dy, dz = [mesh[d][1] - mesh[d][0] for d in mesh.keys()]
 
-        dt = prm.dt * (float(suffixes[1]) - float(suffixes[0]))
+        try:
+            dt = prm.dt * (float(suffixes[1]) - float(suffixes[0]))
+        except:
+            dt = 1
 
         if folder == "xy_planes":
             nz, dz = 0, 0

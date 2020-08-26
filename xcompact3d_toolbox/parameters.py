@@ -8,7 +8,7 @@ import traitlets
 import ipywidgets as widgets
 from .param import mytype
 from .mesh import get_mesh
-from .io import i3d_to_dict, dict_to_i3d
+from .io import i3d_to_dict, dict_to_i3d, write_xdmf
 
 possible_mesh = [
     9,
@@ -1464,6 +1464,36 @@ class Parameters(traitlets.HasTraits):
                     ).description_tooltip = description[name]
                 except:
                     pass
+
+    def write_xdmf(self):
+        """Writes four xdmf files:
+
+        * ``./data/3d_snapshots.xdmf`` for 3D snapshots in ``./data/3d_snapshots/*``;
+        * ``./data/xy_planes.xdmf`` for planes in ``./data/xy_planes/*``;
+        * ``./data/xz_planes.xdmf`` for planes in ``./data/xz_planes/*``;
+        * ``./data/yz_planes.xdmf`` for planes in ``./data/yz_planes/*``.
+
+        Shape and time are inferted from folder structure and filenames.
+        File list is obtained automatically with :obj:`glob`.
+
+        .. note:: This is only compatible with the new filename structure,
+            the conversion is exemplified in `convert_filenames_x3d_toolbox`_.
+
+        .. _`convert_filenames_x3d_toolbox`: https://gist.github.com/fschuch/5a05b8d6e9787d76655ecf25760e7289
+
+        Parameters
+        ----------
+        prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
+            Contains the computational and physical parameters.
+
+        Examples
+        -------
+
+        >>> prm = x3d.Parameters()
+        >>> prm.write_xdmf()
+
+        """
+        write_xdmf(self)
 
     @property
     def get_mesh(self):
