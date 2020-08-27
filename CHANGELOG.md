@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Support for stretched mesh in y, by [@fschuch](https://github.com/fschuch).
+
 ## [0.1.3] - 2020-08-17
 ### Added
 - Unittest for observations and validations at [parameters.py](./xcompact3d_toolbox/parameters.py), by [@fschuch](https://github.com/fschuch).

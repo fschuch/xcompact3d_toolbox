@@ -34,12 +34,97 @@ def get_mesh(prm, raf=False, staggered=False):
                 endpoint=not ncl[d],
             )
     #
-    #stretching
+    # stretching
     #
-    istret = prm.istret
-    beta = prm.beta
-    #
-    if istret != 0:
-        raise NotImplementedError("Unsupported: Not prepared yet for istret != 0")
+    if prm.istret != 0:
+        #
+        istret = prm.istret
+        beta = prm.beta
+        yp = np.zeros_like(mesh["y"])
+        yeta = np.zeros_like(mesh["y"])
+        #
+        if staggered:
+            raise NotImplementedError("Unsupported: Not prepared yet for istret != 0")
+
+        yinf = -0.5 * prm.yly
+        den = 2.0 * beta * yinf
+        xnum = -yinf - np.sqrt(np.pi * np.pi * beta * beta + yinf * yinf)
+        alpha = np.abs(xnum / den)
+        xcx = 1.0 / beta / alpha
+        if alpha != 0.0:
+            if istret == 1:
+                yp[0] = 0.0
+            if istret == 2:
+                yp[0] = 0.0
+            if istret == 1:
+                yeta[0] = 0.0
+            if istret == 2:
+                yeta[0] = -0.5
+            if istret == 3:
+                yp[0] = 0.0
+            if istret == 3:
+                yeta[0] = -0.5
+            for j in range(1, prm.ny):
+                if istret == 1:
+                    yeta[j] = j / prm._my
+                if istret == 2:
+                    yeta[j] = j / prm._my - 0.5
+                if istret == 3:
+                    yeta[j] = 0.5 * j / prm._my - 0.5
+                den1 = np.sqrt(alpha * beta + 1.0)
+                xnum = den1 / np.sqrt(alpha / np.pi) / np.sqrt(beta) / np.sqrt(np.pi)
+                den = (
+                    2.0
+                    * np.sqrt(alpha / np.pi)
+                    * np.sqrt(beta)
+                    * np.pi
+                    * np.sqrt(np.pi)
+                )
+                den3 = (
+                    (np.sin(np.pi * yeta[j])) * (np.sin(np.pi * yeta[j])) / beta / np.pi
+                ) + alpha / np.pi
+                den4 = 2.0 * alpha * beta - np.cos(2.0 * np.pi * yeta[j]) + 1.0
+                xnum1 = (
+                    (np.arctan(xnum * np.tan(np.pi * yeta[j])))
+                    * den4
+                    / den1
+                    / den3
+                    / den
+                )
+                cst = (
+                    np.sqrt(beta)
+                    * np.pi
+                    / (2.0 * np.sqrt(alpha) * np.sqrt(alpha * beta + 1.0))
+                )
+                if istret == 1:
+                    if yeta[j] < 0.5:
+                        yp[j] = xnum1 - cst - yinf
+                    if yeta[j] == 0.5:
+                        yp[j] = -yinf
+                    if yeta[j] > 0.5:
+                        yp[j] = xnum1 + cst - yinf
+                elif istret == 2:
+                    if yeta[j] < 0.5:
+                        yp[j] = xnum1 - cst + prm.yly
+                    if yeta[j] == 0.5:
+                        yp[j] = prm.yly
+                    if yeta[j] > 0.5:
+                        yp[j] = xnum1 + cst + prm.yly
+                elif istret == 3:
+                    if yeta[j] < 0.5:
+                        yp[j] = (xnum1 - cst + prm.yly) * 2.0
+                    if yeta[j] == 0.5:
+                        yp[j] = prm.yly * 2.0
+                    if yeta[j] > 0.5:
+                        yp[j] = (xnum1 + cst + prm.yly) * 2.0
+                else:
+                    raise NotImplementedError("Unsupported: invalid value for istret")
+        if alpha == 0.0:
+            yp[0] = -1.0e10
+            for j in range(1, prm.ny):
+                yeta[j] = j / prm.ny
+                yp[j] = -beta * np.cos(np.pi * yeta[j]) / np.sin(yeta[j] * np.pi)
+
+        mesh["y"] = yp
 
     return mesh

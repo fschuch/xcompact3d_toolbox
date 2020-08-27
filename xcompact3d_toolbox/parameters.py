@@ -497,7 +497,6 @@ class Parameters(traitlets.HasTraits):
         group="BasicParam",
         widget=widgets.Dropdown(
             description="istret",
-            disabled=True,
             options=[
                 ("No refinement", 0),
                 ("Refinement at the center", 1),
@@ -520,9 +519,7 @@ class Parameters(traitlets.HasTraits):
 
     beta = traitlets.Float(default_value=1.0, min=0).tag(
         group="BasicParam",
-        widget=widgets.BoundedFloatText(
-            description="beta", min=0.0, max=1e6, disabled=True
-        ),
+        widget=widgets.BoundedFloatText(description="beta", min=0.0, max=1e6),
     )
     """float: Refinement factor in **y**.
 
