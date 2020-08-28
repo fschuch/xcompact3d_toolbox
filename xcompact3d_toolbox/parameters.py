@@ -1506,7 +1506,7 @@ class Parameters(traitlets.HasTraits):
         -------
 
         >>> prm = xcompact3d_toolbox.Parameters()
-        >>> prm.get_mesh()
+        >>> prm.get_mesh
 
         """
         return get_mesh(self)

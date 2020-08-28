@@ -98,7 +98,7 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
     ...     './data/ux0010',
     ...     prm,
     ...     dims = ["x", "y", "z"],
-    ...     coords = prm.get_mesh()
+    ...     coords = prm.get_mesh
     ... )
     """
 
@@ -111,7 +111,7 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
         if "phi" in name:
             name = "phi"
 
-        mesh = prm.get_mesh()
+        mesh = prm.get_mesh
 
         if path == "3d_snapshots":
             pass
