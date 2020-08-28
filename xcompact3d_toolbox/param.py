@@ -34,18 +34,18 @@ def boundary_condition(prm, var=None):
         },
         "pp": {
             "x": {
-                "ncl1": 0 if prm.nclx else 1,
-                "ncln": 0 if prm.ncln else 1,
+                "ncl1": 0 if prm._nclx else 1,
+                "ncln": 0 if prm._nclx else 1,
                 "npaire": 1,
             },
             "y": {
-                "ncl1": 0 if prm.ncly else 1,
-                "ncln": 0 if prm.ncly else 1,
+                "ncl1": 0 if prm._ncly else 1,
+                "ncln": 0 if prm._ncly else 1,
                 "npaire": 1,
             },
             "z": {
-                "ncl1": 0 if prm.nclz else 1,
-                "ncln": 0 if prm.nclz else 1,
+                "ncl1": 0 if prm._nclz else 1,
+                "ncln": 0 if prm._nclz else 1,
                 "npaire": 1,
             },
         },
@@ -54,7 +54,7 @@ def boundary_condition(prm, var=None):
     if prm.numscalar > 0:
 
         BC["phi"] = {
-            "x": {"ncl1": prm.nclxS1, "ncln": prm.nclnS1, "npaire": 1},
+            "x": {"ncl1": prm.nclxS1, "ncln": prm.nclxS1, "npaire": 1},
             "y": {"ncl1": prm.nclyS1, "ncln": prm.nclySn, "npaire": 1},
             "z": {"ncl1": prm.nclzS1, "ncln": prm.nclzSn, "npaire": 1},
         }
