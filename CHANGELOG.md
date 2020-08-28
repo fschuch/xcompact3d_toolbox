@@ -51,7 +51,7 @@ No changes, just trying to get familiar with workflows and the release to Pypi.
 ### Added
 - Unittest for observations and validations at [parameters.py](./xcompact3d_toolbox/parameters.py), by [@fschuch](https://github.com/fschuch).
 
-## Changed
+### Changed
 - Temporarily disabling the link between parameters and their widgets (see [#2](https://github.com/fschuch/xcompact3d_toolbox/issues/2)), by [@fschuch](https://github.com/fschuch).
 
 ## [0.1.1] - 2020-08-14
