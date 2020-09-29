@@ -1,8 +1,8 @@
-from .param import mytype
+from .param import param
 import scipy.sparse as sp
 
 
-def SecondDerivative(n, d, ncl1=2, ncln=2, npaire=1):
+def SecondDerivative(n, d=None, ncl1=2, ncln=2, npaire=1, coord=None):
     """
     f_xx = (-1*f[i-2]+16*f[i-1]-30*f[i+0]+16*f[i+1]-1*f[i+2])/(12*h**2)
     """
@@ -10,7 +10,7 @@ def SecondDerivative(n, d, ncl1=2, ncln=2, npaire=1):
         [-1.0, 16.0, -30.0, 16.0, -1.0],
         offsets=[-2, -1, 0, 1, 2],
         shape=(n, n),
-        dtype=mytype,
+        dtype=param["mytype"],
         format="lil",
     )
 
@@ -97,7 +97,7 @@ def FirstDerivative(n, d, ncl1=2, ncln=2, npaire=1):
         [1.0, -8.0, 8.0, -1],
         offsets=[-2, -1, 1, 2],
         shape=(n, n),
-        dtype=mytype,
+        dtype=param["mytype"],
         format="lil",
     )
 

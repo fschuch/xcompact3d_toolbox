@@ -1,4 +1,4 @@
-from .param import mytype
+from .param import param
 import numpy as np
 
 
@@ -19,7 +19,10 @@ def get_mesh(prm, raf=False, staggered=False):
             n[d] = int(m[d] * prm.nraf + 1)
     # Mesh
     mesh = {
-        d: np.linspace(start=0.0, stop=l[d], num=n[d], endpoint=not ncl[d]) for d in dim
+        d: np.linspace(
+            start=0.0, stop=l[d], num=n[d], endpoint=not ncl[d], dtype=param["mytype"]
+        )
+        for d in dim
     }
     #
     # Half-staggered for pressure
@@ -32,6 +35,7 @@ def get_mesh(prm, raf=False, staggered=False):
                 stop=l[d] - 0.5 * delta,
                 num=m[d],
                 endpoint=not ncl[d],
+                dtype=param["mytype"],
             )
     #
     # stretching

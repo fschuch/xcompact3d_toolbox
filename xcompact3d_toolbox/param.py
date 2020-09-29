@@ -1,15 +1,6 @@
 from numpy import float64
 
-mytype = float64
-""":obj:`numpy.float32` or :obj:`numpy.float64`: Defines the float point precision
-
-This precision is applyed for I/O and for initialization at
-:obj:`xcompact3d_toolbox.sandbox`.
-
-Use :obj:`numpy.float64` (default) if Xcompact3d was compiled with the flag
-``-DDOUBLE_PREC``, or use ``np.float32`` otherwise (including ``-DSAVE_SINGLE``).
-
-"""
+param = {"mytype": float64}
 
 
 def boundary_condition(prm, var=None):
