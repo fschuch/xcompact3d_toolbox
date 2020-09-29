@@ -12,7 +12,7 @@ See https://github.com/fschuch/Xcompact3d/ for more information.
 
 from .array import X3dDataArray, X3dDataset
 from .mesh import get_mesh
-from .param import mytype
+from .param import param
 import numpy as np
 import os.path
 import xarray as xr
@@ -123,7 +123,7 @@ def init_dataset(prm):
     -------
     :obj:`xarray.Dataset`
         Each variable is initialized with
-        ``np.zeros(dtype=xcompact3d_toolbox.mytype)`` and wrapped into a
+        ``np.zeros(dtype=xcompact3d_toolbox.param["mytype"])`` and wrapped into a
         :obj:`xarray.Dataset` with the proper size, dimensions, coordinates and
         attributes, check them for more details. The variables are:
 
@@ -174,7 +174,7 @@ def init_dataset(prm):
     if prm.nclx1 == 2:
         for i, var in enumerate("bxx1 bxy1 bxz1 noise_mod_x1".split()):
             ds[var] = xr.DataArray(
-                mytype(0.0),
+                param["mytype"](0.0),
                 dims=["y", "z"],
                 coords=[ds.y, ds.z],
                 attrs={
@@ -191,7 +191,7 @@ def init_dataset(prm):
     if prm.numscalar != 0:
         if prm.nclxS1 == 2:
             ds["bxphi1"] = xr.DataArray(
-                mytype(0.0),
+                param["mytype"](0.0),
                 dims=["n", "y", "z"],
                 coords=[ds.n, ds.y, ds.z],
                 attrs={
@@ -202,7 +202,7 @@ def init_dataset(prm):
             )
         if prm.nclyS1 == 2:
             ds["byphi1"] = xr.DataArray(
-                mytype(0.0),
+                param["mytype"](0.0),
                 dims=["n", "x", "z"],
                 coords=[ds.n, ds.x, ds.z],
                 attrs={
@@ -213,7 +213,7 @@ def init_dataset(prm):
             )
         if prm.nclySn == 2:
             ds["byphin"] = xr.DataArray(
-                mytype(0.0),
+                param["mytype"](0.0),
                 dims=["n", "x", "z"],
                 coords=[ds.n, ds.x, ds.z],
                 attrs={
@@ -225,7 +225,7 @@ def init_dataset(prm):
     # Initial Condition
     for i, var in enumerate(["ux", "uy", "uz"]):
         ds[var] = xr.DataArray(
-            mytype(0.0),
+            param["mytype"](0.0),
             dims=["x", "y", "z"],
             coords=[ds.x, ds.y, ds.z],
             attrs={
@@ -236,7 +236,7 @@ def init_dataset(prm):
         )
     if prm.numscalar != 0:
         ds["phi"] = xr.DataArray(
-            mytype(0.0),
+            param["mytype"](0.0),
             dims=["n", "x", "y", "z"],
             coords=[ds.n, ds.x, ds.y, ds.z],
             attrs={
@@ -248,7 +248,7 @@ def init_dataset(prm):
     # Flowrate control
     if prm.nclx1 == 0 and prm.nclxn == 0:
         ds["vol_frc"] = xr.DataArray(
-            mytype(0.0),
+            param["mytype"](0.0),
             dims=["x", "y", "z"],
             coords=[ds.x, ds.y, ds.z],
             attrs={

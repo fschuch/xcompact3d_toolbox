@@ -25,7 +25,7 @@ Notes
 
 """
 
-from .param import mytype, boundary_condition
+from .param import param, boundary_condition
 import numpy as np
 import xarray as xr
 import os.path
@@ -47,7 +47,7 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
 
     Attributes include the proper boundary conditions for derivatives if the
     file prefix is ``ux``, ``uy``, ``uz``, ``phi`` or ``pp``. Data type is
-    defined by :obj:`xcompact3d_toolbox.mytype`.
+    defined by :obj:`xcompact3d_toolbox.param["mytype"]`.
 
     Parameters
     ----------
@@ -81,8 +81,8 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
 
     >>> prm = x3d.Parameters()
 
-    >>> xcompact3d_toolbox.mytype = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
-    >>> xcompact3d_toolbox.mytype = np.float32 # otherwise
+    >>> xcompact3d_toolbox.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
+    >>> xcompact3d_toolbox.param["mytype"] = np.float32 # otherwise
 
     In the following cases, coordinates and dimensions are infered from the
     folder containing the file:
@@ -139,8 +139,13 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
         for key, value in coords.items():
             shape.append(value.size)
 
+    if os.path.islink(filename):
+        from os import readlink
+
+        filename = readlink(filename)
+
     return xr.DataArray(
-        np.fromfile(filename, dtype=mytype).reshape(shape, order="F"),
+        np.fromfile(filename, dtype=param["mytype"]).reshape(shape, order="F"),
         dims=dims,
         coords=coords,
         name=name,
@@ -176,8 +181,8 @@ def read_all(filename_pattern, prm):
 
     >>> prm = x3d.Parameters()
 
-    >>> x3d.mytype = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
-    >>> x3d.mytype = np.float32 # otherwise
+    >>> x3d.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
+    >>> x3d.param["mytype"] = np.float32 # otherwise
 
     In the following cases, coordinates and dimensions are infered from the
     folder containing the file and time from the filenames:
@@ -193,10 +198,10 @@ def read_all(filename_pattern, prm):
     dt = prm.dt
     t = dt * np.array(
         [
-            mytype(os.path.basename(file).split("-")[-1].split(".")[0])
+            param["mytype"](os.path.basename(file).split("-")[-1].split(".")[0])
             for file in filenames
         ],
-        dtype=mytype,
+        dtype=param["mytype"],
     )
 
     # numscalar = prm.dict['BasicParam'].get('numscalar', 0)
@@ -280,7 +285,7 @@ def write_xdmf(prm):
         elif folder == "yz_planes":
             nx, dx = 0, 0
 
-        prec = 8 if mytype == np.float64 else 4
+        prec = 8 if param["mytype"] == np.float64 else 4
 
         ibm_flag = "ibm" in prefixes
 

@@ -22,7 +22,6 @@ import numpy as np
 import xarray as xr
 from .array import X3dDataArray, X3dDataset
 from .mesh import get_mesh
-from .param import mytype
 
 
 def gene_epsi_3D(epsi_in_dict, prm):

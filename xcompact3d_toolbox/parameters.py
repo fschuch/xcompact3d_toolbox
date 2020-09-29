@@ -6,7 +6,7 @@ import numpy as np
 import math
 import traitlets
 import ipywidgets as widgets
-from .param import mytype
+from .param import param
 from .mesh import get_mesh
 from .io import i3d_to_dict, dict_to_i3d, write_xdmf
 
@@ -1295,7 +1295,7 @@ class Parameters(traitlets.HasTraits):
                     return "%3.1f %s" % (num, x)
                 num /= step_unit
 
-        prec = 4 if mytype == np.float32 else 8
+        prec = 4 if param["mytype"] == np.float32 else 8
 
         # Restart Size from tools.f90
         count = 3 + self.numscalar  # ux, uy, uz, phi

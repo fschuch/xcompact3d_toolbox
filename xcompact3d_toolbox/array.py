@@ -18,7 +18,7 @@ and :obj:`xarray.Dataset`, all the details are described bellow.
     http://xarray.pydata.org/en/stable/
 """
 
-from .param import mytype
+from .param import param
 from .derive import FirstDerivative, SecondDerivative
 import xarray as xr
 import numpy as np
@@ -90,7 +90,7 @@ class X3dDataset:
             input_core_dims=[[dim]],
             output_core_dims=[[dim]],
             dask="parallelized",
-            output_dtypes=[mytype],
+            output_dtypes=[param["mytype"]],
             kwargs={"x": self._data_set[dim], "axis": -1, "initial": 0.0},
         )
 
@@ -122,7 +122,7 @@ class X3dDataset:
             self._data_set,
             input_core_dims=[[dim]],
             dask="parallelized",
-            output_dtypes=[mytype],
+            output_dtypes=[param["mytype"]],
             kwargs={"x": self._data_set[dim], "axis": -1},
         )
 
@@ -230,7 +230,7 @@ class X3dDataArray:
                 align = []
                 for i in reversed(sorted(self._data_array.dims)):
                     align.append(self._data_array.get_axis_num(i))
-                self._data_array.values.astype(mytype).transpose(align).tofile(
+                self._data_array.values.astype(param["mytype"]).transpose(align).tofile(
                     filename + ".bin"
                 )
 
@@ -380,7 +380,7 @@ class X3dDataArray:
             output_core_dims=[[dim]],
             dask="parallelized",
             vectorize=True,
-            output_dtypes=[mytype],
+            output_dtypes=[param["mytype"]],
         )
 
     def second_derivative(self, dim):
@@ -446,5 +446,5 @@ class X3dDataArray:
             output_core_dims=[[dim]],
             dask="parallelized",
             vectorize=True,
-            output_dtypes=[mytype],
+            output_dtypes=[param["mytype"]],
         )
