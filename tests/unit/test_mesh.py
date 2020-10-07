@@ -16,6 +16,7 @@ class test_mesh(unittest.TestCase):
 
         where combined with two values for beta:
 
+        * ``beta = 0.75``;
         * ``beta = 1``;
         * ``beta = 4``.
 
