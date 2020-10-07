@@ -108,7 +108,7 @@ def FirstDerivative(n, d, ncl1=2, ncln=2, npaire=1):
         rhs[0, -2] = -rhs[0, 2]
         # f_x = (1*f[-1]-8*f[0]+0*f[1]+8*f[2]-1*f[3])/(12*h**1)
         rhs[1, -1] = -rhs[1, 3]
-    if ncln == 1:
+    if ncl1 == 1:
         if npaire == 0:
             # f_x = (-1*f[2]+8*f[1]+0*f[0]+8*f[1]-1*f[2])/(12*h**1)
             rhs[0, 1] *= 2.0
