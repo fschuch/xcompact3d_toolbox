@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `get_boundary_condition` at class `Parameters`. It returns the appropriate boundary parameters that are
 expected by the derivative functions. by [@fschuch](https://github.com/fschuch).
+- First and second derivatives for stretched mesh in y, by [@fschuch](https://github.com/fschuch).
 
 ### Fixed
 - First derivative was incorrect when `ncl1=1` and `ncln=2`. by [@fschuch](https://github.com/fschuch).

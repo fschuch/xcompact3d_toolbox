@@ -6,6 +6,8 @@ param = {"mytype": float64}
 def boundary_condition(prm, var=None):
 
     default = {d: {"ncl1": 2, "ncln": 2, "npaire": 1} for d in ["x", "y", "z"]}
+    default["y"]["istret"] = prm.istret
+    default["y"]["beta"] = prm.beta
 
     BC = {
         "ux": {
@@ -50,4 +52,8 @@ def boundary_condition(prm, var=None):
             "z": {"ncl1": prm.nclzS1, "ncln": prm.nclzSn, "npaire": 1},
         }
 
-    return BC.get(var, default)
+    for key, value in BC.items():
+        value["y"]["istret"] = prm.istret
+        value["y"]["beta"] = prm.beta
+
+    return BC.get(var.lower(), default)

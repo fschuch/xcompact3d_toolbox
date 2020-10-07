@@ -18,6 +18,7 @@ and :obj:`xarray.Dataset`, all the details are described bellow.
     http://xarray.pydata.org/en/stable/
 """
 
+from .mesh import stretching
 from .param import param
 from .derive import FirstDerivative, SecondDerivative
 import xarray as xr
@@ -345,7 +346,9 @@ class X3dDataArray:
         ...     'y': {
         ...         'ncl1': 2,
         ...         'ncln': 1,
-        ...         'npaire': 1
+        ...         'npaire': 1,
+        ...         'istret': 0,
+        ...         'beta': 1.0
         ...     },
         ...     'z': {
         ...         'ncl1': 0,
@@ -358,7 +361,8 @@ class X3dDataArray:
         -----
         The **atribute** ``BC`` is automatically defined for ``ux``, ``uy``,
         ``uz``, ``pp`` and ``phi`` when read from the disc with
-        :obj:`xcompact3d_toolbox.io.readfield`.
+        :obj:`xcompact3d_toolbox.io.readfield` or initialized at
+        :obj:`xcompact3d_toolbox.sendbox.init_dataset`.
         """
 
         if dim not in self._Dx:
@@ -370,18 +374,46 @@ class X3dDataArray:
                 ncl1, ncln, npaire = 2, 2, 1
 
             n = self._data_array[dim].size
-            d = (self._data_array[dim][1] - self._data_array[dim][0]).values
+            m = n if ncl1 == 0 and ncln == 0 else n - 1
+            d = (self._data_array[dim][-1] - self._data_array[dim][0]).values / m
             self._Dx[dim] = FirstDerivative(n, d, ncl1, ncln, npaire)
 
-        return xr.apply_ufunc(
-            lambda f: self._Dx[dim].dot(f),
-            self._data_array,
-            input_core_dims=[[dim]],
-            output_core_dims=[[dim]],
-            dask="parallelized",
-            vectorize=True,
-            output_dtypes=[param["mytype"]],
-        )
+        try:
+            istret = self._data_array.attrs["BC"][dim]["istret"]
+            beta = self._data_array.attrs["BC"][dim]["beta"]
+        except:
+            istret = 0
+            beta = 1.0
+
+        if istret == 0:
+
+            return xr.apply_ufunc(
+                lambda f: self._Dx[dim].dot(f),
+                self._data_array,
+                input_core_dims=[[dim]],
+                output_core_dims=[[dim]],
+                dask="parallelized",
+                vectorize=True,
+                output_dtypes=[param["mytype"]],
+            )
+
+        else:
+
+            yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
+
+            yp, ppy, pp2y, pp4y = stretching(istret, beta, yly, m, n)
+
+            da_ppy = xr.DataArray(ppy, coords=[self._data_array[dim]], name="ppy")
+
+            return da_ppy * xr.apply_ufunc(
+                lambda f: self._Dx[dim].dot(f),
+                self._data_array,
+                input_core_dims=[[dim]],
+                output_core_dims=[[dim]],
+                dask="parallelized",
+                vectorize=True,
+                output_dtypes=[param["mytype"]],
+            )
 
     def second_derivative(self, dim):
         """Compute second derivative with the 4th order accurate centered scheme.
@@ -413,6 +445,8 @@ class X3dDataArray:
         ...         'ncl1': 2,
         ...         'ncln': 1,
         ...         'npaire': 1
+        ...         'istret': 0,
+        ...         'beta': 1.0
         ...     },
         ...     'z': {
         ...         'ncl1': 0,
@@ -425,7 +459,8 @@ class X3dDataArray:
         -----
         The **atribute** ``BC`` is automatically defined for ``ux``, ``uy``,
         ``uz``, ``pp`` and ``phi`` when read from the disc with
-        :obj:`xcompact3d_toolbox.io.readfield`.
+        :obj:`xcompact3d_toolbox.io.readfield` or initialized at
+        :obj:`xcompact3d_toolbox.sendbox.init_dataset`.
         """
         if dim not in self._Dxx:
             try:
@@ -436,15 +471,44 @@ class X3dDataArray:
                 ncl1, ncln, npaire = 2, 2, 1
 
             n = self._data_array[dim].size
-            d = (self._data_array[dim][1] - self._data_array[dim][0]).values
+            m = n if ncl1 == 0 and ncln == 0 else n - 1
+            d = (self._data_array[dim][-1] - self._data_array[dim][0]).values / m
             self._Dxx[dim] = SecondDerivative(n, d, ncl1, ncln, npaire)
 
-        return xr.apply_ufunc(
-            lambda f: self._Dxx[dim].dot(f),
-            self._data_array,
-            input_core_dims=[[dim]],
-            output_core_dims=[[dim]],
-            dask="parallelized",
-            vectorize=True,
-            output_dtypes=[param["mytype"]],
-        )
+        try:
+            istret = self._data_array.attrs["BC"][dim]["istret"]
+            beta = self._data_array.attrs["BC"][dim]["beta"]
+        except:
+            istret = 0
+            beta = 1.0
+
+        if istret == 0:
+
+            return xr.apply_ufunc(
+                lambda f: self._Dxx[dim].dot(f),
+                self._data_array,
+                input_core_dims=[[dim]],
+                output_core_dims=[[dim]],
+                dask="parallelized",
+                vectorize=True,
+                output_dtypes=[param["mytype"]],
+            )
+
+        else:
+
+            yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
+
+            yp, ppy, pp2y, pp4y = stretching(istret, beta, yly, m, n)
+
+            da_pp2y = xr.DataArray(pp2y, coords=[self._data_array[dim]], name="pp2y")
+            da_pp4y = xr.DataArray(pp4y, coords=[self._data_array[dim]], name="pp4y")
+
+            return da_pp2y * xr.apply_ufunc(
+                lambda f: self._Dxx[dim].dot(f),
+                self._data_array,
+                input_core_dims=[[dim]],
+                output_core_dims=[[dim]],
+                dask="parallelized",
+                vectorize=True,
+                output_dtypes=[param["mytype"]],
+            ) - da_pp4y * self._data_array.x3d.first_derivative(dim)
