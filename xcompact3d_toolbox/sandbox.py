@@ -186,8 +186,8 @@ def init_dataset(prm):
         ds.noise_mod_x1.attrs[
             "name"
         ] = "Modulation function for Random Numbers at Inflow Plane"
-        # ds.noise_mod_x1.attrs["long_name"] = r"$\text{mod} (x_1=0,x_2,x_3)$"
-        #
+        ds.noise_mod_x1.attrs["long_name"] = r"$\text{mod} (x_1=0,x_2,x_3)$"
+
     if prm.numscalar != 0:
         if prm.nclxS1 == 2:
             ds["bxphi1"] = xr.DataArray(
@@ -232,6 +232,7 @@ def init_dataset(prm):
                 "file_name": os.path.join("data", var),
                 "name": f"Initial Condition for {description.get(i,'')} Velocity",
                 "long_name": fr"$u_{str(i+1)} (x_1,x_2,x_3,t=0)$",
+                "BC": prm.get_boundary_condition(var),
             },
         )
     if prm.numscalar != 0:
@@ -243,6 +244,7 @@ def init_dataset(prm):
                 "file_name": os.path.join("data", "phi"),
                 "name": "Initial Condition for Scalar field(s)",
                 "long_name": r"$\varphi (x_1,x_2,x_3,n,t=0)$",
+                "BC": prm.get_boundary_condition("phi"),
             },
         )
     # Flowrate control

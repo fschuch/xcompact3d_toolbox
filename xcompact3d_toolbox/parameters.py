@@ -6,7 +6,7 @@ import numpy as np
 import math
 import traitlets
 import ipywidgets as widgets
-from .param import param
+from .param import boundary_condition, param
 from .mesh import get_mesh
 from .io import i3d_to_dict, dict_to_i3d, write_xdmf
 
@@ -1367,6 +1367,38 @@ class Parameters(traitlets.HasTraits):
             except:
                 # print(f'{name} not in dictionary')
                 pass
+
+    def get_boundary_condition(self, var=""):
+        """This method returns the appropriate boundary parameters that are
+        expected by the derivative functions.
+
+        Parameters
+        ----------
+        var : str
+            Variable name (the default is ""). The supported options are `ux`,
+            `uy`, `uz`, `pp` and `phi`, otherwise the method returns a default
+            option.
+
+        Returns
+        -------
+        dict
+            Constants the boundary conditions for the desired variable.
+
+        Examples
+        -------
+
+        >>> prm = x3d.Parameters()
+        >>> prm.get_boundary_condition('ux')
+        {'x': {'ncl1': 1, 'ncln': 1, 'npaire': 0},
+        'y': {'ncl1': 1, 'ncln': 2, 'npaire': 1, 'istret': 0, 'beta': 0.75},
+        'z': {'ncl1': 0, 'ncln': 0, 'npaire': 1}}
+
+        >>> DataArray.attrs['BC'] = prm.get_boundary_condition('ux')
+
+        >>> DataArray.x3d.first_derivative('x')
+        """
+
+        return boundary_condition(self, var)
 
     def read(self):
         """Reads all valid attributes from an ``.i3d`` file.
