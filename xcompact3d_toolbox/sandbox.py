@@ -186,7 +186,7 @@ def init_dataset(prm):
         ds.noise_mod_x1.attrs[
             "name"
         ] = "Modulation function for Random Numbers at Inflow Plane"
-        ds.noise_mod_x1.attrs["long_name"] = r"$\text{mod} (x_1=0,x_2,x_3)$"
+        ds.noise_mod_x1.attrs["long_name"] = r"mod $ (x_1=0,x_2,x_3)$"
 
     if prm.numscalar != 0:
         if prm.nclxS1 == 2:
