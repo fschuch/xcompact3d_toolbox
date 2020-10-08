@@ -75,7 +75,7 @@ class X3dDataset:
         Returns
         -------
         :obj:`xarray.Dataset`
-            Integrated
+            **Integrated**
 
         Examples
         -------
@@ -95,59 +95,84 @@ class X3dDataset:
             kwargs={"x": self._data_set[dim], "axis": -1, "initial": 0.0},
         )
 
-    def simps(self, dim):
-        """Integrate :obj:`xarray.Dataset` in direction ``dim`` using the
+    def simps(self, *args):
+        """Integrate :obj:`xarray.Dataset` in direction(s) ``args`` using the
         composite Simpson’s rule.
         It is a wrapper for :obj:`scipy.integrate.simps`.
 
         Parameters
         ----------
-        dim : str
-            Coordinate used for the integration.
+        arg : str or sequence of str
+            Dimension(s) to compute integration.
 
         Returns
         -------
         :obj:`xarray.Dataset`
-            Integrated
+            **Integrated**
+
+        Raises
+        -------
+        ValueError
+            args must be valid dimensions in the dataset
 
         Examples
         -------
 
         >>> ds.x3d.simps('x')
+        >>> ds.x3d.simps('t')
+        >>> ds.x3d.simps('x', 'y', 'z')
 
         """
+
         from scipy.integrate import simps
 
-        return xr.apply_ufunc(
-            simps,
-            self._data_set,
-            input_core_dims=[[dim]],
-            dask="parallelized",
-            output_dtypes=[param["mytype"]],
-            kwargs={"x": self._data_set[dim], "axis": -1},
-        )
+        def integrate(dataset, dim):
+            return xr.apply_ufunc(
+                simps,
+                dataset,
+                input_core_dims=[[dim]],
+                dask="parallelized",
+                output_dtypes=[param["mytype"]],
+                kwargs={"x": self._data_set[dim], "axis": -1},
+            )
 
-    def pencil_decomp(self, dim=None, chunks=None):
+        for var in args:
+            if not var in self._data_set.dims:
+                raise ValueError(
+                    f'Invalid value for "args", it should be a valid dimension'
+                )
+
+        for i, var in enumerate(args):
+            if i == 0:
+                I = integrate(self._data_set, var)
+            else:
+                I = integrate(I, var)
+
+        return I
+
+    def pencil_decomp(self, *args):
         """Coerce all arrays in this dataset into dask arrays.
 
-        It applies ``chunk=-1`` for all coordinates listed in ``dim``, which means
-        no decompositon, and ``'auto'`` to the others, resulting in a pencil
-        decomposition for parallel evaluation.
+        It applies ``chunk=-1`` for all coordinates listed in ``args``, which
+        means no decompositon, and ``'auto'`` to the others, resulting in a
+        pencil decomposition for parallel evaluation.
 
-        If ``chunks`` is provided, the behavior will be just like
-        :obj:`xarray.Dataset.chunk`.
+        For customized ``chunks`` adjust, see :obj:`xarray.Dataset.chunk`.
 
         Parameters
         ----------
-        dim : str or sequence of str
-            Description of parameter `dim` (the default is None).
-        chunks : int, 'auto' or maping, optional
-            Description of parameter `chunks` (the default is None).
+        arg : str or sequence of str
+            Dimension(s) to apply no decompositon.
 
         Returns
         -------
         :obj:`xarray.Dataset`
             **chunked**
+
+        Raises
+        -------
+        ValueError
+            args must be valid dimensions in the dataset
 
         Examples
         -------
@@ -157,15 +182,21 @@ class X3dDataset:
         >>> ds.x3d.pencil_decomp('y', 'z') # Slab decomposition
 
         """
-        if chunks == None and dim != None:
-            chunks = {}
-            for var in self._data_set.dims:
-                if var in dim:
-                    # no chunking along this dimension
-                    chunks[var] = -1
-                else:
-                    # allow the chunking in this dimension to accommodate ideal chunk sizes
-                    chunks[var] = "auto"
+
+        for var in args:
+            if not var in self._data_set.dims:
+                raise ValueError(
+                    f'Invalid value for "args", it should be a valid dimension'
+                )
+
+        chunks = {}
+        for var in self._data_set.dims:
+            if var in args:
+                # no chunking along this dimension
+                chunks[var] = -1
+            else:
+                # allow the chunking in this dimension to accommodate ideal chunk sizes
+                chunks[var] = "auto"
 
         return self._data_set.chunk(chunks)
 
@@ -260,51 +291,60 @@ class X3dDataArray:
         ds = self._data_array._to_temp_dataset().x3d.cumtrapz(dim)
         return self._data_array._from_temp_dataset(ds)
 
-    def simps(self, dim):
-        """Integrate :obj:`xarray.DataArray` in direction ``dim`` using the
+    def simps(self, *args):
+        """Integrate :obj:`xarray.DataArray` in direction(s) ``args`` using the
         composite Simpson’s rule.
         It is a wrapper for :obj:`scipy.integrate.simps`.
 
         Parameters
         ----------
-        dim : str
-            Coordinate used for the integration.
+        arg : str or sequence of str
+            Dimension(s) to compute integration.
 
         Returns
         -------
         :obj:`xarray.DataArray`
             Integrated
 
+        Raises
+        -------
+        ValueError
+            args must be valid dimensions in the data array
+
         Examples
         -------
 
         >>> da.x3d.simps('x')
+        >>> da.x3d.simps('t')
+        >>> da.x3d.simps('x', 'y', 'z')
 
         """
-        ds = self._data_array._to_temp_dataset().x3d.simps(dim)
+        ds = self._data_array._to_temp_dataset().x3d.simps(*args)
         return self._data_array._from_temp_dataset(ds)
 
-    def pencil_decomp(self, dim=None, chunks=None):
-        """Coerce the array into dask array.
+    def pencil_decomp(self, *args):
+        """Coerce the data array into dask array.
 
-        It applies ``chunk=-1`` for all coordinates listed in ``dim``, which means
-        no decompositon, and ``'auto'`` to the others, resulting in a pencil
-        decomposition for parallel evaluation.
+        It applies ``chunk=-1`` for all coordinates listed in ``args``, which
+        means no decompositon, and ``'auto'`` to the others, resulting in a
+        pencil decomposition for parallel evaluation.
 
-        If ``chunks`` is provided, the behavior will be just like
-        :obj:`xarray.DataArray.chunk`.
+        For customized ``chunks`` adjust, see :obj:`xarray.DataArray.chunk`.
 
         Parameters
         ----------
-        dim : str or sequence of str
-            Description of parameter `dim` (the default is None).
-        chunks : int, 'auto' or maping, optional
-            Description of parameter `chunks` (the default is None).
+        arg : str or sequence of str
+            Dimension(s) to apply no decompositon.
 
         Returns
         -------
         :obj:`xarray.DataArray`
             **chunked**
+
+        Raises
+        -------
+        ValueError
+            args must be valid dimensions in the data array
 
         Examples
         -------
@@ -314,15 +354,17 @@ class X3dDataArray:
         >>> da.x3d.pencil_decomp('y', 'z') # Slab decomposition
 
         """
-        ds = self._data_array._to_temp_dataset().x3d.pencil_decomp(dim, chunks)
+        ds = self._data_array._to_temp_dataset().x3d.pencil_decomp(*args)
         return self._data_array._from_temp_dataset(ds)
 
     def first_derivative(self, dim):
         """Compute first derivative with the 4th order accurate centered scheme.
 
-        It is fully functional with all boundary conditions available on Xcompact3d.
-        The **atribute** ``BC`` is used to store BC information in a dictionary
-        (see examples), default is ``ncl1 = ncln = 2`` and ``npaire = 1``.
+        It is fully functional with all boundary conditions available on
+        Xcompact3d and stretched mesh in y direction.
+        The **atribute** ``BC`` is used to store Boundary Condition information
+        in a dictionary (see examples), default is ``ncl1 = ncln = 2`` and
+        ``npaire = 1``.
 
         Parameters
         ----------
@@ -418,9 +460,11 @@ class X3dDataArray:
     def second_derivative(self, dim):
         """Compute second derivative with the 4th order accurate centered scheme.
 
-        It is fully functional with all boundary conditions available on Xcompact3d.
-        The **atribute** ``BC`` is used to store BC information in a dictionary
-        (see examples), default is ``ncl1 = ncln = 2`` and ``npaire = 1``.
+        It is fully functional with all boundary conditions available on
+        Xcompact3d and stretched mesh in y direction.
+        The **atribute** ``BC`` is used to store Boundary Condition information
+        in a dictionary (see examples), default is ``ncl1 = ncln = 2`` and
+        ``npaire = 1``.
 
         Parameters
         ----------

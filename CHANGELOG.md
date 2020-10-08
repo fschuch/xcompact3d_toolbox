@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 expected by the derivative functions. by [@fschuch](https://github.com/fschuch).
 - First and second derivatives for stretched mesh in y, by [@fschuch](https://github.com/fschuch).
 
+### Changed
+- Syntax for `<da,ds>.x3d.simps` and `<da,ds>.x3d.pencil_decomp`. It is now possible to use them over multiple dimensions with just one call (for instance `ds.x3d.simps('x', 'y', 'z')`), by [@fschuch](https://github.com/fschuch).
+
 ### Fixed
 - First derivative was incorrect when `ncl1=1` and `ncln=2`. by [@fschuch](https://github.com/fschuch).
 
