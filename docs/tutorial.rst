@@ -13,3 +13,4 @@ Sandbox Examples
    examples/Axisymmetric_flow.ipynb
    examples/Cylinder.ipynb
    examples/Square.ipynb
+   examples/Heat-exchanger.ipynb
