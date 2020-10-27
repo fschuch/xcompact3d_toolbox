@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9] - 2020-10-09
+
 ### Added
 - `get_boundary_condition` at class `Parameters`. It returns the appropriate boundary parameters that are
 expected by the derivative functions. by [@fschuch](https://github.com/fschuch).
@@ -85,7 +87,8 @@ No changes, just trying to get familiar with workflows and the release to Pypi.
 - Support to *Sandbox Flow Configuration* (see [fschuch/Xcompact3d](https://github.com/fschuch/Xcompact3d/)), by [@fschuch](https://github.com/fschuch).
 - Ahmed body as benchmark geometry, mirror and plotting tools, by [@momba98](https://github.com/momba98).
 
-[Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.8...HEAD
+[Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.9...HEAD
+[0.1.9]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.5...v0.1.6
