@@ -325,7 +325,7 @@ class Geometry:
         dis = np.sqrt(dis)
 
         if height != None:
-            height /= 2.0
+            height *= 0.5
             # Notice that r*10 is just to garantee that the values are larger than r
             # and consequently outside the cylinder
             dis = dis.where(
@@ -540,7 +540,7 @@ class Geometry:
         if not "y" in kwargs:
             kwargs["y"] = 0.0
         if not "z" in kwargs:
-            kwargs["z"] = 0.5 * self._data_array.z[-1].values - ((389 * s) / 2)
+            kwargs["z"] = 0.5 * self._data_array.z[-1].values - ((389.0 * s) / 2.0)
         else:
             # That is because of the mirror in Z
             raise NotImplementedError("Unsupported: Body must be centered in Z")
@@ -594,19 +594,19 @@ class Geometry:
         tmp = tmp.geo.cylinder(
             x=100.00 * s + kwargs["x"],
             y=150.00 * s + kwargs["y"],
-            z=147.25 * s + kwargs["z"],
+            z=147.25 * s + kwargs["z"] + 1.0,  # fixing issue #5
             axis="z",
             radius=100.00 * s,
-            height=94.50 * s,
+            height=94.50 * s + 2.0,  # fixing issue #5
         )
 
         tmp = tmp.geo.cylinder(
             x=100.00 * s + kwargs["x"],
             y=238.00 * s + kwargs["y"],
-            z=147.25 * s + kwargs["z"],
+            z=147.25 * s + kwargs["z"] + 1.0,  # fixing issue #5
             axis="z",
             radius=100.00 * s,
-            height=94.50 * s,
+            height=94.50 * s + 2.0,  # fixing issue #5
         )
 
         tmp = tmp.geo.cylinder(
