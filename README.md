@@ -41,4 +41,4 @@ Click on any link above to launch [Binder](https://mybinder.org/) and interact w
 
 ## Copyright and License
 
-(c) 2020 [Felipe N. Schuch](https://fschuch.github.io/). All content is under [GPL-3.0 License](https://github.com/fschuch/xcompact3d_toolbox/blob/master/LICENSE).
+All content is under [GPL-3.0 License](https://github.com/fschuch/xcompact3d_toolbox/blob/master/LICENSE).
