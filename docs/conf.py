@@ -19,9 +19,9 @@ sys.path.insert(0, os.path.abspath("../"))
 # -- Project information -----------------------------------------------------
 
 project = "Xcompact3d-toolbox"
-copyright = "2020, Felipe N. Schuch"
+copyright = "2021, Felipe N. Schuch"
 author = "Felipe N. Schuch"
-master_doc = 'index'
+master_doc = "index"
 
 # -- Get version information and date from Git ----------------------------
 
@@ -70,7 +70,17 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    ".i3d",
+    ".bin",
+    ".dat",
+    ".csv",
+    ".out",
+    ".xdmf",
+]
 
 
 # -- Options for HTML output -------------------------------------------------
