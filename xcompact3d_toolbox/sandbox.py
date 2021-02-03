@@ -527,7 +527,7 @@ class Geometry:
 
         import math
 
-        s = scale / 338.0  # adimensional and scale factor
+        s = scale / 288.0  # adimensional and scale factor
 
         for key in kwargs.keys():
             if not key in self._data_array.dims:
