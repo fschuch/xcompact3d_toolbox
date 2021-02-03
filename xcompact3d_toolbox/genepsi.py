@@ -322,6 +322,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
                 )
             ),
             fmt=fmt,
+            newline="\r\n",
         )
 
     X, Z = np.meshgrid(ds.x.values, ds.z.values)
@@ -340,6 +341,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
                 )
             ),
             fmt=fmt,
+            newline="\r\n",
         )
 
     X, Y = np.meshgrid(ds.x.values, ds.y.values)
@@ -366,6 +368,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
                 )
             ),
             fmt=fmt,
+            newline="\r\n",
         )
 
     ds.to_netcdf("./data/geometry/obj.nc")
