@@ -13,7 +13,7 @@ from .parameters import description, Parameters, possible_mesh, possible_mesh_p
 class ParametersGui(Parameters):
     def __init__(self, **kargs):
 
-        super(ParametersGui, self).__init__()
+        super(ParametersGui, self).__init__(**kargs)
 
         self._widgets = dict(
             #
