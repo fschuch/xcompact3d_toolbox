@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Changed from method `__call__` to `__repr__` at `parameters.py` as the procedure to show the parameters on screen, by [@fschuch](https://github.com/fschuch).
+
 ### Fixed
 - Scale factor for Ahmed Body at sandbox, by [@fschuch](https://github.com/fschuch).
 - Fix #5, by [@fschuch](https://github.com/fschuch).

@@ -997,164 +997,37 @@ class Parameters(traitlets.HasTraits):
                 raise KeyError(f"There is no parameter named {key}!")
             setattr(self, key, arg)
 
-        # self.link_widgets()
+    def __repr__(self):
+        self._class_to_dict()
+        string = ""
 
-    def __call__(self, *args):
-        """Returns widgets on demand.
+        string += "! -*- mode: f90 -*-\n"
 
-        Parameters
-        ----------
-        *args : str
-            Name(s) for the desired widget(s).
+        for blockkey, block in self._i3d.items():
+            if blockkey == "auxiliar":
+                continue
 
-        Returns
-        -------
-        :obj:`ipywidgets.VBox`
-            Widgets for an user friendly interface.
+            string += "\n"
+            string += "!===================\n"
+            string += "&" + blockkey + "\n"
+            string += "!===================\n"
+            string += "\n"
 
-        Raises
-        -------
-        KeyError
-            Exception is raised if an argument is not a valid atribute.
-            An attribute is considered valid if it has a ``tag`` named ``widget``.
+            for paramkey, param in block.items():
+                # Check if param is a list or not
+                if isinstance(param, list):
+                    for n, p in enumerate(param):
+                        string += f"{paramkey+'('+str(n+1)+')':>15} = {p:<15} {'! '+description.get(paramkey,'')}\n"
+                # Check if param is a string
+                elif isinstance(param, str):
+                    param = "'" + param + "'"
+                    string += f"{paramkey:>15} = {param:<15} {'! '+description.get(paramkey,'')}\n"
+                else:
+                    string += f"{paramkey:>15} = {param:<15} {'! '+description.get(paramkey,'')}\n"
+            string += "\n"
+            string += "/End\n"
 
-        Examples
-        -------
-
-        >>> prm = xcompact3d_toolbox.Parameters()
-        >>> prm()
-
-        >>> prm('nx', 'xlx', 'dx', 'nclx1', 'nclxn')
-
-        """
-
-        if len(args) == 0:
-            dim = "x y z".split()
-
-            return widgets.VBox(
-                [
-                    widgets.HTML(value="<h1>Xcompact3d Parameters</h1>"),
-                    widgets.HBox(
-                        [
-                            self.trait_metadata("filename", "widget"),
-                            widgets.Button(
-                                description="Read", disabled=True, icon="file-upload"
-                            ),
-                            widgets.Button(
-                                description="Write", disabled=True, icon="file-download"
-                            ),
-                            widgets.Button(
-                                description="Run", disabled=True, icon="rocket"
-                            ),
-                            widgets.Button(
-                                description="Sync", disabled=True, icon="sync"
-                            ),
-                        ]
-                    ),
-                    widgets.HTML(value="<h2>BasicParam</h2>"),
-                    widgets.HBox(
-                        [self.trait_metadata(d, "widget") for d in "itype re".split()]
-                    ),
-                    widgets.HBox(
-                        [
-                            self.trait_metadata(d, "widget")
-                            for d in "iin init_noise inflow_noise".split()
-                        ]
-                    ),
-                    widgets.HTML(value="<h3>Domain Decomposition</h3>"),
-                    widgets.HBox(
-                        [
-                            self.trait_metadata(f"{d}", "widget")
-                            for d in "ncores p_row p_col".split()
-                        ]
-                    ),
-                    widgets.HTML(value="<h3>Temporal discretization</h3>"),
-                    widgets.HBox(
-                        [
-                            self.trait_metadata(d, "widget")
-                            for d in "ifirst ilast dt".split()
-                        ]
-                    ),
-                    widgets.HTML(value="<h3>InOutParam</h3>"),
-                    widgets.HBox(
-                        [
-                            self.trait_metadata(d, "widget")
-                            for d in "irestart nvisu _size_in_disc".split()
-                        ]
-                    ),
-                    widgets.HBox(
-                        [
-                            self.trait_metadata(d, "widget")
-                            for d in "icheckpoint ioutput iprocessing".split()
-                        ]
-                    ),
-                    widgets.HTML(value="<h3>Spatial discretization</h3>"),
-                    widgets.HBox([self.trait_metadata(f"n{d}", "widget") for d in dim]),
-                    widgets.HBox(
-                        [self.trait_metadata(f"{d}l{d}", "widget") for d in dim]
-                    ),
-                    widgets.HBox([self.trait_metadata(f"d{d}", "widget") for d in dim]),
-                    widgets.HBox(
-                        [self.trait_metadata(f"ncl{d}1", "widget") for d in dim]
-                    ),
-                    widgets.HBox(
-                        [self.trait_metadata(f"ncl{d}n", "widget") for d in dim]
-                    ),
-                    widgets.HBox(
-                        [
-                            self.trait_metadata(d, "widget")
-                            for d in "istret beta".split()
-                        ]
-                    ),
-                    widgets.HTML(value="<h2>NumOptions</h2>"),
-                    widgets.HBox(
-                        [
-                            self.trait_metadata(d, "widget")
-                            for d in "ifirstder isecondder itimescheme".split()
-                        ]
-                    ),
-                    widgets.HBox(
-                        [
-                            self.trait_metadata(d, "widget")
-                            for d in "ilesmod nu0nu cnu".split()
-                        ]
-                    ),
-                    widgets.HTML(value="<h2>ScalarParam</h2>"),
-                    widgets.HBox([self.trait_metadata("numscalar", "widget")]),
-                    widgets.HBox(
-                        [self.trait_metadata(f"ncl{d}S1", "widget") for d in dim]
-                    ),
-                    widgets.HBox(
-                        [self.trait_metadata(f"ncl{d}Sn", "widget") for d in dim]
-                    ),
-                    widgets.HBox(
-                        [self.trait_metadata(f"grav{d}", "widget") for d in dim]
-                    ),
-                    widgets.HBox(
-                        [self.trait_metadata(d, "widget") for d in "iibmS".split()]
-                    ),
-                    widgets.HTML(
-                        value="<strong>cp, us, sc, ri, scalar_lbound & scalar_ubound</strong> are lists with length numscalar, set them properly on the code."
-                    ),
-                    widgets.HTML(value="<h2>IBMStuff</h2>"),
-                    widgets.HBox(
-                        [
-                            self.trait_metadata(d, "widget")
-                            for d in "iibm nraf nobjmax".split()
-                        ]
-                    ),
-                ]
-            )
-
-        widgets_list = []
-        for name in args:
-            if name not in self.trait_names():
-                raise KeyError(f"There is no parameter named {name}!")
-            widget = self.trait_metadata(name, "widget")
-            if widget != None:
-                widgets_list.append(widget)
-
-        return widgets.VBox(widgets_list)
+        return string
 
     @traitlets.validate("nx")
     def _validade_mesh_nx(self, proposal):
