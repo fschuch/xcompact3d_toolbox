@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Scale factor for Ahmed Body at sandbox, by [@fschuch](https://github.com/fschuch).
+- Fix #2, by [@fschuch](https://github.com/fschuch).
 - Fix #5, by [@fschuch](https://github.com/fschuch).
 - Fix #6, by [@fschuch](https://github.com/fschuch).
 

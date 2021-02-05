@@ -5,7 +5,6 @@
 import numpy as np
 import math
 import traitlets
-import ipywidgets as widgets
 from .param import boundary_condition, param
 from .mesh import get_mesh
 from .io import i3d_to_dict, dict_to_i3d, write_xdmf
@@ -357,7 +356,7 @@ class Parameters(traitlets.HasTraits):
 
     p_row, p_col = [
         traitlets.Int(default_value=0, min=0).tag(
-            group="BasicParam", widget=widgets.Dropdown(description=name, options=[0])
+            group="BasicParam", desc="Domain decomposition for parallel computation"
         )
         for name in ["p_row", "p_col"]
     ]
@@ -377,23 +376,7 @@ class Parameters(traitlets.HasTraits):
 
     itype = traitlets.Int(default_value=10, min=0, max=10).tag(
         group="BasicParam",
-        widget=widgets.Dropdown(
-            description="itype",
-            disabled=True,
-            options=[
-                ("User", 0),
-                ("Lock-exchange", 1),
-                ("Taylor-Green Vortex", 2),
-                ("Channel", 3),
-                ("Periodic Hill", 4),
-                ("Cylinder", 5),
-                ("Debug Schemes", 6),
-                ("Mixing Layer", 7),
-                ("Turbulent Jet", 8),
-                ("Turbulent Boundary Layer", 9),
-                ("Sandbox", 10),
-            ],
-        ),
+        desc="Flow configuration (1=Lock-exchange, 2=TGV, 3=Channel, 4=Periodic hill, 5=Cylinder, and others)",
     )
     """int: Sets the flow configuration, each one is specified in a different
     ``BC.<flow-configuration>.f90`` file (see `Xcompact3d/src`_), they are:
@@ -413,15 +396,7 @@ class Parameters(traitlets.HasTraits):
     """
 
     iin = traitlets.Int(default_value=0, min=0, max=2).tag(
-        group="BasicParam",
-        widget=widgets.Dropdown(
-            description="iin",
-            options=[
-                ("No random noise", 0),
-                ("Random noise", 1),
-                ("Random noise with fixed seed", 2),
-            ],
-        ),
+        group="BasicParam", desc="Defines pertubation at initial condition"
     )
     """int: Defines perturbation at the initial condition:
 
@@ -438,10 +413,9 @@ class Parameters(traitlets.HasTraits):
 
     nx, ny, nz = [
         traitlets.Int(default_value=17, min=0).tag(
-            group="BasicParam",
-            widget=widgets.Dropdown(description=name, options=possible_mesh),
+            group="BasicParam", desc=f"Number of mesh points in {name} direction"
         )
-        for name in ["nx", "ny", "nz"]
+        for name in "x y z".split()
     ]
     """int: Number of mesh points.
 
@@ -452,59 +426,35 @@ class Parameters(traitlets.HasTraits):
 
     xlx, yly, zlz = [
         traitlets.Float(default_value=1.0, min=0).tag(
-            group="BasicParam",
-            widget=widgets.BoundedFloatText(description=name, min=0.0, max=1e6),
+            group="BasicParam", desc=f"Domain size in {name} direction"
         )
-        for name in ["xlx", "yly", "zlz"]
+        for name in "x y z".split()
     ]
     """float: Domain size.
     """
 
     # Docstrings included together with the class
     nclx1 = traitlets.Int(default_value=2, min=0, max=2).tag(
-        group="BasicParam",
-        widget=widgets.Dropdown(
-            description="nclx1",
-            options=[("Periodic", 0), ("Free-slip", 1), ("Inflow", 2)],
-        ),
+        group="BasicParam", desc="Velocidy boundary condition where x=0"
     )
 
     # Docstrings included together with the class
     nclxn = traitlets.Int(default_value=2, min=0, max=2).tag(
-        group="BasicParam",
-        widget=widgets.Dropdown(
-            description="nclxn",
-            options=[("Periodic", 0), ("Free-slip", 1), ("Outflow", 2)],
-        ),
+        group="BasicParam", desc="Velocidy boundary condition where x=xlx"
     )
 
     # Docstrings included together with the class
     ncly1, nclyn, nclz1, nclzn = [
         traitlets.Int(default_value=2, min=0, max=2).tag(
-            group="BasicParam",
-            widget=widgets.Dropdown(
-                description=name,
-                options=[("Periodic", 0), ("Free-slip", 1), ("No-slip", 2)],
-            ),
+            group="BasicParam", desc=f"Velocidy boundary condition where {name}"
         )
-        for name in "ncly1 nclyn nclz1 nclzn".split()
+        for name in "y=0 y=yly z=0 z=zlz".split()
     ]
 
     # Docstrings included together with the class
     ivisu, ipost, ilesmod = [traitlets.Bool(default_value=True) for i in range(3)]
 
-    istret = traitlets.Int(default_value=0, min=0, max=3).tag(
-        group="BasicParam",
-        widget=widgets.Dropdown(
-            description="istret",
-            options=[
-                ("No refinement", 0),
-                ("Refinement at the center", 1),
-                ("Both sides", 2),
-                ("Just near the bottom", 3),
-            ],
-        ),
-    )
+    istret = traitlets.Int(default_value=0, min=0, max=3).tag(group="BasicParam")
     """int: Controls mesh refinement in **y**:
 
     * 0 - No refinement (default);
@@ -517,10 +467,7 @@ class Parameters(traitlets.HasTraits):
         See :obj:`beta`.
     """
 
-    beta = traitlets.Float(default_value=1.0, min=0).tag(
-        group="BasicParam",
-        widget=widgets.BoundedFloatText(description="beta", min=0.0, max=1e6),
-    )
+    beta = traitlets.Float(default_value=1.0, min=0).tag(group="BasicParam")
     """float: Refinement factor in **y**.
 
     Notes
@@ -528,30 +475,21 @@ class Parameters(traitlets.HasTraits):
         Only necessary if :obj:`istret` :math:`\\ne` 0.
     """
 
-    dt = traitlets.Float(default_value=1e-3, min=0.0).tag(
-        group="BasicParam",
-        widget=widgets.BoundedFloatText(description="dt", min=0.0, max=1e6),
-    )
+    dt = traitlets.Float(default_value=1e-3, min=0.0).tag(group="BasicParam")
     """float: Time step :math:`(\\Delta t)`.
     """
 
     # Docstrings included together with the class
     ifirst, ilast = [
-        traitlets.Int(default_value=0, min=0).tag(
-            group="BasicParam", widget=widgets.IntText(description=name)
-        )
+        traitlets.Int(default_value=0, min=0).tag(group="BasicParam")
         for name in ["ifirst", "ilast"]
     ]
 
-    re = traitlets.Float(default_value=1e3).tag(
-        group="BasicParam", widget=widgets.FloatText(description="re")
-    )
+    re = traitlets.Float(default_value=1e3).tag(group="BasicParam")
     """float: Reynolds number :math:`(Re)`.
     """
 
-    init_noise = traitlets.Float(default_value=0.0).tag(
-        group="BasicParam", widget=widgets.FloatText(description="init_noise")
-    )
+    init_noise = traitlets.Float(default_value=0.0).tag(group="BasicParam")
     """float: Random number amplitude at initial condition.
 
     Notes
@@ -561,9 +499,7 @@ class Parameters(traitlets.HasTraits):
         Only necessary if :obj:`iin` :math:`\\ne` 0.
     """
 
-    inflow_noise = traitlets.Float(default_value=0.0).tag(
-        group="BasicParam", widget=widgets.FloatText(description="inflow_noise")
-    )
+    inflow_noise = traitlets.Float(default_value=0.0).tag(group="BasicParam")
     """float: Random number amplitude at inflow boundary (where :math:`x=0`).
 
     Notes
@@ -572,20 +508,11 @@ class Parameters(traitlets.HasTraits):
     """
 
     ilesmod, ivisu, ipost = [
-        traitlets.Int(default_value=1, min=0, max=1).tag(
-            group="BasicParam",
-            widget=widgets.Dropdown(description=name, options=[("Off", 0), ("On", 1)]),
-        )
+        traitlets.Int(default_value=1, min=0, max=1).tag(group="BasicParam")
         for name in ["ilesmod", "ivisu", "ipost"]
     ]
 
-    iibm = traitlets.Int(default_value=0, min=0, max=2).tag(
-        group="BasicParam",
-        widget=widgets.Dropdown(
-            description="iibm",
-            options=[("Off", 0), ("Forced to zero", 1), ("Interpolated to zero", 2)],
-        ),
-    )
+    iibm = traitlets.Int(default_value=0, min=0, max=2).tag(group="BasicParam")
     """int: Enables Immersed Boundary Method (IBM):
 
     * 0 - Off (default);
@@ -596,12 +523,7 @@ class Parameters(traitlets.HasTraits):
       and imposes no-slip condition at the solid/fluid interface.
     """
 
-    numscalar = traitlets.Int(default_value=0, min=0, max=9).tag(
-        group="BasicParam",
-        widget=widgets.IntSlider(
-            min=0, max=9, description="numscalar", continuous_update=False
-        ),
-    )
+    numscalar = traitlets.Int(default_value=0, min=0, max=9).tag(group="BasicParam")
     """int: Number of scalar fraction, which can have different properties.
 
     Notes
@@ -611,10 +533,7 @@ class Parameters(traitlets.HasTraits):
     """
 
     gravx, gravy, gravz = [
-        traitlets.Float(default_value=0.0).tag(
-            group="BasicParam",
-            widget=widgets.FloatText(description=name, disabled=True),
-        )
+        traitlets.Float(default_value=0.0).tag(group="BasicParam")
         for name in ["gravx", "gravy", "gravz"]
     ]
     """float: Component of the unitary vector pointing in the gravity's direction.
@@ -624,19 +543,7 @@ class Parameters(traitlets.HasTraits):
     # # NumOptions
     #
 
-    ifirstder = traitlets.Int(default_value=4, min=1, max=4).tag(
-        group="NumOptions",
-        widget=widgets.Dropdown(
-            description="ifirstder",
-            disabled=True,
-            options=[
-                ("2nd central", 1),
-                ("4th central", 1),
-                ("4th compact", 1),
-                ("6th compact", 4),
-            ],
-        ),
-    )
+    ifirstder = traitlets.Int(default_value=4, min=1, max=4).tag(group="NumOptions")
     """int: Scheme for first order derivative:
 
     * 1 - 2nd central;
@@ -645,18 +552,7 @@ class Parameters(traitlets.HasTraits):
     * 4 - 6th compact (default).
     """
 
-    isecondder = traitlets.Int(default_value=4, min=1, max=5).tag(
-        group="NumOptions",
-        widget=widgets.Dropdown(
-            description="isecondder",
-            disabled=True,
-            options=[
-                # '2nd central', 1),
-                ("6th compact", 4),
-                ("hyperviscous 6th", 5),
-            ],
-        ),
-    )
+    isecondder = traitlets.Int(default_value=4, min=1, max=5).tag(group="NumOptions",)
     """int: Scheme for second order derivative:
 
     * 1 - 2nd central;
@@ -668,19 +564,7 @@ class Parameters(traitlets.HasTraits):
 
     ipinter = traitlets.Int(3)
 
-    itimescheme = traitlets.Int(default_value=3, min=1, max=7).tag(
-        group="NumOptions",
-        widget=widgets.Dropdown(
-            description="itimescheme",
-            options=[
-                ("Euler", 1),
-                ("AB2", 2),
-                ("AB3", 3),
-                ("RK3", 5),
-                ("Semi-implicit", 7),
-            ],
-        ),
-    )
+    itimescheme = traitlets.Int(default_value=3, min=1, max=7).tag(group="NumOptions")
     """int: Time integration scheme:
 
     * 1 - Euler;
@@ -690,21 +574,11 @@ class Parameters(traitlets.HasTraits):
     * 7 - Semi-implicit.
     """
 
-    nu0nu = traitlets.Float(default_value=4, min=0.0).tag(
-        group="NumOptions",
-        widget=widgets.BoundedFloatText(
-            description="nu0nu", min=0.0, max=1e6, disabled=True
-        ),
-    )
+    nu0nu = traitlets.Float(default_value=4, min=0.0).tag(group="NumOptions")
     """float: Ratio between hyperviscosity/viscosity at nu.
     """
 
-    cnu = traitlets.Float(default_value=0.44, min=0.0).tag(
-        group="NumOptions",
-        widget=widgets.BoundedFloatText(
-            description="cnu", min=0.0, max=1e6, disabled=True
-        ),
-    )
+    cnu = traitlets.Float(default_value=0.44, min=0.0).tag(group="NumOptions")
     """float: Ratio between hypervisvosity at :math:`k_m=2/3\\pi` and :math:`k_c= \\pi`.
     """
 
@@ -712,30 +586,17 @@ class Parameters(traitlets.HasTraits):
     # # InOutParam
     #
 
-    irestart = traitlets.Int(default_value=0, min=0, max=1).tag(
-        group="InOutParam",
-        widget=widgets.Dropdown(
-            description="irestart", options=[("Off", 0), ("On", 1)]
-        ),
-    )
+    irestart = traitlets.Int(default_value=0, min=0, max=1).tag(group="InOutParam")
     """int: Reads initial flow field if equals to 1.
     """
 
-    nvisu = traitlets.Int(default_value=1, min=1).tag(
-        group="InOutParam",
-        widget=widgets.BoundedIntText(
-            description="nvisu", min=1, max=1e9, disabled=True
-        ),
-    )
+    nvisu = traitlets.Int(default_value=1, min=1).tag(group="InOutParam")
     """int: Size for visual collection.
     """
 
     icheckpoint, ioutput, iprocessing = [
-        traitlets.Int(default_value=1000, min=1).tag(
-            group="InOutParam",
-            widget=widgets.BoundedIntText(description=name, min=1, max=1e9),
-        )
-        for name in ["icheckpoint", "ioutput", "iprocessing"]
+        traitlets.Int(default_value=1000, min=1).tag(group="InOutParam")
+        for i in range(3)
     ]
 
     ifilenameformat = traitlets.Int(default_value=9, min=1)
@@ -775,18 +636,7 @@ class Parameters(traitlets.HasTraits):
     """:obj:`list` of :obj:`float`: Upper scalar bound(s), for clipping methodology.
     """
 
-    iibmS = traitlets.Int(default_value=0, min=0, max=3).tag(
-        group="ScalarParam",
-        widget=widgets.Dropdown(
-            description="iibmS",
-            options=[
-                ("Off", 0),
-                ("Forced to zero", 1),
-                ("Interpolated to zero", 2),
-                ("Interpolated to no-flux", 3),
-            ],
-        ),
-    )
+    iibmS = traitlets.Int(default_value=0, min=0, max=3).tag(group="ScalarParam")
     """int: Enables Immersed Boundary Method (IBM) for scalar field(s):
 
     * 0 - Off (default);
@@ -805,13 +655,7 @@ class Parameters(traitlets.HasTraits):
 
     # Docstrings included together with the class
     nclxS1, nclxSn, nclyS1, nclySn, nclzS1, nclzSn = [
-        traitlets.Int(default_value=2, min=0, max=2).tag(
-            group="ScalarParam",
-            widget=widgets.Dropdown(
-                description=name,
-                options=[("Periodic", 0), ("No-flux", 1), ("Dirichlet", 2)],
-            ),
-        )
+        traitlets.Int(default_value=2, min=0, max=2).tag(group="ScalarParam")
         for name in ["nclxS1", "nclxSn", "nclyS1", "nclySn", "nclzS1", "nclzSn"]
     ]
 
@@ -819,19 +663,7 @@ class Parameters(traitlets.HasTraits):
     # # LESModel
     #
 
-    jles = traitlets.Int(default_value=0, min=0, max=4).tag(
-        group="LESModel",
-        widget=widgets.Dropdown(
-            description="ilesmod",
-            options=[
-                ("DNS", 0),
-                ("Phys Smag", 1),
-                ("Phys WALE", 2),
-                ("Phys dyn. Smag", 3),
-                ("iSVV", 4),
-            ],
-        ),
-    )
+    jles = traitlets.Int(default_value=0, min=0, max=4).tag(group="LESModel")
     """int: Chooses LES model, they are:
 
     * 0 - No model (DNS);
@@ -845,23 +677,17 @@ class Parameters(traitlets.HasTraits):
     # # ibmstuff
     #
 
-    nobjmax = traitlets.Int(default_value=1, min=0).tag(
-        group="ibmstuff", widget=widgets.IntText(description="nobjmax", disabled=True)
-    )
+    nobjmax = traitlets.Int(default_value=1, min=0).tag(group="ibmstuff")
     """int: Maximum number of objects in any direction. It is defined
         automatically at :obj:`gene_epsi_3D`.
     """
 
-    nraf = traitlets.Int(default_value=10, min=1).tag(
-        group="ibmstuff", widget=widgets.IntSlider(min=1, max=25, description="nraf")
-    )
+    nraf = traitlets.Int(default_value=10, min=1).tag(group="ibmstuff")
     """int: Refinement constant.
     """
 
     # Auxiliar
-    filename = traitlets.Unicode(default_value="input.i3d").tag(
-        widget=widgets.Text(description="filename")
-    )
+    filename = traitlets.Unicode(default_value="input.i3d").tag()
     """str: Filename for the ``.i3d`` file.
     """
 
@@ -883,10 +709,7 @@ class Parameters(traitlets.HasTraits):
     _mx, _my, _mz = [traitlets.Int(default_value=1, min=1) for i in range(3)]
 
     dx, dy, dz = [
-        traitlets.Float(default_value=0.0625, min=0.0).tag(
-            widget=widgets.BoundedFloatText(description=name, min=0.0, max=1e6)
-        )
-        for name in ["dx", "dy", "dz"]
+        traitlets.Float(default_value=0.0625, min=0.0).tag() for dir in "x y z".split()
     ]
     """float: Mesh resolution.
     """
@@ -904,9 +727,7 @@ class Parameters(traitlets.HasTraits):
         it stores the avalilable options according to the boudary conditions.
     """
 
-    ncores = traitlets.Int(default_value=4, min=1).tag(
-        widget=widgets.BoundedIntText(value=0, min=0, description="ncores", max=1e9)
-    )
+    ncores = traitlets.Int(default_value=4, min=1).tag()
     """int: Number of computational cores where Xcompact3d will run.
     """
 
@@ -919,9 +740,7 @@ class Parameters(traitlets.HasTraits):
     """
 
     # cfl = traitlets.Float(0.0)
-    _size_in_disc = traitlets.Unicode().tag(
-        widget=widgets.Text(value="", description="Size", disabled=True)
-    )
+    size = traitlets.Unicode().tag()
     """str: Auxiliar variable indicating the demanded space in disc
     """
 
@@ -1156,7 +975,7 @@ class Parameters(traitlets.HasTraits):
         "iprocessing",
         "ilast",
     )
-    def _observe_size_in_disc(self, change):
+    def _observe_size(self, change):
         def convert_bytes(num):
             """
             this function will convert bytes to MB.... GB... etc
@@ -1216,7 +1035,7 @@ class Parameters(traitlets.HasTraits):
                 // self.iprocessing
             )
 
-        self._size_in_disc = convert_bytes(count)
+        self.size = convert_bytes(count)
 
     def _class_to_dict(self):
         for name in self.trait_names():
@@ -1302,70 +1121,8 @@ class Parameters(traitlets.HasTraits):
         >>> prm.write()
 
         """
-        self._class_to_dict()
-        dict_to_i3d(self._i3d, self.filename)
-
-    def link_widgets(self, silence=True):
-        """Creates a two-way link between the value of an attribute and its widget.
-
-        This method is called at initialization, but provides an easy way to link
-        any new variable.
-
-        Parameters
-        ----------
-        silence : bool
-            Print error to screen if :obj:`True`.
-
-        Examples
-        -------
-
-        >>> prm = xcompact3d_toolbox.Parameters(filename = 'example.i3d')
-        >>> prm.link_widgets()
-
-        """
-        # Create two-way link between variable and widget
-        for name in self.trait_names():
-            try:
-                traitlets.link(
-                    (self, name), (self.trait_metadata(name, "widget"), "value")
-                )
-            except:
-                if not silence:
-                    print(f"Widget not linked for {name}")
-
-        for dim in ["x", "y", "z"]:
-            traitlets.link(
-                (self, f"_possible_mesh_{dim}"),
-                (self.trait_metadata(f"n{dim}", "widget"), "options"),
-            )
-        for name in ["p_row", "p_col"]:
-            traitlets.link(
-                (self, f"_possible_{name}"),
-                (self.trait_metadata(f"{name}", "widget"), "options"),
-            )
-
-        for name in self.trait_names():
-            if name == "numscalar":
-                continue
-            group = self.trait_metadata(name, "group")
-            if group == "ScalarParam":
-                try:
-                    traitlets.link(
-                        (self, "_iscalar"),
-                        (self.trait_metadata(name, "widget"), "disabled"),
-                    )
-                except:
-                    if not silence:
-                        print(f"Widget not linked to numscalar for {name}")
-        # Try adding a description
-        for name in self.trait_names():
-            if name in description:
-                try:
-                    self.trait_metadata(
-                        name, "widget"
-                    ).description_tooltip = description[name]
-                except:
-                    pass
+        with open(self.filename, "w", encoding="utf-8") as file:
+            file.write(self.__str__())
 
     def write_xdmf(self):
         """Writes four xdmf files:
