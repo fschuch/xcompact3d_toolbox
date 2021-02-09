@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add support for previous parameters format `.prm` (#7), by [@fschuch](https://github.com/fschuch).
+
 ### Changed
 - Changed from method `__call__` to `__repr__` at `parameters.py` as the procedure to show the parameters on screen, by [@fschuch](https://github.com/fschuch).
 

@@ -30,6 +30,7 @@ import numpy as np
 import xarray as xr
 import os.path
 import glob
+import warnings
 
 
 def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
@@ -355,6 +356,58 @@ def write_xdmf(prm):
             f.write("</Xdmf>")
 
 
+def prm_to_dict(filename="incompact3d.prm"):
+
+    f = open(filename)
+
+    dict_outer = {}
+
+    for line in f:
+        # Remove spaces
+        line = " ".join(line.split())
+
+        if line == "":  # Cycle if line is empty
+            continue
+        if line[0] == "#":  # Cycle if starts with a comment
+            continue
+
+        line = line.split("#")
+        # Get variable's name and value
+        param = line[1].strip()
+        value = line[0].strip()
+
+        try:
+            # Converting from string according to datatype
+            if value[0] == "'" and value[-1] == "'":  # String
+                value = value[1:-1]
+            elif value.lower() == ".false.":  # Bool
+                value = False
+            elif value.lower() == ".true.":  # Bool
+                value = True
+            elif "." in value:  # Float
+                value = float(value)
+            else:  # Int
+                value = int(value)
+        except:
+            warnings.warn(f"Can't convert {param} : {value}")
+            continue
+
+        if "(" in param and ")" == param[-1]:  # Param is a list
+            param = param.split("(")[0]
+            if param not in dict_outer:
+                dict_outer[param] = []
+            dict_outer[param].append(value)
+        else:  # Not a list
+            dict_outer[param] = value
+
+    f.close()
+
+    return dict_outer
+
+
+prm_to_dict(filename="incompact3d.prm")
+
+
 def i3d_to_dict(filename="input.i3d"):
 
     f = open(filename)
@@ -398,7 +451,7 @@ def i3d_to_dict(filename="input.i3d"):
             else:  # Int
                 value = int(value)
         except:
-            print(f"Can't convert {param} : {value}")
+            warnings.warn(f"Can't convert {param} : {value}")
             continue
 
         if "(" in param and ")" == param[-1]:  # Param is a list

@@ -5,9 +5,10 @@
 import numpy as np
 import math
 import traitlets
+import warnings
 from .param import boundary_condition, param
 from .mesh import get_mesh
-from .io import i3d_to_dict, dict_to_i3d, write_xdmf
+from .io import i3d_to_dict, dict_to_i3d, prm_to_dict, write_xdmf
 
 possible_mesh = [
     9,
@@ -691,21 +692,6 @@ class Parameters(traitlets.HasTraits):
     """str: Filename for the ``.i3d`` file.
     """
 
-    _i3d = traitlets.Dict(
-        default_value={
-            "BasicParam": {},
-            "NumOptions": {},
-            "InOutParam": {},
-            "Statistics": {},
-            "ScalarParam": {},
-            "LESModel": {},
-            "WallModel": {},
-            "ibmstuff": {},
-            "ForceCVs": {},
-            "CASE": {},
-        }
-    )
-
     _mx, _my, _mz = [traitlets.Int(default_value=1, min=1) for i in range(3)]
 
     dx, dy, dz = [
@@ -811,18 +797,30 @@ class Parameters(traitlets.HasTraits):
             if bc in kwargs:
                 setattr(self, bc, kwargs[bc])
 
+        if "loadfile" in kwargs.keys():
+            self.filename = kwargs["loadfile"]
+            self.load()
+            del kwargs["loadfile"]
+
         for key, arg in kwargs.items():
             if key not in self.trait_names():
-                raise KeyError(f"There is no parameter named {key}!")
+                warnings.warn(f"{key} is not a valid parameter and was not loaded")
             setattr(self, key, arg)
 
     def __repr__(self):
-        self._class_to_dict()
+
+        dictionary = {}
+        for name in self.trait_names():
+            group = self.trait_metadata(name, "group")
+            if group != None:
+                if group not in dictionary.keys():
+                    dictionary[group] = {}
+                dictionary[group][name] = getattr(self, name)
         string = ""
 
         string += "! -*- mode: f90 -*-\n"
 
-        for blockkey, block in self._i3d.items():
+        for blockkey, block in dictionary.items():
             if blockkey == "auxiliar":
                 continue
 
@@ -1037,29 +1035,6 @@ class Parameters(traitlets.HasTraits):
 
         self.size = convert_bytes(count)
 
-    def _class_to_dict(self):
-        for name in self.trait_names():
-            group = self.trait_metadata(name, "group")
-            if group != None:
-                if group not in self._i3d.keys():
-                    self._i3d[group] = {}
-                self._i3d[group][name] = getattr(self, name)
-
-    def _dict_to_class(self):
-
-        # Boundary conditions are high priority in order to avoid bugs
-        for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn".split():
-            if bc in self._i3d["BasicParam"]:
-                setattr(self, bc, self._i3d["BasicParam"][bc])
-
-        for name in self.trait_names():
-            try:
-                group = self.trait_metadata(name, "group")
-                setattr(self, name, self._i3d[group][name])
-            except:
-                # print(f'{name} not in dictionary')
-                pass
-
     def get_boundary_condition(self, var=""):
         """This method returns the appropriate boundary parameters that are
         expected by the derivative functions.
@@ -1092,21 +1067,57 @@ class Parameters(traitlets.HasTraits):
 
         return boundary_condition(self, var)
 
-    def read(self):
-        """Reads all valid attributes from an ``.i3d`` file.
+    def load(self):
+        """Loads all valid attributes from the parameters file.
 
         An attribute is considered valid if it has a ``tag`` named ``group``,
         witch assigns it to the respective namespace at the ``.i3d`` file.
+
+        It also includes support for the previous format ``.prm``.
 
         Examples
         -------
 
         >>> prm = xcompact3d_toolbox.Parameters(filename = 'example.i3d')
-        >>> prm.read()
+        >>> prm.load()
+
+        or just:
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile = 'example.i3d')
 
         """
-        self._i3d = i3d_to_dict(self.filename)
-        self._dict_to_class()
+
+        if self.filename.split(".")[-1] == "i3d":
+            dictionary = {}
+
+            # unpacking the nested dictionary
+            for key_out, value_out in i3d_to_dict(self.filename).items():
+                for key_in, value_in in value_out.items():
+                    dictionary[key_in] = value_in
+
+        elif self.filename.split(".")[-1] == "prm":
+            dictionary = prm_to_dict(self.filename)
+
+        else:
+            raise IOError(
+                f"{self.filename} is invalid. Supported formats are .i3d and .prm."
+            )
+
+        # Boundary conditions are high priority in order to avoid bugs
+        for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn".split():
+            if bc in dictionary:
+                setattr(self, bc, dictionary[bc])
+
+        for key, value in dictionary.items():
+            try:
+                if self.trait_metadata(key, "group") != None:
+                    setattr(self, key, dictionary[key])
+            except:
+                warnings.warn(f"{key} is not a valid parameter and was not loaded")
+
+    def read(self):
+        """See :obj:`xcompact3d_toolbox.Parameters.load`."""
+        warnings.warn("read is deprecated, use load", DeprecationWarning)
+        self.load()
 
     def write(self):
         """Writes all valid attributes to an ``.i3d`` file.
@@ -1117,12 +1128,20 @@ class Parameters(traitlets.HasTraits):
         Examples
         -------
 
-        >>> prm = xcompact3d_toolbox.Parameters(filename = 'example.i3d')
+        >>> prm = xcompact3d_toolbox.Parameters(filename = 'example.i3d'
+        ...     nx = 101,
+        ...     ny = 65,
+        ...     nz = 11,
+        ...     # end so on...
+        ... )
         >>> prm.write()
 
         """
-        with open(self.filename, "w", encoding="utf-8") as file:
-            file.write(self.__str__())
+        if self.filename.split(".")[-1] == "i3d":
+            with open(self.filename, "w", encoding="utf-8") as file:
+                file.write(self.__str__())
+        else:
+            raise filename("Format error, only .i3d is supported")
 
     def write_xdmf(self):
         """Writes four xdmf files:
