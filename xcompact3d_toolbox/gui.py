@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 Manipulate the physical and computational parameters, just like :obj:`xcompact3d_toolbox.parameters.Parameters`,
-but with IPywidgets.
+but with `ipywidgets`_.
+
+.. _ipywidgets:
+    https://ipywidgets.readthedocs.io/en/latest/
 """
 
 import ipywidgets as widgets
@@ -11,8 +14,78 @@ from .parameters import description, Parameters, possible_mesh, possible_mesh_p
 
 
 class ParametersGui(Parameters):
-    def __init__(self, **kargs):
+    """This class is derivated from :obj:`xcompact3d_toolbox.parameters.Parameters`,
+    including all its features. In addition, there is a two way link between the
+    parameters and their widgets. Control them with code and/or with the graphical
+    user interface.
 
+    """
+
+    def __init__(self, **kargs):
+        """Initializes the Parameters Class.
+
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments for valid atributes.
+
+        Raises
+        -------
+        KeyError
+            Exception is raised when an Keyword arguments is not a valid atribute.
+
+        Examples
+        -------
+
+        There are a few ways to initialize the class.
+
+        First, calling it with no
+        arguments initializes all variables with default value:
+
+        >>> prm = xcompact3d_toolbox.ParametersGui()
+
+        It is possible to set any values afterwards (including new atributes):
+
+        >>> prm.re = 1e6
+
+        Second, we can specify some values, and let the missing ones be
+        initialized with default value:
+
+        >>> prm = x3d.ParametersGui(
+        ...     filename = 'example.i3d',
+        ...     itype = 10,
+        ...     nx = 257,
+        ...     ny = 129,
+        ...     nz = 32,
+        ...     xlx = 15.0,
+        ...     yly = 10.0,
+        ...     zlz = 3.0,
+        ...     nclx1 = 2,
+        ...     nclxn = 2,
+        ...     ncly1 = 1,
+        ...     nclyn = 1,
+        ...     nclz1 = 0,
+        ...     nclzn = 0,
+        ...     re = 300.0,
+        ...     init_noise = 0.0125,
+        ...     dt = 0.0025,
+        ...     ilast = 45000,
+        ...     ioutput = 200,
+        ...     iprocessing = 50
+        ... )
+
+        And finally, it is possible to read the parameters from the disc:
+
+        >>> prm = xcompact3d_toolbox.ParametersGui(loadfile = 'example.i3d')
+
+        It also supports the previous parameters file format (see `#7`_):
+
+        >>> prm = xcompact3d_toolbox.ParametersGui(loadfile = 'incompact3d.prm')
+
+        .. _#7:
+            https://github.com/fschuch/xcompact3d_toolbox/issues/7
+
+        """
         super(ParametersGui, self).__init__(**kargs)
 
         self._widgets = dict(
@@ -255,9 +328,10 @@ class ParametersGui(Parameters):
         """Creates a two-way link between the value of an attribute and its widget.
         This method is called at initialization, but provides an easy way to link
         any new variable.
+
         Examples
         -------
-        >>> prm = xcompact3d_toolbox.ParametersGUI(filename = 'example.i3d')
+        >>> prm = xcompact3d_toolbox.ParametersGui(loadfile = 'example.i3d')
         >>> prm.link_widgets()
         """
 
