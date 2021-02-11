@@ -13,8 +13,6 @@ class test_parameters(unittest.TestCase):
         prm2.read()
 
         for name in prm1.trait_names():
-            if name == "_i3d":
-                continue
             with self.subTest(name=name):
                 self.assertEqual(getattr(prm1, name), getattr(prm2, name))
 
