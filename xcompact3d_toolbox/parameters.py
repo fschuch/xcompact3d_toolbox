@@ -838,9 +838,9 @@ class Parameters(traitlets.HasTraits):
         representation of the .i3d file."""
         dictionary = {}
         for name in self.trait_names():
-            if skip_default:
-                if getattr(self, name) == self.trait_defaults(name):
-                    continue
+            # if skip_default:
+            #     if getattr(self, name) == self.trait_defaults(name):
+            #         continue
             group = self.trait_metadata(name, "group")
             if group != None:
                 if group not in dictionary.keys():
@@ -1436,7 +1436,7 @@ class Parameters(traitlets.HasTraits):
             with open(self.filename, "w", encoding="utf-8") as file:
                 file.write(self.__str__())
         else:
-            raise filename("Format error, only .i3d is supported")
+            raise IOError("Format error, only .i3d is supported")
 
     def write_xdmf(self):
         """Writes four xdmf files:
