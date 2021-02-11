@@ -12,16 +12,18 @@ Parameters
    :members:
    :special-members:
 
+Parameters - GUI
+-----------------
+
+.. automodule:: xcompact3d_toolbox.gui
+  :members:
+  :special-members:
+
+
 Data Structures
 -----------------
 
 .. automodule:: xcompact3d_toolbox.array
-   :members:
-
-I/O
------------------
-
-.. automodule:: xcompact3d_toolbox.io
    :members:
 
 Sandbox

@@ -246,119 +246,9 @@ class Parameters(traitlets.HasTraits):
     .. _#2:
         https://github.com/fschuch/xcompact3d_toolbox/issues/2
 
-    Attributes
-    ----------
-    nclx1 : int
-        Boundary condition for velocity field where :math:`x=0`, the options are:
-
-        * 0 - Periodic;
-        * 1 - Free-slip;
-        * 2 - Inflow.
-
-    nclxn : int
-        Boundary condition for velocity field where :math:`x=L_x`, the options are:
-
-        * 0 - Periodic;
-        * 1 - Free-slip;
-        * 2 - Convective outflow.
-
-    ncly1 : int
-        Boundary condition for velocity field where :math:`y=0`, the options are:
-
-        * 0 - Periodic;
-        * 1 - Free-slip;
-        * 2 - No-slip.
-
-    nclyn : int
-        Boundary condition for velocity field where :math:`y=L_y`, the options are:
-
-        * 0 - Periodic;
-        * 1 - Free-slip;
-        * 2 - No-slip.
-
-    nclz1 : int
-        Boundary condition for velocity field where :math:`z=0`, the options are:
-
-        * 0 - Periodic;
-        * 1 - Free-slip;
-        * 2 - No-slip.
-
-    nclzn : int
-        Boundary condition for velocity field where :math:`z=L_z`, the options are:
-
-        * 0 - Periodic;
-        * 1 - Free-slip;
-        * 2 - No-slip.
-
-    nclxS1 : int
-        Boundary condition for scalar field(s) where :math:`x=0`, the options are:
-
-        * 0 - Periodic;
-        * 1 - No-flux;
-        * 2 - Inflow.
-
-    nclxSn : int
-        Boundary condition for scalar field(s) where :math:`x=L_x`, the options are:
-
-        * 0 - Periodic;
-        * 1 - No-flux;
-        * 2 - Convective outflow.
-
-    nclyS1 : int
-        Boundary condition for scalar field(s) where :math:`y=0`, the options are:
-
-        * 0 - Periodic;
-        * 1 - No-flux;
-        * 2 - Dirichlet.
-
-    nclySn : int
-        Boundary condition for scalar field(s) where :math:`y=L_y`, the options are:
-
-        * 0 - Periodic;
-        * 1 - No-flux;
-        * 2 - Dirichlet.
-
-    nclzS1 : int
-        Boundary condition for scalar field(s) where :math:`z=0`, the options are:
-
-        * 0 - Periodic;
-        * 1 - No-flux;
-        * 2 - Dirichlet.
-
-    nclzSn : int
-        Boundary condition for scalar field(s) where :math:`z=L_z`, the options are:
-
-        * 0 - Periodic;
-        * 1 - No-flux;
-        * 2 - Dirichlet.
-
-    ivisu : bool
-        Enables store snapshots if :obj:`True`.
-
-    ipost : bool
-        Enables online postprocessing if :obj:`True`.
-
-    ilesmod : bool
-        Enables Large-Eddy methodologies if :obj:`True`.
-
-    ifirst : int
-        The number for the first iteration.
-
-    ilast : int
-        The number for the last iteration.
-
-    icheckpoint : int
-        Frequency for writing restart file.
-
-    ioutput : int
-        Frequency for visualization (3D snapshots).
-
-    iprocessing : int
-        Frequency for online postprocessing.
-
-        Notes
-        -----
-            The exactly output may be different according to each flow configuration.
+    Notes
+    -----
+        This is a work in progress, not all parameters are covered yet.
     """
 
     #
@@ -367,9 +257,10 @@ class Parameters(traitlets.HasTraits):
 
     p_row, p_col = [
         traitlets.Int(default_value=0, min=0).tag(
-            group="BasicParam", desc="Domain decomposition for parallel computation"
+            group="BasicParam",
+            desc=f"{name} for domain decomposition and parallel computation",
         )
-        for name in ["p_row", "p_col"]
+        for name in ["Row partition", "Column partition"]
     ]
     """int: Defines the domain decomposition for (large-scale) parallel computation.
 
@@ -387,7 +278,7 @@ class Parameters(traitlets.HasTraits):
 
     itype = traitlets.Int(default_value=10, min=0, max=10).tag(
         group="BasicParam",
-        desc="Flow configuration (1=Lock-exchange, 2=TGV, 3=Channel, 4=Periodic hill, 5=Cylinder, and others)",
+        desc="Flow configuration (1:Lock-exchange, 2:TGV, 3:Channel, and others)",
     )
     """int: Sets the flow configuration, each one is specified in a different
     ``BC.<flow-configuration>.f90`` file (see `Xcompact3d/src`_), they are:
@@ -424,7 +315,7 @@ class Parameters(traitlets.HasTraits):
 
     nx, ny, nz = [
         traitlets.Int(default_value=17, min=0).tag(
-            group="BasicParam", desc=f"Number of mesh points in {name} direction"
+            group="BasicParam", desc=f"{name.upper()}-direction nodes"
         )
         for name in "x y z".split()
     ]
@@ -437,35 +328,108 @@ class Parameters(traitlets.HasTraits):
 
     xlx, yly, zlz = [
         traitlets.Float(default_value=1.0, min=0).tag(
-            group="BasicParam", desc=f"Domain size in {name} direction"
+            group="BasicParam", desc=f"Size of the box in {name}-direction"
         )
         for name in "x y z".split()
     ]
     """float: Domain size.
     """
 
-    # Docstrings included together with the class
     nclx1 = traitlets.Int(default_value=2, min=0, max=2).tag(
-        group="BasicParam", desc="Velocidy boundary condition where x=0"
+        group="BasicParam", desc="Velocity boundary condition where x=0"
     )
+    """int: Boundary condition for velocity field where :math:`x=0`, the options are:
 
-    # Docstrings included together with the class
+        * 0 - Periodic;
+        * 1 - Free-slip;
+        * 2 - Inflow.
+    """
+
     nclxn = traitlets.Int(default_value=2, min=0, max=2).tag(
-        group="BasicParam", desc="Velocidy boundary condition where x=xlx"
+        group="BasicParam", desc="Velocity boundary condition where x=xlx"
     )
+    """int: Boundary condition for velocity field where :math:`x=L_x`, the options are:
 
-    # Docstrings included together with the class
-    ncly1, nclyn, nclz1, nclzn = [
-        traitlets.Int(default_value=2, min=0, max=2).tag(
-            group="BasicParam", desc=f"Velocidy boundary condition where {name}"
-        )
-        for name in "y=0 y=yly z=0 z=zlz".split()
-    ]
+    * 0 - Periodic;
+    * 1 - Free-slip;
+    * 2 - Convective outflow.
+    """
 
-    # Docstrings included together with the class
-    ivisu, ipost, ilesmod = [traitlets.Bool(default_value=True) for i in range(3)]
+    ncly1 = traitlets.Int(default_value=2, min=0, max=2).tag(
+        group="BasicParam", desc="Velocity boundary condition where y=0"
+    )
+    """int: Boundary condition for velocity field where :math:`y=0`, the options are:
 
-    istret = traitlets.Int(default_value=0, min=0, max=3).tag(group="BasicParam")
+        * 0 - Periodic;
+        * 1 - Free-slip;
+        * 2 - No-slip.
+    """
+
+    nclyn = traitlets.Int(default_value=2, min=0, max=2).tag(
+        group="BasicParam", desc="Velocity boundary condition where y=yly"
+    )
+    """int: Boundary condition for velocity field where :math:`y=L_y`, the options are:
+
+        * 0 - Periodic;
+        * 1 - Free-slip;
+        * 2 - No-slip.
+    """
+
+    nclz1 = traitlets.Int(default_value=2, min=0, max=2).tag(
+        group="BasicParam", desc="Velocity boundary condition where z=0"
+    )
+    """int: Boundary condition for velocity field where :math:`z=0`, the options are:
+
+        * 0 - Periodic;
+        * 1 - Free-slip;
+        * 2 - No-slip.
+    """
+
+    nclzn = traitlets.Int(default_value=2, min=0, max=2).tag(
+        group="BasicParam", desc="Velocity boundary condition where z=zlz"
+    )
+    """int: Boundary condition for velocity field where :math:`z=L_z`, the options are:
+
+        * 0 - Periodic;
+        * 1 - Free-slip;
+        * 2 - No-slip.
+    """
+
+    ivisu = traitlets.Int(default_value=1, min=0, max=1).tag(
+        group="BasicParam",
+        desc="Enable store snapshots at a frequency ioutput (0: No, 1: Yes)",
+    )
+    """int: Enables store snapshots at a frequency :obj:`ioutput`:
+
+        * 0 - No;
+        * 1 - Yes (default).
+    """
+
+    ipost = traitlets.Int(default_value=0, min=0, max=1).tag(
+        group="BasicParam",
+        desc="Enables online postprocessing at a frequency iprocessing (0: No, 1: Yes)",
+    )
+    """int: Enables online postprocessing at a frequency :obj:`iprocessing`:
+
+        * 0 - No;
+        * 1 - Yes (default).
+
+      .. note:: The computation for each case is specified at the ``BC.<flow-configuration>.f90`` file.
+    """
+
+    ilesmod = traitlets.Int(default_value=0, min=0, max=1).tag(
+        group="BasicParam", desc="Enables Large-Eddy methodologies (0: No, 1: Yes)"
+    )
+    """int: Enables Large-Eddy methodologies:
+
+        * 0 - No (also forces :obj:`nu0nu` and :obj:`cnu` to 4.0 and 0.44, respectively);
+        * 1 - Yes (alse activates the namespace **LESModel**, with variables like :obj:`jles`).
+    """
+
+    istret = traitlets.Int(default_value=0, min=0, max=3).tag(
+        group="BasicParam",
+        desc="y mesh refinement (0:no, 1:center, 2:both sides, 3:bottom)",
+    )
     """int: Controls mesh refinement in **y**:
 
     * 0 - No refinement (default);
@@ -478,7 +442,9 @@ class Parameters(traitlets.HasTraits):
         See :obj:`beta`.
     """
 
-    beta = traitlets.Float(default_value=1.0, min=0).tag(group="BasicParam")
+    beta = traitlets.Float(default_value=1.0, min=0).tag(
+        group="BasicParam", desc="Refinement parameter"
+    )
     """float: Refinement factor in **y**.
 
     Notes
@@ -486,21 +452,33 @@ class Parameters(traitlets.HasTraits):
         Only necessary if :obj:`istret` :math:`\\ne` 0.
     """
 
-    dt = traitlets.Float(default_value=1e-3, min=0.0).tag(group="BasicParam")
+    dt = traitlets.Float(default_value=1e-3, min=0.0).tag(
+        group="BasicParam", desc="Time step"
+    )
     """float: Time step :math:`(\\Delta t)`.
     """
 
-    # Docstrings included together with the class
-    ifirst, ilast = [
-        traitlets.Int(default_value=0, min=0).tag(group="BasicParam")
-        for name in ["ifirst", "ilast"]
-    ]
+    ifirst = traitlets.Int(default_value=0, min=0).tag(
+        group="BasicParam", desc="The number for the first iteration"
+    )
+    """int: The number for the first iteration.
+    """
 
-    re = traitlets.Float(default_value=1e3).tag(group="BasicParam")
+    ilast = traitlets.Int(default_value=0, min=0).tag(
+        group="BasicParam", desc="The number for the last iteration"
+    )
+    """int: The number for the last iteration.
+    """
+
+    re = traitlets.Float(default_value=1e3).tag(
+        group="BasicParam", desc="Reynolds number"
+    )
     """float: Reynolds number :math:`(Re)`.
     """
 
-    init_noise = traitlets.Float(default_value=0.0).tag(group="BasicParam")
+    init_noise = traitlets.Float(default_value=0.0).tag(
+        group="BasicParam", desc="Turbulence intensity (1=100%) !! Initial condition"
+    )
     """float: Random number amplitude at initial condition.
 
     Notes
@@ -510,20 +488,19 @@ class Parameters(traitlets.HasTraits):
         Only necessary if :obj:`iin` :math:`\\ne` 0.
     """
 
-    inflow_noise = traitlets.Float(default_value=0.0).tag(group="BasicParam")
+    inflow_noise = traitlets.Float(default_value=0.0).tag(
+        group="BasicParam", desc="Turbulence intensity (1=100%) !! Inflow condition"
+    )
     """float: Random number amplitude at inflow boundary (where :math:`x=0`).
 
     Notes
     -----
         Only necessary if :obj:`nclx1` is equal to 2.
     """
-    # Docstrings included together with the class
-    ilesmod, ivisu, ipost = [
-        traitlets.Int(default_value=1, min=0, max=1).tag(group="BasicParam")
-        for name in ["ilesmod", "ivisu", "ipost"]
-    ]
 
-    iibm = traitlets.Int(default_value=0, min=0, max=2).tag(group="BasicParam")
+    iibm = traitlets.Int(default_value=0, min=0, max=2).tag(
+        group="BasicParam", desc="Flag for immersed boundary method (0: No, 1: Yes)"
+    )
     """int: Enables Immersed Boundary Method (IBM):
 
     * 0 - Off (default);
@@ -532,10 +509,16 @@ class Parameters(traitlets.HasTraits):
     * 2 - On with alternating forcing method, i.e, it uses
       Lagrangian Interpolators to define the velocity inside the body
       and imposes no-slip condition at the solid/fluid interface.
+
+    Any option greater than zero activates the namespace **ibmstuff**, for variables like :obj:`nobjmax` and :obj:`nraf`.
     """
 
-    numscalar = traitlets.Int(default_value=0, min=0, max=9).tag(group="BasicParam")
+    numscalar = traitlets.Int(default_value=0, min=0, max=9).tag(
+        group="BasicParam", desc="Number of scalar fractions"
+    )
     """int: Number of scalar fraction, which can have different properties.
+    Any option greater than zero activates the namespace **numscalar**,
+    for variables like :obj:`sc`, :obj:`ri`, :obj:`uset` and others.
 
     Notes
     -----
@@ -544,8 +527,10 @@ class Parameters(traitlets.HasTraits):
     """
 
     gravx, gravy, gravz = [
-        traitlets.Float(default_value=0.0).tag(group="BasicParam")
-        for name in ["gravx", "gravy", "gravz"]
+        traitlets.Float(default_value=0.0).tag(
+            group="BasicParam", desc=f"Gravity unitary vector in {name}-direction"
+        )
+        for name in "x y z".split()
     ]
     """float: Component of the unitary vector pointing in the gravity's direction.
     """
@@ -563,7 +548,9 @@ class Parameters(traitlets.HasTraits):
     * 4 - 6th compact (default).
     """
 
-    isecondder = traitlets.Int(default_value=4, min=1, max=5).tag(group="NumOptions",)
+    isecondder = traitlets.Int(default_value=4, min=1, max=5).tag(
+        group="NumOptions", desc="Scheme for first order derivative"
+    )
     """int: Scheme for second order derivative:
 
     * 1 - 2nd central;
@@ -575,7 +562,10 @@ class Parameters(traitlets.HasTraits):
 
     ipinter = traitlets.Int(3)
 
-    itimescheme = traitlets.Int(default_value=3, min=1, max=7).tag(group="NumOptions")
+    itimescheme = traitlets.Int(default_value=3, min=1, max=7).tag(
+        group="NumOptions",
+        desc="Time integration scheme (1: Euler, 2: AB2, 3: AB3, 5: RK3)",
+    )
     """int: Time integration scheme:
 
     * 1 - Euler;
@@ -585,11 +575,17 @@ class Parameters(traitlets.HasTraits):
     * 7 - Semi-implicit.
     """
 
-    nu0nu = traitlets.Float(default_value=4, min=0.0).tag(group="NumOptions")
+    nu0nu = traitlets.Float(default_value=4, min=0.0).tag(
+        group="NumOptions",
+        desc="Ratio between hyperviscosity/viscosity at nu (dissipation factor intensity)",
+    )
     """float: Ratio between hyperviscosity/viscosity at nu.
     """
 
-    cnu = traitlets.Float(default_value=0.44, min=0.0).tag(group="NumOptions")
+    cnu = traitlets.Float(default_value=0.44, min=0.0).tag(
+        group="NumOptions",
+        desc="Ratio between hypervisvosity at km=2/3π and kc=π (dissipation factor range)",
+    )
     """float: Ratio between hypervisvosity at :math:`k_m=2/3\\pi` and :math:`k_c= \\pi`.
     """
 
@@ -597,28 +593,50 @@ class Parameters(traitlets.HasTraits):
     # # InOutParam
     #
 
-    irestart = traitlets.Int(default_value=0, min=0, max=1).tag(group="InOutParam")
+    irestart = traitlets.Int(default_value=0, min=0, max=1).tag(
+        group="InOutParam", desc="Read initial flow field (0: No, 1: Yes)"
+    )
     """int: Reads initial flow field if equals to 1.
     """
 
-    nvisu = traitlets.Int(default_value=1, min=1).tag(group="InOutParam")
+    nvisu = traitlets.Int(default_value=1, min=1).tag(
+        group="InOutParam", desc="Size for visualisation collection"
+    )
     """int: Size for visual collection.
     """
 
-    icheckpoint, ioutput, iprocessing = [
-        traitlets.Int(default_value=1000, min=1).tag(group="InOutParam")
-        for i in range(3)
-    ]
+    icheckpoint = traitlets.Int(default_value=1000, min=1).tag(
+        group="InOutParam", desc="Frequency for writing backup file"
+    )
+    """int: Frequency for writing restart file.
+    """
+
+    ioutput = traitlets.Int(default_value=1000, min=1).tag(
+        group="InOutParam", desc="Frequency for visualization file"
+    )
+    """int: Frequency for visualization (3D snapshots).
+    """
+
+    iprocessing = traitlets.Int(default_value=1000, min=1).tag(
+        group="InOutParam", desc="Frequency for online postprocessing"
+    )
+    """int: Frequency for online postprocessing.
+    """
 
     filenamedigits = traitlets.Int(default_value=0, min=0, max=1).tag(
-        group="InOutParam"
+        group="InOutParam",
+        desc="Controls the way that the output binary files are enumerated",
     )
     """int: Controls the way that the output binary files are enumerated:
 
     * 0 - Files receive the number according to the current timestep (default);
     * 1 - Continuous counting.
     """
-    ifilenameformat = traitlets.Unicode(default_value="(I9.9)").tag(group="InOutParam")
+
+    ifilenameformat = traitlets.Unicode(default_value="(I9.9)").tag(
+        group="InOutParam",
+        desc="The number of digits used to name the output binary files",
+    )
     """str: The number of digits used to name the output binary files,
     in Fortran format (default is ``(I9.9)``).
     """
@@ -626,38 +644,46 @@ class Parameters(traitlets.HasTraits):
     # # ScalarParam
     #
 
-    _iscalar = traitlets.Bool(False)
-
-    # Include widgets for list demands some planning about code design
-    sc = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam")
+    sc = traitlets.List(trait=traitlets.Float()).tag(
+        group="ScalarParam", desc="Schmidt number(s)"
+    )
     """:obj:`list` of :obj:`float`: Schmidt number(s).
     """
 
-    ri = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam")
+    ri = traitlets.List(trait=traitlets.Float()).tag(
+        group="ScalarParam", desc="Richardson number(s)"
+    )
     """:obj:`list` of :obj:`float`: Richardson number(s).
     """
 
-    uset = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam")
+    uset = traitlets.List(trait=traitlets.Float()).tag(
+        group="ScalarParam", desc="Settling velocity(ies)"
+    )
     """:obj:`list` of :obj:`float`: Settling velocity(s).
     """
 
-    cp = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam")
+    cp = traitlets.List(trait=traitlets.Float()).tag(
+        group="ScalarParam", desc="Initial concentration(s)"
+    )
     """:obj:`list` of :obj:`float`: Initial concentration(s).
     """
 
     scalar_lbound = traitlets.List(trait=traitlets.Float(default_value=-1e6)).tag(
-        group="ScalarParam"
+        group="ScalarParam", desc="Lower scalar bound(s), for clipping methodology."
     )
     """:obj:`list` of :obj:`float`: Lower scalar bound(s), for clipping methodology.
     """
 
     scalar_ubound = traitlets.List(trait=traitlets.Float(default_value=1e6)).tag(
-        group="ScalarParam"
+        group="ScalarParam", desc="Upper scalar bound(s), for clipping methodology."
     )
     """:obj:`list` of :obj:`float`: Upper scalar bound(s), for clipping methodology.
     """
 
-    iibmS = traitlets.Int(default_value=0, min=0, max=3).tag(group="ScalarParam")
+    iibmS = traitlets.Int(default_value=0, min=0, max=3).tag(
+        group="ScalarParam",
+        desc="Enables Immersed Boundary Method (IBM) for scalar field(s) (alpha version)",
+    )
     """int: Enables Immersed Boundary Method (IBM) for scalar field(s):
 
     * 0 - Off (default);
@@ -674,17 +700,74 @@ class Parameters(traitlets.HasTraits):
             faces are aligned with one of the coordinate axes.
     """
 
-    # Docstrings included together with the class
-    nclxS1, nclxSn, nclyS1, nclySn, nclzS1, nclzSn = [
-        traitlets.Int(default_value=2, min=0, max=2).tag(group="ScalarParam")
-        for name in ["nclxS1", "nclxSn", "nclyS1", "nclySn", "nclzS1", "nclzSn"]
-    ]
+    nclxS1 = traitlets.Int(default_value=2, min=0, max=2).tag(
+        group="ScalarParam", desc="Scalar boundary condition where x=0"
+    )
+    """int: Boundary condition for scalar field(s) where :math:`x=0`, the options are:
+
+    * 0 - Periodic;
+    * 1 - No-flux;
+    * 2 - Inflow.
+    """
+
+    nclxSn = traitlets.Int(default_value=2, min=0, max=2).tag(
+        group="ScalarParam", desc="Scalar boundary condition where x=xlx"
+    )
+    """int: Boundary condition for scalar field(s) where :math:`x=L_x`, the options are:
+
+    * 0 - Periodic;
+    * 1 - No-flux;
+    * 2 - Convective outflow.
+    """
+
+    nclyS1 = traitlets.Int(default_value=2, min=0, max=2).tag(
+        group="ScalarParam", desc="Scalar boundary condition where y=0"
+    )
+    """int: Boundary condition for scalar field(s) where :math:`y=0`, the options are:
+
+    * 0 - Periodic;
+    * 1 - No-flux;
+    * 2 - Dirichlet.
+    """
+
+    nclySn = traitlets.Int(default_value=2, min=0, max=2).tag(
+        group="ScalarParam", desc="Scalar boundary condition where y=yly"
+    )
+    """int: Boundary condition for scalar field(s) where :math:`y=L_y`, the options are:
+
+    * 0 - Periodic;
+    * 1 - No-flux;
+    * 2 - Dirichlet.
+    """
+
+    nclzS1 = traitlets.Int(default_value=2, min=0, max=2).tag(
+        group="ScalarParam", desc="Scalar boundary condition where z=0"
+    )
+    """int: Boundary condition for scalar field(s) where :math:`z=0`, the options are:
+
+    * 0 - Periodic;
+    * 1 - No-flux;
+    * 2 - Dirichlet.
+    """
+
+    nclzSn = traitlets.Int(default_value=2, min=0, max=2).tag(
+        group="ScalarParam", desc="Scalar boundary condition where z=zlz"
+    )
+    """int: Boundary condition for scalar field(s) where :math:`z=L_z`, the options are:
+
+    * 0 - Periodic;
+    * 1 - No-flux;
+    * 2 - Dirichlet.
+    """
 
     #
     # # LESModel
     #
 
-    jles = traitlets.Int(default_value=0, min=0, max=4).tag(group="LESModel")
+    jles = traitlets.Int(default_value=4, min=0, max=4).tag(
+        group="LESModel",
+        desc="LES Model (1: Phys Smag, 2: Phys WALE, 3: Phys dyn. Smag, 4: iSVV)",
+    )
     """int: Chooses LES model, they are:
 
     * 0 - No model (DNS);
@@ -698,13 +781,18 @@ class Parameters(traitlets.HasTraits):
     # # ibmstuff
     #
 
-    nobjmax = traitlets.Int(default_value=1, min=0).tag(group="ibmstuff")
+    nobjmax = traitlets.Int(default_value=1, min=1).tag(
+        group="ibmstuff", desc="Maximum number of objects in any direction"
+    )
     """int: Maximum number of objects in any direction. It is defined
         automatically at :obj:`gene_epsi_3D`.
     """
 
-    nraf = traitlets.Int(default_value=10, min=1).tag(group="ibmstuff")
-    """int: Refinement constant.
+    nraf = traitlets.Int(default_value=10, min=1).tag(
+        group="ibmstuff",
+        desc="Level of refinement for iibm==2 to find the surface of the immersed object",
+    )
+    """int: "Level of refinement for :obj:`iibm` equals to 2, to find the surface of the immersed object"
     """
 
     # Auxiliar
@@ -842,17 +930,28 @@ class Parameters(traitlets.HasTraits):
             #     if getattr(self, name) == self.trait_defaults(name):
             #         continue
             group = self.trait_metadata(name, "group")
-            if group != None:
+            if group is not None:
                 if group not in dictionary.keys():
                     dictionary[group] = {}
                 dictionary[group][name] = getattr(self, name)
+
+        # This block is not handled by x3d if ilesmod is off
+        if "LESModel" in dictionary.keys() and self.ilesmod == 0:
+            del dictionary["LESModel"]
+
+        # This block is not handled by x3d if iibm is off
+        if "ibmstuff" in dictionary.keys() and self.iibm == 0:
+            del dictionary["ibmstuff"]
+
+        # This block is not handled by x3d if numscalar is 0
+        if "ScalarParam" in dictionary.keys() and self.numscalar == 0:
+            del dictionary["ScalarParam"]
+
         string = ""
 
         string += "! -*- mode: f90 -*-\n"
 
         for blockkey, block in dictionary.items():
-            if blockkey == "auxiliar":
-                continue
 
             string += "\n"
             string += "!===================\n"
@@ -861,16 +960,20 @@ class Parameters(traitlets.HasTraits):
             string += "\n"
 
             for paramkey, param in block.items():
+                # get description to print together with the values
+                description = self.trait_metadata(paramkey, "desc")
+                if description is None:
+                    description = ""
                 # Check if param is a list or not
                 if isinstance(param, list):
                     for n, p in enumerate(param):
-                        string += f"{paramkey+'('+str(n+1)+')':>15} = {p:<15} {'! '+description.get(paramkey,'')}\n"
+                        string += f"{paramkey+'('+str(n+1)+')':>15} = {p:<15} {'! '+description}\n"
                 # Check if param is a string
                 elif isinstance(param, str):
                     param = "'" + param + "'"
-                    string += f"{paramkey:>15} = {param:<15} {'! '+description.get(paramkey,'')}\n"
+                    string += f"{paramkey:>15} = {param:<15} {'! '+description}\n"
                 else:
-                    string += f"{paramkey:>15} = {param:<15} {'! '+description.get(paramkey,'')}\n"
+                    string += f"{paramkey:>15} = {param:<15} {'! '+description}\n"
             string += "\n"
             string += "/End\n"
 
@@ -988,21 +1091,18 @@ class Parameters(traitlets.HasTraits):
             except:
                 self.p_row = 0
 
-    # @traitlets.observe("ilesmod")
-    # def _observe_ilesmod(self, change):
-    #     if change["new"] == 0:
-    #         self.nu0nu, self.cnu, self.isecondder = 4.0, 0.44, 4
-    #         self.trait_metadata("nu0nu", "widget").disabled = True
-    #         self.trait_metadata("cnu", "widget").disabled = True
-    #         self.trait_metadata("isecondder", "widget").disabled = True
-    #     else:
-    #         self.trait_metadata("nu0nu", "widget").disabled = False
-    #         self.trait_metadata("cnu", "widget").disabled = False
-    #         self.trait_metadata("isecondder", "widget").disabled = False
-
-    @traitlets.observe("numscalar")
-    def _observe_numscalar(self, change):
-        self._iscalar = True if change["new"] == 0 else False
+    @traitlets.observe("ilesmod")
+    def _observe_ilesmod(self, change):
+        if change["new"] == 0:
+            # It is coded at xcompact3d, look at parameters.f90
+            self.nu0nu, self.cnu = 4.0, 0.44
+            # self.trait_metadata("nu0nu", "widget").disabled = True
+            # self.trait_metadata("cnu", "widget").disabled = True
+            # self.trait_metadata("isecondder", "widget").disabled = True
+        # else:
+        # self.trait_metadata("nu0nu", "widget").disabled = False
+        # self.trait_metadata("cnu", "widget").disabled = False
+        # self.trait_metadata("isecondder", "widget").disabled = False
 
     @traitlets.observe(
         "numscalar",
@@ -1170,7 +1270,7 @@ class Parameters(traitlets.HasTraits):
 
         for key, value in dictionary.items():
             try:
-                if self.trait_metadata(key, "group") != None:
+                if self.trait_metadata(key, "group") is not None:
                     setattr(self, key, dictionary[key])
             except:
                 warnings.warn(f"{key} is not a valid parameter and was not loaded")
@@ -1517,85 +1617,3 @@ def _validate_mesh(n, ncl, ncl1, ncln, dim):
     if n != 1:
         # Because of the FFT library
         raise traitlets.TraitError(f"Invalid value for mesh points (n{dim})")
-
-
-description = dict(
-    # Basic Parameters
-    p_row="Domain decomposition for parallel computation",
-    p_col="Domain decomposition for parallel computation",
-    itype="Flow configuration (Taylor-Green Vortex,  Flow around a Cylinder...)",
-    nx="Number of mesh points in x direction",
-    ny="Number of mesh points in y direction",
-    nz="Number of mesh points in z direction",
-    xlx="Domain size in x direction",
-    yly="Domain size in y direction",
-    zlz="Domain size in z direction",
-    nclx1="Velocidy boundary condition at begin of x direction",
-    nclxn="Velocidy boundary condition at end of x direction",
-    ncly1="Velocidy boundary condition at begin of y direction",
-    nclyn="Velocidy boundary condition at end of y direction",
-    nclz1="Velocidy boundary condition at begin of z direction",
-    nclzn="Velocidy boundary condition at end of z direction",
-    istret="Mesh refinement in y direction at certain location",
-    beta="Refinement parameter",
-    iin="Defines pertubation at initial condition",
-    re="Reynolds number",
-    init_noise="Value to initial noise, turbulence intensity",
-    inflow_noise="Random amplitude value at inflow boundary, turbulence intensity",
-    dt="Value to time step",
-    ifirst="Value to first iteration",
-    ilast="Value to last iteration",
-    ilesmod="Enables Large-Eddy methodologies",
-    iscalar="Enables scalar fields",
-    numscalar="Number of scalar fractions",
-    iibm="Immersed boundary configuration for velocity",
-    ilmn="Enables Low Mach Number methodology (compressible flows)",
-    ivisu="Enable store snapshots",
-    ipost="Enables online postprocessing",
-    gravx="Value to x component in gravity unitary vector",
-    gravy="Value to y component in gravity unitary vector",
-    gravz="Value to z component in gravity unitary vector",
-    # Numeric Options
-    ifirstder="Scheme for first order derivative",
-    isecondder="Scheme for second order derivative",
-    itimescheme="Scheme for time integration",
-    nu0nu="Ratio between hyperviscosity/viscosity at nu (dissipation factor intensity)",
-    cnu="Ratio between hypervisvosity at km=2/3π and kc=π (dissipation factor range)",
-    # In/Out Parameters
-    irestart="Flag to read initial flow field",
-    icheckpoint="Frequency for writing backup file",
-    ioutput="Frequency for visualization file",
-    nvisu="Size for visual collection",
-    iprocessing="Frequency for online postprocessing",
-    # Statistics
-    spinup_time="Time in seconds after which statistics are collected",
-    nstat="Statistic array size",
-    wrotation="Rotation speed to trigger turbulence",
-    # Scalar Parameters
-    nclxS1="Scalar boundary condition at begin of x direction",
-    nclxSn="Scalar boundary condition at end of x direction",
-    nclyS1="Scalar boundary condition at begin of y direction",
-    nclySn="Scalar boundary condition at end of y direction",
-    nclzS1="Scalar boundary condition at begin of z direction",
-    nclzSn="Scalar boundary condition at end of z direction",
-    sc="Schmidt number(s)",
-    ri="Richardson number(s)",
-    uset="Settling velocity(ies)",
-    cp="Initial concentration(s)",
-    iibmS="Immersed boundary configuration for scalar (alpha version)",
-    scalar_lbound="Lower scalar bound",
-    scalar_ubound="Upper scalar bound",
-    # LES Model
-    jles="LES model",
-    smagcst="Value to Smagorinsky constant",
-    # IBM stuff
-    nraf="Refinement constant which each axis will be multiplicated",
-    nobjmax="Maximum number of objects in any direction",
-    # Force balance
-    iforces="Flag to drag and sustentation coefficients",
-    nvol="Number of volumes for computing force balance",
-    xld="Volume left bound",
-    xrd="Volume right bound",
-    yld="Volume lower bound",
-    yud="Volume upper bound",
-)

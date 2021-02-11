@@ -10,7 +10,7 @@ but with `ipywidgets`_.
 import ipywidgets as widgets
 from traitlets import link
 from IPython.display import display
-from .parameters import description, Parameters, possible_mesh, possible_mesh_p
+from .parameters import Parameters, possible_mesh, possible_mesh_p
 
 
 class ParametersGui(Parameters):
@@ -251,8 +251,10 @@ class ParametersGui(Parameters):
 
         # Try to add a description
         for name in self._widgets.keys():
-            if name in description:
-                self._widgets[name].description_tooltip = description[name]
+            # get description to include together with widgets
+            description = self.trait_metadata(name, "desc")
+            if description is not None:
+                self._widgets[name].description_tooltip = description
 
         # Creating an arrange with all widgets
         dim = "x y z".split()
@@ -321,6 +323,25 @@ class ParametersGui(Parameters):
 
         self.link_widgets()
 
+    def __call__(self, *args):
+        """Returns widgets on demand.
+        Parameters
+        ----------
+        *args : str
+            Name(s) for the desired widget(s).
+        Returns
+        -------
+        :obj:`ipywidgets.VBox`
+            Widgets for an user friendly interface.
+
+        Examples
+        -------
+        >>> prm = xcompact3d_toolbox.ParametersGui()
+        >>> prm('nx', 'xlx', 'dx', 'nclx1', 'nclxn')
+        """
+
+        return widgets.VBox([self._widgets[name] for name in args])
+
     def _ipython_display_(self):
         display(self.ipyview)
 
@@ -335,24 +356,27 @@ class ParametersGui(Parameters):
         >>> prm.link_widgets()
         """
 
-        # Create two-way link between variables and widgets
-        for name in self._widgets.keys():
-            link((self, name), (self._widgets[name], "value"))
-
+        # Link the possible mesh values with the respective dropdown widget
         for dim in ["x", "y", "z"]:
             link(
                 (self, f"_possible_mesh_{dim}"), (self._widgets[f"n{dim}"], "options"),
             )
+
+        # Link the possible domain decomposition values with the respective dropdown widget
         for name in ["p_row", "p_col"]:
             link(
                 (self, f"_possible_{name}"), (self._widgets[f"{name}"], "options"),
             )
 
+        # Create two-way link between variables and widgets
         for name in self._widgets.keys():
-            if name == "numscalar":
-                continue
-            group = self.trait_metadata(name, "group")
-            if group == "ScalarParam":
-                link(
-                    (self, "_iscalar"), (self._widgets[name], "disabled"),
-                )
+            link((self, name), (self._widgets[name], "value"))
+
+        # for name in self._widgets.keys():
+        #     if name == "numscalar":
+        #         continue
+        #     group = self.trait_metadata(name, "group")
+        #     if group == "ScalarParam":
+        #         link(
+        #             (self, "_iscalar"), (self._widgets[name], "disabled"),
+        #         )
