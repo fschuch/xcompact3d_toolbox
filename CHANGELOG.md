@@ -7,17 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.10] - 2021-02-11
+
 ### Added
-- Add support for previous parameters format `.prm` (#7), by [@fschuch](https://github.com/fschuch).
+- Add support for the previous parameters format `.prm` (#7), by [@fschuch](https://github.com/fschuch).
+- Class `ParametersGui`, a subclass from `Parameters`, but with widgets, by [@fschuch](https://github.com/fschuch).
+- Argument `loadfile` added to class `Parameters`, so it is possible to initialize and load form the disc with just one line of code `prm = x3d.Parameters(loadfile='example.i3d')`, by [@fschuch](https://github.com/fschuch).
 
 ### Changed
 - Changed from method `__call__` to `__repr__` at `parameters.py` as the procedure to show the parameters on screen, by [@fschuch](https://github.com/fschuch).
+- Functions to read binary fields where moved from `io.py` to methods at `parameters.py`, so the syntax is simplified from `x3d.read_field('filename', prm)` to just `prm.read_field('filename')`. by [@fschuch](https://github.com/fschuch).
 
 ### Fixed
 - Scale factor for Ahmed Body at sandbox, by [@fschuch](https://github.com/fschuch).
-- Fix #2, by [@fschuch](https://github.com/fschuch).
-- Fix #5, by [@fschuch](https://github.com/fschuch).
-- Fix #6, by [@fschuch](https://github.com/fschuch).
+- Fix #2, widgets are now working in a new class `ParametersGui`, by [@fschuch](https://github.com/fschuch).
+- Fix #5, Bug at Ahmed body when using double precision, by [@fschuch](https://github.com/fschuch).
+- Fix #6, The files describing the geometry are incompatible when running on Linux, by [@fschuch](https://github.com/fschuch).
 
 ## [0.1.9] - 2020-10-09
 
@@ -99,7 +104,8 @@ No changes, just trying to get familiar with workflows and the release to Pypi.
 - Support to *Sandbox Flow Configuration* (see [fschuch/Xcompact3d](https://github.com/fschuch/Xcompact3d/)), by [@fschuch](https://github.com/fschuch).
 - Ahmed body as benchmark geometry, mirror and plotting tools, by [@momba98](https://github.com/momba98).
 
-[Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.9...HEAD
+[Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.10...HEAD
+[0.1.10]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.9...v0.1.10
 [0.1.9]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.6...v0.1.7
