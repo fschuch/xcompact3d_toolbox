@@ -35,7 +35,7 @@ class X3dDataset:
 
         self._data_set = data_set
 
-    def write(self, prm):
+    def write(self, prm, **kwargs):
         """Write the arrays in this data set to binary files on the disc, in the
         same order that Xcompact3d would do, so they can be easily read with
         2DECOMP.
@@ -58,8 +58,7 @@ class X3dDataset:
         """
         for key, val in self._data_set.items():
             if "file_name" in val.attrs:
-                print("Writing : " + key)
-                val.x3d.write(prm)
+                val.x3d.write(prm, **kwargs)
 
     def cumtrapz(self, dim):
         """Cumulatively integrate :obj:`xarray.Dataset` in direction ``dim``
@@ -212,7 +211,15 @@ class X3dDataArray:
         self._Dx = {}
         self._Dxx = {}
 
-    def write(self, prm, filename=None):
+    def write(
+        self,
+        prm,
+        filename=None,
+        steep="ioutput",
+        progress_function="",
+        separator="-",
+        fileformat=".bin",
+    ):
         """Write the array to binary files on the disc, in the same order that
         Xcompact3d would do, so they can be easily read with 2DECOMP.
 
@@ -242,28 +249,58 @@ class X3dDataArray:
         """
         if filename == None:  # Try to get from atributes
             filename = self._data_array.attrs.get("file_name", None)
-        if filename != None:
+        if filename is not None:
+            # If n is a dimension (for scalar), call write recursively to save
+            # phi1, phi2, phi3, for instance.
             if "n" in self._data_array.dims:
                 for n in self._data_array.n:
                     self._data_array.sel(n=n).x3d.write(
-                        prm, filename + str(n.values + 1)
+                        prm,
+                        filename + str(n.values + 1),
+                        steep=steep,
+                        progress_function=progress_function,
+                        fileformat=fileformat,
                     )
+            # If t is a dimension (for time), call write recursively to save
+            # ux-000000000.bin, ux-000000100.bin, ux-000000200.bin, for instance.
             elif "t" in self._data_array.dims:
 
-                from tqdm.notebook import tqdm as tqdm
+                if not progress_function:
+                    progress_function = lambda x, **kwargs: x
+                elif progress_function.lower() == "notebook":
+                    from tqdm.notebook import tqdm as progress_function
+                elif progress_function.lower() == "tqdm":
+                    from tqdm import tqdm as progress_function
+                else:
+                    raise ValueError(
+                        'Invalid value for progress_function, try again with "", "notebook" or "tqdm".'
+                    )
 
-                fmt = prm.ifilenameformat
+                i1, i2 = prm.ifilenameformat[2:-1].split(".")
                 k = 0
-                for t in tqdm(self._data_array.t.values, desc=filename):
-                    num = str(int(t / prm.dt)).zfill(fmt)
-                    self._data_array.isel(t=k).x3d.write(prm, filename + "-" + num)
+                # <To do> put the logical tests outside the loop
+                for t in progress_function(self._data_array.t.values, desc=filename):
+                    # New filename format, see https://github.com/fschuch/Xcompact3d/issues/3
+                    if prm.filenamedigits == 0:
+                        num = str(int(t / prm.dt)).zfill(int(i1))
+                    # Previous filename format
+                    elif prm.filenamedigits == 1:
+                        num = str(int(t / prm.dt / getattr(prm, steep))).zfill(int(i1))
+                    self._data_array.isel(t=k).x3d.write(
+                        prm,
+                        filename + separator + num,
+                        steep=steep,
+                        progress_function="",
+                        fileformat=fileformat,
+                    )
                     k += 1
+            # and finally writes to the disc
             else:
                 align = []
                 for i in reversed(sorted(self._data_array.dims)):
                     align.append(self._data_array.get_axis_num(i))
                 self._data_array.values.astype(param["mytype"]).transpose(align).tofile(
-                    filename + ".bin"
+                    filename + fileformat
                 )
 
     def cumtrapz(self, dim):
@@ -403,8 +440,9 @@ class X3dDataArray:
         -----
         The **atribute** ``BC`` is automatically defined for ``ux``, ``uy``,
         ``uz``, ``pp`` and ``phi`` when read from the disc with
-        :obj:`xcompact3d_toolbox.io.readfield` or initialized at
-        :obj:`xcompact3d_toolbox.sendbox.init_dataset`.
+        :obj:`xcompact3d_toolbox.Parameters.read_field` and
+        :obj:`xcompact3d_toolbox.Parameters.read_all_fields` or initialized at
+        :obj:`xcompact3d_toolbox.sandbox.init_dataset`.
         """
 
         if dim not in self._Dx:
