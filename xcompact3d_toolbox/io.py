@@ -38,7 +38,7 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
     and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
     coordinates and attributes.
 
-    The properties are automatically inferted if the
+    The properties can be inferted automatically if the
     file is inside Xcompact3d's output folders structure, i.e.:
 
     * 3d_snapshots (nx, ny, nz);
@@ -46,9 +46,7 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
     * xz_planes (nx, nz);
     * yz_planes (ny, nz).
 
-    Attributes include the proper boundary conditions for derivatives if the
-    file prefix is ``ux``, ``uy``, ``uz``, ``phi`` or ``pp``. Data type is
-    defined by :obj:`xcompact3d_toolbox.param["mytype"]`.
+    Data type is defined by :obj:`xcompact3d_toolbox.param["mytype"]`.
 
     Parameters
     ----------
@@ -75,7 +73,8 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
     Returns
     -------
     :obj:`xarray.DataArray`
-        Data array containing values read from the disc.
+        Data array containing values read from the disc. Attributes include the proper boundary conditions for derivatives if the
+        file prefix is ``ux``, ``uy``, ``uz``, ``phi`` or ``pp``.
 
     Examples
     -------
@@ -102,6 +101,10 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
     ...     coords = prm.get_mesh
     ... )
     """
+    warnings.warn(
+        "read_all is deprecated, use xcompact3d_toolbox.Parameters.read_field",
+        DeprecationWarning,
+    )
 
     if dims.lower() == "auto":
 
@@ -193,6 +196,10 @@ def read_all(filename_pattern, prm):
     >>> uz = x3d.read_all('./data/xz_planes/uz-0000??00.bin', prm)
 
     """
+    warnings.warn(
+        "read_all is deprecated, use xcompact3d_toolbox.Parameters.read_all_fields",
+        DeprecationWarning,
+    )
 
     filenames = sorted(glob.glob(filename_pattern))
 
@@ -403,9 +410,6 @@ def prm_to_dict(filename="incompact3d.prm"):
     f.close()
 
     return dict_outer
-
-
-prm_to_dict(filename="incompact3d.prm")
 
 
 def i3d_to_dict(filename="input.i3d"):

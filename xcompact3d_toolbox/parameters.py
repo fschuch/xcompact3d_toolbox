@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
-"""Manipulate the physical and computational parameters.
+"""
+Manipulate physical and computational parameters. It contains variables and
+methods designed to be a bridge between Xcompact3d and Python applications for
+pre and post-processing.
 """
 
 import numpy as np
 import math
+import glob
 import traitlets
+import os.path
+import xarray as xr
 import warnings
 from .param import boundary_condition, param
 from .mesh import get_mesh
@@ -221,13 +227,17 @@ def divisorGenerator(n):
 
 class Parameters(traitlets.HasTraits):
     """The physical and computational parameters are built on top of `traitlets`_.
-
     It is a framework that lets Python classes have attributes with type checking,
     dynamically calculated default values, and ‘on change’ callbacks.
-    In addition, there are `ipywidgets`_ for a friendly user interface.
+    So, many of the parameters are validated regarding type, norms, and values
+    supported by Xcompact3d.
 
-    .. warning:: There is a bug reported affecting the widgets `#2`_,
-        they are not working properly at the moment.
+    There are methods to handle the parameters file, to read the binary
+    arrays produced by Xcompact3d and also to write the xdmf file, so the binary
+    fields can be open in any external visualization tool.
+
+    In addition, there are `ipywidgets`_ for a friendly user interface,
+    see :obj:`xcompact3d_toolbox.gui.ParametersGui`.
 
     .. _traitlets:
         https://traitlets.readthedocs.io/en/stable/index.html
@@ -507,7 +517,7 @@ class Parameters(traitlets.HasTraits):
     -----
         Only necessary if :obj:`nclx1` is equal to 2.
     """
-
+    # Docstrings included together with the class
     ilesmod, ivisu, ipost = [
         traitlets.Int(default_value=1, min=0, max=1).tag(group="BasicParam")
         for name in ["ilesmod", "ivisu", "ipost"]
@@ -600,8 +610,18 @@ class Parameters(traitlets.HasTraits):
         for i in range(3)
     ]
 
-    ifilenameformat = traitlets.Int(default_value=9, min=1)
+    filenamedigits = traitlets.Int(default_value=0, min=0, max=1).tag(
+        group="InOutParam"
+    )
+    """int: Controls the way that the output binary files are enumerated:
 
+    * 0 - Files receive the number according to the current timestep (default);
+    * 1 - Continuous counting.
+    """
+    ifilenameformat = traitlets.Unicode(default_value="(I9.9)").tag(group="InOutParam")
+    """str: The number of digits used to name the output binary files,
+    in Fortran format (default is ``(I9.9)``).
+    """
     #
     # # ScalarParam
     #
@@ -785,8 +805,14 @@ class Parameters(traitlets.HasTraits):
 
         And finally, it is possible to read the parameters from the disc:
 
-        >>> prm = xcompact3d_toolbox.Parameters(filename = 'example.i3d')
-        >>> prm.read()
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile = 'example.i3d')
+
+        It also supports the previous parameters file format (see `#7`_):
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile = 'incompact3d.prm')
+
+        .. _#7:
+            https://github.com/fschuch/xcompact3d_toolbox/issues/7
 
         """
 
@@ -808,9 +834,13 @@ class Parameters(traitlets.HasTraits):
             setattr(self, key, arg)
 
     def __repr__(self):
-
+        """Representation of the parameters class, similar to the
+        representation of the .i3d file."""
         dictionary = {}
         for name in self.trait_names():
+            if skip_default:
+                if getattr(self, name) == self.trait_defaults(name):
+                    continue
             group = self.trait_metadata(name, "group")
             if group != None:
                 if group not in dictionary.keys():
@@ -860,6 +890,18 @@ class Parameters(traitlets.HasTraits):
     def _validade_mesh_nz(self, proposal):
         _validate_mesh(proposal["value"], self._nclz, self.nclz1, self.nclzn, "z")
         return proposal["value"]
+
+    @traitlets.validate("ifilenameformat")
+    def _validade_ifilenameformat(self, proposal):
+
+        if proposal["value"][:2] == "(I" and proposal["value"][-1] == ")":
+            i1, i2 = proposal["value"][2:-1].split(".")
+            if i1 == i2:
+                return proposal["value"]
+
+        raise traitlets.TraitError(
+            f"Invalid value for ifilenameformat, try with something like (I3.3) or (I9.9)"
+        )
 
     @traitlets.observe("dx", "nx", "xlx", "dy", "ny", "yly", "dz", "nz", "zlz")
     def _observe_resolution(self, change):
@@ -946,17 +988,17 @@ class Parameters(traitlets.HasTraits):
             except:
                 self.p_row = 0
 
-    @traitlets.observe("ilesmod")
-    def _observe_ilesmod(self, change):
-        if change["new"] == 0:
-            self.nu0nu, self.cnu, self.isecondder = 4.0, 0.44, 4
-            self.trait_metadata("nu0nu", "widget").disabled = True
-            self.trait_metadata("cnu", "widget").disabled = True
-            self.trait_metadata("isecondder", "widget").disabled = True
-        else:
-            self.trait_metadata("nu0nu", "widget").disabled = False
-            self.trait_metadata("cnu", "widget").disabled = False
-            self.trait_metadata("isecondder", "widget").disabled = False
+    # @traitlets.observe("ilesmod")
+    # def _observe_ilesmod(self, change):
+    #     if change["new"] == 0:
+    #         self.nu0nu, self.cnu, self.isecondder = 4.0, 0.44, 4
+    #         self.trait_metadata("nu0nu", "widget").disabled = True
+    #         self.trait_metadata("cnu", "widget").disabled = True
+    #         self.trait_metadata("isecondder", "widget").disabled = True
+    #     else:
+    #         self.trait_metadata("nu0nu", "widget").disabled = False
+    #         self.trait_metadata("cnu", "widget").disabled = False
+    #         self.trait_metadata("isecondder", "widget").disabled = False
 
     @traitlets.observe("numscalar")
     def _observe_numscalar(self, change):
@@ -1035,15 +1077,15 @@ class Parameters(traitlets.HasTraits):
 
         self.size = convert_bytes(count)
 
-    def get_boundary_condition(self, var=""):
+    def get_boundary_condition(self, var):
         """This method returns the appropriate boundary parameters that are
         expected by the derivative functions.
 
         Parameters
         ----------
         var : str
-            Variable name (the default is ""). The supported options are `ux`,
-            `uy`, `uz`, `pp` and `phi`, otherwise the method returns a default
+            Variable name. The supported options are ``ux``, ``uy``,
+            ``uz``, ``pp`` and ``phi``, otherwise the method returns a default
             option.
 
         Returns
@@ -1060,9 +1102,23 @@ class Parameters(traitlets.HasTraits):
         'y': {'ncl1': 1, 'ncln': 2, 'npaire': 1, 'istret': 0, 'beta': 0.75},
         'z': {'ncl1': 0, 'ncln': 0, 'npaire': 1}}
 
+        It is possible to store this information as an attribute in any
+        :obj:`xarray.DataArray`:
+
         >>> DataArray.attrs['BC'] = prm.get_boundary_condition('ux')
 
+        So the correct boundary conditions will be used to compute the derivatives:
+
         >>> DataArray.x3d.first_derivative('x')
+        >>> DataArray.x3d.second_derivative('x')
+
+        Notes
+        -----
+        The **atribute** ``BC`` is automatically defined for ``ux``, ``uy``,
+        ``uz``, ``pp`` and ``phi`` when read from the disc with
+        :obj:`xcompact3d_toolbox.Parameters.read_field` and
+        :obj:`xcompact3d_toolbox.Parameters.read_all_fields` or initialized at
+        :obj:`xcompact3d_toolbox.sandbox.init_dataset`.
         """
 
         return boundary_condition(self, var)
@@ -1073,7 +1129,7 @@ class Parameters(traitlets.HasTraits):
         An attribute is considered valid if it has a ``tag`` named ``group``,
         witch assigns it to the respective namespace at the ``.i3d`` file.
 
-        It also includes support for the previous format ``.prm``.
+        It also includes support for the previous format ``.prm``  (see `#7`_).
 
         Examples
         -------
@@ -1082,7 +1138,12 @@ class Parameters(traitlets.HasTraits):
         >>> prm.load()
 
         or just:
+
         >>> prm = xcompact3d_toolbox.Parameters(loadfile = 'example.i3d')
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile = 'incompact3d.prm')
+
+        .. _#7:
+            https://github.com/fschuch/xcompact3d_toolbox/issues/7
 
         """
 
@@ -1115,9 +1176,243 @@ class Parameters(traitlets.HasTraits):
                 warnings.warn(f"{key} is not a valid parameter and was not loaded")
 
     def read(self):
-        """See :obj:`xcompact3d_toolbox.Parameters.load`."""
+        """Read is deprecated, use :obj:`xcompact3d_toolbox.parameters.Parameters.load`."""
         warnings.warn("read is deprecated, use load", DeprecationWarning)
         self.load()
+
+    def read_field(self, filename, coords=None, name="", attrs={}):
+        """This method reads a binary field from Xcompact3d with :obj:`numpy.fromfile`
+        and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
+        coordinates and attributes.
+
+        The properties can be inferted automatically if the
+        file is inside Xcompact3d's output folders structure, i.e.:
+
+        * 3d_snapshots (nx, ny, nz);
+        * xy_planes (nx, ny);
+        * xz_planes (nx, nz);
+        * yz_planes (ny, nz).
+
+        Data type is defined by :obj:`xcompact3d_toolbox.param["mytype"]`.
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to be read.
+        coords : dict of array_like objects or None, optional
+            Coordinates (tick labels) to use for indexing along each dimension (see
+            :obj:`xarray.DataArray`). If dims=None (default), coordinates are inferred
+            from the folder structure.
+        name : str, optional
+            Name of this array. If name is empty (default), it is inferred
+            from filename.
+        attrs : dict_like, optional
+            Attributes to assign to the new instance. Boundary conditions are
+            automatically included in this method, for derivatives routines.
+
+        Returns
+        -------
+        :obj:`xarray.DataArray`
+            Data array containing values read from the disc. Attributes include
+            the proper boundary conditions for derivatives if the
+            file prefix is ``ux``, ``uy``, ``uz``, ``phi`` or ``pp``.
+
+        Examples
+        -------
+
+        >>> prm = x3d.Parameters()
+
+        >>> xcompact3d_toolbox.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
+        >>> xcompact3d_toolbox.param["mytype"] = np.float32 # otherwise
+
+        In the following cases, coordinates and dimensions are infered from the
+        folder containing the file:
+
+        >>> uy = prm.read_field('./data/xy_planes/uy-00000400.bin')
+        >>> uz = prm.read_field('./data/xz_planes/uz-00000400.bin')
+        >>> ux = prm.read_field('./data/3d_snapshots/ux-00000400.bin')
+
+        It is possible to handle 3D arrays with the filenames from previous X3d's
+        versions:
+
+        >>> ux = x3d.read_field('./data/ux0010')
+
+        If it is a plane and not included in the folder structure presented above,
+        just delete the extra coordinate from the dictionary
+        returned by :obj:`xcompact3d_toolbox.parameters.Parameters.get_mesh` and
+        inform it as an argument. For example, to read a xy-plane:
+
+        >>> mesh = prm.get_mesh
+        >>> del mesh['z']
+        >>> ux = x3d.read_field('./data/uy0010', coords = prm.get_mesh)
+
+        Notes
+        ----
+
+        Take a look at xarray_'s documentation, specially, see `Why xarray?`_.
+        :obj:`xarray.DataArray` includes many useful methods for indexing,
+        comparisons, reshaping and reorganizing, computations and plotting.
+
+        .. _xarray: http://xarray.pydata.org/en/stable/
+        .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
+        """
+
+        path, file = os.path.split(filename)
+        path = os.path.basename(path)
+
+        # If coords is None, we assume a 3d field, and then we cut one coordinate
+        # for planes if necessary
+        if coords is None:
+            coords = self.get_mesh
+            if path == "3d_snapshots":
+                pass
+            elif path == "xy_planes":
+                del coords["z"]
+            elif path == "xz_planes":
+                del coords["y"]
+            elif path == "yz_planes":
+                del coords["x"]
+
+        # if name is empty, we obtain it from the filename
+        if not name:
+            try:
+                if "-" in file:
+                    name = os.path.basename(file.replace(".bin", "")).split("-")[0]
+                else:
+                    i1, i2 = self.ifilenameformat[2:-1].split(".")
+                    name = os.path.basename(file.replace(".bin", ""))[0:-i1]
+            except:
+                warnings.warn(
+                    "Impossible to obtain array name automatically, try to set it manually."
+                )
+
+        # Include atributes for boundary conditions, useful to compute the derivatives
+        if "phi" in name:
+            attrs["BC"] = self.get_boundary_condition("phi")
+        else:
+            attrs["BC"] = self.get_boundary_condition(name)
+
+        # We obtain the shape for np.fromfile from the coordinates
+        shape = []
+        for key, value in coords.items():
+            shape.append(value.size)
+
+        # This is necessary if the file is a link
+        if os.path.islink(filename):
+            from os import readlink
+
+            filename = readlink(filename)
+
+        # Finally, we read the array and wrap it into a xarray dataset
+        return xr.DataArray(
+            np.fromfile(filename, dtype=param["mytype"]).reshape(shape, order="F"),
+            dims=coords.keys(),
+            coords=coords,
+            name=name,
+            attrs=attrs,
+        )
+
+    def read_all_fields(
+        self, filename_pattern, steep="ioutput", progress_function="", **kargs
+    ):
+        """Reads all files matching the ``filename_pattern`` with
+        :obj:`xcompact3d_toolbox.parameters.Parameters.read_field` and
+        concatenates them into a time series.
+
+        .. note:: Make sure to have enough memory to load all files at the same time.
+
+        Parameters
+        ----------
+        filename_pattern : str
+            A specified pattern according to the rules used by the Unix shell.
+        steep : str
+            The variable at the parameters class that controls how many time steps
+            are computed between snapshots. Default is ``ioutput``. Only useful
+            if ``filenamedigits = 1``.
+        progress_function : str
+            Activates a progress bar with the options ``tqdm`` or ``notebook``,
+            or turn it off when the string is empty (default).
+        **kwargs :
+            Arguments to be send to :obj:`xcompact3d_toolbox.parameters.Parameters.read_field`,
+            like ``coords``, ``name`` and ``attrs``.
+
+        Returns
+        -------
+        :obj:`xarray.DataArray`
+            Data array containing values read from the disc.
+
+        Examples
+        -------
+
+        >>> prm = x3d.Parameters()
+
+        >>> x3d.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
+        >>> x3d.param["mytype"] = np.float32 # otherwise
+
+        In the following cases, coordinates and dimensions are infered from the
+        folder containing the file and time from the filenames:
+
+        >>> ux = prm.read_all_fields('./data/3d_snapshots/ux-*.bin')
+        >>> uy = prm.read_all_fields('./data/xy_planes/uy-*.bin')
+        >>> uz = prm.read_all_fields('./data/xz_planes/uz-0000??00.bin')
+
+        It is possible to handle 3D arrays with the filenames from previous X3d's
+        versions:
+
+        >>> ux = prm.read_all_fields('./data/ux????')
+
+        If it is a plane and not included in the folder structure presented above,
+        just delete the extra coordinate from the dictionary
+        returned by :obj:`xcompact3d_toolbox.parameters.Parameters.get_mesh` and
+        inform it as an argument. For example, to read a xy-plane:
+
+        >>> mesh = prm.get_mesh
+        >>> del mesh['z']
+        >>> ux = x3d.read_all_fields('./data/uy????', coords = prm.get_mesh)
+
+        """
+        filenames = sorted(glob.glob(filename_pattern))
+
+        # is empty
+        if not filenames:
+            raise IOError(f"No file was found corresponding to {filename_pattern}.")
+
+        # New filename format, see https://github.com/fschuch/Xcompact3d/issues/3
+        if self.filenamedigits == 0:
+            dt = self.dt
+        # Previous filename format
+        elif self.filenamedigits == 1:
+            dt = self.dt * getattr(self, steep)
+
+        i1, i2 = self.ifilenameformat[2:-1].split(".")
+        t = dt * np.array(
+            [
+                param["mytype"](os.path.basename(file).replace(".bin", "")[-int(i1) :])
+                for file in filenames
+            ],
+            dtype=param["mytype"],
+        )
+
+        # <To do> Maybe turn this in a global parameter, because it is useful in
+        # many methods
+        if not progress_function:
+            progress_function = lambda x, **kwargs: x
+        elif progress_function.lower() == "notebook":
+            from tqdm.notebook import tqdm as progress_function
+        elif progress_function.lower() == "tqdm":
+            from tqdm import tqdm as progress_function
+        else:
+            raise ValueError(
+                'Invalid value for progress_function, try again with "", "notebook" or "tqdm".'
+            )
+
+        return xr.concat(
+            [
+                self.read_field(file, **kargs)
+                for file in progress_function(filenames, desc=filename_pattern)
+            ],
+            dim="t",
+        ).assign_coords(coords={"t": t})
 
     def write(self):
         """Writes all valid attributes to an ``.i3d`` file.
@@ -1154,15 +1449,10 @@ class Parameters(traitlets.HasTraits):
         Shape and time are inferted from folder structure and filenames.
         File list is obtained automatically with :obj:`glob`.
 
-        .. note:: This is only compatible with the new filename structure,
+        .. note:: For now, this is only compatible with the new filename structure,
             the conversion is exemplified in `convert_filenames_x3d_toolbox`_.
 
         .. _`convert_filenames_x3d_toolbox`: https://gist.github.com/fschuch/5a05b8d6e9787d76655ecf25760e7289
-
-        Parameters
-        ----------
-        prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
-            Contains the computational and physical parameters.
 
         Examples
         -------
@@ -1175,7 +1465,9 @@ class Parameters(traitlets.HasTraits):
 
     @property
     def get_mesh(self):
-        """Get mesh point locations for the three coordinates.
+        """Get mesh point locations for the three coordinates. They are stored
+        in a dictionary. It supports mesh refinement in **y** when
+        :obj:`istret` :math:`\\ne` 0.
 
         Returns
         -------
@@ -1188,7 +1480,15 @@ class Parameters(traitlets.HasTraits):
 
         >>> prm = xcompact3d_toolbox.Parameters()
         >>> prm.get_mesh
-
+        {'x': array([0.    , 0.0625, 0.125 , 0.1875, 0.25  , 0.3125, 0.375 , 0.4375,
+                0.5   , 0.5625, 0.625 , 0.6875, 0.75  , 0.8125, 0.875 , 0.9375,
+                1.    ]),
+         'y': array([0.    , 0.0625, 0.125 , 0.1875, 0.25  , 0.3125, 0.375 , 0.4375,
+                0.5   , 0.5625, 0.625 , 0.6875, 0.75  , 0.8125, 0.875 , 0.9375,
+                1.    ]),
+         'z': array([0.    , 0.0625, 0.125 , 0.1875, 0.25  , 0.3125, 0.375 , 0.4375,
+                0.5   , 0.5625, 0.625 , 0.6875, 0.75  , 0.8125, 0.875 , 0.9375,
+                1.    ])}
         """
         return get_mesh(self)
 
