@@ -924,7 +924,10 @@ class Parameters(traitlets.HasTraits):
     def __repr__(self):
         """Representation of the parameters class, similar to the
         representation of the .i3d file."""
-        dictionary = {}
+        # These groups are demanded by Xcompact3d, see parameters.f90
+        dictionary = dict(
+            BasicParam={}, NumOptions={}, InOutParam={}, Statistics={}, CASE={},
+        )
         for name in self.trait_names():
             # if skip_default:
             #     if getattr(self, name) == self.trait_defaults(name):
