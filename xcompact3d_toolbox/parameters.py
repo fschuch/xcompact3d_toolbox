@@ -5,16 +5,20 @@ methods designed to be a bridge between Xcompact3d and Python applications for
 pre and post-processing.
 """
 
-import numpy as np
-import math
 import glob
-import traitlets
+import math
 import os.path
-import xarray as xr
 import warnings
-from .param import boundary_condition, param
+
+import numpy as np
+import traitlets
+import xarray as xr
+
+from tqdm.autonotebook import tqdm
+
+from .io import dict_to_i3d, FilenameProperties, i3d_to_dict, prm_to_dict, write_xdmf
 from .mesh import get_mesh
-from .io import i3d_to_dict, dict_to_i3d, prm_to_dict, write_xdmf
+from .param import boundary_condition, param
 
 possible_mesh = [
     9,
@@ -163,7 +167,7 @@ Due to restrictions at the FFT library, they must be equal to:
     n_i = 2^{1+a} \\times 3^b \\times 5^c + 1,
 
 where :math:`a`, :math:`b` and :math:`c` are non negative integers, and :math:`i`
-representes the three coordinates (**x**, **y** and **z**).
+represents the three coordinates (**x**, **y** and **z**).
 
 Aditionally, the derivative's stencil imposes that :math:`n_i \\ge 9`.
 
@@ -181,7 +185,7 @@ Due to restrictions at the FFT library, they must be equal to:
     n_i = 2^{1+a} \\times 3^b \\times 5^c,
 
 where :math:`a`, :math:`b` and :math:`c` are non negative integers, and :math:`i`
-representes the three coordinates (**x**, **y** and **z**).
+represents the three coordinates (**x**, **y** and **z**).
 
 Aditionally, the derivative's stencil imposes that :math:`n_i \\ge 8`.
 
@@ -192,7 +196,7 @@ There is no upper limit, as long as the restrictions are satisfied.
 
 
 def divisorGenerator(n):
-    """Yelds the possibles divisors for ``n``.
+    """Yields the possibles divisors for ``n``.
 
     Especially useful to compute the possible values for :obj:`p_row` and :obj:`p_col`
     as functions of the number of computational cores available (:obj:`ncores`).
@@ -298,7 +302,7 @@ class Parameters(traitlets.HasTraits):
     """
 
     iin = traitlets.Int(default_value=0, min=0, max=2).tag(
-        group="BasicParam", desc="Defines pertubation at initial condition"
+        group="BasicParam", desc="Defines perturbation at initial condition"
     )
     """int: Defines perturbation at the initial condition:
 
@@ -600,7 +604,7 @@ class Parameters(traitlets.HasTraits):
     """
 
     nvisu = traitlets.Int(default_value=1, min=1).tag(
-        group="InOutParam", desc="Size for visualisation collection"
+        group="InOutParam", desc="Size for visualization collection"
     )
     """int: Size for visual collection.
     """
@@ -818,7 +822,7 @@ class Parameters(traitlets.HasTraits):
         for i in range(3)
     ]
     """:obj:`list` of :obj:`int`: Auxiliar variable for mesh points widgets,
-        it stores the avalilable options according to the boudary conditions.
+        it stores the available options according to the boundary conditions.
     """
 
     ncores = traitlets.Int(default_value=4, min=1).tag()
@@ -830,7 +834,7 @@ class Parameters(traitlets.HasTraits):
         for i in range(2)
     ]
     """:obj:`list` of :obj:`int`: Auxiliar variable for parallel domain decomposition,
-        it stores the avalilable options according to :obj:`ncores`.
+        it stores the available options according to :obj:`ncores`.
     """
 
     # cfl = traitlets.Float(0.0)
@@ -844,12 +848,12 @@ class Parameters(traitlets.HasTraits):
         Parameters
         ----------
         **kwargs
-            Keyword arguments for valid atributes.
+            Keyword arguments for valid attributes.
 
         Raises
         -------
         KeyError
-            Exception is raised when an Keyword arguments is not a valid atribute.
+            Exception is raised when an Keyword arguments is not a valid attribute.
 
         Examples
         -------
@@ -861,7 +865,7 @@ class Parameters(traitlets.HasTraits):
 
         >>> prm = xcompact3d_toolbox.Parameters()
 
-        It is possible to set any values afterwards (including new atributes):
+        It is possible to set any values afterwards (including new attributes):
 
         >>> prm.re = 1e6
 
@@ -983,22 +987,22 @@ class Parameters(traitlets.HasTraits):
         return string
 
     @traitlets.validate("nx")
-    def _validade_mesh_nx(self, proposal):
+    def _validate_mesh_nx(self, proposal):
         _validate_mesh(proposal["value"], self._nclx, self.nclx1, self.nclxn, "x")
         return proposal["value"]
 
     @traitlets.validate("ny")
-    def _validade_mesh_ny(self, proposal):
+    def _validate_mesh_ny(self, proposal):
         _validate_mesh(proposal["value"], self._ncly, self.ncly1, self.nclyn, "y")
         return proposal["value"]
 
     @traitlets.validate("nz")
-    def _validade_mesh_nz(self, proposal):
+    def _validate_mesh_nz(self, proposal):
         _validate_mesh(proposal["value"], self._nclz, self.nclz1, self.nclzn, "z")
         return proposal["value"]
 
     @traitlets.validate("ifilenameformat")
-    def _validade_ifilenameformat(self, proposal):
+    def _validate_ifilenameformat(self, proposal):
 
         if proposal["value"][:2] == "(I" and proposal["value"][-1] == ")":
             i1, i2 = proposal["value"][2:-1].split(".")
@@ -1496,23 +1500,10 @@ class Parameters(traitlets.HasTraits):
             dtype=param["mytype"],
         )
 
-        # <To do> Maybe turn this in a global parameter, because it is useful in
-        # many methods
-        if not progress_function:
-            progress_function = lambda x, **kwargs: x
-        elif progress_function.lower() == "notebook":
-            from tqdm.notebook import tqdm as progress_function
-        elif progress_function.lower() == "tqdm":
-            from tqdm import tqdm as progress_function
-        else:
-            raise ValueError(
-                'Invalid value for progress_function, try again with "", "notebook" or "tqdm".'
-            )
-
         return xr.concat(
             [
                 self.read_field(file, **kargs)
-                for file in progress_function(filenames, desc=filename_pattern)
+                for file in tqdm(filenames, desc=filename_pattern)
             ],
             dim="t",
         ).assign_coords(coords={"t": t})

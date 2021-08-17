@@ -49,7 +49,7 @@ class test_parameters(unittest.TestCase):
                 self.assertEqual(getattr(prm, f"n{dim}"), 200)
                 self.assertEqual(getattr(prm, f"d{dim}"), 0.005)
                 self.assertEqual(getattr(prm, f"{dim}l{dim}"), 1.0)
-                # End back
+                # and back
                 setattr(prm, f"ncl{dim}1", 1)
                 self.assertEqual(getattr(prm, f"ncl{dim}1"), 1)
                 self.assertEqual(getattr(prm, f"ncl{dim}n"), 1)
@@ -65,7 +65,7 @@ class test_parameters(unittest.TestCase):
                 self.assertEqual(getattr(prm, f"n{dim}"), 200)
                 self.assertEqual(getattr(prm, f"d{dim}"), 0.005)
                 self.assertEqual(getattr(prm, f"{dim}l{dim}"), 1.0)
-                # End back
+                # and back
                 setattr(prm, f"ncl{dim}n", 2)
                 self.assertEqual(getattr(prm, f"ncl{dim}1"), 2)
                 self.assertEqual(getattr(prm, f"ncl{dim}n"), 2)
@@ -80,7 +80,7 @@ class test_parameters(unittest.TestCase):
 
         prm = Parameters()
 
-        # To small grid
+        # Too small grid
         for dim in "x y z".split():
             with self.subTest(dim=dim):
                 with self.assertRaises(traitlets.TraitError):

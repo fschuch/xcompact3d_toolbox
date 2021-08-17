@@ -20,6 +20,6 @@ def test_set_get_filename_from_bin(
         separator=separator, file_extension=extension, number_of_digits=number_of_digits
     )
     assert (counter, prefix) == filename_properties.get_info_from_filename(
-        filename_properties.get_filename_for_bin(prefix, counter)
+        filename_properties.get_filename_for_binary(prefix, counter)
     )
 

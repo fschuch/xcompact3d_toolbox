@@ -153,7 +153,7 @@ class X3dDataset:
         """Coerce all arrays in this dataset into dask arrays.
 
         It applies ``chunk=-1`` for all coordinates listed in ``args``, which
-        means no decompositon, and ``'auto'`` to the others, resulting in a
+        means no decomposition, and ``'auto'`` to the others, resulting in a
         pencil decomposition for parallel evaluation.
 
         For customized ``chunks`` adjust, see :obj:`xarray.Dataset.chunk`.
@@ -161,7 +161,7 @@ class X3dDataset:
         Parameters
         ----------
         arg : str or sequence of str
-            Dimension(s) to apply no decompositon.
+            Dimension(s) to apply no decomposition.
 
         Returns
         -------
@@ -182,27 +182,19 @@ class X3dDataset:
 
         """
 
-        for var in args:
-            if not var in self._data_set.dims:
-                raise ValueError(
-                    f'Invalid value for "args", it should be a valid dimension'
-                )
+        if not set(args).issubset(set(self._data_set.dims)):
+            raise ValueError(
+                f'Invalid value for "args", it should be a valid dimension'
+            )
 
-        chunks = {}
-        for var in self._data_set.dims:
-            if var in args:
-                # no chunking along this dimension
-                chunks[var] = -1
-            else:
-                # allow the chunking in this dimension to accommodate ideal chunk sizes
-                chunks[var] = "auto"
-
-        return self._data_set.chunk(chunks)
+        return self._data_set.chunk(
+            chunks={dim: "auto" if dim in args else -1 for dim in self._data_set.dims}
+        )
 
 
 @xr.register_dataarray_accessor("x3d")
 class X3dDataArray:
-    """An acessor with extra utilities for :obj:`xarray.DataArray`.
+    """An accessor with extra utilities for :obj:`xarray.DataArray`.
     """
 
     def __init__(self, data_array):
@@ -363,7 +355,7 @@ class X3dDataArray:
         """Coerce the data array into dask array.
 
         It applies ``chunk=-1`` for all coordinates listed in ``args``, which
-        means no decompositon, and ``'auto'`` to the others, resulting in a
+        means no decomposition, and ``'auto'`` to the others, resulting in a
         pencil decomposition for parallel evaluation.
 
         For customized ``chunks`` adjust, see :obj:`xarray.DataArray.chunk`.
@@ -371,7 +363,7 @@ class X3dDataArray:
         Parameters
         ----------
         arg : str or sequence of str
-            Dimension(s) to apply no decompositon.
+            Dimension(s) to apply no decomposition.
 
         Returns
         -------

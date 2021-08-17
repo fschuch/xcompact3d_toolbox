@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Usefull functions to read binary fields from the disc.
+Usefull functions to read/write binary fields and parameters files that
+are compatible with XCompact3d.
 
 Notes
 ----
@@ -36,26 +37,105 @@ from tqdm.autonotebook import tqdm
 
 from .param import boundary_condition, param
 
+
 class FilenameProperties(traitlets.HasTraits):
+    """[summary]
+
+    Parameters
+    ----------
+    separator : str
+        [description]
+    file_extension : str
+        [description]
+    number_of_digits : int or None
+        [description]
+
+    Returns
+    -------
+    [type]
+        [description]
+
+    Raises
+    ------
+    IOError
+        It is not possible to get information from filename if `separator`
+        is an empty string and `number_of_digits` is None.
+    
+    Examples
+    --------
+
+    If the simulated fields are named like `ux-000.bin`, they are in the default
+    configuration, there is no need to specify filename properties. But just in case,
+    it would be like:
+
+    >>> xcompact3d_toolbox.FilenameProperties(
+    ...     separator = "-",
+    ...     file_extension = ".bin",
+    ...     number_of_digits = 3
+    ... )
+
+    If the simulated fields are named like `ux0000`:
+
+    >>> xcompact3d_toolbox.FilenameProperties(
+    ...     separator = "",
+    ...     file_extension = "",
+    ...     number_of_digits = 4
+    ... )
+
+    """    
     separator = traitlets.Unicode(default_value="-")
     file_extension = traitlets.Unicode(default_value=".bin")
-    number_of_digits = traitlets.Int(default_value=3, min=1)
+    number_of_digits = traitlets.Int(default_value=3, min=1, allow_none = True)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-        self.set(*args, **kwargs)
+        self.set(**kwargs)
 
-    def set(self, *args, **kwargs) -> None:
+    def set(self, **kwargs) -> None:
+        """[summary]
+        """        
         for key, arg in kwargs.items():
             if key not in self.trait_names():
                 warnings.warn(f"{key} is not a valid parameter and was not loaded")
             setattr(self, key, arg)
 
-    def get_filename_for_bin(self, prefix: str, counter: int) -> str:
+    def get_filename_for_binary(self, prefix: str, counter: int) -> str:
+        """[summary]
+
+        Parameters
+        ----------
+        prefix : str
+            [description]
+        counter : int
+            [description]
+
+        Returns
+        -------
+        str
+            [description]
+        """        
         return f"{prefix}{self.separator}{str(counter).zfill(self.number_of_digits)}{self.file_extension}"
 
     def get_info_from_filename(self, filename: str) -> tuple[int, str]:
+        """[summary]
+
+        Parameters
+        ----------
+        filename : str
+            [description]
+
+        Returns
+        -------
+        tuple[int, str]
+            [description]
+
+        Raises
+        ------
+        IOError
+            It is not possible to get information from filename if `separator`
+            is an empty string and `number_of_digits` is None.
+        """        
         if self.file_extension:
             filename = filename[: -len(self.file_extension)]
         if self.separator:
@@ -253,12 +333,10 @@ def read_all(filename_pattern, prm):
     # if numscalar > 1:
     #    mesh['n'] = [int(os.path.basename(file).split('-')[0][-1])]
 
-    from tqdm.notebook import tqdm as tqdm
-
     return xr.concat(
         [readfield(file, prm) for file in tqdm(filenames, desc=filename_pattern)],
         dim="t",
-    ).assign_coords(coords={"t": t})
+    ).assign_coords(t=t)
 
 
 def write_xdmf(prm):

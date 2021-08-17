@@ -44,7 +44,7 @@ def init_epsi(prm, dask=False):
         Each one initialized with np.zeros(dtype=np.bool) and wrapped into a
         :obj:`xarray.DataArray` with the proper size, dimensions and coordinates.
         They are used to define the object(s) that is(are) going to be inserted
-        into the cartesiann domain by the Immersed Boundary Method (IBM).
+        into the cartesian domain by the Immersed Boundary Method (IBM).
         They should be set to one (True) at the solid points and stay
         zero (False) at the fluid points, some standard geometries are provided
         by the accessor xcompact3d_toolbox.sandbox.geo.
@@ -696,39 +696,3 @@ class Geometry:
             self._data_array[dim] <= self._data_array[dim][-1] / 2.0,
             self._data_array[{dim: slice(None, None, -1)}].values,
         )
-
-    def visual3d(self):
-
-        import plotly.graph_objects as go
-        import plotly.offline as pyo
-        import plotly.io as pio
-
-        pio.renderers.default = "browser"  #'jupyterlab', 'vscode', 'nteract', 'notebook_connected', 'png', 'jpeg', 'jpg', 'svg', 'pdf', 'browser', 'sphinx_gallery'
-
-        X, Y, Z = np.mgrid[
-            0 : self._data_array.x[-1].values : self._data_array.x.shape[0] * 1j,
-            0 : self._data_array.y[-1].values : self._data_array.y.shape[0] * 1j,
-            0 : self._data_array.z[-1].values : self._data_array.z.shape[0] * 1j,
-        ]
-
-        values = (self._data_array * 1).values
-
-        fig = go.Figure()
-
-        # fig.add_scatter3d(x=X.flatten(), y=Y.flatten(), z=Z.flatten(), mode='markers',marker=dict(size=0.75))
-
-        fig.add_isosurface(
-            x=X.flatten(),
-            z=Y.flatten(),
-            y=Z.flatten(),
-            value=values.flatten(),
-            isomin=0.99,
-            isomax=1,
-            colorscale="sunset",
-            lighting=dict(ambient=0.4, specular=1.0),
-        )
-
-        fig.update_layout(scene_aspectmode="data")
-        fig.update_traces(showscale=False)
-
-        fig.show()
