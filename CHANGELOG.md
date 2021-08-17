@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Two functions to handle the binaries filenames and its tests. This abstraction will help in future refactoring. By [@fschuch](https://github.com/fschuch).
+- A class that handles the binaries filenames and its tests. This abstraction will help in future refactoring. By [@fschuch](https://github.com/fschuch).
 
 ## [0.1.11] - 2021-02-12
 

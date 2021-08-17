@@ -30,10 +30,44 @@ import os.path
 import warnings
 
 import numpy as np
+import traitlets
 import xarray as xr
+from tqdm.autonotebook import tqdm
 
 from .param import boundary_condition, param
 
+class FilenameProperties(traitlets.HasTraits):
+    separator = traitlets.Unicode(default_value="-")
+    file_extension = traitlets.Unicode(default_value=".bin")
+    number_of_digits = traitlets.Int(default_value=3, min=1)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.set(*args, **kwargs)
+
+    def set(self, *args, **kwargs) -> None:
+        for key, arg in kwargs.items():
+            if key not in self.trait_names():
+                warnings.warn(f"{key} is not a valid parameter and was not loaded")
+            setattr(self, key, arg)
+
+    def get_filename_for_bin(self, prefix: str, counter: int) -> str:
+        return f"{prefix}{self.separator}{str(counter).zfill(self.number_of_digits)}{self.file_extension}"
+
+    def get_info_from_filename(self, filename: str) -> tuple[int, str]:
+        if self.file_extension:
+            filename = filename[: -len(self.file_extension)]
+        if self.separator:
+            prefix, counter = filename.split(self.separator)
+        elif self.number_of_digits is not None:
+            prefix = filename[: -self.number_of_digits]
+            counter = filename[-self.number_of_digits :]
+        else:
+            raise IOError(
+                "Impossible to get time from filename without separator or number of digits"
+            )
+        return int(counter), prefix
 
 def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
     """This functions reads a binary field from Xcompact3d with :obj:`numpy.fromfile`
@@ -255,7 +289,6 @@ def write_xdmf(prm):
     >>> x3d.write_xdmf(prm)
 
     """
-    from tqdm.notebook import tqdm as tqdm
 
     for folder in ["3d_snapshots", "xy_planes", "xz_planes", "yz_planes"]:
 
@@ -507,30 +540,3 @@ def dict_to_i3d(dict, filename="input.i3d"):
 
     except IOError as e:
         print("Couldn't open or write to file (%s)." % e)
-
-def set_filename_for_bin(
-    prefix: str,
-    counter: int,
-    separator: str = "-",
-    extension: str = ".bin",
-    number_of_digits: int = 4,
-) -> str:
-    return f"{prefix}{separator}{str(counter).zfill(number_of_digits)}{extension}"
-
-
-def get_info_from_filename(
-    filename: str, separator: str = "", extension=".bin", number_of_digits: int = None
-) -> tuple[int, str]:
-    if extension:
-        filename = filename[: -len(extension)]
-    if separator:
-        prefix, counter = filename.split(separator)
-    elif number_of_digits is not None:
-        prefix = filename[:-number_of_digits]
-        counter = filename[-number_of_digits:]
-    else:
-        raise IOError(
-            "Impossible to get time from filename without separator or number of digits"
-        )
-    return int(counter), prefix
-
