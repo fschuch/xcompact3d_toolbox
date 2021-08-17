@@ -1,5 +1,122 @@
-from .param import param
 import numpy as np
+import traitlets
+
+from .param import param
+
+
+class Coordinate(traitlets.HasTraits):
+    length = traitlets.Float(default_value=1.0, min=0.0, max=1e10)
+    grid_size = traitlets.Int(default_value=17)
+    delta = traitlets.Float(default_value=1.0, min=0.0)
+    is_periodic = traitlets.Bool(default_value=False)
+    _sub_grid_size = traitlets.Int(default_value=16)
+
+    def __init__(
+        self, length: float = None, grid_size: int = None, is_periodic: bool = None
+    ):
+        if is_periodic is not None:
+            self.is_periodic = is_periodic
+        if grid_size is not None:
+            self.grid_size = grid_size
+        if length is not None:
+            self.length = length
+
+    def __array__(self):
+        return np.linspace(
+            start=0.0,
+            stop=self.length,
+            num=self.grid_size,
+            endpoint=not self.is_periodic,
+            dtype=param["mytype"],
+        )
+
+    def __len__(self):
+        return self.grid_size
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.length}, {self.grid_size}, {self.is_periodic})"
+
+    def get_possible_grid_size_values(self, start: int = 0, stop: int = 9002) -> list:
+        return list(
+            filter(
+                lambda num: _validate_grid_size(num, self.is_periodic),
+                range(start, stop),
+            )
+        )
+
+    @traitlets.validate("grid_size")
+    def _validate_grid_size(self, proposal):
+        if not _validate_grid_size(proposal.get("value"), self.is_periodic):
+            raise traitlets.TraitError(
+                f'{proposal.get("value")} is an invalid value for grid size'
+            )
+        return proposal.get("value")
+
+    @traitlets.observe("is_periodic")
+    def _observe_is_periodic(self, change):
+        if change.get("new"):
+            self.grid_size -= 1
+        else:
+            self.grid_size += 1
+
+    @traitlets.observe("_sub_grid_size")
+    def _observe_sub_grid_size(self, change):
+        new_delta = self.length / change.get("new")
+        if new_delta != self.delta:
+            self.delta = new_delta
+
+    @traitlets.observe("grid_size")
+    def _observe_grid_size(self, change):
+
+        new_sgs = change.get("new") if self.is_periodic else change.get("new") - 1
+        if new_sgs != self._sub_grid_size:
+            self._sub_grid_size = new_sgs
+
+    @traitlets.observe("length")
+    def _observe_length(self, change):
+        new_delta = change.get("new") / self._sub_grid_size
+        if new_delta != self.delta:
+            self.delta = new_delta
+
+    @traitlets.observe("delta")
+    def _observe_delta(self, change):
+        new_length = change.get("new") * self._sub_grid_size
+        if new_length != self.length:
+            self.length = new_length
+
+    @property
+    def vector(self):
+        return self.__array__()
+
+    @property
+    def size(self):
+        return self.grid_size
+
+
+def _validate_grid_size(grid_size, is_periodic):
+
+    size = grid_size if is_periodic else grid_size - 1
+
+    if size < 8:
+        return False
+
+    if size % 2 == 0:
+        size //= 2
+
+        for num in [2, 3, 5]:
+            while True:
+                if size % num == 0:
+                    size //= num
+                else:
+                    break
+
+    if size != 1:
+        return False
+    return True
+
+
+class StretchedCoordinate(Coordinate):
+    pass
 
 
 def stretching(istret, beta, yly, my, ny):
