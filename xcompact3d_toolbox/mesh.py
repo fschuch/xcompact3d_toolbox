@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import traitlets
 
@@ -7,19 +9,13 @@ from .param import param
 class Coordinate(traitlets.HasTraits):
     length = traitlets.Float(default_value=1.0, min=0.0, max=1e10)
     grid_size = traitlets.Int(default_value=17)
-    delta = traitlets.Float(default_value=1.0, min=0.0)
+    delta = traitlets.Float(default_value=0.0625, min=0.0)
     is_periodic = traitlets.Bool(default_value=False)
     _sub_grid_size = traitlets.Int(default_value=16)
 
-    def __init__(
-        self, length: float = None, grid_size: int = None, is_periodic: bool = None
-    ):
-        if is_periodic is not None:
-            self.is_periodic = is_periodic
-        if grid_size is not None:
-            self.grid_size = grid_size
-        if length is not None:
-            self.length = length
+    def __init__(self, **kwargs):
+
+        self.set(**kwargs)
 
     def __array__(self):
         return np.linspace(
@@ -43,6 +39,17 @@ class Coordinate(traitlets.HasTraits):
                 range(start, stop),
             )
         )
+
+    def set(self, **kwargs) -> None:
+        """[summary]
+        """
+        if "is_periodic" in kwargs:
+            self.is_periodic = kwargs.get("is_periodic")
+            del kwargs["is_periodic"]
+        for key, arg in kwargs.items():
+            if key not in self.trait_names():
+                warnings.warn(f"{key} is not a valid parameter and was not loaded")
+            setattr(self, key, arg)
 
     @traitlets.validate("grid_size")
     def _validate_grid_size(self, proposal):
@@ -116,10 +123,35 @@ def _validate_grid_size(grid_size, is_periodic):
 
 
 class StretchedCoordinate(Coordinate):
-    pass
+    istret = traitlets.Int(
+        default_value=0,
+        min=0,
+        max=3,
+        help="type of mesh refinement (0:no, 1:center, 2:both sides, 3:bottom)",
+    )
+    beta = traitlets.Float(default_value=1.0, min=0.0, help="Refinement parameter")
 
+    def __array__(self):
+        if self.istret == 0:
+            return super().__array__()
+        return stretching(
+            istret=self.istret,
+            beta=self.beta,
+            yly=self.length,
+            my=self._sub_grid_size,
+            ny=self.grid_size,
+            return_auxiliar_variables=False,
+        )
+    
+    @traitlets.validate("istret")
+    def _validate_istret(self, proposal):
+        if proposal.get("value") == 3 and self.is_periodic:
+            raise traitlets.TraitError(
+                f'mesh refinement at the bottom (istret=3) is not possible when periodic'
+            )
+        return proposal.get("value")
 
-def stretching(istret, beta, yly, my, ny):
+def stretching(istret, beta, yly, my, ny, return_auxiliar_variables=True):
 
     yp = np.zeros(ny, dtype=param["mytype"])
     yeta = np.zeros_like(yp)
@@ -296,8 +328,9 @@ def stretching(istret, beta, yly, my, ny):
             pp4yi[j] = (
                 -2.0 / beta * np.cos(np.pi * yetai[j]) * np.sin(np.pi * yetai[j])
             ) / 2.0
-
-    return yp, ppy, pp2y, pp4y
+    if return_auxiliar_variables:
+        return yp, ppy, pp2y, pp4y
+    return yp
 
 
 def get_mesh(prm, raf=False, staggered=False):

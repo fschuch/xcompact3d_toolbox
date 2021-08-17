@@ -1,6 +1,91 @@
+import glob
+import os.path
+
+import numpy as np
 import pytest
 import xcompact3d_toolbox as x3d
 import xcompact3d_toolbox.mesh
+
+
+def test_coordinate_grid_size_value(possible_mesh):
+    coordinate = x3d.mesh.Coordinate(is_periodic=False)
+    assert set(coordinate.get_possible_grid_size_values(0, 9002)) == possible_mesh
+
+
+def test_coordinate_periodic_grid_size_value(possible_mesh_periodic):
+    coordinate = x3d.mesh.Coordinate(is_periodic=True)
+    assert (
+        set(coordinate.get_possible_grid_size_values(0, 9002)) == possible_mesh_periodic
+    )
+
+
+@pytest.fixture
+def coordinate():
+    return x3d.mesh.Coordinate()
+
+
+@pytest.mark.parametrize("length", [1.0, 10.0, 100.0])
+@pytest.mark.parametrize("grid_size", [101, 201])
+@pytest.mark.parametrize("is_periodic", [True, False])
+def test_coordinate_properties(coordinate, length, grid_size, is_periodic):
+    if is_periodic:
+        grid_size -= 1
+    sub_grid_size = grid_size if is_periodic else grid_size - 1
+    delta = length / grid_size if is_periodic else length / (grid_size - 1)
+    coordinate.set(
+        is_periodic = is_periodic,
+        grid_size = grid_size,
+        length = length
+    )
+
+    assert (sub_grid_size, delta) == (coordinate._sub_grid_size, coordinate.delta)
+
+    new_length = coordinate.length / 2.0
+    coordinate.delta /= 2.0
+
+    assert new_length == coordinate.length
+
+
+@pytest.fixture
+def stretched_coordinate():
+    return x3d.mesh.StretchedCoordinate()
+
+
+@pytest.mark.parametrize(
+    "filename", glob.glob(os.path.join("tests", "unit", "data", "yp", "*.dat"))
+)
+def test_stretched_coordinate(stretched_coordinate, filename):
+    """In order to test the stretched mesh, three values for istret:
+
+    * ``istret = 1``;
+    * ``istret = 2``;
+    * ``istret = 3``;
+
+    where combined with two values for beta:
+
+    * ``beta = 0.75``;
+    * ``beta = 1``;
+    * ``beta = 4``.
+
+    Xcompact3d wrote the coordinate y to the disc (all with ``ny=55``),
+    the six files where saved as:
+
+    * ``./test/unit/data/yp/yp_<istret>_<beta>_.dat``,
+
+    so now we can compare and validate the python implementation.
+
+    """
+    coord_ref = np.loadtxt(filename)
+
+    stretched_coordinate.set(
+        istret = int(filename.split("_")[1]),
+        beta = float(filename.split("_")[2]),
+        grid_size = coord_ref.size
+    )
+
+    np.testing.assert_allclose(
+        actual=stretched_coordinate, desired=coord_ref, rtol=1e-5, atol=1e-8
+    )
 
 
 @pytest.fixture
@@ -145,37 +230,7 @@ def possible_mesh():
         9001,
     }
 
+
 @pytest.fixture
 def possible_mesh_periodic(possible_mesh):
     return {i - 1 for i in possible_mesh}
-
-def test_coordinate_grid_size_value(possible_mesh):
-    coordinate = x3d.mesh.Coordinate(is_periodic = False)
-    assert set(coordinate.get_possible_grid_size_values(0, 9002)) == possible_mesh
-
-def test_coordinate_periodic_grid_size_value(possible_mesh_periodic):
-    coordinate = x3d.mesh.Coordinate(is_periodic = True)
-    assert set(coordinate.get_possible_grid_size_values(0, 9002)) == possible_mesh_periodic
-
-@pytest.fixture
-def coordinate():
-    return x3d.mesh.Coordinate()
-
-@pytest.mark.parametrize("length", [1.0, 10.0, 100.0])
-@pytest.mark.parametrize("grid_size", [101, 201])
-@pytest.mark.parametrize("is_periodic", [True, False])
-def test_coordinate_properties(coordinate, length, grid_size, is_periodic):
-    if is_periodic: grid_size -= 1
-    sub_grid_size = grid_size if is_periodic else grid_size - 1
-    delta = length / grid_size if is_periodic else length / (grid_size - 1)
-    coordinate.is_periodic = is_periodic
-    coordinate.grid_size = grid_size
-    coordinate.length = length
-
-    assert (sub_grid_size, delta) == (coordinate._sub_grid_size, coordinate.delta)
-
-    new_length = coordinate.length / 2.0
-    coordinate.delta /= 2.0
-
-    assert new_length == coordinate.length
-
