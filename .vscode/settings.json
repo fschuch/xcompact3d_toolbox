@@ -1,0 +1,15 @@
+{
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "cSpell.words": [
+        "mytype",
+        "tqdm",
+        "write",
+        "xdmf",
+        "zfill"
+    ]
+}
