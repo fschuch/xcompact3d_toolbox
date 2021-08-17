@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Two functions to handle the binaries filenames and its tests. This abstraction will help in future refactoring. By [@fschuch](https://github.com/fschuch).
+
 ## [0.1.11] - 2021-02-12
+
+### Fixed
 
 - Fix #8, a little incompatibility problem with xcompact3d was fixed, by [@fschuch](https://github.com/fschuch).
 

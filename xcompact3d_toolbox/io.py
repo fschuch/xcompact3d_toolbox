@@ -25,12 +25,14 @@ Notes
 
 """
 
-from .param import param, boundary_condition
+import glob
+import os.path
+import warnings
+
 import numpy as np
 import xarray as xr
-import os.path
-import glob
-import warnings
+
+from .param import boundary_condition, param
 
 
 def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
@@ -84,7 +86,7 @@ def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
     >>> xcompact3d_toolbox.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
     >>> xcompact3d_toolbox.param["mytype"] = np.float32 # otherwise
 
-    In the following cases, coordinates and dimensions are infered from the
+    In the following cases, coordinates and dimensions are inferred from the
     folder containing the file:
 
     >>> ux = x3d.readfield('./data/3d_snapshots/ux-00000400.bin', prm)
@@ -188,7 +190,7 @@ def read_all(filename_pattern, prm):
     >>> x3d.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
     >>> x3d.param["mytype"] = np.float32 # otherwise
 
-    In the following cases, coordinates and dimensions are infered from the
+    In the following cases, coordinates and dimensions are inferred from the
     folder containing the file and time from the filenames:
 
     >>> ux = x3d.read_all('./data/3d_snapshots/ux-*.bin', prm)
@@ -412,6 +414,10 @@ def prm_to_dict(filename="incompact3d.prm"):
     return dict_outer
 
 
+def dict_to_prm(*args, **kargs):
+    raise NotImplementedError("It is not possible to write a .prm file")
+
+
 def i3d_to_dict(filename="input.i3d"):
 
     f = open(filename)
@@ -501,3 +507,30 @@ def dict_to_i3d(dict, filename="input.i3d"):
 
     except IOError as e:
         print("Couldn't open or write to file (%s)." % e)
+
+def set_filename_for_bin(
+    prefix: str,
+    counter: int,
+    separator: str = "-",
+    extension: str = ".bin",
+    number_of_digits: int = 4,
+) -> str:
+    return f"{prefix}{separator}{str(counter).zfill(number_of_digits)}{extension}"
+
+
+def get_info_from_filename(
+    filename: str, separator: str = "", extension=".bin", number_of_digits: int = None
+) -> tuple[int, str]:
+    if extension:
+        filename = filename[: -len(extension)]
+    if separator:
+        prefix, counter = filename.split(separator)
+    elif number_of_digits is not None:
+        prefix = filename[:-number_of_digits]
+        counter = filename[-number_of_digits:]
+    else:
+        raise IOError(
+            "Impossible to get time from filename without separator or number of digits"
+        )
+    return int(counter), prefix
+
