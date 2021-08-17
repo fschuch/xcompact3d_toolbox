@@ -30,7 +30,7 @@ class Coordinate(traitlets.HasTraits):
         return self.grid_size
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.length}, {self.grid_size}, {self.is_periodic})"
+        return f"{self.__class__.__name__}(length = {self.length}, grid_size = {self.grid_size}, is_periodic = {self.is_periodic})"
 
     def get_possible_grid_size_values(self, start: int = 0, stop: int = 9002) -> list:
         return list(
@@ -100,6 +100,79 @@ class Coordinate(traitlets.HasTraits):
         return self.grid_size
 
 
+class StretchedCoordinate(Coordinate):
+    istret = traitlets.Int(
+        default_value=0,
+        min=0,
+        max=3,
+        help="type of mesh refinement (0:no, 1:center, 2:both sides, 3:bottom)",
+    )
+    beta = traitlets.Float(default_value=1.0, min=0.0, help="Refinement parameter")
+
+    def __repr__(self):
+        if self.istret == 0:
+            return f"{self.__class__.__name__}(length = {self.length}, grid_size = {self.grid_size}, is_periodic = {self.is_periodic})"
+        return f"{self.__class__.__name__}(length = {self.length}, grid_size = {self.grid_size}, is_periodic = {self.is_periodic}, istret = {self.istret}, beta = {self.beta})"
+
+    def __array__(self):
+        if self.istret == 0:
+            return super().__array__()
+        return stretching(
+            istret=self.istret,
+            beta=self.beta,
+            yly=self.length,
+            my=self._sub_grid_size,
+            ny=self.grid_size,
+            return_auxiliar_variables=False,
+        )
+
+    @traitlets.validate("istret")
+    def _validate_istret(self, proposal):
+        if proposal.get("value") == 3 and self.is_periodic:
+            raise traitlets.TraitError(
+                f"mesh refinement at the bottom (istret=3) is not possible when periodic"
+            )
+        return proposal.get("value")
+
+
+class Mesh3D(traitlets.HasTraits):
+    x = traitlets.Instance(klass=Coordinate)
+    y = traitlets.Instance(klass=StretchedCoordinate)
+    z = traitlets.Instance(klass=Coordinate)
+
+    def __init__(self, **kwargs):
+
+        self.x = Coordinate(**kwargs.get("x", {}))
+        self.y = StretchedCoordinate(**kwargs.get("y", {}))
+        self.z = Coordinate(**kwargs.get("z", {}))
+
+        for key in kwargs.keys():
+            if key not in self.trait_names():
+                warnings.warn(f"{key} is not a valid key parameter for Mesh3D")
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}(\n"
+            f"    x = {self.x}\n"
+            f"    y = {self.y}\n"
+            f"    z = {self.z}\n"
+            ")"
+        )
+
+    def get(self) -> dict:
+        return {dir: getattr(self, dir).vector for dir in self.trait_names()}
+
+    def drop(self, *args) -> dict:
+        for key in args:
+            if key not in self.trait_names():
+                warnings.warn(f"{key} is not a valid key parameter for Mesh3D")
+        return {
+            dir: getattr(self, dir).vector
+            for dir in self.trait_names()
+            if dir not in args
+        }
+
+
 def _validate_grid_size(grid_size, is_periodic):
 
     size = grid_size if is_periodic else grid_size - 1
@@ -121,35 +194,6 @@ def _validate_grid_size(grid_size, is_periodic):
         return False
     return True
 
-
-class StretchedCoordinate(Coordinate):
-    istret = traitlets.Int(
-        default_value=0,
-        min=0,
-        max=3,
-        help="type of mesh refinement (0:no, 1:center, 2:both sides, 3:bottom)",
-    )
-    beta = traitlets.Float(default_value=1.0, min=0.0, help="Refinement parameter")
-
-    def __array__(self):
-        if self.istret == 0:
-            return super().__array__()
-        return stretching(
-            istret=self.istret,
-            beta=self.beta,
-            yly=self.length,
-            my=self._sub_grid_size,
-            ny=self.grid_size,
-            return_auxiliar_variables=False,
-        )
-    
-    @traitlets.validate("istret")
-    def _validate_istret(self, proposal):
-        if proposal.get("value") == 3 and self.is_periodic:
-            raise traitlets.TraitError(
-                f'mesh refinement at the bottom (istret=3) is not possible when periodic'
-            )
-        return proposal.get("value")
 
 def stretching(istret, beta, yly, my, ny, return_auxiliar_variables=True):
 

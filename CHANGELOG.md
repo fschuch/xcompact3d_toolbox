@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A class that handles the binaries filenames and its tests, by [@fschuch](https://github.com/fschuch).
 - A class to handle the coordinates and its tests, so it can be moved out of the parameters class, by [@fschuch](https://github.com/fschuch).
+- New class for the 3D mesh, with useful methods and its testes, by [@fschuch](https://github.com/fschuch).
 
 ## [0.1.11] - 2021-02-12
 

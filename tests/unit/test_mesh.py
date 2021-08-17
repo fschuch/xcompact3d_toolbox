@@ -32,11 +32,7 @@ def test_coordinate_properties(coordinate, length, grid_size, is_periodic):
         grid_size -= 1
     sub_grid_size = grid_size if is_periodic else grid_size - 1
     delta = length / grid_size if is_periodic else length / (grid_size - 1)
-    coordinate.set(
-        is_periodic = is_periodic,
-        grid_size = grid_size,
-        length = length
-    )
+    coordinate.set(is_periodic=is_periodic, grid_size=grid_size, length=length)
 
     assert (sub_grid_size, delta) == (coordinate._sub_grid_size, coordinate.delta)
 
@@ -78,14 +74,30 @@ def test_stretched_coordinate(stretched_coordinate, filename):
     coord_ref = np.loadtxt(filename)
 
     stretched_coordinate.set(
-        istret = int(filename.split("_")[1]),
-        beta = float(filename.split("_")[2]),
-        grid_size = coord_ref.size
+        istret=int(filename.split("_")[1]),
+        beta=float(filename.split("_")[2]),
+        grid_size=coord_ref.size,
     )
 
     np.testing.assert_allclose(
         actual=stretched_coordinate, desired=coord_ref, rtol=1e-5, atol=1e-8
     )
+
+
+@pytest.fixture
+def mesh3d():
+    return x3d.mesh.Mesh3D()
+
+
+def test_mesh_3d_get(mesh3d):
+    dictionary = mesh3d.get()
+    assert set(dictionary.keys()) == {"x", "y", "z"}
+
+
+@pytest.mark.parametrize("direction", ["x", "y", "z"])
+def test_mesh_3d_drop(mesh3d, direction):
+    dictionary = mesh3d.drop(direction)
+    assert direction not in dictionary
 
 
 @pytest.fixture
