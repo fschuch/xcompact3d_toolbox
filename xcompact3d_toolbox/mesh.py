@@ -377,7 +377,7 @@ def stretching(istret, beta, yly, my, ny, return_auxiliar_variables=True):
     return yp
 
 
-def get_mesh(prm, raf=False, staggered=False):
+def get_mesh(prm, raf=False):
     #
     dim = ["x", "y", "z"]
     #
@@ -399,19 +399,6 @@ def get_mesh(prm, raf=False, staggered=False):
         )
         for d in dim
     }
-    #
-    # Half-staggered for pressure
-    #
-    if staggered:
-        for d in dim:
-            delta = mesh[d][1] - mesh[d][0]
-            mesh[d] = np.linspace(
-                start=0.5 * delta,
-                stop=l[d] - 0.5 * delta,
-                num=m[d],
-                endpoint=not ncl[d],
-                dtype=param["mytype"],
-            )
     #
     # stretching
     #
