@@ -612,7 +612,7 @@ class ParametersInOutParam(traitlets.HasTraits):
     """str: The number of digits used to name the output binary files,
     in Fortran format (default is ``(I9.9)``).
     """
-    
+
     size = traitlets.Unicode().tag()
     """str: Auxiliar variable indicating the demanded space in disc
     """
@@ -777,12 +777,19 @@ class Parameters(
     """The physical and computational parameters are built on top of `traitlets`_.
     It is a framework that lets Python classes have attributes with type checking,
     dynamically calculated default values, and ‘on change’ callbacks.
-    So, many of the parameters are validated regarding type, norms, and values
-    supported by Xcompact3d.
+    So, many of the parameters are validated regarding the type, business rules,
+    and the range of values supported by XCompact3d.
 
     There are methods to handle the parameters file, to read the binary
-    arrays produced by Xcompact3d and also to write the xdmf file, so the binary
-    fields can be open in any external visualization tool.
+    arrays produced by XCompact3d and also to write the xdmf file, so the binary
+    fields can be opened in any external visualization tool.
+
+    * :obj:`xcompact3d_toolbox.parameters.ParametersBasicParam`;
+    * :obj:`xcompact3d_toolbox.parameters.ParametersNumOptions`;
+    * :obj:`xcompact3d_toolbox.parameters.ParametersInOutParam`;
+    * :obj:`xcompact3d_toolbox.parameters.ParametersScalarParam`;
+    * :obj:`xcompact3d_toolbox.parameters.ParametersLESModel`;
+    * :obj:`xcompact3d_toolbox.parameters.ParametersIbmStuff`.
 
     In addition, there are `ipywidgets`_ for a friendly user interface,
     see :obj:`xcompact3d_toolbox.gui.ParametersGui`.
