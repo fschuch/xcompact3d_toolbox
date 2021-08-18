@@ -482,7 +482,6 @@ def write_xdmf(prm):
             f.write(" </Domain>\n")
             f.write("</Xdmf>")
 
-
 def prm_to_dict(filename="incompact3d.prm"):
 
     f = open(filename)
@@ -530,10 +529,6 @@ def prm_to_dict(filename="incompact3d.prm"):
     f.close()
 
     return dict_outer
-
-
-def dict_to_prm(*args, **kargs):
-    raise NotImplementedError("It is not possible to write a .prm file")
 
 
 def i3d_to_dict(filename="input.i3d"):

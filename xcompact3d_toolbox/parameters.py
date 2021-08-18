@@ -14,8 +14,7 @@ import traitlets
 import xarray as xr
 from tqdm.autonotebook import tqdm
 
-from .io import (FilenameProperties, dict_to_i3d, i3d_to_dict, prm_to_dict,
-                 write_xdmf)
+from .io import FilenameProperties, dict_to_i3d, i3d_to_dict, prm_to_dict, write_xdmf
 from .mesh import Mesh3D
 from .param import boundary_condition, param
 
@@ -81,16 +80,14 @@ class ParametersBasicParam(traitlets.HasTraits):
     """
 
     nx, ny, nz = [
-        traitlets.Int(default_value=17, min=0).tag(
-            group="BasicParam", desc=f"{name.upper()}-direction nodes"
-        )
+        traitlets.Int().tag(group="BasicParam", desc=f"{name.upper()}-direction nodes")
         for name in "x y z".split()
     ]
     """int: Number of mesh points.
     """
 
     xlx, yly, zlz = [
-        traitlets.Float(default_value=1.0, min=0).tag(
+        traitlets.Float().tag(
             group="BasicParam", desc=f"Size of the box in {name}-direction"
         )
         for name in "x y z".split()
@@ -348,9 +345,9 @@ class ParametersNumOptions(traitlets.HasTraits):
 
     cnu = traitlets.Float(default_value=0.44, min=0.0).tag(
         group="NumOptions",
-        desc="Ratio between hypervisvosity at km=2/3π and kc=π (dissipation factor range)",
+        desc="Ratio between hyperviscosity at km=2/3π and kc=π (dissipation factor range)",
     )
-    """float: Ratio between hypervisvosity at :math:`k_m=2/3\\pi` and :math:`k_c= \\pi`.
+    """float: Ratio between hyperviscosity at :math:`k_m=2/3\\pi` and :math:`k_c= \\pi`.
     """
 
     def __init__(self):
@@ -578,9 +575,7 @@ class ParametersExtras(traitlets.HasTraits):
 
     filename_properties = traitlets.Instance(klass=FilenameProperties)
 
-    dx, dy, dz = [
-        traitlets.Float(default_value=0.0625, min=0.0).tag() for dir in "x y z".split()
-    ]
+    dx, dy, dz = [traitlets.Float().tag() for _ in "x y z".split()]
     """float: Mesh resolution.
     """
 
@@ -720,12 +715,16 @@ class Parameters(
         # Boundary conditions are high priority in order to avoid bugs
         for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn".split():
             if bc in kwargs:
-                setattr(self, bc, kwargs[bc])
+                setattr(self, bc, kwargs.get(bc))
 
         if "loadfile" in kwargs.keys():
-            self.filename = kwargs["loadfile"]
+            self.filename = kwargs.get("loadfile")
             self.load()
             del kwargs["loadfile"]
+
+        if "filename_properties" in kwargs.keys():
+            self.filename_properties.set(**kwargs.get("filename_properties"))
+            del kwargs["filename_properties"]
 
         for key, arg in kwargs.items():
             if key not in self.trait_names():
@@ -733,6 +732,19 @@ class Parameters(
             setattr(self, key, arg)
 
     def __repr__(self):
+        string = f"{self.__class__.__name__}(\n"
+        for name in self.trait_names():
+            group = self.trait_metadata(name, "group")
+            if group is None:
+                continue
+            value = getattr(self, name)
+            if value == self.trait_defaults(name):
+                continue
+            string += f"    {name} = {value},\n"
+        string += ")"
+        return string
+
+    def __str__(self):
         """Representation of the parameters class, similar to the
         representation of the .i3d file."""
         # These groups are demanded by Xcompact3d, see parameters.f90
@@ -824,9 +836,6 @@ class Parameters(
     @traitlets.observe("p_row", "p_col", "ncores")
     def _observe_2Decomp(self, change):
         if change["name"] == "ncores":
-            possible = list(divisorGenerator(change["new"]))
-            self._possible_p_row = possible
-            self._possible_p_col = possible
             self.p_row, self.p_col = 0, 0
         elif change["name"] == "p_row":
             try:
@@ -844,13 +853,6 @@ class Parameters(
         if change["new"] == 0:
             # It is coded at xcompact3d, look at parameters.f90
             self.nu0nu, self.cnu = 4.0, 0.44
-            # self.trait_metadata("nu0nu", "widget").disabled = True
-            # self.trait_metadata("cnu", "widget").disabled = True
-            # self.trait_metadata("isecondder", "widget").disabled = True
-        # else:
-        # self.trait_metadata("nu0nu", "widget").disabled = False
-        # self.trait_metadata("cnu", "widget").disabled = False
-        # self.trait_metadata("isecondder", "widget").disabled = False
 
     @traitlets.observe(
         "numscalar",
@@ -1256,9 +1258,10 @@ class Parameters(
         witch assigns it to the respective namespace at the ``.i3d`` file.
 
         Examples
-        -------
+        --------
 
-        >>> prm = xcompact3d_toolbox.Parameters(filename = 'example.i3d'
+        >>> prm = xcompact3d_toolbox.Parameters(
+        ...     filename = 'example.i3d'
         ...     nx = 101,
         ...     ny = 65,
         ...     nz = 11,
