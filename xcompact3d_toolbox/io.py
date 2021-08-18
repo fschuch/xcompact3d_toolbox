@@ -26,6 +26,8 @@ Notes
 
 """
 
+from __future__ import annotations
+
 import glob
 import os.path
 import warnings
@@ -82,10 +84,11 @@ class FilenameProperties(traitlets.HasTraits):
     ...     number_of_digits = 4
     ... )
 
-    """    
+    """
+
     separator = traitlets.Unicode(default_value="-")
     file_extension = traitlets.Unicode(default_value=".bin")
-    number_of_digits = traitlets.Int(default_value=3, min=1, allow_none = True)
+    number_of_digits = traitlets.Int(default_value=3, min=1, allow_none=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -94,7 +97,7 @@ class FilenameProperties(traitlets.HasTraits):
 
     def set(self, **kwargs) -> None:
         """[summary]
-        """        
+        """
         for key, arg in kwargs.items():
             if key not in self.trait_names():
                 warnings.warn(f"{key} is not a valid parameter and was not loaded")
@@ -114,7 +117,7 @@ class FilenameProperties(traitlets.HasTraits):
         -------
         str
             [description]
-        """        
+        """
         return f"{prefix}{self.separator}{str(counter).zfill(self.number_of_digits)}{self.file_extension}"
 
     def get_info_from_filename(self, filename: str) -> tuple[int, str]:
@@ -135,7 +138,7 @@ class FilenameProperties(traitlets.HasTraits):
         IOError
             It is not possible to get information from filename if `separator`
             is an empty string and `number_of_digits` is None.
-        """        
+        """
         if self.file_extension:
             filename = filename[: -len(self.file_extension)]
         if self.separator:
@@ -148,6 +151,7 @@ class FilenameProperties(traitlets.HasTraits):
                 "Impossible to get time from filename without separator or number of digits"
             )
         return int(counter), prefix
+
 
 def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
     """This functions reads a binary field from Xcompact3d with :obj:`numpy.fromfile`
