@@ -13,11 +13,10 @@ import warnings
 import numpy as np
 import traitlets
 import xarray as xr
-
 from tqdm.autonotebook import tqdm
 
-from .io import dict_to_i3d, FilenameProperties, i3d_to_dict, prm_to_dict, write_xdmf
-from .mesh import get_mesh
+from .io import FilenameProperties, dict_to_i3d, i3d_to_dict, prm_to_dict, write_xdmf
+from .mesh import Mesh3D, get_mesh
 from .param import boundary_condition, param
 
 possible_mesh = [
@@ -511,6 +510,9 @@ class ParametersBasicParam(traitlets.HasTraits):
     """float: Component of the unitary vector pointing in the gravity's direction.
     """
 
+    def __init__(self):
+        super(ParametersBasicParam, self).__init__()
+
 
 class ParametersNumOptions(traitlets.HasTraits):
     ifirstder = traitlets.Int(default_value=4, min=1, max=4).tag(group="NumOptions")
@@ -563,6 +565,9 @@ class ParametersNumOptions(traitlets.HasTraits):
     """float: Ratio between hypervisvosity at :math:`k_m=2/3\\pi` and :math:`k_c= \\pi`.
     """
 
+    def __init__(self):
+        super(ParametersNumOptions, self).__init__()
+
 
 class ParametersInOutParam(traitlets.HasTraits):
     irestart = traitlets.Int(default_value=0, min=0, max=1).tag(
@@ -612,6 +617,10 @@ class ParametersInOutParam(traitlets.HasTraits):
     """str: The number of digits used to name the output binary files,
     in Fortran format (default is ``(I9.9)``).
     """
+
+    def __init__(self):
+        super(ParametersInOutParam, self).__init__()
+
 
 class ParametersScalarParam(traitlets.HasTraits):
     sc = traitlets.List(trait=traitlets.Float()).tag(
@@ -730,6 +739,9 @@ class ParametersScalarParam(traitlets.HasTraits):
     * 2 - Dirichlet.
     """
 
+    def __init__(self):
+        super(ParametersScalarParam, self).__init__()
+
 
 class ParametersLESModel(traitlets.HasTraits):
     jles = traitlets.Int(default_value=4, min=0, max=4).tag(
@@ -746,6 +758,10 @@ class ParametersLESModel(traitlets.HasTraits):
 
     """
 
+    def __init__(self):
+        super(ParametersLESModel, self).__init__()
+
+
 class ParametersIbmStuff(traitlets.HasTraits):
     nobjmax = traitlets.Int(default_value=1, min=1).tag(
         group="ibmstuff", desc="Maximum number of objects in any direction"
@@ -761,10 +777,18 @@ class ParametersIbmStuff(traitlets.HasTraits):
     """int: "Level of refinement for :obj:`iibm` equals to 2, to find the surface of the immersed object"
     """
 
+    def __init__(self):
+        super(ParametersIbmStuff, self).__init__()
+
+
 class ParametersExtras(traitlets.HasTraits):
     filename = traitlets.Unicode(default_value="input.i3d").tag()
     """str: Filename for the ``.i3d`` file.
     """
+
+    mesh = traitlets.Instance(klass=Mesh3D)
+
+    filename_properties = traitlets.Instance(klass=FilenameProperties)
 
     _mx, _my, _mz = [traitlets.Int(default_value=1, min=1) for i in range(3)]
 
@@ -774,7 +798,7 @@ class ParametersExtras(traitlets.HasTraits):
     """float: Mesh resolution.
     """
 
-    _nclx, _ncly, _nclz = [traitlets.Bool() for i in range(3)]
+    _nclx, _ncly, _nclz = [traitlets.Bool(default_value=False) for i in range(3)]
     """bool: Auxiliar variable for boundary condition,
         it is :obj:`True` if Periodic and :obj:`False` otherwise.
     """
@@ -803,6 +827,26 @@ class ParametersExtras(traitlets.HasTraits):
     """str: Auxiliar variable indicating the demanded space in disc
     """
 
+    def __init__(self):
+        super(ParametersExtras, self).__init__()
+        self.mesh = Mesh3D()
+        self.filename_properties = FilenameProperties()
+        self._extra_link_mesh()
+
+    def _extra_link_mesh(self):
+        pass
+        # for dim in "xyz":
+        #     traitlets.link((self, f"{dim}l{dim}"), (getattr(self.mesh, dim), "length"))
+        #     traitlets.link((self, f"n{dim}"), (getattr(self.mesh, dim), "grid_size"))
+        #     traitlets.link((self, f"d{dim}"), (getattr(self.mesh, dim), "delta"))
+        #     traitlets.link(
+        #         (self, f"_ncl{dim}"), (getattr(self.mesh, dim), "is_periodic")
+        #     )
+        #     traitlets.link(
+        #         (self, f"_m{dim}"), (getattr(self.mesh, dim), "_sub_grid_size")
+        #     )
+
+
 class Parameters(
     ParametersBasicParam,
     ParametersNumOptions,
@@ -810,7 +854,7 @@ class Parameters(
     ParametersScalarParam,
     ParametersLESModel,
     ParametersIbmStuff,
-    ParametersExtras
+    ParametersExtras,
 ):
     """The physical and computational parameters are built on top of `traitlets`_.
     It is a framework that lets Python classes have attributes with type checking,
