@@ -6,7 +6,6 @@ pre and post-processing.
 """
 
 import glob
-import math
 import os.path
 import warnings
 
@@ -15,217 +14,10 @@ import traitlets
 import xarray as xr
 from tqdm.autonotebook import tqdm
 
-from .io import FilenameProperties, dict_to_i3d, i3d_to_dict, prm_to_dict, write_xdmf
-from .mesh import Mesh3D, get_mesh
+from .io import (FilenameProperties, dict_to_i3d, i3d_to_dict, prm_to_dict,
+                 write_xdmf)
+from .mesh import Mesh3D
 from .param import boundary_condition, param
-
-possible_mesh = [
-    9,
-    11,
-    13,
-    17,
-    19,
-    21,
-    25,
-    31,
-    33,
-    37,
-    41,
-    49,
-    51,
-    55,
-    61,
-    65,
-    73,
-    81,
-    91,
-    97,
-    101,
-    109,
-    121,
-    129,
-    145,
-    151,
-    161,
-    163,
-    181,
-    193,
-    201,
-    217,
-    241,
-    251,
-    257,
-    271,
-    289,
-    301,
-    321,
-    325,
-    361,
-    385,
-    401,
-    433,
-    451,
-    481,
-    487,
-    501,
-    513,
-    541,
-    577,
-    601,
-    641,
-    649,
-    721,
-    751,
-    769,
-    801,
-    811,
-    865,
-    901,
-    961,
-    973,
-    1001,
-    1025,
-    1081,
-    1153,
-    1201,
-    1251,
-    1281,
-    1297,
-    1351,
-    1441,
-    1459,
-    1501,
-    1537,
-    1601,
-    1621,
-    1729,
-    1801,
-    1921,
-    1945,
-    2001,
-    2049,
-    2161,
-    2251,
-    2305,
-    2401,
-    2431,
-    2501,
-    2561,
-    2593,
-    2701,
-    2881,
-    2917,
-    3001,
-    3073,
-    3201,
-    3241,
-    3457,
-    3601,
-    3751,
-    3841,
-    3889,
-    4001,
-    4051,
-    4097,
-    4321,
-    4375,
-    4501,
-    4609,
-    4801,
-    4861,
-    5001,
-    5121,
-    5185,
-    5401,
-    5761,
-    5833,
-    6001,
-    6145,
-    6251,
-    6401,
-    6481,
-    6751,
-    6913,
-    7201,
-    7291,
-    7501,
-    7681,
-    7777,
-    8001,
-    8101,
-    8193,
-    8641,
-    8749,
-    9001,
-]
-""":obj:`list` of :obj:`int`: Possible number of mesh points for no periodic boundary conditions.
-
-Due to restrictions at the FFT library, they must be equal to:
-
-.. math::
-    n_i = 2^{1+a} \\times 3^b \\times 5^c + 1,
-
-where :math:`a`, :math:`b` and :math:`c` are non negative integers, and :math:`i`
-represents the three coordinates (**x**, **y** and **z**).
-
-Aditionally, the derivative's stencil imposes that :math:`n_i \\ge 9`.
-
-Notes
------
-There is no upper limit, as long as the restrictions are satisfied.
-"""
-
-possible_mesh_p = [i - 1 for i in possible_mesh]
-""":obj:`list` of :obj:`int`: Possible number of mesh points for periodic boundary conditions.
-
-Due to restrictions at the FFT library, they must be equal to:
-
-.. math::
-    n_i = 2^{1+a} \\times 3^b \\times 5^c,
-
-where :math:`a`, :math:`b` and :math:`c` are non negative integers, and :math:`i`
-represents the three coordinates (**x**, **y** and **z**).
-
-Aditionally, the derivative's stencil imposes that :math:`n_i \\ge 8`.
-
-Notes
------
-There is no upper limit, as long as the restrictions are satisfied.
-"""
-
-
-def divisorGenerator(n):
-    """Yields the possibles divisors for ``n``.
-
-    Especially useful to compute the possible values for :obj:`p_row` and :obj:`p_col`
-    as functions of the number of computational cores available (:obj:`ncores`).
-    Zero is also included in the case of auto-tunning, i.e., ``p_row=p_col=0``.
-
-    Parameters
-    ----------
-    n : int
-        Input value.
-
-    Yields
-    ------
-    int
-        The next possible divisor for ``n``.
-
-    Examples
-    -------
-
-    >>> print(list(divisorGenerator(8)))
-    [0, 1, 2, 4, 8]
-
-    """
-    large_divisors = [0]
-    for i in range(1, int(math.sqrt(n) + 1)):
-        if n % i == 0:
-            yield i
-            if i * i != n:
-                large_divisors.append(n / i)
-    for divisor in reversed(large_divisors):
-        yield int(divisor)
 
 
 class ParametersBasicParam(traitlets.HasTraits):
@@ -295,10 +87,6 @@ class ParametersBasicParam(traitlets.HasTraits):
         for name in "x y z".split()
     ]
     """int: Number of mesh points.
-
-    Notes
-    -----
-        See :obj:`possible_mesh` and :obj:`possible_mesh_p`.
     """
 
     xlx, yly, zlz = [
@@ -790,37 +578,14 @@ class ParametersExtras(traitlets.HasTraits):
 
     filename_properties = traitlets.Instance(klass=FilenameProperties)
 
-    _mx, _my, _mz = [traitlets.Int(default_value=1, min=1) for i in range(3)]
-
     dx, dy, dz = [
         traitlets.Float(default_value=0.0625, min=0.0).tag() for dir in "x y z".split()
     ]
     """float: Mesh resolution.
     """
 
-    _nclx, _ncly, _nclz = [traitlets.Bool(default_value=False) for i in range(3)]
-    """bool: Auxiliar variable for boundary condition,
-        it is :obj:`True` if Periodic and :obj:`False` otherwise.
-    """
-
-    _possible_mesh_x, _possible_mesh_y, _possible_mesh_z = [
-        traitlets.List(trait=traitlets.Int(), default_value=possible_mesh)
-        for i in range(3)
-    ]
-    """:obj:`list` of :obj:`int`: Auxiliar variable for mesh points widgets,
-        it stores the available options according to the boundary conditions.
-    """
-
     ncores = traitlets.Int(default_value=4, min=1).tag()
     """int: Number of computational cores where Xcompact3d will run.
-    """
-
-    _possible_p_row, _possible_p_col = [
-        traitlets.List(trait=traitlets.Int(), default_value=list(divisorGenerator(4)))
-        for i in range(2)
-    ]
-    """:obj:`list` of :obj:`int`: Auxiliar variable for parallel domain decomposition,
-        it stores the available options according to :obj:`ncores`.
     """
 
     size = traitlets.Unicode().tag()
@@ -838,12 +603,6 @@ class ParametersExtras(traitlets.HasTraits):
             traitlets.link((getattr(self.mesh, dim), "length"), (self, f"{dim}l{dim}"))
             traitlets.link((getattr(self.mesh, dim), "grid_size"), (self, f"n{dim}"))
             traitlets.link((getattr(self.mesh, dim), "delta"), (self, f"d{dim}"))
-            traitlets.link(
-                (getattr(self.mesh, dim), "is_periodic"), (self, f"_ncl{dim}")
-            )
-            traitlets.link(
-                (getattr(self.mesh, dim), "_sub_grid_size"), (self, f"_m{dim}")
-            )
         traitlets.link((self.mesh.y, "istret"), (self, "istret"))
         traitlets.link((self.mesh.y, "beta"), (self, "beta"))
 
@@ -1053,13 +812,14 @@ class Parameters(
         dim = change["name"][3]  # It will be x, y or z
         #
         if change["new"] == 0:
-            for i in f"ncl{dim}1 ncl{dim}n ncl{dim}S1 ncl{dim}Sn".split():
-                setattr(self, i, 0)
-            setattr(self, f"_ncl{dim}", True)
+            for BC in f"ncl{dim}1 ncl{dim}n ncl{dim}S1 ncl{dim}Sn".split():
+                setattr(self, BC, 0)
+                getattr(self.mesh, dim)
+            setattr(getattr(self.mesh, dim), "is_periodic", True)
         if change["old"] == 0 and change["new"] != 0:
-            for i in f"ncl{dim}1 ncl{dim}n ncl{dim}S1 ncl{dim}Sn".split():
-                setattr(self, i, change["new"])
-            setattr(self, f"_ncl{dim}", False)
+            for BC in f"ncl{dim}1 ncl{dim}n ncl{dim}S1 ncl{dim}Sn".split():
+                setattr(self, BC, change["new"])
+            setattr(getattr(self.mesh, dim), "is_periodic", False)
 
     @traitlets.observe("p_row", "p_col", "ncores")
     def _observe_2Decomp(self, change):
@@ -1565,30 +1325,4 @@ class Parameters(
                 0.5   , 0.5625, 0.625 , 0.6875, 0.75  , 0.8125, 0.875 , 0.9375,
                 1.    ])}
         """
-        return get_mesh(self)
-
-
-def _validate_mesh(n, ncl, ncl1, ncln, dim):
-
-    pmin = 8 if ncl else 9
-
-    if n < pmin:
-        # Because of the derivatives' stencil
-        raise traitlets.TraitError(f"{n} is invalid, n{dim} must be larger than {pmin}")
-
-    if not ncl:
-        n = n - 1
-
-    if n % 2 == 0:
-        n //= 2
-
-        for val in [2, 3, 5]:
-            while True:
-                if n % val == 0:
-                    n //= val
-                else:
-                    break
-
-    if n != 1:
-        # Because of the FFT library
-        raise traitlets.TraitError(f"Invalid value for mesh points (n{dim})")
+        return self.mesh.get()

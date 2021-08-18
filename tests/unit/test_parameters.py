@@ -48,7 +48,7 @@ class test_parameters(unittest.TestCase):
                 setattr(prm, f"ncl{dim}1", 0)
                 self.assertEqual(getattr(prm, f"ncl{dim}1"), 0)
                 self.assertEqual(getattr(prm, f"ncl{dim}n"), 0)
-                self.assertEqual(getattr(prm, f"_ncl{dim}"), True)
+                self.assertEqual(getattr(prm.mesh, dim).is_periodic, True)
                 self.assertEqual(getattr(prm, f"n{dim}"), 200)
                 self.assertEqual(getattr(prm, f"d{dim}"), 0.005)
                 self.assertEqual(getattr(prm, f"{dim}l{dim}"), 1.0)
@@ -56,7 +56,7 @@ class test_parameters(unittest.TestCase):
                 setattr(prm, f"ncl{dim}1", 1)
                 self.assertEqual(getattr(prm, f"ncl{dim}1"), 1)
                 self.assertEqual(getattr(prm, f"ncl{dim}n"), 1)
-                self.assertEqual(getattr(prm, f"_ncl{dim}"), False)
+                self.assertEqual(getattr(prm.mesh, dim).is_periodic, False)
                 self.assertEqual(getattr(prm, f"n{dim}"), 201)
                 self.assertEqual(getattr(prm, f"d{dim}"), 0.005)
                 self.assertEqual(getattr(prm, f"{dim}l{dim}"), 1.0)
@@ -64,7 +64,7 @@ class test_parameters(unittest.TestCase):
                 setattr(prm, f"ncl{dim}n", 0)
                 self.assertEqual(getattr(prm, f"ncl{dim}1"), 0)
                 self.assertEqual(getattr(prm, f"ncl{dim}n"), 0)
-                self.assertEqual(getattr(prm, f"_ncl{dim}"), True)
+                self.assertEqual(getattr(prm.mesh, dim).is_periodic, True)
                 self.assertEqual(getattr(prm, f"n{dim}"), 200)
                 self.assertEqual(getattr(prm, f"d{dim}"), 0.005)
                 self.assertEqual(getattr(prm, f"{dim}l{dim}"), 1.0)
@@ -72,40 +72,10 @@ class test_parameters(unittest.TestCase):
                 setattr(prm, f"ncl{dim}n", 2)
                 self.assertEqual(getattr(prm, f"ncl{dim}1"), 2)
                 self.assertEqual(getattr(prm, f"ncl{dim}n"), 2)
-                self.assertEqual(getattr(prm, f"_ncl{dim}"), False)
+                self.assertEqual(getattr(prm.mesh, dim).is_periodic, False)
                 self.assertEqual(getattr(prm, f"n{dim}"), 201)
                 self.assertEqual(getattr(prm, f"d{dim}"), 0.005)
                 self.assertEqual(getattr(prm, f"{dim}l{dim}"), 1.0)
-
-    def test_validate_mesh(self):
-
-        from xcompact3d_toolbox.parameters import possible_mesh, possible_mesh_p
-
-        prm = Parameters()
-
-        # Too small grid
-        for dim in "x y z".split():
-            with self.subTest(dim=dim):
-                with self.assertRaises(traitlets.TraitError):
-                    setattr(prm, f"n{dim}", 8)
-
-        # Invalid grid not periodic
-        for dim in "x y z".split():
-            for i in range(possible_mesh[-1]):
-                with self.subTest(dim=dim, i=i):
-                    if i not in possible_mesh:
-                        with self.assertRaises(traitlets.TraitError):
-                            setattr(prm, f"n{dim}", i)
-
-        # Invalid grid Periodic
-        for dim in "x y z".split():
-            setattr(prm, f"ncl{dim}1", 0)
-            for i in range(possible_mesh_p[-1]):
-                with self.subTest(dim=dim, i=i):
-                    if i not in possible_mesh_p:
-                        with self.assertRaises(traitlets.TraitError):
-                            setattr(prm, f"n{dim}", i)
-
 
 if __name__ == "__main__":
     unittest.main()

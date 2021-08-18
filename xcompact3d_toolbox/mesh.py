@@ -159,6 +159,9 @@ class Mesh3D(traitlets.HasTraits):
             ")"
         )
 
+    def __len__(self):
+        return self.size
+
     def get(self) -> dict:
         return {dir: getattr(self, dir).vector for dir in self.trait_names()}
 
@@ -171,6 +174,10 @@ class Mesh3D(traitlets.HasTraits):
             for dir in self.trait_names()
             if dir not in args
         }
+    
+    @property
+    def size(self):
+        return self.x.size * self.y.size * self.z.size
 
 
 def _validate_grid_size(grid_size, is_periodic):
@@ -375,34 +382,3 @@ def stretching(istret, beta, yly, my, ny, return_auxiliar_variables=True):
     if return_auxiliar_variables:
         return yp, ppy, pp2y, pp4y
     return yp
-
-
-def get_mesh(prm, raf=False):
-    #
-    dim = ["x", "y", "z"]
-    #
-    n = {d: getattr(prm, f"n{d}") for d in dim}
-    m = {d: getattr(prm, f"_m{d}") for d in dim}
-    #
-    l = {d: getattr(prm, f"{d}l{d}") for d in dim}
-    #
-    # BC, True if periodic, false otherwise
-    ncl = {d: getattr(prm, f"_ncl{d}") for d in dim}
-    #
-    if prm.iibm == 2 and raf:
-        for d in dim:
-            n[d] = int(m[d] * prm.nraf + 1)
-    # Mesh
-    mesh = {
-        d: np.linspace(
-            start=0.0, stop=l[d], num=n[d], endpoint=not ncl[d], dtype=param["mytype"]
-        )
-        for d in dim
-    }
-    #
-    # stretching
-    #
-    if prm.istret != 0:
-        mesh["y"] = stretching(prm.istret, prm.beta, prm.yly, prm._my, prm.ny)[0]
-
-    return mesh

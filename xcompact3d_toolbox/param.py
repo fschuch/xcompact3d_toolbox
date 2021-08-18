@@ -27,18 +27,18 @@ def boundary_condition(prm, var=None):
         },
         "pp": {
             "x": {
-                "ncl1": 0 if prm._nclx else 1,
-                "ncln": 0 if prm._nclx else 1,
+                "ncl1": 0 if prm.mesh.x.is_periodic else 1,
+                "ncln": 0 if prm.mesh.x.is_periodic else 1,
                 "npaire": 1,
             },
             "y": {
-                "ncl1": 0 if prm._ncly else 1,
-                "ncln": 0 if prm._ncly else 1,
+                "ncl1": 0 if prm.mesh.y.is_periodic else 1,
+                "ncln": 0 if prm.mesh.y.is_periodic else 1,
                 "npaire": 1,
             },
             "z": {
-                "ncl1": 0 if prm._nclz else 1,
-                "ncln": 0 if prm._nclz else 1,
+                "ncl1": 0 if prm.mesh.z.is_periodic else 1,
+                "ncln": 0 if prm.mesh.z.is_periodic else 1,
                 "npaire": 1,
             },
         },

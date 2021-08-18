@@ -7,10 +7,52 @@ but with `ipywidgets`_.
     https://ipywidgets.readthedocs.io/en/latest/
 """
 
+import math
+
 import ipywidgets as widgets
-from traitlets import link
+import traitlets
 from IPython.display import display
-from .parameters import Parameters, possible_mesh, possible_mesh_p
+from traitlets import link
+
+from .mesh import Coordinate
+from .parameters import Parameters
+
+possible_mesh = Coordinate(is_periodic=False)
+possible_mesh_p = Coordinate(is_periodic=True)
+
+
+def _divisorGenerator(n):
+    """Yields the possibles divisors for ``n``.
+
+    Especially useful to compute the possible values for :obj:`p_row` and :obj:`p_col`
+    as functions of the number of computational cores available (:obj:`ncores`).
+    Zero is also included in the case of auto-tunning, i.e., ``p_row=p_col=0``.
+
+    Parameters
+    ----------
+    n : int
+        Input value.
+
+    Yields
+    ------
+    int
+        The next possible divisor for ``n``.
+
+    Examples
+    -------
+
+    >>> print(list(divisorGenerator(8)))
+    [0, 1, 2, 4, 8]
+
+    """
+    large_divisors = [0]
+    for i in range(1, int(math.sqrt(n) + 1)):
+        if n % i == 0:
+            yield i
+            if i * i != n:
+                large_divisors.append(n / i)
+    for divisor in reversed(large_divisors):
+        yield int(divisor)
 
 
 class ParametersGui(Parameters):
@@ -19,6 +61,14 @@ class ParametersGui(Parameters):
     parameters and their widgets. Control them with code and/or with the graphical
     user interface.
 
+    """
+
+    _possible_p_row, _possible_p_col = [
+        traitlets.List(trait=traitlets.Int(), default_value=list(_divisorGenerator(4)))
+        for i in range(2)
+    ]
+    """:obj:`list` of :obj:`int`: Auxiliar variable for parallel domain decomposition,
+        it stores the available options according to :obj:`ncores`.
     """
 
     def __init__(self, **kargs):

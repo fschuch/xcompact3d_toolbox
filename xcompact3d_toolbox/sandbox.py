@@ -11,7 +11,6 @@ See https://github.com/fschuch/Xcompact3d/ for more information.
 """
 
 from .array import X3dDataArray, X3dDataset
-from .mesh import get_mesh
 from .param import param
 import numpy as np
 import os.path
@@ -66,7 +65,7 @@ def init_epsi(prm, dask=False):
 
     makedirs(os.path.join("data", "geometry"), exist_ok=True)
 
-    mesh = get_mesh(prm)
+    mesh = prm.get_mesh
 
     # the epsi array in the standard mesh (nx, ny, nz)
     fields = {"epsi": (mesh["x"], mesh["y"], mesh["z"])}
@@ -161,7 +160,7 @@ def init_dataset(prm):
     makedirs(os.path.join("data"), exist_ok=True)
 
     # Init dataset
-    ds = xr.Dataset(coords=get_mesh(prm)).assign_coords({"n": range(prm.numscalar)})
+    ds = xr.Dataset(coords=prm.get_mesh).assign_coords(n = range(prm.numscalar))
 
     ds.x.attrs = {"name": "Streamwise coordinate", "long_name": r"$x_1$"}
     ds.y.attrs = {"name": "Vertical coordinate", "long_name": r"$x_2$"}
