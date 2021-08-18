@@ -5,16 +5,13 @@ methods designed to be a bridge between Xcompact3d and Python applications for
 pre and post-processing.
 """
 
-import glob
-import os.path
 import warnings
 
 import numpy as np
 import traitlets
-import xarray as xr
-from tqdm.autonotebook import tqdm
 
-from .io import FilenameProperties, dict_to_i3d, i3d_to_dict, prm_to_dict, write_xdmf
+from .io import FilenameProperties, i3d_to_dict, prm_to_dict, read_field
+from .io import read_temporal_series, write_xdmf
 from .mesh import Mesh3D
 from .param import boundary_condition, param
 
@@ -966,7 +963,7 @@ class Parameters(
         for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn".split():
             if bc in kwargs:
                 setattr(self, bc, kwargs.get(bc))
-        
+
         if "filename_properties" in kwargs.keys():
             self.filename_properties.set(**kwargs.get("filename_properties"))
             del kwargs["filename_properties"]
@@ -1018,23 +1015,10 @@ class Parameters(
 
         self.set(**dictionary)
 
-    def read(self):
-        """Read is deprecated, use :obj:`xcompact3d_toolbox.parameters.Parameters.load`."""
-        warnings.warn("read is deprecated, use load", DeprecationWarning)
-        self.load()
-
-    def read_field(self, filename, coords=None, name="", attrs={}):
+    def read_field(self, filename, **kwargs):
         """This method reads a binary field from Xcompact3d with :obj:`numpy.fromfile`
         and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
         coordinates and attributes.
-
-        The properties can be inferted automatically if the
-        file is inside Xcompact3d's output folders structure, i.e.:
-
-        * 3d_snapshots (nx, ny, nz);
-        * xy_planes (nx, ny);
-        * xz_planes (nx, nz);
-        * yz_planes (ny, nz).
 
         Data type is defined by :obj:`xcompact3d_toolbox.param["mytype"]`.
 
@@ -1100,64 +1084,9 @@ class Parameters(
         .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
         """
 
-        path, file = os.path.split(filename)
-        path = os.path.basename(path)
+        return read_field(self, filename, **kwargs)
 
-        # If coords is None, we assume a 3d field, and then we cut one coordinate
-        # for planes if necessary
-        if coords is None:
-            coords = self.get_mesh
-            if path == "3d_snapshots":
-                pass
-            elif path == "xy_planes":
-                del coords["z"]
-            elif path == "xz_planes":
-                del coords["y"]
-            elif path == "yz_planes":
-                del coords["x"]
-
-        # if name is empty, we obtain it from the filename
-        if not name:
-            try:
-                if "-" in file:
-                    name = os.path.basename(file.replace(".bin", "")).split("-")[0]
-                else:
-                    i1, i2 = self.ifilenameformat[2:-1].split(".")
-                    name = os.path.basename(file.replace(".bin", ""))[0:-i1]
-            except:
-                warnings.warn(
-                    "Impossible to obtain array name automatically, try to set it manually."
-                )
-
-        # Include atributes for boundary conditions, useful to compute the derivatives
-        if "phi" in name:
-            attrs["BC"] = self.get_boundary_condition("phi")
-        else:
-            attrs["BC"] = self.get_boundary_condition(name)
-
-        # We obtain the shape for np.fromfile from the coordinates
-        shape = []
-        for key, value in coords.items():
-            shape.append(value.size)
-
-        # This is necessary if the file is a link
-        if os.path.islink(filename):
-            from os import readlink
-
-            filename = readlink(filename)
-
-        # Finally, we read the array and wrap it into a xarray dataset
-        return xr.DataArray(
-            np.fromfile(filename, dtype=param["mytype"]).reshape(shape, order="F"),
-            dims=coords.keys(),
-            coords=coords,
-            name=name,
-            attrs=attrs,
-        )
-
-    def read_all_fields(
-        self, filename_pattern, steep="ioutput", progress_function="", **kargs
-    ):
+    def read_temporal_series(self, filenames, steep="ioutput", **kwargs):
         """Reads all files matching the ``filename_pattern`` with
         :obj:`xcompact3d_toolbox.parameters.Parameters.read_field` and
         concatenates them into a time series.
@@ -1214,35 +1143,8 @@ class Parameters(
         >>> ux = x3d.read_all_fields('./data/uy????', coords = prm.get_mesh)
 
         """
-        filenames = sorted(glob.glob(filename_pattern))
 
-        # is empty
-        if not filenames:
-            raise IOError(f"No file was found corresponding to {filename_pattern}.")
-
-        # New filename format, see https://github.com/fschuch/Xcompact3d/issues/3
-        if self.filenamedigits == 0:
-            dt = self.dt
-        # Previous filename format
-        elif self.filenamedigits == 1:
-            dt = self.dt * getattr(self, steep)
-
-        i1, i2 = self.ifilenameformat[2:-1].split(".")
-        t = dt * np.array(
-            [
-                param["mytype"](os.path.basename(file).replace(".bin", "")[-int(i1) :])
-                for file in filenames
-            ],
-            dtype=param["mytype"],
-        )
-
-        return xr.concat(
-            [
-                self.read_field(file, **kargs)
-                for file in tqdm(filenames, desc=filename_pattern)
-            ],
-            dim="t",
-        ).assign_coords(coords={"t": t})
+        return read_temporal_series(self, filenames, steep, **kwargs)
 
     def write(self):
         """Writes all valid attributes to an ``.i3d`` file.

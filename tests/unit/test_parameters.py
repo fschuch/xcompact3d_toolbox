@@ -10,7 +10,7 @@ class test_parameters(unittest.TestCase):
         prm1 = Parameters()
         prm1.write()
         prm2 = Parameters()
-        prm2.read()
+        prm2.load()
 
         for name in prm1.trait_names():
             group = prm1.trait_metadata(name, "group")

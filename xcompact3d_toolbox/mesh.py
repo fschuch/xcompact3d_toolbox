@@ -153,9 +153,9 @@ class Mesh3D(traitlets.HasTraits):
     def __repr__(self):
         return (
             f"{self.__class__.__name__}(\n"
-            f"    x = {self.x}\n"
-            f"    y = {self.y}\n"
-            f"    z = {self.z}\n"
+            f"    x = {self.x},\n"
+            f"    y = {self.y},\n"
+            f"    z = {self.z},\n"
             ")"
         )
 
@@ -166,9 +166,10 @@ class Mesh3D(traitlets.HasTraits):
         return {dir: getattr(self, dir).vector for dir in self.trait_names()}
 
     def drop(self, *args) -> dict:
-        for key in args:
-            if key not in self.trait_names():
-                warnings.warn(f"{key} is not a valid key parameter for Mesh3D")
+        for arg in args:
+            if arg is None: continue
+            if arg not in self.trait_names():
+                warnings.warn(f"{arg} is not a valid key parameter for Mesh3D")
         return {
             dir: getattr(self, dir).vector
             for dir in self.trait_names()

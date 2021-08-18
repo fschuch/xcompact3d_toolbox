@@ -1,7 +1,6 @@
 from .array import X3dDataset, X3dDataArray
 from .genepsi import gene_epsi_3D
 from .gui import ParametersGui
-from .io import readfield, read_all, write_xdmf
 from .param import param
 from .parameters import Parameters
 

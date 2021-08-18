@@ -29,6 +29,7 @@ Notes
 from __future__ import annotations
 
 import glob
+import os
 import os.path
 import warnings
 
@@ -37,7 +38,7 @@ import traitlets
 import xarray as xr
 from tqdm.autonotebook import tqdm
 
-from .param import boundary_condition, param
+from .param import param
 
 
 class FilenameProperties(traitlets.HasTraits):
@@ -89,15 +90,23 @@ class FilenameProperties(traitlets.HasTraits):
     separator = traitlets.Unicode(default_value="-")
     file_extension = traitlets.Unicode(default_value=".bin")
     number_of_digits = traitlets.Int(default_value=3, min=1, allow_none=True)
+    numeration_steep = traitlets.Unicode(default_value="ioutput")
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(FilenameProperties).__init__(**kwargs)
 
         self.set(**kwargs)
-    
+
     def __repr__(self):
-        return f'{self.__class__.__name__}(separator = "{self.separator}", file_extension = "{self.file_extension}", number_of_digits = {self.number_of_digits})'
-    
+        return (
+            f"{self.__class__.__name__}(\n"
+            f'    separator = "{self.separator}",\n'
+            f'    file_extension = "{self.file_extension}",\n'
+            f"    number_of_digits = {self.number_of_digits},\n"
+            f'    numeration_steep = "{self.numeration_steep}",\n'
+            ")"
+        )
+
     def set(self, **kwargs) -> None:
         """[summary]
         """
@@ -156,192 +165,94 @@ class FilenameProperties(traitlets.HasTraits):
         return int(counter), prefix
 
 
-def readfield(filename, prm, dims="auto", coords=None, name=None, attrs=None):
-    """This functions reads a binary field from Xcompact3d with :obj:`numpy.fromfile`
-    and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
-    coordinates and attributes.
+def read_field(prm, filename, drop_coords=None, name="", attrs={}):
 
-    The properties can be inferted automatically if the
-    file is inside Xcompact3d's output folders structure, i.e.:
+    file = os.path.basename(filename)
+    coords = prm.mesh.drop(drop_coords)
 
-    * 3d_snapshots (nx, ny, nz);
-    * xy_planes (nx, ny);
-    * xz_planes (nx, nz);
-    * yz_planes (ny, nz).
+    # if name is empty, we obtain it from the filename
+    if not name:
+        _, name = prm.filename_properties.get_info_from_filename(file)
 
-    Data type is defined by :obj:`xcompact3d_toolbox.param["mytype"]`.
-
-    Parameters
-    ----------
-    filename : str
-        Name of the file to be read.
-    prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
-        Contains the computational and physical parameters.
-    dims : 'auto' or hashable or sequence of hashable
-        Name(s) of the data dimension(s). Must be either a hashable
-        (only for 1D data) or a sequence of hashables with length equal to the
-        number of dimensions (see :obj:`xarray.DataArray`). If dims='auto' (default),
-        dimensions are inferted from the folder structure.
-    coords : sequence or dict of array_like objects, optional
-        Coordinates (tick labels) to use for indexing along each dimension (see
-        :obj:`xarray.DataArray`). If dims='auto' (default), coordinates are inferred
-        from the folder structure.
-    name : str or None, optional
-        Name of this array. If dims='auto' (default), name is inferred
-        from filename.
-    attrs : dict_like or None, optional
-        Attributes to assign to the new instance. If dims='auto' (default),
-        boundary conditions for derivatives are included.
-
-    Returns
-    -------
-    :obj:`xarray.DataArray`
-        Data array containing values read from the disc. Attributes include the proper boundary conditions for derivatives if the
-        file prefix is ``ux``, ``uy``, ``uz``, ``phi`` or ``pp``.
-
-    Examples
-    -------
-
-    >>> prm = x3d.Parameters()
-
-    >>> xcompact3d_toolbox.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
-    >>> xcompact3d_toolbox.param["mytype"] = np.float32 # otherwise
-
-    In the following cases, coordinates and dimensions are inferred from the
-    folder containing the file:
-
-    >>> ux = x3d.readfield('./data/3d_snapshots/ux-00000400.bin', prm)
-    >>> uy = x3d.readfield('./data/xy_planes/uy-00000400.bin', prm)
-    >>> uz = x3d.readfield('./data/xz_planes/uz-00000400.bin', prm)
-
-    It is possible to handle the filenames from previous X3d's versions by
-    setting coordinates manually:
-
-    >>> ux = x3d.readfield(
-    ...     './data/ux0010',
-    ...     prm,
-    ...     dims = ["x", "y", "z"],
-    ...     coords = prm.get_mesh
-    ... )
-    """
-    warnings.warn(
-        "read_all is deprecated, use xcompact3d_toolbox.Parameters.read_field",
-        DeprecationWarning,
-    )
-
-    if dims.lower() == "auto":
-
-        path, file = os.path.split(filename)
-        path = os.path.basename(path)
-
-        name = os.path.basename(file).split("-")[0]
-        if "phi" in name:
-            name = "phi"
-
-        mesh = prm.get_mesh
-
-        if path == "3d_snapshots":
-            pass
-        elif path == "xy_planes":
-            del mesh["z"]
-        elif path == "xz_planes":
-            del mesh["y"]
-        elif path == "yz_planes":
-            del mesh["x"]
-
-        shape = []
-        for key, value in mesh.items():
-            shape.append(value.size)
-
-        dims = mesh.keys()
-        coords = mesh
-
-        # Setting BC
-        if attrs == None:
-            attrs = {}
-        attrs["BC"] = boundary_condition(prm, name)
-
+    # Include atributes for boundary conditions, useful to compute the derivatives
+    if "phi" in name:
+        attrs["BC"] = prm.get_boundary_condition("phi")
     else:
-        shape = []
-        for key, value in coords.items():
-            shape.append(value.size)
+        attrs["BC"] = prm.get_boundary_condition(name)
 
+    # We obtain the shape for np.fromfile from the coordinates
+    shape = [value.size for value in coords.values()]
+
+    # This is necessary if the file is a link
     if os.path.islink(filename):
-        from os import readlink
+        filename = os.readlink(filename)
 
-        filename = readlink(filename)
-
+    # Finally, we read the array and wrap it into a xarray object
     return xr.DataArray(
         np.fromfile(filename, dtype=param["mytype"]).reshape(shape, order="F"),
-        dims=dims,
+        dims=coords.keys(),
         coords=coords,
         name=name,
         attrs=attrs,
     )
 
 
-def read_all(filename_pattern, prm):
-    """Reads all files matching the ``filename_pattern`` with
-    :obj:`xcompact3d_toolbox.io.readfield` and concatenates them into a time series.
+def write_field(dataArray, prm, filename=None):
+    if filename is None:  # Try to get from atributes
+        filename = dataArray.attrs.get("file_name", None)
+    if filename is None:
+        warnings.warn(f"Can't write field without a filename")
+        return
+    # If n is a dimension (for scalar), call write recursively to save
+    # phi1, phi2, phi3, for instance.
+    if "n" in dataArray.dims:
+        for n in range(dataArray.n.size):
+            write_field(dataArray.isel(n=n), prm, f"{filename}{n.values+1}")
+    # If t is a dimension (for time), call write recursively to save
+    # ux-0000.bin, ux-0001.bin, ux-0002.bin, for instance.
+    elif "t" in dataArray.dims:
+        dt = prm.dt * getattr(prm, prm.filename_properties.numeration_steep)
+        k = 0
+        for time in tqdm(dataArray.t.values, desc=filename):
+            write_field(
+                dataArray.isel(t=k),
+                prm,
+                prm.filename_properties.get_filename_for_binary(
+                    prefix=filename, counter=int(time / dt),
+                ),
+            )
+            k += 1
+    # and finally writes to the disc
+    else:
+        fileformat = prm.filename_properties.file_extension
+        if fileformat and not filename.endswith(fileformat):
+            filename += fileformat
+        align = [
+            dataArray.get_axis_num(i) for i in sorted(dataArray.dims, reverse=True)
+        ]
 
-    .. note:: Make sure to have enough memory to load all files at same time.
+        dataArray.values.astype(param["mytype"]).transpose(align).tofile(filename)
 
-    .. note:: This is only compatible with the new filename structure,
-        the conversion is exemplified in `convert_filenames_x3d_toolbox`_.
 
-    .. _`convert_filenames_x3d_toolbox`: https://gist.github.com/fschuch/5a05b8d6e9787d76655ecf25760e7289
+def read_temporal_series(prm, filenames, steep, **kwargs):
+    if isinstance(filenames, str):
+        filenames = sorted(glob.glob(filenames))
 
-    Parameters
-    ----------
-    filename_pattern : str
-        A specified pattern according to the rules used by the Unix shell.
-    prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
-        Contains the computational and physical parameters.
-
-    Returns
-    -------
-    :obj:`xarray.DataArray`
-        Data array containing values read from the disc.
-
-    Examples
-    -------
-
-    >>> prm = x3d.Parameters()
-
-    >>> x3d.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
-    >>> x3d.param["mytype"] = np.float32 # otherwise
-
-    In the following cases, coordinates and dimensions are inferred from the
-    folder containing the file and time from the filenames:
-
-    >>> ux = x3d.read_all('./data/3d_snapshots/ux-*.bin', prm)
-    >>> uy = x3d.read_all('./data/xy_planes/uy-*.bin', prm)
-    >>> uz = x3d.read_all('./data/xz_planes/uz-0000??00.bin', prm)
-
-    """
-    warnings.warn(
-        "read_all is deprecated, use xcompact3d_toolbox.Parameters.read_all_fields",
-        DeprecationWarning,
-    )
-
-    filenames = sorted(glob.glob(filename_pattern))
+    if not filenames:
+        raise IOError(f"No file was found corresponding to {filenames}.")
 
     dt = prm.dt
-    t = dt * np.array(
-        [
-            param["mytype"](os.path.basename(file).split("-")[-1].split(".")[0])
-            for file in filenames
-        ],
-        dtype=param["mytype"],
-    )
+    if steep:
+        dt *= getattr(prm, steep)
 
-    # numscalar = prm.dict['BasicParam'].get('numscalar', 0)
+    def get_time(file):
+        time, _ = prm.filename_properties.get_info_from_filename(os.path.basename(file))
+        return time
 
-    # if numscalar > 1:
-    #    mesh['n'] = [int(os.path.basename(file).split('-')[0][-1])]
+    t = dt * np.array([get_time(file) for file in filenames], dtype=param["mytype"],)
 
     return xr.concat(
-        [readfield(file, prm) for file in tqdm(filenames, desc=filename_pattern)],
+        [read_field(prm, file, **kwargs) for file in tqdm(filenames, desc=filenames)],
         dim="t",
     ).assign_coords(t=t)
 
@@ -481,6 +392,7 @@ def write_xdmf(prm):
             f.write("     </Grid>\n")
             f.write(" </Domain>\n")
             f.write("</Xdmf>")
+
 
 def prm_to_dict(filename="incompact3d.prm"):
 

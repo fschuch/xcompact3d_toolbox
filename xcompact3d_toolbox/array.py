@@ -239,7 +239,7 @@ class X3dDataArray:
         >>> da.x3d.write(prm, './data/3d_snapshots/ux')
 
         """
-        if filename == None:  # Try to get from atributes
+        if filename is None:  # Try to get from atributes
             filename = self._data_array.attrs.get("file_name", None)
         if filename is not None:
             # If n is a dimension (for scalar), call write recursively to save
