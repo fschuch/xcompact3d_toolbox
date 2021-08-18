@@ -7,10 +7,10 @@ ipywidgets
 matplotlib
 pandas
 xarray
-dask
+"dask[complete]"
 numba
-plotly
 sphinx>=1.4
 nbsphinx
 versioneer
 voila
+tqdm
