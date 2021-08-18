@@ -613,11 +613,6 @@ class ParametersInOutParam(traitlets.HasTraits):
     in Fortran format (default is ``(I9.9)``).
     """
 
-    size = traitlets.Unicode().tag()
-    """str: Auxiliar variable indicating the demanded space in disc
-    """
-
-
 class ParametersScalarParam(traitlets.HasTraits):
     sc = traitlets.List(trait=traitlets.Float()).tag(
         group="ScalarParam", desc="Schmidt number(s)"
@@ -766,47 +761,7 @@ class ParametersIbmStuff(traitlets.HasTraits):
     """int: "Level of refinement for :obj:`iibm` equals to 2, to find the surface of the immersed object"
     """
 
-class Parameters(
-    ParametersBasicParam,
-    ParametersNumOptions,
-    ParametersInOutParam,
-    ParametersScalarParam,
-    ParametersLESModel,
-    ParametersIbmStuff
-):
-    """The physical and computational parameters are built on top of `traitlets`_.
-    It is a framework that lets Python classes have attributes with type checking,
-    dynamically calculated default values, and ‘on change’ callbacks.
-    So, many of the parameters are validated regarding the type, business rules,
-    and the range of values supported by XCompact3d.
-
-    There are methods to handle the parameters file, to read the binary
-    arrays produced by XCompact3d and also to write the xdmf file, so the binary
-    fields can be opened in any external visualization tool.
-
-    * :obj:`xcompact3d_toolbox.parameters.ParametersBasicParam`;
-    * :obj:`xcompact3d_toolbox.parameters.ParametersNumOptions`;
-    * :obj:`xcompact3d_toolbox.parameters.ParametersInOutParam`;
-    * :obj:`xcompact3d_toolbox.parameters.ParametersScalarParam`;
-    * :obj:`xcompact3d_toolbox.parameters.ParametersLESModel`;
-    * :obj:`xcompact3d_toolbox.parameters.ParametersIbmStuff`.
-
-    In addition, there are `ipywidgets`_ for a friendly user interface,
-    see :obj:`xcompact3d_toolbox.gui.ParametersGui`.
-
-    .. _traitlets:
-        https://traitlets.readthedocs.io/en/stable/index.html
-    .. _ipywidgets:
-        https://ipywidgets.readthedocs.io/en/latest/
-    .. _#2:
-        https://github.com/fschuch/xcompact3d_toolbox/issues/2
-
-    Notes
-    -----
-        This is a work in progress, not all parameters are covered yet.
-    """
-
-    # Auxiliar
+class ParametersExtras(traitlets.HasTraits):
     filename = traitlets.Unicode(default_value="input.i3d").tag()
     """str: Filename for the ``.i3d`` file.
     """
@@ -844,9 +799,50 @@ class Parameters(
         it stores the available options according to :obj:`ncores`.
     """
 
-    # cfl = traitlets.Float(0.0)
     size = traitlets.Unicode().tag()
     """str: Auxiliar variable indicating the demanded space in disc
+    """
+
+class Parameters(
+    ParametersBasicParam,
+    ParametersNumOptions,
+    ParametersInOutParam,
+    ParametersScalarParam,
+    ParametersLESModel,
+    ParametersIbmStuff,
+    ParametersExtras
+):
+    """The physical and computational parameters are built on top of `traitlets`_.
+    It is a framework that lets Python classes have attributes with type checking,
+    dynamically calculated default values, and ‘on change’ callbacks.
+    So, many of the parameters are validated regarding the type, business rules,
+    and the range of values supported by XCompact3d.
+
+    There are methods to handle the parameters file, to read the binary
+    arrays produced by XCompact3d and also to write the xdmf file, so the binary
+    fields can be opened in any external visualization tool.
+
+    * :obj:`xcompact3d_toolbox.parameters.ParametersBasicParam`;
+    * :obj:`xcompact3d_toolbox.parameters.ParametersNumOptions`;
+    * :obj:`xcompact3d_toolbox.parameters.ParametersInOutParam`;
+    * :obj:`xcompact3d_toolbox.parameters.ParametersScalarParam`;
+    * :obj:`xcompact3d_toolbox.parameters.ParametersLESModel`;
+    * :obj:`xcompact3d_toolbox.parameters.ParametersIbmStuff`;
+    * :obj:`xcompact3d_toolbox.parameters.ParametersExtras`;
+
+    In addition, there are `ipywidgets`_ for a friendly user interface,
+    see :obj:`xcompact3d_toolbox.gui.ParametersGui`.
+
+    .. _traitlets:
+        https://traitlets.readthedocs.io/en/stable/index.html
+    .. _ipywidgets:
+        https://ipywidgets.readthedocs.io/en/latest/
+    .. _#2:
+        https://github.com/fschuch/xcompact3d_toolbox/issues/2
+
+    Notes
+    -----
+        This is a work in progress, not all parameters are covered yet.
     """
 
     def __init__(self, **kwargs):
