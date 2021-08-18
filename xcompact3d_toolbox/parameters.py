@@ -831,20 +831,21 @@ class ParametersExtras(traitlets.HasTraits):
         super(ParametersExtras, self).__init__()
         self.mesh = Mesh3D()
         self.filename_properties = FilenameProperties()
-        self._extra_link_mesh()
+        self._link_mesh_and_parameters()
 
-    def _extra_link_mesh(self):
-        pass
-        # for dim in "xyz":
-        #     traitlets.link((self, f"{dim}l{dim}"), (getattr(self.mesh, dim), "length"))
-        #     traitlets.link((self, f"n{dim}"), (getattr(self.mesh, dim), "grid_size"))
-        #     traitlets.link((self, f"d{dim}"), (getattr(self.mesh, dim), "delta"))
-        #     traitlets.link(
-        #         (self, f"_ncl{dim}"), (getattr(self.mesh, dim), "is_periodic")
-        #     )
-        #     traitlets.link(
-        #         (self, f"_m{dim}"), (getattr(self.mesh, dim), "_sub_grid_size")
-        #     )
+    def _link_mesh_and_parameters(self):
+        for dim in "xyz":
+            traitlets.link((getattr(self.mesh, dim), "length"), (self, f"{dim}l{dim}"))
+            traitlets.link((getattr(self.mesh, dim), "grid_size"), (self, f"n{dim}"))
+            traitlets.link((getattr(self.mesh, dim), "delta"), (self, f"d{dim}"))
+            traitlets.link(
+                (getattr(self.mesh, dim), "is_periodic"), (self, f"_ncl{dim}")
+            )
+            traitlets.link(
+                (getattr(self.mesh, dim), "_sub_grid_size"), (self, f"_m{dim}")
+            )
+        traitlets.link((self.mesh.y, "istret"), (self, "istret"))
+        traitlets.link((self.mesh.y, "beta"), (self, "beta"))
 
 
 class Parameters(
@@ -1033,59 +1034,6 @@ class Parameters(
 
         return string
 
-    @traitlets.validate("nx")
-    def _validate_mesh_nx(self, proposal):
-        _validate_mesh(proposal["value"], self._nclx, self.nclx1, self.nclxn, "x")
-        return proposal["value"]
-
-    @traitlets.validate("ny")
-    def _validate_mesh_ny(self, proposal):
-        _validate_mesh(proposal["value"], self._ncly, self.ncly1, self.nclyn, "y")
-        return proposal["value"]
-
-    @traitlets.validate("nz")
-    def _validate_mesh_nz(self, proposal):
-        _validate_mesh(proposal["value"], self._nclz, self.nclz1, self.nclzn, "z")
-        return proposal["value"]
-
-    @traitlets.validate("ifilenameformat")
-    def _validate_ifilenameformat(self, proposal):
-
-        if proposal["value"][:2] == "(I" and proposal["value"][-1] == ")":
-            i1, i2 = proposal["value"][2:-1].split(".")
-            if i1 == i2:
-                return proposal["value"]
-
-        raise traitlets.TraitError(
-            f"Invalid value for ifilenameformat, try with something like (I3.3) or (I9.9)"
-        )
-
-    @traitlets.observe("dx", "nx", "xlx", "dy", "ny", "yly", "dz", "nz", "zlz")
-    def _observe_resolution(self, change):
-        # for name in "name new old".split():
-        #     print(f"    {name:>5} : {change[name]}")
-
-        dim = change["name"][-1]  # It will be x, y or z
-        #
-        if change["name"] == f"n{dim}":
-            if getattr(self, f"_ncl{dim}"):
-                setattr(self, f"_m{dim}", change["new"])
-            else:
-                setattr(self, f"_m{dim}", change["new"] - 1)
-            setattr(
-                self,
-                f"d{dim}",
-                getattr(self, f"{dim}l{dim}") / getattr(self, f"_m{dim}"),
-            )
-        if change["name"] == f"d{dim}":
-            new_l = change["new"] * getattr(self, f"_m{dim}")
-            if new_l != getattr(self, f"{dim}l{dim}"):
-                setattr(self, f"{dim}l{dim}", new_l)
-        if change["name"] == f"{dim}l{dim}":
-            new_d = change["new"] / getattr(self, f"_m{dim}")
-            if new_d != getattr(self, f"d{dim}"):
-                setattr(self, f"d{dim}", new_d)
-
     @traitlets.observe(
         "nclx1",
         "nclxn",
@@ -1112,20 +1060,6 @@ class Parameters(
             for i in f"ncl{dim}1 ncl{dim}n ncl{dim}S1 ncl{dim}Sn".split():
                 setattr(self, i, change["new"])
             setattr(self, f"_ncl{dim}", False)
-
-    @traitlets.observe("_nclx", "_ncly", "_nclz")
-    def _observe_periodicity(self, change):
-        #
-        dim = change["name"][-1]  # It will be x, y or z
-        #
-        if change["new"]:
-            tmp = getattr(self, f"n{dim}") - 1
-            setattr(self, f"_possible_mesh_{dim}", possible_mesh_p)
-            setattr(self, f"n{dim}", tmp)
-        else:
-            tmp = getattr(self, f"n{dim}") + 1
-            setattr(self, f"_possible_mesh_{dim}", possible_mesh)
-            setattr(self, f"n{dim}", tmp)
 
     @traitlets.observe("p_row", "p_col", "ncores")
     def _observe_2Decomp(self, change):

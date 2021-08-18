@@ -94,7 +94,10 @@ class FilenameProperties(traitlets.HasTraits):
         super().__init__(**kwargs)
 
         self.set(**kwargs)
-
+    
+    def __repr__(self):
+        return f'{self.__class__.__name__}(separator = "{self.separator}", file_extension = "{self.file_extension}", number_of_digits = {self.number_of_digits})'
+    
     def set(self, **kwargs) -> None:
         """[summary]
         """
