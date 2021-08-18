@@ -229,35 +229,7 @@ def divisorGenerator(n):
         yield int(divisor)
 
 
-class Parameters(traitlets.HasTraits):
-    """The physical and computational parameters are built on top of `traitlets`_.
-    It is a framework that lets Python classes have attributes with type checking,
-    dynamically calculated default values, and ‘on change’ callbacks.
-    So, many of the parameters are validated regarding type, norms, and values
-    supported by Xcompact3d.
-
-    There are methods to handle the parameters file, to read the binary
-    arrays produced by Xcompact3d and also to write the xdmf file, so the binary
-    fields can be open in any external visualization tool.
-
-    In addition, there are `ipywidgets`_ for a friendly user interface,
-    see :obj:`xcompact3d_toolbox.gui.ParametersGui`.
-
-    .. _traitlets:
-        https://traitlets.readthedocs.io/en/stable/index.html
-    .. _ipywidgets:
-        https://ipywidgets.readthedocs.io/en/latest/
-    .. _#2:
-        https://github.com/fschuch/xcompact3d_toolbox/issues/2
-
-    Notes
-    -----
-        This is a work in progress, not all parameters are covered yet.
-    """
-
-    #
-    # # BasicParam
-    #
+class ParametersBasicParam(traitlets.HasTraits):
 
     p_row, p_col = [
         traitlets.Int(default_value=0, min=0).tag(
@@ -539,10 +511,8 @@ class Parameters(traitlets.HasTraits):
     """float: Component of the unitary vector pointing in the gravity's direction.
     """
 
-    #
-    # # NumOptions
-    #
 
+class ParametersNumOptions(traitlets.HasTraits):
     ifirstder = traitlets.Int(default_value=4, min=1, max=4).tag(group="NumOptions")
     """int: Scheme for first order derivative:
 
@@ -593,10 +563,8 @@ class Parameters(traitlets.HasTraits):
     """float: Ratio between hypervisvosity at :math:`k_m=2/3\\pi` and :math:`k_c= \\pi`.
     """
 
-    #
-    # # InOutParam
-    #
 
+class ParametersInOutParam(traitlets.HasTraits):
     irestart = traitlets.Int(default_value=0, min=0, max=1).tag(
         group="InOutParam", desc="Read initial flow field (0: No, 1: Yes)"
     )
@@ -644,10 +612,13 @@ class Parameters(traitlets.HasTraits):
     """str: The number of digits used to name the output binary files,
     in Fortran format (default is ``(I9.9)``).
     """
-    #
-    # # ScalarParam
-    #
+    
+    size = traitlets.Unicode().tag()
+    """str: Auxiliar variable indicating the demanded space in disc
+    """
 
+
+class ParametersScalarParam(traitlets.HasTraits):
     sc = traitlets.List(trait=traitlets.Float()).tag(
         group="ScalarParam", desc="Schmidt number(s)"
     )
@@ -764,10 +735,8 @@ class Parameters(traitlets.HasTraits):
     * 2 - Dirichlet.
     """
 
-    #
-    # # LESModel
-    #
 
+class ParametersLESModel(traitlets.HasTraits):
     jles = traitlets.Int(default_value=4, min=0, max=4).tag(
         group="LESModel",
         desc="LES Model (1: Phys Smag, 2: Phys WALE, 3: Phys dyn. Smag, 4: iSVV)",
@@ -781,10 +750,8 @@ class Parameters(traitlets.HasTraits):
     * 4 - iSVV.
 
     """
-    #
-    # # ibmstuff
-    #
 
+class ParametersIbmStuff(traitlets.HasTraits):
     nobjmax = traitlets.Int(default_value=1, min=1).tag(
         group="ibmstuff", desc="Maximum number of objects in any direction"
     )
@@ -797,6 +764,39 @@ class Parameters(traitlets.HasTraits):
         desc="Level of refinement for iibm==2 to find the surface of the immersed object",
     )
     """int: "Level of refinement for :obj:`iibm` equals to 2, to find the surface of the immersed object"
+    """
+
+class Parameters(
+    ParametersBasicParam,
+    ParametersNumOptions,
+    ParametersInOutParam,
+    ParametersScalarParam,
+    ParametersLESModel,
+    ParametersIbmStuff
+):
+    """The physical and computational parameters are built on top of `traitlets`_.
+    It is a framework that lets Python classes have attributes with type checking,
+    dynamically calculated default values, and ‘on change’ callbacks.
+    So, many of the parameters are validated regarding type, norms, and values
+    supported by Xcompact3d.
+
+    There are methods to handle the parameters file, to read the binary
+    arrays produced by Xcompact3d and also to write the xdmf file, so the binary
+    fields can be open in any external visualization tool.
+
+    In addition, there are `ipywidgets`_ for a friendly user interface,
+    see :obj:`xcompact3d_toolbox.gui.ParametersGui`.
+
+    .. _traitlets:
+        https://traitlets.readthedocs.io/en/stable/index.html
+    .. _ipywidgets:
+        https://ipywidgets.readthedocs.io/en/latest/
+    .. _#2:
+        https://github.com/fschuch/xcompact3d_toolbox/issues/2
+
+    Notes
+    -----
+        This is a work in progress, not all parameters are covered yet.
     """
 
     # Auxiliar
