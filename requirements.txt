@@ -7,7 +7,7 @@ ipywidgets
 matplotlib
 pandas
 xarray
-"dask[complete]"
+dask[complete]
 numba
 sphinx>=1.4
 nbsphinx
