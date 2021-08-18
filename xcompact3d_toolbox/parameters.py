@@ -712,24 +712,12 @@ class Parameters(
 
         super(Parameters, self).__init__()
 
-        # Boundary conditions are high priority in order to avoid bugs
-        for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn".split():
-            if bc in kwargs:
-                setattr(self, bc, kwargs.get(bc))
-
         if "loadfile" in kwargs.keys():
             self.filename = kwargs.get("loadfile")
             self.load()
             del kwargs["loadfile"]
 
-        if "filename_properties" in kwargs.keys():
-            self.filename_properties.set(**kwargs.get("filename_properties"))
-            del kwargs["filename_properties"]
-
-        for key, arg in kwargs.items():
-            if key not in self.trait_names():
-                warnings.warn(f"{key} is not a valid parameter and was not loaded")
-            setattr(self, key, arg)
+        self.set(**kwargs)
 
     def __repr__(self):
         string = f"{self.__class__.__name__}(\n"
@@ -973,6 +961,21 @@ class Parameters(
 
         return boundary_condition(self, var)
 
+    def set(self, **kwargs):
+        # Boundary conditions are high priority in order to avoid bugs
+        for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn".split():
+            if bc in kwargs:
+                setattr(self, bc, kwargs.get(bc))
+        
+        if "filename_properties" in kwargs.keys():
+            self.filename_properties.set(**kwargs.get("filename_properties"))
+            del kwargs["filename_properties"]
+
+        for key, arg in kwargs.items():
+            if key not in self.trait_names():
+                warnings.warn(f"{key} is not a valid parameter and was not loaded")
+            setattr(self, key, arg)
+
     def load(self):
         """Loads all valid attributes from the parameters file.
 
@@ -1013,17 +1016,7 @@ class Parameters(
                 f"{self.filename} is invalid. Supported formats are .i3d and .prm."
             )
 
-        # Boundary conditions are high priority in order to avoid bugs
-        for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn".split():
-            if bc in dictionary:
-                setattr(self, bc, dictionary[bc])
-
-        for key, value in dictionary.items():
-            try:
-                if self.trait_metadata(key, "group") is not None:
-                    setattr(self, key, dictionary[key])
-            except:
-                warnings.warn(f"{key} is not a valid parameter and was not loaded")
+        self.set(**dictionary)
 
     def read(self):
         """Read is deprecated, use :obj:`xcompact3d_toolbox.parameters.Parameters.load`."""
