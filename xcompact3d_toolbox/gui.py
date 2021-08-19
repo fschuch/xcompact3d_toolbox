@@ -136,7 +136,7 @@ class ParametersGui(Parameters):
             https://github.com/fschuch/xcompact3d_toolbox/issues/7
 
         """
-        super(ParametersGui, self).__init__(**kargs)
+        super(ParametersGui, self).__init__()
 
         self._widgets = dict(
             #

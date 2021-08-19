@@ -93,7 +93,7 @@ class FilenameProperties(traitlets.HasTraits):
     numeration_steep = traitlets.Unicode(default_value="ioutput")
 
     def __init__(self, **kwargs):
-        super(FilenameProperties).__init__(**kwargs)
+        super(FilenameProperties).__init__()
 
         self.set(**kwargs)
 
@@ -165,14 +165,25 @@ class FilenameProperties(traitlets.HasTraits):
         return int(counter), prefix
 
 
-def read_field(prm, filename, drop_coords=None, name="", attrs={}):
+def read_field(
+    prm,
+    filename: str,
+    drop_coords: str = "",
+    name: str = "",
+    add_time: bool = False,
+    attrs: dict = {},
+) -> Type[xr.DataArray]:
 
     file = os.path.basename(filename)
-    coords = prm.mesh.drop(drop_coords)
+    coords = prm.mesh.drop(*drop_coords)
 
     # if name is empty, we obtain it from the filename
+    # time coordinate is added as well
     if not name:
-        _, name = prm.filename_properties.get_info_from_filename(file)
+        time_int, name = prm.filename_properties.get_info_from_filename(file)
+        if add_time:
+            step = getattr(prm, prm.filename_properties.numeration_steep)
+            coords["t"] = [param["mytype"](time_int * step * prm.dt)]
 
     # Include atributes for boundary conditions, useful to compute the derivatives
     if "phi" in name:
@@ -181,7 +192,7 @@ def read_field(prm, filename, drop_coords=None, name="", attrs={}):
         attrs["BC"] = prm.get_boundary_condition(name)
 
     # We obtain the shape for np.fromfile from the coordinates
-    shape = [value.size for value in coords.values()]
+    shape = [len(value) for value in coords.values()]
 
     # This is necessary if the file is a link
     if os.path.islink(filename):
@@ -197,7 +208,7 @@ def read_field(prm, filename, drop_coords=None, name="", attrs={}):
     )
 
 
-def write_field(dataArray, prm, filename=None):
+def write_field(dataArray, prm, filename: str = None) -> None:
     if filename is None:  # Try to get from atributes
         filename = dataArray.attrs.get("file_name", None)
     if filename is None:
@@ -207,13 +218,13 @@ def write_field(dataArray, prm, filename=None):
     # phi1, phi2, phi3, for instance.
     if "n" in dataArray.dims:
         for n in range(dataArray.n.size):
-            write_field(dataArray.isel(n=n), prm, f"{filename}{n.values+1}")
+            write_field(dataArray.isel(n=n), prm, filename=f"{filename}{n+1}")
     # If t is a dimension (for time), call write recursively to save
     # ux-0000.bin, ux-0001.bin, ux-0002.bin, for instance.
     elif "t" in dataArray.dims:
-        dt = prm.dt * getattr(prm, prm.filename_properties.numeration_steep)
-        k = 0
-        for time in tqdm(dataArray.t.values, desc=filename):
+        step = getattr(prm, prm.filename_properties.numeration_steep)
+        dt = prm.dt * step
+        for k, time in enumerate(tqdm(dataArray.t.values, desc=filename)):
             write_field(
                 dataArray.isel(t=k),
                 prm,
@@ -221,7 +232,6 @@ def write_field(dataArray, prm, filename=None):
                     prefix=filename, counter=int(time / dt),
                 ),
             )
-            k += 1
     # and finally writes to the disc
     else:
         fileformat = prm.filename_properties.file_extension
@@ -234,27 +244,25 @@ def write_field(dataArray, prm, filename=None):
         dataArray.values.astype(param["mytype"]).transpose(align).tofile(filename)
 
 
-def read_temporal_series(prm, filenames, steep, **kwargs):
-    if isinstance(filenames, str):
-        filenames = sorted(glob.glob(filenames))
+def read_temporal_series(
+    prm, filename_pattern: str = None, filename_list: list = None, **kwargs,
+) -> Type[xr.DataArray]:
+    if filename_list is None:
+        filename_list = sorted(glob.glob(filename_pattern))
 
-    if not filenames:
-        raise IOError(f"No file was found corresponding to {filenames}.")
+    if not filename_list:
+        raise IOError(f"No file was found corresponding to {filename_pattern}.")
 
-    dt = prm.dt
-    if steep:
-        dt *= getattr(prm, steep)
-
-    def get_time(file):
-        time, _ = prm.filename_properties.get_info_from_filename(os.path.basename(file))
-        return time
-
-    t = dt * np.array([get_time(file) for file in filenames], dtype=param["mytype"],)
+    # set or subescribe, time is needed for the concatenation
+    kwargs["add_time"] = True
 
     return xr.concat(
-        [read_field(prm, file, **kwargs) for file in tqdm(filenames, desc=filenames)],
+        [
+            read_field(prm, file, **kwargs)
+            for file in tqdm(filename_list, desc=filename_pattern)
+        ],
         dim="t",
-    ).assign_coords(t=t)
+    )
 
 
 def write_xdmf(prm):
@@ -307,7 +315,7 @@ def write_xdmf(prm):
             )
         )
 
-        mesh = prm.get_mesh
+        mesh = prm.get_mesh()
 
         nx, ny, nz = [mesh[d].size for d in mesh.keys()]
         dx, dy, dz = [mesh[d][1] - mesh[d][0] for d in mesh.keys()]

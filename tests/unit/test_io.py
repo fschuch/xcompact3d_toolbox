@@ -31,10 +31,33 @@ def prm():
     return x3d.Parameters()
 
 
-def test_read_write_field(prm, numpy_array):
+def test_write_read_field(prm):
     numpy_array = np.random.random((prm.nx, prm.ny, prm.nz)).astype(x3d.param["mytype"])
     filename = prm.filename_properties.get_filename_for_binary("test_field", 0)
-    array_out = xr.DataArray(numpy_array, coords=prm.get_mesh, dims=prm.get_mesh.keys())
+    array_out = xr.DataArray(numpy_array, coords=prm.get_mesh(), dims=prm.get_mesh().keys())
     x3d.io.write_field(array_out, prm, filename)
     array_in = x3d.io.read_field(prm, filename)
     xr.testing.assert_equal(array_out, array_in)
+
+
+def test_write_read_temporal_series(prm):
+    prm.set(numscalar=3, ilast=11, ioutput=1)
+    coords = prm.get_mesh()
+    coords["t"] = [prm.dt * i for i in range(prm.ilast)]
+    coords["n"] = range(prm.numscalar)
+
+    numpy_array = np.random.random([len(i) for i in coords.values()]).astype(
+        x3d.param["mytype"]
+    )
+
+    array_out = xr.DataArray(
+        numpy_array, coords=coords, dims=coords.keys(), attrs=dict(file_name="phi")
+    )
+    x3d.io.write_field(array_out, prm)
+
+    for n in array_out.n.data:
+        array_in = x3d.io.read_temporal_series(
+            prm, filename_pattern=f"phi{n+1}-???.bin"
+        )
+        xr.testing.assert_equal(array_out.isel(n=n).drop("n"), array_in)
+

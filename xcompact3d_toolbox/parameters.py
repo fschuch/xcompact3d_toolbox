@@ -1196,8 +1196,7 @@ class Parameters(
         """
         write_xdmf(self)
 
-    @property
-    def get_mesh(self):
+    def get_mesh(self, refined_for_ibm = False):
         """Get mesh point locations for the three coordinates. They are stored
         in a dictionary. It supports mesh refinement in **y** when
         :obj:`istret` :math:`\\ne` 0.
@@ -1223,4 +1222,6 @@ class Parameters(
                 0.5   , 0.5625, 0.625 , 0.6875, 0.75  , 0.8125, 0.875 , 0.9375,
                 1.    ])}
         """
+        if refined_for_ibm:
+            raise NotImplementedError("Unsupported: mesh refinement for ibm")
         return self.mesh.get()

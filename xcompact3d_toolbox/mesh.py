@@ -1,4 +1,5 @@
 import warnings
+from collections import OrderedDict
 
 import numpy as np
 import traitlets
@@ -163,19 +164,22 @@ class Mesh3D(traitlets.HasTraits):
         return self.size
 
     def get(self) -> dict:
-        return {dir: getattr(self, dir).vector for dir in self.trait_names()}
+        return self.drop(None)
 
     def drop(self, *args) -> dict:
         for arg in args:
-            if arg is None: continue
+            if not arg:
+                continue
             if arg not in self.trait_names():
                 warnings.warn(f"{arg} is not a valid key parameter for Mesh3D")
-        return {
-            dir: getattr(self, dir).vector
-            for dir in self.trait_names()
-            if dir not in args
-        }
-    
+        return OrderedDict(
+            {
+                dir: getattr(self, dir).vector
+                for dir in self.trait_names()
+                if dir not in args
+            }
+        )
+
     @property
     def size(self):
         return self.x.size * self.y.size * self.z.size
