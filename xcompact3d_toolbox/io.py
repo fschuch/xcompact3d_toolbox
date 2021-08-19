@@ -245,7 +245,7 @@ def write_field(dataArray, prm, filename: str = None) -> None:
         dataArray.values.astype(param["mytype"]).transpose(align).tofile(filename)
 
 
-def read_temporal_series(
+def read_time_series(
     prm, filename_pattern: str = None, filename_list: list = None, **kwargs,
 ) -> Type[xr.DataArray]:
     if filename_list is None:

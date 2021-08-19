@@ -11,7 +11,7 @@ import numpy as np
 import traitlets
 
 from .io import FilenameProperties, i3d_to_dict, prm_to_dict, read_field
-from .io import read_temporal_series, write_xdmf
+from .io import read_time_series, write_xdmf
 from .mesh import Mesh3D
 from .param import boundary_condition, param
 
@@ -1086,7 +1086,7 @@ class Parameters(
 
         return read_field(self, **kwargs)
 
-    def read_temporal_series(self, **kwargs):
+    def read_time_series(self, **kwargs):
         """Reads all files matching the ``filename_pattern`` with
         :obj:`xcompact3d_toolbox.parameters.Parameters.read_field` and
         concatenates them into a time series.
@@ -1144,7 +1144,7 @@ class Parameters(
 
         """
 
-        return read_temporal_series(self, **kwargs)
+        return read_time_series(self, **kwargs)
 
     def write(self):
         """Writes all valid attributes to an ``.i3d`` file.

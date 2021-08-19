@@ -63,12 +63,12 @@ def write_time_series(prm):
     return prm, array_out
 
 
-def test_write_read_temporal_series(write_time_series):
+def test_write_read_time_series(write_time_series):
 
     prm, array_out = write_time_series
 
     for n in array_out.n.data:
-        array_in = x3d.io.read_temporal_series(
+        array_in = x3d.io.read_time_series(
             prm, filename_pattern=f"phi{n+1}-???.bin"
         )
         xr.testing.assert_equal(array_out.isel(n=n).drop_vars("n"), array_in)
