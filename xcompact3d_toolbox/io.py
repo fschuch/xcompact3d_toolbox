@@ -314,7 +314,8 @@ def write_xdmf(
 
     def get_filename(var_name, num):
         string = ""
-        if data_path: string += data_path+"/"
+        if data_path:
+            string += data_path + "/"
         string += prm.filename_properties.get_filename_for_binary(var_name, num)
         return string
 
@@ -323,19 +324,47 @@ def write_xdmf(
         f.write(' <!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>\n')
         f.write(' <Xdmf xmlns:xi="http://www.w3.org/2001/XInclude" Version="2.0">\n')
         f.write(" <Domain>\n")
-        f.write('     <Topology name="topo" TopologyType="3DCoRectMesh"\n')
-        f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
-        f.write("     </Topology>\n")
-        f.write('     <Geometry name="geo" Type="ORIGIN_DXDYDZ">\n')
-        f.write("         <!-- Origin -->\n")
-        f.write('         <DataItem Format="XML" Dimensions="3">\n')
-        f.write("         0.0 0.0 0.0\n")
-        f.write("         </DataItem>\n")
-        f.write("         <!-- DxDyDz -->\n")
-        f.write('         <DataItem Format="XML" Dimensions="3">\n')
-        f.write(f"           {dz}  {dy}  {dx}\n")
-        f.write("         </DataItem>\n")
-        f.write("     </Geometry>\n")
+        if prm.istret == 0:
+            f.write('     <Topology name="topo" TopologyType="3DCoRectMesh"\n')
+            f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
+            f.write("     </Topology>\n")
+            f.write('     <Geometry name="geo" Type="ORIGIN_DXDYDZ">\n')
+            f.write("         <!-- Origin -->\n")
+            f.write('         <DataItem Format="XML" Dimensions="3">\n')
+            f.write("         0.0 0.0 0.0\n")
+            f.write("         </DataItem>\n")
+            f.write("         <!-- DxDyDz -->\n")
+            f.write('         <DataItem Format="XML" Dimensions="3">\n')
+            f.write(f"           {dz}  {dy}  {dx}\n")
+            f.write("         </DataItem>\n")
+            f.write("     </Geometry>\n")
+        else:
+            f.write('     <Topology name="topo" TopologyType="3DRectMesh"\n')
+            f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
+            f.write("     </Topology>\n")
+            f.write('     <Geometry name="geo" Type="VXVYVZ">\n')
+            f.write(
+                f'         <DataItem Dimensions="{nx}" NumberType="Float" Precision="{prec}" Format="XML">\n'
+            )
+            f.write(
+                f'         {" ".join(map(str, prm.mesh.x.vector)) if nx > 1 else 0.0}\n'
+            )
+            f.write("          </DataItem>\n")
+            f.write(
+                f'         <DataItem Dimensions="{ny}" NumberType="Float" Precision="{prec}" Format="XML">\n'
+            )
+            f.write(
+                f'         {" ".join(map(str, prm.mesh.y.vector)) if ny > 1 else 0.0}'
+            )
+            f.write("          </DataItem>\n")
+            f.write(
+                f'         <DataItem Dimensions="{nz}" NumberType="Float" Precision="{prec}" Format="XML">\n'
+            )
+            f.write(
+                f'         {" ".join(map(str, prm.mesh.z.vector)) if nz > 1 else 0.0}'
+            )
+            f.write("         </DataItem>\n")
+            f.write("     </Geometry>\n")
         f.write("\n")
         f.write(
             '     <Grid Name="TimeSeries" GridType="Collection" CollectionType="Temporal">\n'

@@ -36,10 +36,13 @@ def prm():
 def test_write_read_field(prm):
     numpy_array = np.random.random((prm.nx, prm.ny, prm.nz)).astype(x3d.param["mytype"])
     filename = prm.filename_properties.get_filename_for_binary("test_field", 0)
-    array_out = xr.DataArray(numpy_array, coords=prm.get_mesh(), dims=prm.get_mesh().keys())
+    array_out = xr.DataArray(
+        numpy_array, coords=prm.get_mesh(), dims=prm.get_mesh().keys()
+    )
     x3d.io.write_field(array_out, prm, filename)
     array_in = x3d.io.read_field(prm, filename)
     xr.testing.assert_equal(array_out, array_in)
+
 
 @pytest.fixture
 def write_time_series(prm):
@@ -59,6 +62,7 @@ def write_time_series(prm):
 
     return prm, array_out
 
+
 def test_write_read_temporal_series(write_time_series):
 
     prm, array_out = write_time_series
@@ -68,9 +72,14 @@ def test_write_read_temporal_series(write_time_series):
             prm, filename_pattern=f"phi{n+1}-???.bin"
         )
         xr.testing.assert_equal(array_out.isel(n=n).drop_vars("n"), array_in)
-    
-def test_write_xdmf(write_time_series):
+
+
+@pytest.mark.parametrize("istret", [0, 1])
+def test_write_xdmf(write_time_series, istret):
     prm, _ = write_time_series
-    x3d.io.write_xdmf(prm, filename_pattern = "phi?-???.bin")
-    assert filecmp.cmp("snapshots.xdmf", "./tests/unit/data/snapshots_ref.xdmf")
+    prm.set(istret=istret)
+    x3d.io.write_xdmf(prm, filename_pattern="phi?-???.bin")
+    assert filecmp.cmp(
+        "snapshots.xdmf", f"./tests/unit/data/snapshots_istret_{istret}.xdmf"
+    )
 
