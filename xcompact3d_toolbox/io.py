@@ -133,6 +133,14 @@ class FilenameProperties(traitlets.HasTraits):
         """
         return f"{prefix}{self.separator}{str(counter).zfill(self.number_of_digits)}{self.file_extension}"
 
+    def get_num_from_filename(self, filename: str) -> int:
+        num, _ = self.get_info_from_filename(filename)
+        return num
+
+    def get_name_from_filename(self, filename: str) -> int:
+        _, name = self.get_info_from_filename(filename)
+        return name
+
     def get_info_from_filename(self, filename: str) -> tuple[int, str]:
         """[summary]
 
@@ -217,9 +225,14 @@ def write_field(dataArray, prm, filename: str = None) -> None:
         return
     # If n is a dimension (for scalar), call write recursively to save
     # phi1, phi2, phi3, for instance.
-    if "n" in dataArray.dims:
+    if "n" in dataArray.n:
         for n in range(dataArray.n.size):
-            write_field(dataArray.isel(n=n), prm, filename=f"{filename}{n+1}")
+            write_field(dataArray.sel(n=n), prm, filename=f"{filename}{n.data}")
+    # If i is a dimension, call write recursively to save
+    # ux, uy and uz, for instance
+    if "i" in dataArray.dims:
+        for i in dataArray.i:
+            write_field(dataArray.sel(i=i), prm, filename=f"{filename}{i}")
     # If t is a dimension (for time), call write recursively to save
     # ux-0000.bin, ux-0001.bin, ux-0002.bin, for instance.
     elif "t" in dataArray.dims:
@@ -264,6 +277,89 @@ def read_time_series(
         ],
         dim="t",
     )
+
+
+def read_snapshot(
+    prm,
+    numerical_identifier: int,
+    list_of_variables: list = None,
+    data_path: str = "",
+    drop_coords: str = "",
+    add_time: bool = False,
+    stack_velocity: bool = True,
+    stack_scalar: bool = True,
+) -> Type[xr.Dataset]:
+
+    dataset = xr.Dataset()
+
+    if list_of_variables is None:
+        target_filename = prm.filename_properties.get_filename_for_binary(
+            "*", numerical_identifier
+        )
+
+        list_of_variables = glob.glob(os.path.join(data_path, target_filename))
+        list_of_variables = map(
+            prm.filename_properties.get_name_from_filename, list_of_variables
+        )
+
+    if list_of_variables is None:
+        raise IOError(f"No file found corresponding to .{data_path}/{target_filename}")
+
+    list_of_variables = set(list_of_variables)
+
+    if stack_scalar:
+        scalar_variables = sorted(
+            list(
+                filter(lambda name: len(name) == 4 and "phi" in name, list_of_variables)
+            )
+        )
+        if scalar_variables:
+            dataset["phi"] = (
+                read_snapshot(
+                    prm,
+                    numerical_identifier,
+                    scalar_variables,
+                    data_path,
+                    drop_coords,
+                    add_time,
+                    stack_velocity=False,
+                    stack_scalar=False,
+                )
+                .to_array(dim="n")
+                .assign_coords(n=[int(var[-1]) for var in scalar_variables])
+            )
+            list_of_variables -= set(scalar_variables)
+
+    if stack_velocity:
+        velocity_variables = sorted(
+            list(filter(lambda name: name in {"ux", "uy", "uz"}, list_of_variables))
+        )
+        if velocity_variables:
+            dataset["u"] = (
+                read_snapshot(
+                    prm,
+                    numerical_identifier,
+                    velocity_variables,
+                    data_path,
+                    drop_coords,
+                    add_time,
+                    stack_velocity=False,
+                    stack_scalar=False,
+                )
+                .to_array(dim="i")
+                .assign_coords(i=[var[-1] for var in velocity_variables])
+            )
+            list_of_variables -= set(velocity_variables)
+
+    for var in list_of_variables:
+        filename = prm.filename_properties.get_filename_for_binary(
+            var, numerical_identifier
+        )
+        dataset[var] = read_field(
+            prm=prm, filename=filename, drop_coords=drop_coords, add_time=add_time
+        )
+
+    return dataset
 
 
 def write_xdmf(
