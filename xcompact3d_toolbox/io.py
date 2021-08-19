@@ -32,6 +32,7 @@ import glob
 import os
 import os.path
 import warnings
+from typing import Type
 
 import numpy as np
 import traitlets

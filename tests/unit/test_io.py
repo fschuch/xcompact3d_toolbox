@@ -59,5 +59,5 @@ def test_write_read_temporal_series(prm):
         array_in = x3d.io.read_temporal_series(
             prm, filename_pattern=f"phi{n+1}-???.bin"
         )
-        xr.testing.assert_equal(array_out.isel(n=n).drop("n"), array_in)
+        xr.testing.assert_equal(array_out.isel(n=n).drop_vars("n"), array_in)
 

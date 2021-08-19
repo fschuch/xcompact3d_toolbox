@@ -179,6 +179,9 @@ class Mesh3D(traitlets.HasTraits):
                 if dir not in args
             }
         )
+    
+    def copy(self):
+        return Mesh3D(**{dim: getattr(self, dim).trait_values() for dim in self.trait_names()})
 
     @property
     def size(self):

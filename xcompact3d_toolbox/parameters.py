@@ -1015,7 +1015,7 @@ class Parameters(
 
         self.set(**dictionary)
 
-    def read_field(self, filename, **kwargs):
+    def read_field(self, **kwargs):
         """This method reads a binary field from Xcompact3d with :obj:`numpy.fromfile`
         and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
         coordinates and attributes.
@@ -1084,9 +1084,9 @@ class Parameters(
         .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
         """
 
-        return read_field(self, filename, **kwargs)
+        return read_field(self, **kwargs)
 
-    def read_temporal_series(self, filenames, steep="ioutput", **kwargs):
+    def read_temporal_series(self, **kwargs):
         """Reads all files matching the ``filename_pattern`` with
         :obj:`xcompact3d_toolbox.parameters.Parameters.read_field` and
         concatenates them into a time series.
@@ -1144,7 +1144,7 @@ class Parameters(
 
         """
 
-        return read_temporal_series(self, filenames, steep, **kwargs)
+        return read_temporal_series(self, **kwargs)
 
     def write(self):
         """Writes all valid attributes to an ``.i3d`` file.
@@ -1196,7 +1196,7 @@ class Parameters(
         """
         write_xdmf(self)
 
-    def get_mesh(self, refined_for_ibm = False):
+    def get_mesh(self, refined_for_ibm=False):
         """Get mesh point locations for the three coordinates. They are stored
         in a dictionary. It supports mesh refinement in **y** when
         :obj:`istret` :math:`\\ne` 0.
@@ -1208,7 +1208,7 @@ class Parameters(
             for **x**, **y** and **z**.
 
         Examples
-        -------
+        --------
 
         >>> prm = xcompact3d_toolbox.Parameters()
         >>> prm.get_mesh
@@ -1222,6 +1222,12 @@ class Parameters(
                 0.5   , 0.5625, 0.625 , 0.6875, 0.75  , 0.8125, 0.875 , 0.9375,
                 1.    ])}
         """
-        if refined_for_ibm:
-            raise NotImplementedError("Unsupported: mesh refinement for ibm")
+        if refined_for_ibm and self.iibm != 0:
+            copy = self.mesh.copy()
+            for dim in copy.trait_names():
+                new_grid_size = getattr(self.mesh, dim)._sub_grid_size * self.nraf
+                if not getattr(self.mesh, dim).is_periodic:
+                    new_grid_size += 1
+                getattr(copy, dim).set(grid_size = new_grid_size)
+            return copy.get()
         return self.mesh.get()
