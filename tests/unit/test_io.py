@@ -1,8 +1,10 @@
+import filecmp
+
+import numpy as np
 import pytest
+import xarray as xr
 import xcompact3d_toolbox as x3d
 import xcompact3d_toolbox.io
-import numpy as np
-import xarray as xr
 
 
 @pytest.fixture
@@ -39,8 +41,8 @@ def test_write_read_field(prm):
     array_in = x3d.io.read_field(prm, filename)
     xr.testing.assert_equal(array_out, array_in)
 
-
-def test_write_read_temporal_series(prm):
+@pytest.fixture
+def write_time_series(prm):
     prm.set(numscalar=3, ilast=11, ioutput=1)
     coords = prm.get_mesh()
     coords["t"] = [prm.dt * i for i in range(prm.ilast)]
@@ -55,9 +57,20 @@ def test_write_read_temporal_series(prm):
     )
     x3d.io.write_field(array_out, prm)
 
+    return prm, array_out
+
+def test_write_read_temporal_series(write_time_series):
+
+    prm, array_out = write_time_series
+
     for n in array_out.n.data:
         array_in = x3d.io.read_temporal_series(
             prm, filename_pattern=f"phi{n+1}-???.bin"
         )
         xr.testing.assert_equal(array_out.isel(n=n).drop_vars("n"), array_in)
+    
+def test_write_xdmf(write_time_series):
+    prm, _ = write_time_series
+    x3d.io.write_xdmf(prm, filename_pattern = "phi?-???.bin")
+    assert filecmp.cmp("snapshots.xdmf", "./tests/unit/data/snapshots_ref.xdmf")
 

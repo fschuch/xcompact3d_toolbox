@@ -254,7 +254,7 @@ def read_temporal_series(
     if not filename_list:
         raise IOError(f"No file was found corresponding to {filename_pattern}.")
 
-    # set or subescribe, time is needed for the concatenation
+    # set or sobescribe, time is needed for the concatenation
     kwargs["add_time"] = True
 
     return xr.concat(
@@ -266,141 +266,109 @@ def read_temporal_series(
     )
 
 
-def write_xdmf(prm):
-    """Writes four xdmf files:
+def write_xdmf(
+    prm,
+    xdmf_name: str = "snapshots.xdmf",
+    filename_pattern: str = "./data/*",
+    drop_coords: str = "",
+) -> None:
 
-    * ``./data/3d_snapshots.xdmf`` for 3D snapshots in ``./data/3d_snapshots/*``;
-    * ``./data/xy_planes.xdmf`` for planes in ``./data/xy_planes/*``;
-    * ``./data/xz_planes.xdmf`` for planes in ``./data/xz_planes/*``;
-    * ``./data/yz_planes.xdmf`` for planes in ``./data/yz_planes/*``.
+    filename_list = glob.glob(filename_pattern)
 
-    Shape and time are inferted from folder structure and filenames.
-    File list is obtained automatically with :obj:`glob`.
+    if not filename_list:
+        raise IOError(f"No file was found corresponding to {filename_pattern}.")
 
-    .. note:: This is only compatible with the new filename structure,
-        the conversion is exemplified in `convert_filenames_x3d_toolbox`_.
+    data_path = os.path.dirname(filename_pattern)
 
-    .. _`convert_filenames_x3d_toolbox`: https://gist.github.com/fschuch/5a05b8d6e9787d76655ecf25760e7289
-
-    Parameters
-    ----------
-    prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
-        Contains the computational and physical parameters.
-
-    Examples
-    -------
-
-    >>> prm = x3d.Parameters()
-    >>> x3d.write_xdmf(prm)
-
-    """
-
-    for folder in ["3d_snapshots", "xy_planes", "xz_planes", "yz_planes"]:
-
-        xdmf = os.path.join("data", f"{folder}.xdmf")
-        filepath = os.path.join("data", folder, "*")
-
-        filenames = glob.glob(filepath)
-        if len(filenames) == 0:
-            continue
-
-        prefixes = sorted(
-            set([os.path.basename(file).split("-")[0] for file in filenames])
+    properties = zip(
+        *map(
+            lambda file: prm.filename_properties.get_info_from_filename(
+                os.path.basename(file)
+            ),
+            filename_list,
         )
-        suffixes = sorted(
-            set(
-                [
-                    os.path.basename(file).split("-")[-1].split(".")[0]
-                    for file in filenames
-                ]
-            )
+    )
+    time_numbers, var_names = properties
+    time_numbers = sorted(list(set(time_numbers)))
+    var_names = sorted(list(set(var_names)))
+
+    nx = prm.nx
+    ny = prm.ny
+    nz = prm.nz
+
+    dx = prm.dx
+    dy = prm.dy
+    dz = prm.dz
+
+    step = getattr(prm, prm.filename_properties.numeration_steep)
+    dt = prm.dt * step
+
+    if drop_coords == "x":
+        nx, dx = 1, 0.0
+    elif drop_coords == "y":
+        ny, dy = 1, 0.0
+    elif drop_coords == "z":
+        nz, dz = 1, 0.0
+
+    prec = 8 if param["mytype"] == np.float64 else 4
+
+    def get_filename(var_name, num):
+        string = ""
+        if data_path: string += data_path+"/"
+        string += prm.filename_properties.get_filename_for_binary(var_name, num)
+        return string
+
+    with open(xdmf_name, "w") as f:
+        f.write('<?xml version="1.0" ?>\n')
+        f.write(' <!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>\n')
+        f.write(' <Xdmf xmlns:xi="http://www.w3.org/2001/XInclude" Version="2.0">\n')
+        f.write(" <Domain>\n")
+        f.write('     <Topology name="topo" TopologyType="3DCoRectMesh"\n')
+        f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
+        f.write("     </Topology>\n")
+        f.write('     <Geometry name="geo" Type="ORIGIN_DXDYDZ">\n')
+        f.write("         <!-- Origin -->\n")
+        f.write('         <DataItem Format="XML" Dimensions="3">\n')
+        f.write("         0.0 0.0 0.0\n")
+        f.write("         </DataItem>\n")
+        f.write("         <!-- DxDyDz -->\n")
+        f.write('         <DataItem Format="XML" Dimensions="3">\n')
+        f.write(f"           {dz}  {dy}  {dx}\n")
+        f.write("         </DataItem>\n")
+        f.write("     </Geometry>\n")
+        f.write("\n")
+        f.write(
+            '     <Grid Name="TimeSeries" GridType="Collection" CollectionType="Temporal">\n'
         )
-
-        mesh = prm.get_mesh()
-
-        nx, ny, nz = [mesh[d].size for d in mesh.keys()]
-        dx, dy, dz = [mesh[d][1] - mesh[d][0] for d in mesh.keys()]
-
-        try:
-            dt = prm.dt * (float(suffixes[1]) - float(suffixes[0]))
-        except:
-            dt = 1
-
-        if folder == "xy_planes":
-            nz, dz = 0, 0
-        elif folder == "xz_planes":
-            ny, dy = 0, 0
-        elif folder == "yz_planes":
-            nx, dx = 0, 0
-
-        prec = 8 if param["mytype"] == np.float64 else 4
-
-        ibm_flag = "ibm" in prefixes
-
-        with open(xdmf, "w") as f:
-            f.write('<?xml version="1.0" ?>\n')
-            f.write(' <!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>\n')
-            f.write(
-                ' <Xdmf xmlns:xi="http://www.w3.org/2001/XInclude" Version="2.0">\n'
-            )
-            f.write(" <Domain>\n")
-            f.write('     <Topology name="topo" TopologyType="3DCoRectMesh"\n')
-            f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
-            f.write("     </Topology>\n")
-            f.write('     <Geometry name="geo" Type="ORIGIN_DXDYDZ">\n')
-            f.write("         <!-- Origin -->\n")
-            f.write('         <DataItem Format="XML" Dimensions="3">\n')
-            f.write("         0.0 0.0 0.0\n")
-            f.write("         </DataItem>\n")
-            f.write("         <!-- DxDyDz -->\n")
-            f.write('         <DataItem Format="XML" Dimensions="3">\n')
-            f.write(f"           {dz}  {dy}  {dx}\n")
-            f.write("         </DataItem>\n")
-            f.write("     </Geometry>\n")
+        f.write('         <Time TimeType="HyperSlab">\n')
+        f.write(
+            '             <DataItem Format="XML" NumberType="Float" Dimensions="3">\n'
+        )
+        f.write("             <!--Start, Stride, Count-->\n")
+        f.write(f"             0.0 {dt}\n")
+        f.write("             </DataItem>\n")
+        f.write("         </Time>\n")
+        for suffix in tqdm(time_numbers, desc=xdmf_name):
             f.write("\n")
-            f.write(
-                '     <Grid Name="TimeSeries" GridType="Collection" CollectionType="Temporal">\n'
-            )
-            f.write('         <Time TimeType="HyperSlab">\n')
-            f.write(
-                '             <DataItem Format="XML" NumberType="Float" Dimensions="3">\n'
-            )
-            f.write("             <!--Start, Stride, Count-->\n")
-            f.write(f"             0.0 {dt}\n")
-            f.write("             </DataItem>\n")
-            f.write("         </Time>\n")
-            for suffix in tqdm(suffixes, desc=xdmf):
-                f.write("\n")
-                f.write("\n")
-                f.write(f'         <Grid Name="{suffix}" GridType="Uniform">\n')
-                f.write(
-                    '             <Topology Reference="/Xdmf/Domain/Topology[1]"/>\n'
-                )
-                f.write(
-                    '             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>\n'
-                )
-                for prefix in prefixes:
-                    f.write(f'             <Attribute Name="{prefix}" Center="Node">\n')
-                    f.write('                <DataItem Format="Binary"\n')
-                    f.write(
-                        f'                 DataType="Float" Precision="{prec}" Endian="little" Seek="0" \n'
-                    )
-                    f.write(f'                 Dimensions="{nz} {ny} {nx}">\n')
-                    if ibm_flag and prefix == "ibm":
-                        f.write(
-                            f"                   ./{folder}/{prefix}-{suffixes[0]}.bin\n"
-                        )
-                    else:
-                        f.write(
-                            f"                   ./{folder}/{prefix}-{suffix}.bin\n"
-                        )
-                    f.write("                </DataItem>\n")
-                    f.write("             </Attribute>\n")
-                f.write("         </Grid>\n")
             f.write("\n")
-            f.write("     </Grid>\n")
-            f.write(" </Domain>\n")
-            f.write("</Xdmf>")
+            f.write(f'         <Grid Name="{suffix}" GridType="Uniform">\n')
+            f.write('             <Topology Reference="/Xdmf/Domain/Topology[1]"/>\n')
+            f.write('             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>\n')
+            for prefix in var_names:
+                f.write(f'             <Attribute Name="{prefix}" Center="Node">\n')
+                f.write('                <DataItem Format="Binary"\n')
+                f.write(
+                    f'                 DataType="Float" Precision="{prec}" Endian="little" Seek="0" \n'
+                )
+                f.write(f'                 Dimensions="{nz} {ny} {nx}">\n')
+                f.write(f"                   {get_filename(prefix, suffix)}\n")
+                f.write("                </DataItem>\n")
+                f.write("             </Attribute>\n")
+            f.write("         </Grid>\n")
+        f.write("\n")
+        f.write("     </Grid>\n")
+        f.write(" </Domain>\n")
+        f.write("</Xdmf>")
 
 
 def prm_to_dict(filename="incompact3d.prm"):

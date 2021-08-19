@@ -1,0 +1,326 @@
+<?xml version="1.0" ?>
+ <!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+ <Xdmf xmlns:xi="http://www.w3.org/2001/XInclude" Version="2.0">
+ <Domain>
+     <Topology name="topo" TopologyType="3DCoRectMesh"
+         Dimensions="17 17 17">
+     </Topology>
+     <Geometry name="geo" Type="ORIGIN_DXDYDZ">
+         <!-- Origin -->
+         <DataItem Format="XML" Dimensions="3">
+         0.0 0.0 0.0
+         </DataItem>
+         <!-- DxDyDz -->
+         <DataItem Format="XML" Dimensions="3">
+           0.0625  0.0625  0.0625
+         </DataItem>
+     </Geometry>
+
+     <Grid Name="TimeSeries" GridType="Collection" CollectionType="Temporal">
+         <Time TimeType="HyperSlab">
+             <DataItem Format="XML" NumberType="Float" Dimensions="3">
+             <!--Start, Stride, Count-->
+             0.0 0.001
+             </DataItem>
+         </Time>
+
+
+         <Grid Name="0" GridType="Uniform">
+             <Topology Reference="/Xdmf/Domain/Topology[1]"/>
+             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>
+             <Attribute Name="phi1" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi1-000.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi2" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi2-000.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi3" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi3-000.bin
+                </DataItem>
+             </Attribute>
+         </Grid>
+
+
+         <Grid Name="1" GridType="Uniform">
+             <Topology Reference="/Xdmf/Domain/Topology[1]"/>
+             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>
+             <Attribute Name="phi1" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi1-001.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi2" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi2-001.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi3" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi3-001.bin
+                </DataItem>
+             </Attribute>
+         </Grid>
+
+
+         <Grid Name="2" GridType="Uniform">
+             <Topology Reference="/Xdmf/Domain/Topology[1]"/>
+             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>
+             <Attribute Name="phi1" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi1-002.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi2" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi2-002.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi3" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi3-002.bin
+                </DataItem>
+             </Attribute>
+         </Grid>
+
+
+         <Grid Name="3" GridType="Uniform">
+             <Topology Reference="/Xdmf/Domain/Topology[1]"/>
+             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>
+             <Attribute Name="phi1" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi1-003.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi2" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi2-003.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi3" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi3-003.bin
+                </DataItem>
+             </Attribute>
+         </Grid>
+
+
+         <Grid Name="4" GridType="Uniform">
+             <Topology Reference="/Xdmf/Domain/Topology[1]"/>
+             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>
+             <Attribute Name="phi1" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi1-004.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi2" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi2-004.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi3" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi3-004.bin
+                </DataItem>
+             </Attribute>
+         </Grid>
+
+
+         <Grid Name="5" GridType="Uniform">
+             <Topology Reference="/Xdmf/Domain/Topology[1]"/>
+             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>
+             <Attribute Name="phi1" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi1-005.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi2" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi2-005.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi3" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi3-005.bin
+                </DataItem>
+             </Attribute>
+         </Grid>
+
+
+         <Grid Name="6" GridType="Uniform">
+             <Topology Reference="/Xdmf/Domain/Topology[1]"/>
+             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>
+             <Attribute Name="phi1" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi1-006.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi2" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi2-006.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi3" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi3-006.bin
+                </DataItem>
+             </Attribute>
+         </Grid>
+
+
+         <Grid Name="7" GridType="Uniform">
+             <Topology Reference="/Xdmf/Domain/Topology[1]"/>
+             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>
+             <Attribute Name="phi1" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi1-007.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi2" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi2-007.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi3" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi3-007.bin
+                </DataItem>
+             </Attribute>
+         </Grid>
+
+
+         <Grid Name="8" GridType="Uniform">
+             <Topology Reference="/Xdmf/Domain/Topology[1]"/>
+             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>
+             <Attribute Name="phi1" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi1-008.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi2" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi2-008.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi3" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi3-008.bin
+                </DataItem>
+             </Attribute>
+         </Grid>
+
+
+         <Grid Name="9" GridType="Uniform">
+             <Topology Reference="/Xdmf/Domain/Topology[1]"/>
+             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>
+             <Attribute Name="phi1" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi1-009.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi2" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi2-009.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi3" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi3-009.bin
+                </DataItem>
+             </Attribute>
+         </Grid>
+
+
+         <Grid Name="10" GridType="Uniform">
+             <Topology Reference="/Xdmf/Domain/Topology[1]"/>
+             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>
+             <Attribute Name="phi1" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi1-010.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi2" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi2-010.bin
+                </DataItem>
+             </Attribute>
+             <Attribute Name="phi3" Center="Node">
+                <DataItem Format="Binary"
+                 DataType="Float" Precision="8" Endian="little" Seek="0" 
+                 Dimensions="17 17 17">
+                   phi3-010.bin
+                </DataItem>
+             </Attribute>
+         </Grid>
+
+     </Grid>
+ </Domain>
+</Xdmf>

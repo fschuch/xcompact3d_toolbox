@@ -135,6 +135,14 @@ class StretchedCoordinate(Coordinate):
             )
         return proposal.get("value")
 
+    @traitlets.validate("is_periodic")
+    def _validate_is_periodic(self, proposal):
+        if proposal.get("value") and self.istret == 3:
+            raise traitlets.TraitError(
+                f"mesh refinement at the bottom (istret=3) is not possible when periodic"
+            )
+        return proposal.get("value")
+
 
 class Mesh3D(traitlets.HasTraits):
     x = traitlets.Instance(klass=Coordinate)
@@ -179,9 +187,11 @@ class Mesh3D(traitlets.HasTraits):
                 if dir not in args
             }
         )
-    
+
     def copy(self):
-        return Mesh3D(**{dim: getattr(self, dim).trait_values() for dim in self.trait_names()})
+        return Mesh3D(
+            **{dim: getattr(self, dim).trait_values() for dim in self.trait_names()}
+        )
 
     @property
     def size(self):

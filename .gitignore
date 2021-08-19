@@ -133,6 +133,5 @@ xcompact3d
 *.bin
 *.o
 *.mod
-*.xdmf
 *.out
 *.dat
