@@ -11,7 +11,7 @@ import numpy as np
 import traitlets
 
 from .io import FilenameProperties, i3d_to_dict, prm_to_dict, read_field
-from .io import read_time_series, write_xdmf
+from .io import read_time_series, write_xdmf, read_snapshot
 from .mesh import Mesh3D
 from .param import boundary_condition, param
 
@@ -1145,6 +1145,10 @@ class Parameters(
         """
 
         return read_time_series(self, **kwargs)
+
+    def read_snapshot(self, **kwargs):
+
+        return read_snapshot(self, **kwargs)
 
     def write(self):
         """Writes all valid attributes to an ``.i3d`` file.

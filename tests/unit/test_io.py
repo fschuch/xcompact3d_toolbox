@@ -49,7 +49,7 @@ def write_time_series(prm):
     prm.set(numscalar=3, ilast=11, ioutput=1)
     coords = prm.get_mesh()
     coords["t"] = [prm.dt * i for i in range(prm.ilast)]
-    coords["n"] = range(prm.numscalar)
+    coords["n"] = [n + 1 for n in range(prm.numscalar)]
 
     numpy_array = np.random.random([len(i) for i in coords.values()]).astype(
         x3d.param["mytype"]
@@ -68,10 +68,39 @@ def test_write_read_time_series(write_time_series):
     prm, array_out = write_time_series
 
     for n in array_out.n.data:
-        array_in = x3d.io.read_time_series(
-            prm, filename_pattern=f"phi{n+1}-???.bin"
+        array_in = x3d.io.read_time_series(prm, filename_pattern=f"phi{n}-???.bin")
+        xr.testing.assert_equal(array_out.sel(n=n, drop=True), array_in)
+
+
+@pytest.fixture
+def write_snapshot(prm):
+    prm.set(numscalar=0, ilast=3, ioutput=1)
+    coords = prm.get_mesh()
+    coords["t"] = [prm.dt * i for i in range(prm.ilast)]
+
+    dataset = xr.Dataset()
+
+    for var in "ux uy uz pp".split():
+        numpy_array = np.random.random([len(i) for i in coords.values()]).astype(
+            x3d.param["mytype"]
         )
-        xr.testing.assert_equal(array_out.isel(n=n).drop_vars("n"), array_in)
+        dataset[var] = xr.DataArray(
+            numpy_array, coords=coords, dims=coords.keys(), attrs=dict(file_name=var)
+        )
+        x3d.io.write_field(dataset[var], prm)
+
+    return prm, dataset
+
+
+def test_write_read_snapshots(write_snapshot):
+
+    prm, dataset_out = write_snapshot
+
+    for t in range(dataset_out.t.size):
+        dataset_in = x3d.io.read_snapshot(
+            prm, t, list_of_variables="ux uy uz pp".split()
+        )
+        xr.testing.assert_equal(dataset_out.isel(t=t, drop=True), dataset_in)
 
 
 @pytest.mark.parametrize("istret", [0, 1])

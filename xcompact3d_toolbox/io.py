@@ -225,22 +225,22 @@ def write_field(dataArray, prm, filename: str = None) -> None:
         return
     # If n is a dimension (for scalar), call write recursively to save
     # phi1, phi2, phi3, for instance.
-    if "n" in dataArray.n:
-        for n in range(dataArray.n.size):
-            write_field(dataArray.sel(n=n), prm, filename=f"{filename}{n.data}")
+    if "n" in dataArray.dims:
+        for n, n_val in enumerate(dataArray.n.data):
+            write_field(dataArray.isel(n=n, drop=True), prm, filename=f"{filename}{n_val}")
     # If i is a dimension, call write recursively to save
     # ux, uy and uz, for instance
-    if "i" in dataArray.dims:
-        for i in dataArray.i:
-            write_field(dataArray.sel(i=i), prm, filename=f"{filename}{i}")
+    elif "i" in dataArray.dims:
+        for i, i_val in enumerate(dataArray.i.data):
+            write_field(dataArray.isel(i=i, drop=True), prm, filename=f"{filename}{i_val}")
     # If t is a dimension (for time), call write recursively to save
     # ux-0000.bin, ux-0001.bin, ux-0002.bin, for instance.
     elif "t" in dataArray.dims:
         step = getattr(prm, prm.filename_properties.numeration_steep)
         dt = prm.dt * step
-        for k, time in enumerate(tqdm(dataArray.t.values, desc=filename)):
+        for k, time in enumerate(tqdm(dataArray.t.data, desc=filename)):
             write_field(
-                dataArray.isel(t=k),
+                dataArray.isel(t=k, drop=True),
                 prm,
                 prm.filename_properties.get_filename_for_binary(
                     prefix=filename, counter=int(time / dt),
@@ -286,9 +286,11 @@ def read_snapshot(
     data_path: str = "",
     drop_coords: str = "",
     add_time: bool = False,
-    stack_velocity: bool = True,
-    stack_scalar: bool = True,
+    stack_velocity: bool = False,
+    stack_scalar: bool = False,
 ) -> Type[xr.Dataset]:
+
+    # TODO: Make read_snapshot be powered by read_time_series for a combo effect
 
     dataset = xr.Dataset()
 
