@@ -41,7 +41,7 @@ def test_write_read_field(dataset):
     numpy_array = np.random.random(size=shape).astype(x3d.param["mytype"])
     filename = dataset.filename_properties.get_filename_for_binary("ux", 0)
     array_out = xr.DataArray(numpy_array, coords=coords, dims=coords.keys())
-    dataset.write_array(array_out, filename)
+    dataset.write(array_out, filename)
     array_in = dataset.load_array(dataset.data_path + filename, add_time=False)
     xr.testing.assert_equal(array_out, array_in)
 
@@ -69,8 +69,7 @@ def snapshot(dataset):
     ds["u"] = xr_array("u", i="x y z".split(), **coords)
     ds["phi"] = xr_array("phi", n=[n + 1 for n in range(3)], **coords)
 
-    for _, val in ds.items():
-        dataset.write_array(val)
+    dataset.write(ds)
 
     return ds
 

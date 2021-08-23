@@ -205,7 +205,7 @@ class Dataset(traitlets.HasTraits):
         self.set(**kwargs)
 
     def __call__(self, *args) -> Type(xr.Dataset):
-        for t in self._range(*args):
+        for t in range(*args):
             yield self.load_snapshot(t)
 
     def __getitem__(self, arg) -> Type(xr.Dataset):
@@ -383,7 +383,26 @@ class Dataset(traitlets.HasTraits):
             dim="t",
         )
 
-    def write_array(self, dataArray, filename: str = None) -> None:
+    def write(self, data, file_prefix: str = None):
+
+        if isinstance(data, xr.Dataset):
+            self._write_dataset(data)
+        elif isinstance(data, xr.DataArray):
+            self._write_array(data, file_prefix)
+        else:
+            raise IOError(
+                f"Invalid type for data, try with: xarray.Dataset or xarray.DataArray"
+            )
+
+    def _write_dataset(self, dataset):
+        
+        for array_name, array in dataset.items():
+            if "file_name" in array.attrs:
+                self._write_array(array)
+            else:
+                warnings.warn(f"Can't write array {array_name}")
+
+    def _write_array(self, dataArray, filename: str = None) -> None:
         if filename is None:  # Try to get from atributes
             filename = dataArray.attrs.get("file_name", None)
         if filename is None:
@@ -393,22 +412,26 @@ class Dataset(traitlets.HasTraits):
         # phi1, phi2, phi3, for instance.
         if "n" in dataArray.dims:
             for n, n_val in enumerate(dataArray.n.data):
-                self.write_array(
+                self._write_array(
                     dataArray.isel(n=n, drop=True), filename=f"{filename}{n_val}"
                 )
         # If i is a dimension, call write recursively to save
         # ux, uy and uz, for instance
         elif "i" in dataArray.dims:
             for i, i_val in enumerate(dataArray.i.data):
-                self.write_array(
+                self._write_array(
                     dataArray.isel(i=i, drop=True), filename=f"{filename}{i_val}"
                 )
         # If t is a dimension (for time), call write recursively to save
         # ux-0000.bin, ux-0001.bin, ux-0002.bin, for instance.
         elif "t" in dataArray.dims:
             dt = self._time_step
-            for k, time in enumerate(tqdm(dataArray.t.data, desc=filename)):
-                self.write_array(
+            if dataArray.t.size == 1:
+                loop_itr = enumerate(dataArray.t.data)
+            else:
+                loop_itr = enumerate(tqdm(dataArray.t.data, desc=filename))
+            for k, time in loop_itr:
+                self._write_array(
                     dataArray.isel(t=k, drop=True),
                     self.filename_properties.get_filename_for_binary(
                         prefix=filename, counter=int(time / dt),
@@ -430,24 +453,23 @@ class Dataset(traitlets.HasTraits):
     def write_xdmf(self, xdmf_name: str = "snapshots.xdmf",) -> None:
 
         if self.set_of_variables:
-            filename_pattern = f'[{",".join(self.set_of_variables)}]'
+            time_numbers = range(len(self))
+            var_names = sorted(list(self.set_of_variables))
         else:
-            filename_pattern = "*"
+            filename_pattern = self.filename_properties.get_filename_for_binary(
+                "*", "*", self.data_path
+            )
+            filename_list = glob.iglob(filename_pattern)
 
-        filename_pattern = self.filename_properties.get_filename_for_binary(
-            filename_pattern, "*", self.data_path
-        )
-        filename_list = glob.glob(filename_pattern)
+            if not filename_list:
+                raise IOError(f"No file was found corresponding to {filename_pattern}.")
 
-        if not filename_list:
-            raise IOError(f"No file was found corresponding to {filename_pattern}.")
-
-        properties = zip(
-            *map(self.filename_properties.get_info_from_filename, filename_list,)
-        )
-        time_numbers, var_names = properties
-        time_numbers = sorted(list(set(time_numbers)))
-        var_names = sorted(list(set(var_names)))
+            properties = zip(
+                *map(self.filename_properties.get_info_from_filename, filename_list,)
+            )
+            time_numbers, var_names = properties
+            time_numbers = sorted(list(set(time_numbers)))
+            var_names = sorted(list(set(var_names)))
 
         nx = self._mesh.x.grid_size
         ny = self._mesh.y.grid_size
