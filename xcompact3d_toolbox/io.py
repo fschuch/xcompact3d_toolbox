@@ -99,14 +99,13 @@ class FilenameProperties(traitlets.HasTraits):
         self.set(**kwargs)
 
     def __repr__(self):
-        return (
-            f"{self.__class__.__name__}(\n"
-            f'    separator = "{self.separator}",\n'
-            f'    file_extension = "{self.file_extension}",\n'
-            f"    number_of_digits = {self.number_of_digits},\n"
-            f'    numeration_steep = "{self.numeration_steep}",\n'
-            ")"
-        )
+        string = f"{self.__class__.__name__}(\n"
+        for name in self.trait_names():
+            if name.startswith("_"):
+                continue
+            string += f"    {name} = {repr(getattr(self, name))},\n"
+        string += ")"
+        return string
 
     def set(self, **kwargs) -> None:
         """[summary]
@@ -116,7 +115,7 @@ class FilenameProperties(traitlets.HasTraits):
                 warnings.warn(f"{key} is not a valid parameter and was not loaded")
             setattr(self, key, arg)
 
-    def get_filename_for_binary(self, prefix: str, counter: int) -> str:
+    def get_filename_for_binary(self, prefix: str, counter: int, data_path="") -> str:
         """[summary]
 
         Parameters
@@ -133,7 +132,10 @@ class FilenameProperties(traitlets.HasTraits):
         """
         if counter == "*":
             counter = "?" * self.number_of_digits
-        return f"{prefix}{self.separator}{str(counter).zfill(self.number_of_digits)}{self.file_extension}"
+        filename = f"{prefix}{self.separator}{str(counter).zfill(self.number_of_digits)}{self.file_extension}"
+        if data_path:
+            filename = os.path.join(data_path, filename)
+        return filename
 
     def get_num_from_filename(self, filename: str) -> int:
         num, _ = self.get_info_from_filename(filename)
@@ -180,37 +182,37 @@ class FilenameProperties(traitlets.HasTraits):
 class Dataset(traitlets.HasTraits):
 
     data_path = traitlets.Unicode(default_value="./data/")
-    numeration_steep = traitlets.Unicode(default_value="ioutput")
+    snapshot_step = traitlets.Unicode(default_value="ioutput")
+    snapshot_counting = traitlets.Unicode(default_value="ilast")
     set_of_variables = traitlets.Set()
     drop_coords = traitlets.Unicode(default_value="")
     stack_velocity = traitlets.Bool(default_value=False)
     stack_scalar = traitlets.Bool(default_value=False)
+    filename_properties = traitlets.Instance(klass=FilenameProperties)
 
-    _number_of_snapshots = traitlets.Int(default_value=1, min=0)
-    _time_step = traitlets.Float(default_value=1.0, min=0.0)
     _mesh = traitlets.Instance(klass=Mesh3D)
-    _filename_properties = traitlets.Instance(klass=FilenameProperties)
+    _prm = traitlets.Instance(
+        klass="xcompact3d_toolbox.parameters.Parameters", allow_none=True
+    )
 
     def __init__(self, **kwargs):
 
         self.set_of_variables = set()
+        self.filename_properties = FilenameProperties()
         self._mesh = Mesh3D()
-        self._filename_properties = FilenameProperties()
+        self._prm = None
 
         self.set(**kwargs)
 
-    def __call__(self, *args):
-        print(args)
-        # for t in self._range(*args):
-        #     yield self.load_snapshot(t)
+    def __call__(self, *args) -> Type(xr.Dataset):
+        for t in self._range(*args):
+            yield self.load_snapshot(t)
 
-    def __getitem__(self, arg):
+    def __getitem__(self, arg) -> Type(xr.Dataset):
         if isinstance(arg, int):
             return self.load_snapshot(arg)
         elif isinstance(arg, slice):
-            start = arg.start or 0
-            stop = arg.stop or self._number_of_snapshots
-            step = arg.step or 1
+            start, stop, step = arg.indices(len(self))
             return xr.concat(
                 [self.load_snapshot(t) for t in range(start, stop, step)], "t"
             )
@@ -219,11 +221,34 @@ class Dataset(traitlets.HasTraits):
         raise TypeError("Dataset indices should be integers, string or slices")
 
     def __len__(self):
-        return self._number_of_snapshots
+        # Test environment
+        if self._prm is None:
+            return 11
+        return (
+            getattr(self._prm, self.snapshot_counting)
+            // getattr(self._prm, self.snapshot_step)
+            + 1
+        )
 
     def __iter__(self):
-        for t in range(self._number_of_snapshots):
+        for t in range(len(self)):
             yield self.load_snapshot(t)
+
+    def __repr__(self):
+        string = f"{self.__class__.__name__}(\n"
+        for name in self.trait_names():
+            if name.startswith("_"):
+                continue
+            string += f"    {name} = {repr(getattr(self, name))},\n"
+        string += ")"
+        return string
+
+    @property
+    def _time_step(self):
+        # test environment
+        if self._prm is None:
+            return 1.0
+        return self._prm.dt * getattr(self._prm, self.snapshot_step)
 
     def set(self, **kwargs):
 
@@ -236,7 +261,7 @@ class Dataset(traitlets.HasTraits):
 
         coords = self._mesh.drop(*self.drop_coords)
 
-        time_int, name = self._filename_properties.get_info_from_filename(filename)
+        time_int, name = self.filename_properties.get_info_from_filename(filename)
 
         if add_time:
             coords["t"] = [param["mytype"](self._time_step * time_int)]
@@ -262,6 +287,8 @@ class Dataset(traitlets.HasTraits):
         numerical_identifier,
         list_of_variables: list = None,
         add_time: bool = True,
+        stack_scalar: bool = None,
+        stack_velocity: bool = None,
     ) -> Type[xr.Dataset]:
 
         dataset = xr.Dataset()
@@ -271,29 +298,35 @@ class Dataset(traitlets.HasTraits):
         elif self.set_of_variables:
             set_of_variables = self.set_of_variables.copy()
         else:
-            target_filename = self._filename_properties.get_filename_for_binary(
+            target_filename = self.filename_properties.get_filename_for_binary(
                 "*", numerical_identifier
             )
 
             list_of_variables = glob.glob(os.path.join(self.data_path, target_filename))
             list_of_variables = map(
-                self._filename_properties.get_name_from_filename, list_of_variables
+                self.filename_properties.get_name_from_filename, list_of_variables
             )
             set_of_variables = set(list_of_variables)
 
         if not set_of_variables:
             raise IOError(
-                f"No file found corresponding to .{self.data_path}/{target_filename}"
+                f"No file found corresponding to {self.data_path}/{target_filename}"
             )
 
-        def stack_variables(variables):
+        if stack_scalar is None:
+            stack_scalar = self.stack_scalar
+        if stack_velocity is None:
+            stack_velocity = self.stack_velocity
+
+        def stack_variables(variables, **kwargs):
             return self.load_snapshot(
                 numerical_identifier=numerical_identifier,
                 list_of_variables=variables,
                 add_time=add_time,
+                **kwargs,
             )
 
-        if self.stack_scalar:
+        if stack_scalar:
             scalar_variables = sorted(
                 list(
                     filter(
@@ -304,27 +337,26 @@ class Dataset(traitlets.HasTraits):
 
             if scalar_variables:
                 dataset["phi"] = (
-                    stack_variables(scalar_variables)
+                    stack_variables(scalar_variables, stack_scalar=False)
                     .to_array(dim="n")
                     .assign_coords(n=[int(var[-1]) for var in scalar_variables])
                 )
-
                 set_of_variables -= set(scalar_variables)
 
-        if self.stack_velocity:
+        if stack_velocity:
             velocity_variables = sorted(
                 list(filter(lambda name: name in {"ux", "uy", "uz"}, set_of_variables))
             )
             if velocity_variables:
                 dataset["u"] = (
-                    stack_variables(velocity_variables)
+                    stack_variables(velocity_variables, stack_velocity=False)
                     .to_array(dim="i")
                     .assign_coords(i=[var[-1] for var in velocity_variables])
                 )
                 set_of_variables -= set(velocity_variables)
 
-        for var in set_of_variables:
-            filename = self._filename_properties.get_filename_for_binary(
+        for var in sorted(list(set_of_variables)):
+            filename = self.filename_properties.get_filename_for_binary(
                 var, numerical_identifier
             )
             filename = os.path.join(self.data_path, filename)
@@ -334,7 +366,7 @@ class Dataset(traitlets.HasTraits):
 
     def load_time_series(self, array_prefix: str):
 
-        target_filename = self._filename_properties.get_filename_for_binary(
+        target_filename = self.filename_properties.get_filename_for_binary(
             array_prefix, "*"
         )
         filename_pattern = os.path.join(self.data_path, target_filename)
@@ -378,13 +410,13 @@ class Dataset(traitlets.HasTraits):
             for k, time in enumerate(tqdm(dataArray.t.data, desc=filename)):
                 self.write_array(
                     dataArray.isel(t=k, drop=True),
-                    self._filename_properties.get_filename_for_binary(
+                    self.filename_properties.get_filename_for_binary(
                         prefix=filename, counter=int(time / dt),
                     ),
                 )
         # and finally writes to the disc
         else:
-            fileformat = self._filename_properties.file_extension
+            fileformat = self.filename_properties.file_extension
             if fileformat and not filename.endswith(fileformat):
                 filename += fileformat
             align = [
@@ -395,241 +427,137 @@ class Dataset(traitlets.HasTraits):
                 filename_and_path
             )
 
+    def write_xdmf(self, xdmf_name: str = "snapshots.xdmf",) -> None:
 
-def read_time_series(
-    prm, filename_pattern: str = None, filename_list: list = None, **kwargs,
-) -> Type[xr.DataArray]:
-
-    if filename_list is None:
-        filename_list = sorted(glob.glob(filename_pattern))
-
-    if not filename_list:
-        raise IOError(f"No file was found corresponding to {filename_pattern}.")
-
-    # set or overwrite, time is needed for the concatenation
-    kwargs["add_time"] = True
-
-    return xr.concat(
-        [
-            read_field(prm, file, **kwargs)
-            for file in tqdm(filename_list, desc=filename_pattern)
-        ],
-        dim="t",
-    )
-
-
-def read_snapshot(
-    prm,
-    numerical_identifier: int,
-    list_of_variables: list = None,
-    data_path: str = "",
-    drop_coords: str = "",
-    add_time: bool = False,
-    stack_velocity: bool = False,
-    stack_scalar: bool = False,
-) -> Type[xr.Dataset]:
-
-    # TODO: Make read_snapshot be powered by read_time_series for a combo effect
-
-    dataset = xr.Dataset()
-
-    if list_of_variables is None:
-        target_filename = prm.filename_properties.get_filename_for_binary(
-            "*", numerical_identifier
-        )
-
-        list_of_variables = glob.glob(os.path.join(data_path, target_filename))
-        list_of_variables = map(
-            prm.filename_properties.get_name_from_filename, list_of_variables
-        )
-
-    if list_of_variables is None:
-        raise IOError(f"No file found corresponding to .{data_path}/{target_filename}")
-
-    list_of_variables = set(list_of_variables)
-
-    if stack_scalar:
-        scalar_variables = sorted(
-            list(
-                filter(lambda name: len(name) == 4 and "phi" in name, list_of_variables)
-            )
-        )
-        if scalar_variables:
-            dataset["phi"] = (
-                read_snapshot(
-                    prm,
-                    numerical_identifier,
-                    scalar_variables,
-                    data_path,
-                    drop_coords,
-                    add_time,
-                    stack_velocity=False,
-                    stack_scalar=False,
-                )
-                .to_array(dim="n")
-                .assign_coords(n=[int(var[-1]) for var in scalar_variables])
-            )
-            list_of_variables -= set(scalar_variables)
-
-    if stack_velocity:
-        velocity_variables = sorted(
-            list(filter(lambda name: name in {"ux", "uy", "uz"}, list_of_variables))
-        )
-        if velocity_variables:
-            dataset["u"] = (
-                read_snapshot(
-                    prm,
-                    numerical_identifier,
-                    velocity_variables,
-                    data_path,
-                    drop_coords,
-                    add_time,
-                    stack_velocity=False,
-                    stack_scalar=False,
-                )
-                .to_array(dim="i")
-                .assign_coords(i=[var[-1] for var in velocity_variables])
-            )
-            list_of_variables -= set(velocity_variables)
-
-    for var in list_of_variables:
-        filename = prm.filename_properties.get_filename_for_binary(
-            var, numerical_identifier
-        )
-        dataset[var] = read_field(
-            prm=prm, filename=filename, drop_coords=drop_coords, add_time=add_time
-        )
-
-    return dataset
-
-
-def write_xdmf(
-    prm,
-    xdmf_name: str = "snapshots.xdmf",
-    filename_pattern: str = "./data/*",
-    drop_coords: str = "",
-) -> None:
-
-    filename_list = glob.glob(filename_pattern)
-
-    if not filename_list:
-        raise IOError(f"No file was found corresponding to {filename_pattern}.")
-
-    data_path = os.path.dirname(filename_pattern)
-
-    properties = zip(
-        *map(prm.filename_properties.get_info_from_filename, filename_list,)
-    )
-    time_numbers, var_names = properties
-    time_numbers = sorted(list(set(time_numbers)))
-    var_names = sorted(list(set(var_names)))
-
-    nx = prm.nx
-    ny = prm.ny
-    nz = prm.nz
-
-    dx = prm.dx
-    dy = prm.dy
-    dz = prm.dz
-
-    step = getattr(prm, prm.filename_properties.numeration_steep)
-    dt = prm.dt * step
-
-    if drop_coords == "x":
-        nx, dx = 1, 0.0
-    elif drop_coords == "y":
-        ny, dy = 1, 0.0
-    elif drop_coords == "z":
-        nz, dz = 1, 0.0
-
-    prec = 8 if param["mytype"] == np.float64 else 4
-
-    def get_filename(var_name, num):
-        string = ""
-        if data_path:
-            string += data_path + "/"
-        string += prm.filename_properties.get_filename_for_binary(var_name, num)
-        return string
-
-    with open(xdmf_name, "w") as f:
-        f.write('<?xml version="1.0" ?>\n')
-        f.write(' <!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>\n')
-        f.write(' <Xdmf xmlns:xi="http://www.w3.org/2001/XInclude" Version="2.0">\n')
-        f.write(" <Domain>\n")
-        if prm.istret == 0:
-            f.write('     <Topology name="topo" TopologyType="3DCoRectMesh"\n')
-            f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
-            f.write("     </Topology>\n")
-            f.write('     <Geometry name="geo" Type="ORIGIN_DXDYDZ">\n')
-            f.write("         <!-- Origin -->\n")
-            f.write('         <DataItem Format="XML" Dimensions="3">\n')
-            f.write("         0.0 0.0 0.0\n")
-            f.write("         </DataItem>\n")
-            f.write("         <!-- DxDyDz -->\n")
-            f.write('         <DataItem Format="XML" Dimensions="3">\n')
-            f.write(f"           {dz}  {dy}  {dx}\n")
-            f.write("         </DataItem>\n")
-            f.write("     </Geometry>\n")
+        if self.set_of_variables:
+            filename_pattern = f'[{",".join(self.set_of_variables)}]'
         else:
-            f.write('     <Topology name="topo" TopologyType="3DRectMesh"\n')
-            f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
-            f.write("     </Topology>\n")
-            f.write('     <Geometry name="geo" Type="VXVYVZ">\n')
-            f.write(
-                f'         <DataItem Dimensions="{nx}" NumberType="Float" Precision="{prec}" Format="XML">\n'
-            )
-            f.write(
-                f'         {" ".join(map(str, prm.mesh.x.vector)) if nx > 1 else 0.0}\n'
-            )
-            f.write("          </DataItem>\n")
-            f.write(
-                f'         <DataItem Dimensions="{ny}" NumberType="Float" Precision="{prec}" Format="XML">\n'
-            )
-            f.write(
-                f'         {" ".join(map(str, prm.mesh.y.vector)) if ny > 1 else 0.0}'
-            )
-            f.write("          </DataItem>\n")
-            f.write(
-                f'         <DataItem Dimensions="{nz}" NumberType="Float" Precision="{prec}" Format="XML">\n'
-            )
-            f.write(
-                f'         {" ".join(map(str, prm.mesh.z.vector)) if nz > 1 else 0.0}'
-            )
-            f.write("         </DataItem>\n")
-            f.write("     </Geometry>\n")
-        f.write("\n")
-        f.write(
-            '     <Grid Name="TimeSeries" GridType="Collection" CollectionType="Temporal">\n'
+            filename_pattern = "*"
+
+        filename_pattern = self.filename_properties.get_filename_for_binary(
+            filename_pattern, "*", self.data_path
         )
-        f.write('         <Time TimeType="HyperSlab">\n')
-        f.write(
-            '             <DataItem Format="XML" NumberType="Float" Dimensions="3">\n'
+        filename_list = glob.glob(filename_pattern)
+
+        if not filename_list:
+            raise IOError(f"No file was found corresponding to {filename_pattern}.")
+
+        properties = zip(
+            *map(self.filename_properties.get_info_from_filename, filename_list,)
         )
-        f.write("             <!--Start, Stride, Count-->\n")
-        f.write(f"             0.0 {dt}\n")
-        f.write("             </DataItem>\n")
-        f.write("         </Time>\n")
-        for suffix in tqdm(time_numbers, desc=xdmf_name):
-            f.write("\n")
-            f.write("\n")
-            f.write(f'         <Grid Name="{suffix}" GridType="Uniform">\n')
-            f.write('             <Topology Reference="/Xdmf/Domain/Topology[1]"/>\n')
-            f.write('             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>\n')
-            for prefix in var_names:
-                f.write(f'             <Attribute Name="{prefix}" Center="Node">\n')
-                f.write('                <DataItem Format="Binary"\n')
+        time_numbers, var_names = properties
+        time_numbers = sorted(list(set(time_numbers)))
+        var_names = sorted(list(set(var_names)))
+
+        nx = self._mesh.x.grid_size
+        ny = self._mesh.y.grid_size
+        nz = self._mesh.z.grid_size
+
+        dx = self._mesh.x.delta
+        dy = self._mesh.y.delta
+        dz = self._mesh.z.delta
+
+        dt = self._time_step
+
+        if "x" in self.drop_coords:
+            nx, dx = 1, 0.0
+        elif "y" in self.drop_coords:
+            ny, dy = 1, 0.0
+        elif "z" in self.drop_coords:
+            nz, dz = 1, 0.0
+
+        prec = 8 if param["mytype"] == np.float64 else 4
+
+        def get_filename(var_name, num):
+            return self.filename_properties.get_filename_for_binary(
+                var_name, num, self.data_path
+            )
+
+        with open(xdmf_name, "w") as f:
+            f.write('<?xml version="1.0" ?>\n')
+            f.write(' <!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>\n')
+            f.write(
+                ' <Xdmf xmlns:xi="http://www.w3.org/2001/XInclude" Version="2.0">\n'
+            )
+            f.write(" <Domain>\n")
+            if self._mesh.y.istret == 0:
+                f.write('     <Topology name="topo" TopologyType="3DCoRectMesh"\n')
+                f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
+                f.write("     </Topology>\n")
+                f.write('     <Geometry name="geo" Type="ORIGIN_DXDYDZ">\n')
+                f.write("         <!-- Origin -->\n")
+                f.write('         <DataItem Format="XML" Dimensions="3">\n')
+                f.write("         0.0 0.0 0.0\n")
+                f.write("         </DataItem>\n")
+                f.write("         <!-- DxDyDz -->\n")
+                f.write('         <DataItem Format="XML" Dimensions="3">\n')
+                f.write(f"           {dz}  {dy}  {dx}\n")
+                f.write("         </DataItem>\n")
+                f.write("     </Geometry>\n")
+            else:
+                f.write('     <Topology name="topo" TopologyType="3DRectMesh"\n')
+                f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
+                f.write("     </Topology>\n")
+                f.write('     <Geometry name="geo" Type="VXVYVZ">\n')
                 f.write(
-                    f'                 DataType="Float" Precision="{prec}" Endian="little" Seek="0" \n'
+                    f'         <DataItem Dimensions="{nx}" NumberType="Float" Precision="{prec}" Format="XML">\n'
                 )
-                f.write(f'                 Dimensions="{nz} {ny} {nx}">\n')
-                f.write(f"                   {get_filename(prefix, suffix)}\n")
-                f.write("                </DataItem>\n")
-                f.write("             </Attribute>\n")
-            f.write("         </Grid>\n")
-        f.write("\n")
-        f.write("     </Grid>\n")
-        f.write(" </Domain>\n")
-        f.write("</Xdmf>")
+                f.write(
+                    f'         {" ".join(map(str, self._mesh.x.vector)) if nx > 1 else 0.0}\n'
+                )
+                f.write("          </DataItem>\n")
+                f.write(
+                    f'         <DataItem Dimensions="{ny}" NumberType="Float" Precision="{prec}" Format="XML">\n'
+                )
+                f.write(
+                    f'         {" ".join(map(str, self._mesh.y.vector)) if ny > 1 else 0.0}'
+                )
+                f.write("          </DataItem>\n")
+                f.write(
+                    f'         <DataItem Dimensions="{nz}" NumberType="Float" Precision="{prec}" Format="XML">\n'
+                )
+                f.write(
+                    f'         {" ".join(map(str, self._mesh.z.vector)) if nz > 1 else 0.0}'
+                )
+                f.write("         </DataItem>\n")
+                f.write("     </Geometry>\n")
+            f.write("\n")
+            f.write(
+                '     <Grid Name="TimeSeries" GridType="Collection" CollectionType="Temporal">\n'
+            )
+            f.write('         <Time TimeType="HyperSlab">\n')
+            f.write(
+                '             <DataItem Format="XML" NumberType="Float" Dimensions="3">\n'
+            )
+            f.write("             <!--Start, Stride, Count-->\n")
+            f.write(f"             0.0 {dt}\n")
+            f.write("             </DataItem>\n")
+            f.write("         </Time>\n")
+            for suffix in tqdm(time_numbers, desc=xdmf_name):
+                f.write("\n")
+                f.write("\n")
+                f.write(f'         <Grid Name="{suffix}" GridType="Uniform">\n')
+                f.write(
+                    '             <Topology Reference="/Xdmf/Domain/Topology[1]"/>\n'
+                )
+                f.write(
+                    '             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>\n'
+                )
+                for prefix in var_names:
+                    f.write(f'             <Attribute Name="{prefix}" Center="Node">\n')
+                    f.write('                <DataItem Format="Binary"\n')
+                    f.write(
+                        f'                 DataType="Float" Precision="{prec}" Endian="little" Seek="0" \n'
+                    )
+                    f.write(f'                 Dimensions="{nz} {ny} {nx}">\n')
+                    f.write(f"                   {get_filename(prefix, suffix)}\n")
+                    f.write("                </DataItem>\n")
+                    f.write("             </Attribute>\n")
+                f.write("         </Grid>\n")
+            f.write("\n")
+            f.write("     </Grid>\n")
+            f.write(" </Domain>\n")
+            f.write("</Xdmf>")
 
 
 def prm_to_dict(filename="incompact3d.prm"):
@@ -738,35 +666,3 @@ def i3d_to_dict(filename="input.i3d"):
     f.close()
 
     return dict_outer
-
-
-def dict_to_i3d(dict, filename="input.i3d"):
-    try:
-        with open(filename, "w") as file:
-
-            file.write("! -*- mode: f90 -*-\n")
-
-            for blockkey, block in dict.items():
-                if blockkey == "auxiliar":
-                    continue
-
-                file.write("\n")
-                file.write("!===================\n")
-                file.write("&" + blockkey + "\n")
-                file.write("!===================\n")
-                file.write("\n")
-
-                for paramkey, param in block.items():
-                    # Check if param is a list or not
-                    if isinstance(param, list):
-                        for n, p in enumerate(param):
-                            file.write(f"{paramkey}({n+1}) = {p}\n")
-                    elif isinstance(param, str):
-                        file.write(f"{paramkey} = '{param}'\n")
-                    else:
-                        file.write(f"{paramkey} = {param}\n")
-                file.write("\n")
-                file.write("/End\n")
-
-    except IOError as e:
-        print("Couldn't open or write to file (%s)." % e)

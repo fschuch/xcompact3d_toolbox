@@ -10,7 +10,7 @@ import warnings
 import numpy as np
 import traitlets
 
-from .io import Dataset, FilenameProperties, i3d_to_dict, prm_to_dict
+from .io import Dataset, i3d_to_dict, prm_to_dict
 from .mesh import Mesh3D
 from .param import boundary_condition, param
 
@@ -571,8 +571,6 @@ class ParametersExtras(traitlets.HasTraits):
 
     dataset = traitlets.Instance(klass=Dataset)
 
-    filename_properties = traitlets.Instance(klass=FilenameProperties)
-
     dx, dy, dz = [traitlets.Float().tag() for _ in "x y z".split()]
     """float: Mesh resolution.
     """
@@ -589,12 +587,9 @@ class ParametersExtras(traitlets.HasTraits):
         super(ParametersExtras, self).__init__()
         self.mesh = Mesh3D()
 
-        self.filename_properties = FilenameProperties()
         self._link_mesh_and_parameters()
 
-        self.dataset = Dataset(
-            **dict(_mesh=self.mesh, _filename_properties=self.filename_properties)
-        )
+        self.dataset = Dataset(**dict(_mesh=self.mesh, _prm = self))
 
     def _link_mesh_and_parameters(self):
         for dim in "xyz":
@@ -970,10 +965,6 @@ class Parameters(
             if bc in kwargs:
                 setattr(self, bc, kwargs.get(bc))
 
-        if "filename_properties" in kwargs.keys():
-            self.filename_properties.set(**kwargs.get("filename_properties"))
-            del kwargs["filename_properties"]
-
         for key, arg in kwargs.items():
             if key not in self.trait_names():
                 warnings.warn(f"{key} is not a valid parameter and was not loaded")
@@ -1090,7 +1081,7 @@ class Parameters(
         .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
         """
 
-        return #read_field(self, **kwargs)
+        return  # read_field(self, **kwargs)
 
     def read_time_series(self, **kwargs):
         """Reads all files matching the ``filename_pattern`` with
@@ -1150,11 +1141,11 @@ class Parameters(
 
         """
 
-        return #read_time_series(self, **kwargs)
+        return  # read_time_series(self, **kwargs)
 
     def read_snapshot(self, **kwargs):
 
-        return #read_snapshot(self, **kwargs)
+        return  # read_snapshot(self, **kwargs)
 
     def write(self):
         """Writes all valid attributes to an ``.i3d`` file.
@@ -1204,7 +1195,7 @@ class Parameters(
         >>> prm.write_xdmf()
 
         """
-        #write_xdmf(self, **kwargs)
+        # write_xdmf(self, **kwargs)
 
     def get_mesh(self, refined_for_ibm=False):
         """Get mesh point locations for the three coordinates. They are stored

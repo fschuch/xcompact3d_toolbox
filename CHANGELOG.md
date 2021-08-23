@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A class to handle the binaries filenames and its tests. Now all methods support different filenames, like the classic `ux000`, or the new `ux-0000.bin`, and some combinations between them. By [@fschuch](https://github.com/fschuch).
 - A class to handle the coordinates and its tests, so they can be moved out of the parameters class, by [@fschuch](https://github.com/fschuch).
 - New class for the 3D mesh, with useful methods and its testes, by [@fschuch](https://github.com/fschuch).
-- Add `read_snapshot` to read all or selected variables for a given time, returns them in a proper xr.Dataset, by [@fschuch](https://github.com/fschuch).
+- Add `class Dataset` to read the binary files from XCompact3d on-demand, it is possible to loop through the snapshots, select any of them or read the entire time-series for a given variable. It returns them in a proper xr.Dataset, by [@fschuch](https://github.com/fschuch).
 
 ## [0.1.11] - 2021-02-12
 
