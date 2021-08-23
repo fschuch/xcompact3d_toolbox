@@ -40,6 +40,7 @@ import xarray as xr
 from tqdm.autonotebook import tqdm
 
 from .param import param
+from .mesh import Mesh3D
 
 
 class FilenameProperties(traitlets.HasTraits):
@@ -91,7 +92,6 @@ class FilenameProperties(traitlets.HasTraits):
     separator = traitlets.Unicode(default_value="-")
     file_extension = traitlets.Unicode(default_value=".bin")
     number_of_digits = traitlets.Int(default_value=3, min=1, allow_none=True)
-    numeration_steep = traitlets.Unicode(default_value="ioutput")
 
     def __init__(self, **kwargs):
         super(FilenameProperties).__init__()
@@ -131,6 +131,8 @@ class FilenameProperties(traitlets.HasTraits):
         str
             [description]
         """
+        if counter == "*":
+            counter = "?" * self.number_of_digits
         return f"{prefix}{self.separator}{str(counter).zfill(self.number_of_digits)}{self.file_extension}"
 
     def get_num_from_filename(self, filename: str) -> int:
@@ -160,13 +162,14 @@ class FilenameProperties(traitlets.HasTraits):
             It is not possible to get information from filename if `separator`
             is an empty string and `number_of_digits` is None.
         """
+        _filename = os.path.basename(filename)
         if self.file_extension:
-            filename = filename[: -len(self.file_extension)]
+            _filename = _filename[: -len(self.file_extension)]
         if self.separator:
-            prefix, counter = filename.split(self.separator)
+            prefix, counter = _filename.split(self.separator)
         elif self.number_of_digits is not None:
-            prefix = filename[: -self.number_of_digits]
-            counter = filename[-self.number_of_digits :]
+            prefix = _filename[: -self.number_of_digits]
+            counter = _filename[-self.number_of_digits :]
         else:
             raise IOError(
                 "Impossible to get time from filename without separator or number of digits"
@@ -174,100 +177,236 @@ class FilenameProperties(traitlets.HasTraits):
         return int(counter), prefix
 
 
-def read_field(
-    prm,
-    filename: str,
-    drop_coords: str = "",
-    name: str = "",
-    add_time: bool = False,
-    attrs: dict = {},
-) -> Type[xr.DataArray]:
+class Dataset(traitlets.HasTraits):
 
-    file = os.path.basename(filename)
-    coords = prm.mesh.drop(*drop_coords)
+    data_path = traitlets.Unicode(default_value="./data/")
+    numeration_steep = traitlets.Unicode(default_value="ioutput")
+    set_of_variables = traitlets.Set()
+    drop_coords = traitlets.Unicode(default_value="")
+    stack_velocity = traitlets.Bool(default_value=False)
+    stack_scalar = traitlets.Bool(default_value=False)
 
-    # if name is empty, we obtain it from the filename
-    # time coordinate is added as well
-    if not name:
-        time_int, name = prm.filename_properties.get_info_from_filename(file)
-        if add_time:
-            step = getattr(prm, prm.filename_properties.numeration_steep)
-            coords["t"] = [param["mytype"](time_int * step * prm.dt)]
+    _number_of_snapshots = traitlets.Int(default_value=1, min=0)
+    _time_step = traitlets.Float(default_value=1.0, min=0.0)
+    _mesh = traitlets.Instance(klass=Mesh3D)
+    _filename_properties = traitlets.Instance(klass=FilenameProperties)
 
-    # Include atributes for boundary conditions, useful to compute the derivatives
-    if "phi" in name:
-        attrs["BC"] = prm.get_boundary_condition("phi")
-    else:
-        attrs["BC"] = prm.get_boundary_condition(name)
+    def __init__(self, **kwargs):
 
-    # We obtain the shape for np.fromfile from the coordinates
-    shape = [len(value) for value in coords.values()]
+        self.set_of_variables = set()
+        self._mesh = Mesh3D()
+        self._filename_properties = FilenameProperties()
 
-    # This is necessary if the file is a link
-    if os.path.islink(filename):
-        filename = os.readlink(filename)
+        self.set(**kwargs)
 
-    # Finally, we read the array and wrap it into a xarray object
-    return xr.DataArray(
-        np.fromfile(filename, dtype=param["mytype"]).reshape(shape, order="F"),
-        dims=coords.keys(),
-        coords=coords,
-        name=name,
-        attrs=attrs,
-    )
+    def __call__(self, *args):
+        print(args)
+        # for t in self._range(*args):
+        #     yield self.load_snapshot(t)
 
-
-def write_field(dataArray, prm, filename: str = None) -> None:
-    if filename is None:  # Try to get from atributes
-        filename = dataArray.attrs.get("file_name", None)
-    if filename is None:
-        warnings.warn(f"Can't write field without a filename")
-        return
-    # If n is a dimension (for scalar), call write recursively to save
-    # phi1, phi2, phi3, for instance.
-    if "n" in dataArray.dims:
-        for n, n_val in enumerate(dataArray.n.data):
-            write_field(dataArray.isel(n=n, drop=True), prm, filename=f"{filename}{n_val}")
-    # If i is a dimension, call write recursively to save
-    # ux, uy and uz, for instance
-    elif "i" in dataArray.dims:
-        for i, i_val in enumerate(dataArray.i.data):
-            write_field(dataArray.isel(i=i, drop=True), prm, filename=f"{filename}{i_val}")
-    # If t is a dimension (for time), call write recursively to save
-    # ux-0000.bin, ux-0001.bin, ux-0002.bin, for instance.
-    elif "t" in dataArray.dims:
-        step = getattr(prm, prm.filename_properties.numeration_steep)
-        dt = prm.dt * step
-        for k, time in enumerate(tqdm(dataArray.t.data, desc=filename)):
-            write_field(
-                dataArray.isel(t=k, drop=True),
-                prm,
-                prm.filename_properties.get_filename_for_binary(
-                    prefix=filename, counter=int(time / dt),
-                ),
+    def __getitem__(self, arg):
+        if isinstance(arg, int):
+            return self.load_snapshot(arg)
+        elif isinstance(arg, slice):
+            start = arg.start or 0
+            stop = arg.stop or self._number_of_snapshots
+            step = arg.step or 1
+            return xr.concat(
+                [self.load_snapshot(t) for t in range(start, stop, step)], "t"
             )
-    # and finally writes to the disc
-    else:
-        fileformat = prm.filename_properties.file_extension
-        if fileformat and not filename.endswith(fileformat):
-            filename += fileformat
-        align = [
-            dataArray.get_axis_num(i) for i in sorted(dataArray.dims, reverse=True)
-        ]
+        elif isinstance(arg, str):
+            return self.load_time_series(arg)
+        raise TypeError("Dataset indices should be integers, string or slices")
 
-        dataArray.values.astype(param["mytype"]).transpose(align).tofile(filename)
+    def __len__(self):
+        return self._number_of_snapshots
+
+    def __iter__(self):
+        for t in range(self._number_of_snapshots):
+            yield self.load_snapshot(t)
+
+    def set(self, **kwargs):
+
+        for key, arg in kwargs.items():
+            if key not in self.trait_names():
+                warnings.warn(f"{key} is not a valid parameter and was not defined")
+            setattr(self, key, arg)
+
+    def load_array(self, filename: str, add_time=True, attrs: dict = None):
+
+        coords = self._mesh.drop(*self.drop_coords)
+
+        time_int, name = self._filename_properties.get_info_from_filename(filename)
+
+        if add_time:
+            coords["t"] = [param["mytype"](self._time_step * time_int)]
+
+        # We obtain the shape for np.fromfile from the coordinates
+        shape = [len(value) for value in coords.values()]
+
+        # This is necessary if the file is a link
+        if os.path.islink(filename):
+            filename = os.readlink(filename)
+
+        # Finally, we read the array and wrap it into a xarray object
+        return xr.DataArray(
+            np.fromfile(filename, dtype=param["mytype"]).reshape(shape, order="F"),
+            dims=coords.keys(),
+            coords=coords,
+            name=name,
+            attrs=attrs,
+        )
+
+    def load_snapshot(
+        self,
+        numerical_identifier,
+        list_of_variables: list = None,
+        add_time: bool = True,
+    ) -> Type[xr.Dataset]:
+
+        dataset = xr.Dataset()
+
+        if list_of_variables is not None:
+            set_of_variables = set(list_of_variables)
+        elif self.set_of_variables:
+            set_of_variables = self.set_of_variables.copy()
+        else:
+            target_filename = self._filename_properties.get_filename_for_binary(
+                "*", numerical_identifier
+            )
+
+            list_of_variables = glob.glob(os.path.join(self.data_path, target_filename))
+            list_of_variables = map(
+                self._filename_properties.get_name_from_filename, list_of_variables
+            )
+            set_of_variables = set(list_of_variables)
+
+        if not set_of_variables:
+            raise IOError(
+                f"No file found corresponding to .{self.data_path}/{target_filename}"
+            )
+
+        def stack_variables(variables):
+            return self.load_snapshot(
+                numerical_identifier=numerical_identifier,
+                list_of_variables=variables,
+                add_time=add_time,
+            )
+
+        if self.stack_scalar:
+            scalar_variables = sorted(
+                list(
+                    filter(
+                        lambda name: len(name) == 4 and "phi" in name, set_of_variables
+                    )
+                )
+            )
+
+            if scalar_variables:
+                dataset["phi"] = (
+                    stack_variables(scalar_variables)
+                    .to_array(dim="n")
+                    .assign_coords(n=[int(var[-1]) for var in scalar_variables])
+                )
+
+                set_of_variables -= set(scalar_variables)
+
+        if self.stack_velocity:
+            velocity_variables = sorted(
+                list(filter(lambda name: name in {"ux", "uy", "uz"}, set_of_variables))
+            )
+            if velocity_variables:
+                dataset["u"] = (
+                    stack_variables(velocity_variables)
+                    .to_array(dim="i")
+                    .assign_coords(i=[var[-1] for var in velocity_variables])
+                )
+                set_of_variables -= set(velocity_variables)
+
+        for var in set_of_variables:
+            filename = self._filename_properties.get_filename_for_binary(
+                var, numerical_identifier
+            )
+            filename = os.path.join(self.data_path, filename)
+            dataset[var] = self.load_array(filename=filename, add_time=add_time)
+
+        return dataset
+
+    def load_time_series(self, array_prefix: str):
+
+        target_filename = self._filename_properties.get_filename_for_binary(
+            array_prefix, "*"
+        )
+        filename_pattern = os.path.join(self.data_path, target_filename)
+        filename_list = sorted(glob.glob(filename_pattern))
+
+        if not filename_list:
+            raise IOError(f"No file was found corresponding to {filename_pattern}.")
+
+        return xr.concat(
+            [
+                self.load_array(file, add_time=True)
+                for file in tqdm(filename_list, desc=filename_pattern)
+            ],
+            dim="t",
+        )
+
+    def write_array(self, dataArray, filename: str = None) -> None:
+        if filename is None:  # Try to get from atributes
+            filename = dataArray.attrs.get("file_name", None)
+        if filename is None:
+            warnings.warn(f"Can't write field without a filename")
+            return
+        # If n is a dimension (for scalar), call write recursively to save
+        # phi1, phi2, phi3, for instance.
+        if "n" in dataArray.dims:
+            for n, n_val in enumerate(dataArray.n.data):
+                self.write_array(
+                    dataArray.isel(n=n, drop=True), filename=f"{filename}{n_val}"
+                )
+        # If i is a dimension, call write recursively to save
+        # ux, uy and uz, for instance
+        elif "i" in dataArray.dims:
+            for i, i_val in enumerate(dataArray.i.data):
+                self.write_array(
+                    dataArray.isel(i=i, drop=True), filename=f"{filename}{i_val}"
+                )
+        # If t is a dimension (for time), call write recursively to save
+        # ux-0000.bin, ux-0001.bin, ux-0002.bin, for instance.
+        elif "t" in dataArray.dims:
+            dt = self._time_step
+            for k, time in enumerate(tqdm(dataArray.t.data, desc=filename)):
+                self.write_array(
+                    dataArray.isel(t=k, drop=True),
+                    self._filename_properties.get_filename_for_binary(
+                        prefix=filename, counter=int(time / dt),
+                    ),
+                )
+        # and finally writes to the disc
+        else:
+            fileformat = self._filename_properties.file_extension
+            if fileformat and not filename.endswith(fileformat):
+                filename += fileformat
+            align = [
+                dataArray.get_axis_num(i) for i in sorted(dataArray.dims, reverse=True)
+            ]
+            filename_and_path = os.path.join(self.data_path, filename)
+            dataArray.values.astype(param["mytype"]).transpose(align).tofile(
+                filename_and_path
+            )
 
 
 def read_time_series(
     prm, filename_pattern: str = None, filename_list: list = None, **kwargs,
 ) -> Type[xr.DataArray]:
+
     if filename_list is None:
         filename_list = sorted(glob.glob(filename_pattern))
 
     if not filename_list:
         raise IOError(f"No file was found corresponding to {filename_pattern}.")
 
-    # set or sobescribe, time is needed for the concatenation
+    # set or overwrite, time is needed for the concatenation
     kwargs["add_time"] = True
 
     return xr.concat(
@@ -379,12 +518,7 @@ def write_xdmf(
     data_path = os.path.dirname(filename_pattern)
 
     properties = zip(
-        *map(
-            lambda file: prm.filename_properties.get_info_from_filename(
-                os.path.basename(file)
-            ),
-            filename_list,
-        )
+        *map(prm.filename_properties.get_info_from_filename, filename_list,)
     )
     time_numbers, var_names = properties
     time_numbers = sorted(list(set(time_numbers)))

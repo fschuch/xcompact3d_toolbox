@@ -10,8 +10,7 @@ import warnings
 import numpy as np
 import traitlets
 
-from .io import FilenameProperties, i3d_to_dict, prm_to_dict, read_field
-from .io import read_time_series, write_xdmf, read_snapshot
+from .io import Dataset, FilenameProperties, i3d_to_dict, prm_to_dict
 from .mesh import Mesh3D
 from .param import boundary_condition, param
 
@@ -570,6 +569,8 @@ class ParametersExtras(traitlets.HasTraits):
 
     mesh = traitlets.Instance(klass=Mesh3D)
 
+    dataset = traitlets.Instance(klass=Dataset)
+
     filename_properties = traitlets.Instance(klass=FilenameProperties)
 
     dx, dy, dz = [traitlets.Float().tag() for _ in "x y z".split()]
@@ -587,8 +588,13 @@ class ParametersExtras(traitlets.HasTraits):
     def __init__(self):
         super(ParametersExtras, self).__init__()
         self.mesh = Mesh3D()
+
         self.filename_properties = FilenameProperties()
         self._link_mesh_and_parameters()
+
+        self.dataset = Dataset(
+            **dict(_mesh=self.mesh, _filename_properties=self.filename_properties)
+        )
 
     def _link_mesh_and_parameters(self):
         for dim in "xyz":
@@ -1084,7 +1090,7 @@ class Parameters(
         .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
         """
 
-        return read_field(self, **kwargs)
+        return #read_field(self, **kwargs)
 
     def read_time_series(self, **kwargs):
         """Reads all files matching the ``filename_pattern`` with
@@ -1144,11 +1150,11 @@ class Parameters(
 
         """
 
-        return read_time_series(self, **kwargs)
+        return #read_time_series(self, **kwargs)
 
     def read_snapshot(self, **kwargs):
 
-        return read_snapshot(self, **kwargs)
+        return #read_snapshot(self, **kwargs)
 
     def write(self):
         """Writes all valid attributes to an ``.i3d`` file.
@@ -1198,7 +1204,7 @@ class Parameters(
         >>> prm.write_xdmf()
 
         """
-        write_xdmf(self, **kwargs)
+        #write_xdmf(self, **kwargs)
 
     def get_mesh(self, refined_for_ibm=False):
         """Get mesh point locations for the three coordinates. They are stored
@@ -1232,6 +1238,6 @@ class Parameters(
                 new_grid_size = getattr(self.mesh, dim)._sub_grid_size * self.nraf
                 if not getattr(self.mesh, dim).is_periodic:
                     new_grid_size += 1
-                getattr(copy, dim).set(grid_size = new_grid_size)
+                getattr(copy, dim).set(grid_size=new_grid_size)
             return copy.get()
         return self.mesh.get()
