@@ -44,28 +44,26 @@ from .mesh import Mesh3D
 
 
 class FilenameProperties(traitlets.HasTraits):
-    """[summary]
+    """Filename properties are important to guarantee consistency for input/output operations.
+    This class makes xcompact3d-toolbox work with different types of file names for the binary
+    fields produced from the numerical simulations and their pre/postprocessing.
 
     Parameters
     ----------
     separator : str
-        [description]
+        The string used as separator between the name of the variable and its numeration, it
+        can be an empty string (default is `"-"`).
     file_extension : str
-        [description]
-    number_of_digits : int or None
-        [description]
-
-    Returns
-    -------
-    [type]
-        [description]
+        The file extension that identify the raw binary files from XCompact3d, it
+        can be an empty string (default is `".bin"`).
+    number_of_digits : int
+        Tue number of numerical digits used to identify the time series (default is `3`).
 
     Raises
     ------
-    IOError
-        It is not possible to get information from filename if `separator`
-        is an empty string and `number_of_digits` is None.
-    
+    KeyError
+        Raises an error if the user tries to set an invalid property.
+
     Examples
     --------
 
@@ -73,15 +71,17 @@ class FilenameProperties(traitlets.HasTraits):
     configuration, there is no need to specify filename properties. But just in case,
     it would be like:
 
-    >>> xcompact3d_toolbox.FilenameProperties(
+    >>> import xcompact3d_toolbox as x3d
+    >>> prm = x3d.Parameters()
+    >>> prm.dataset.filename_properties.set(
     ...     separator = "-",
     ...     file_extension = ".bin",
     ...     number_of_digits = 3
     ... )
 
-    If the simulated fields are named like `ux0000`:
+    If the simulated fields are named like `ux0000`, the parameters are:
 
-    >>> xcompact3d_toolbox.FilenameProperties(
+    >>> prm.dataset.filename_properties.set(
     ...     separator = "",
     ...     file_extension = "",
     ...     number_of_digits = 4
@@ -91,7 +91,7 @@ class FilenameProperties(traitlets.HasTraits):
 
     separator = traitlets.Unicode(default_value="-")
     file_extension = traitlets.Unicode(default_value=".bin")
-    number_of_digits = traitlets.Int(default_value=3, min=1, allow_none=True)
+    number_of_digits = traitlets.Int(default_value=3, min=1)
 
     def __init__(self, **kwargs):
         super(FilenameProperties).__init__()
@@ -108,27 +108,29 @@ class FilenameProperties(traitlets.HasTraits):
         return string
 
     def set(self, **kwargs) -> None:
-        """[summary]
+        """Set new values for any of the properties.
         """
         for key, arg in kwargs.items():
             if key not in self.trait_names():
-                warnings.warn(f"{key} is not a valid parameter and was not loaded")
+                raise KeyError(
+                    f"{key} is not a valid argument for FilenameProperties"
+                )
             setattr(self, key, arg)
 
     def get_filename_for_binary(self, prefix: str, counter: int, data_path="") -> str:
-        """[summary]
+        """Get the filename for an array.
 
         Parameters
         ----------
         prefix : str
-            [description]
+            Name of the array.
         counter : int
-            [description]
+            The number that identifies this array.
 
         Returns
         -------
         str
-            [description]
+            The filename
         """
         if counter == "*":
             counter = "?" * self.number_of_digits
@@ -137,58 +139,105 @@ class FilenameProperties(traitlets.HasTraits):
             filename = os.path.join(data_path, filename)
         return filename
 
-    def get_num_from_filename(self, filename: str) -> int:
-        num, _ = self.get_info_from_filename(filename)
-        return num
-
-    def get_name_from_filename(self, filename: str) -> int:
-        _, name = self.get_info_from_filename(filename)
-        return name
-
     def get_info_from_filename(self, filename: str) -> tuple[int, str]:
-        """[summary]
+        """ Get information from the name of an array.
 
         Parameters
         ----------
         filename : str
-            [description]
+            The name of the array.
 
         Returns
         -------
         tuple[int, str]
-            [description]
+            A tuple with the name of the array and the number that identifies it.
 
-        Raises
-        ------
-        IOError
-            It is not possible to get information from filename if `separator`
-            is an empty string and `number_of_digits` is None.
         """
         _filename = os.path.basename(filename)
         if self.file_extension:
             _filename = _filename[: -len(self.file_extension)]
         if self.separator:
             prefix, counter = _filename.split(self.separator)
-        elif self.number_of_digits is not None:
+        else:
             prefix = _filename[: -self.number_of_digits]
             counter = _filename[-self.number_of_digits :]
-        else:
-            raise IOError(
-                "Impossible to get time from filename without separator or number of digits"
-            )
         return int(counter), prefix
+
+    def get_num_from_filename(self, filename: str) -> int:
+        """Same as get_info_from_filename, but just returns the number
+        """        
+        num, _ = self.get_info_from_filename(filename)
+        return num
+
+    def get_name_from_filename(self, filename: str) -> int:
+        """Same as get_info_from_filename, but just returns the name
+        """        
+        _, name = self.get_info_from_filename(filename)
+        return name
 
 
 class Dataset(traitlets.HasTraits):
+    """[summary]
 
+    Parameters
+    ----------
+    data_path : str
+        The path to the folder where the binary fields are located (default is `"./data/"`).
+    drop_coords : str
+        If working with two-dimensional planes, specify which of the coordinates should be
+        dropped, i.e., `"x"`, `"y"` or `"z"`, or leave it empty for 3D fields (default is `""`).
+    filename_properties : `obj:FilenameProperties`
+        Specifies filename properties for the binary files, like the separator, file extension and
+        number of digits.
+    set_of_variables : set
+        The methods try to find all variables per snapshot, use this parameter
+        to work with just a few specified variables (default is an empty set).
+    snapshot_counting : str
+        The parameter that controls the number of timesteps used to produce tha datasets
+        (default is `"ilast"`).
+    snapshot_step : str
+        The parameter that controls the number of timesteps between each snapshot, it is often
+        `"ioutput"` or `"iprocessing"` (default is `"ioutput"`).
+    stack_scalar : bool
+        When `True`, the scalar fields will be stacked in a new coordinate `n`, otherwise returns one
+        array per scalar fraction (default is `False`).
+    stack_velocity : bool
+        When `True`, the velocity will be stacked in a new coordinate `i` , otherwise returns one
+        array per velocity component (default is `False`).
+
+    Returns
+    -------
+    `obj:Dataset`
+        An object to read and write the raw binary files from XCompact3d on-demand.
+
+    Yields
+    -------
+    `obj:xarray.Dataset`
+        [description]
+
+    Raises
+    ------
+    TypeError
+        [description]
+    KeyError
+        [description]
+    IOError
+        [description]
+    IOError
+        [description]
+    IOError
+        [description]
+    IOError
+        [description]
+    """    
     data_path = traitlets.Unicode(default_value="./data/")
-    snapshot_step = traitlets.Unicode(default_value="ioutput")
-    snapshot_counting = traitlets.Unicode(default_value="ilast")
-    set_of_variables = traitlets.Set()
     drop_coords = traitlets.Unicode(default_value="")
-    stack_velocity = traitlets.Bool(default_value=False)
-    stack_scalar = traitlets.Bool(default_value=False)
     filename_properties = traitlets.Instance(klass=FilenameProperties)
+    set_of_variables = traitlets.Set()
+    snapshot_counting = traitlets.Unicode(default_value="ilast")
+    snapshot_step = traitlets.Unicode(default_value="ioutput")
+    stack_scalar = traitlets.Bool(default_value=False)
+    stack_velocity = traitlets.Bool(default_value=False)
 
     _mesh = traitlets.Instance(klass=Mesh3D)
     _prm = traitlets.Instance(
@@ -254,7 +303,9 @@ class Dataset(traitlets.HasTraits):
 
         for key, arg in kwargs.items():
             if key not in self.trait_names():
-                warnings.warn(f"{key} is not a valid parameter and was not defined")
+                raise KeyError(
+                    f"{key} is not a valid argument for Dataset"
+                )
             setattr(self, key, arg)
 
     def load_array(self, filename: str, add_time=True, attrs: dict = None):
