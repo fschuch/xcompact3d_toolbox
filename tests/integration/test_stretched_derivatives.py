@@ -21,11 +21,12 @@ class test_stretched_derive(unittest.TestCase):
 
                         tol = 1e-1
 
-                        prm.istret = istret
-                        prm.beta = beta
-
-                        prm.ncly1 = int(BC[0])
-                        prm.nclyn = int(BC[1])
+                        prm.set(
+                            istret = istret,
+                            beta = beta,
+                            ncly1 = int(BC[0]),
+                            nclyn = int(BC[1])
+                        )
 
                         ds = init_dataset(prm).isel(x=0, z=0)
 
