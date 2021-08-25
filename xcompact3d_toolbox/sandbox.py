@@ -72,7 +72,7 @@ def init_epsi(prm, dask=False):
 
     if prm.iibm == 2:
         # Getting refined mesh
-        mesh_raf = prm.get_mesh(raf=True)
+        mesh_raf = prm.get_mesh(refined_for_ibm=True)
         # Three additional versions are needed if iibm = 2,
         # each one refined in one dimension by a factor nraf
         fields["xepsi"] = (mesh_raf["x"], mesh["y"], mesh["z"])
