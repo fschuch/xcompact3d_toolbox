@@ -63,7 +63,7 @@ def init_epsi(prm, dask=False):
 
     from os import makedirs
 
-    makedirs(os.path.join("data", "geometry"), exist_ok=True)
+    makedirs(os.path.join(prm.dataset.data_path, "geometry"), exist_ok=True)
 
     mesh = prm.get_mesh()
 
@@ -92,7 +92,7 @@ def init_epsi(prm, dask=False):
 
     # With 'file_name' attribute, we make sure that epsi will be written to disc,
     # while the refined versions are not needed
-    epsi["epsi"].attrs = {"file_name": os.path.join("data", "geometry", "epsilon")}
+    epsi["epsi"].attrs = {"file_name": os.path.join("geometry", "epsilon")}
 
     # Turns on lazy parallel execution with dask arrays
     if dask == True:

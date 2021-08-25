@@ -17,6 +17,8 @@ can approach the speeds of C or FORTRAN.
 
 """
 
+import os.path
+
 import numba
 import numpy as np
 import xarray as xr
@@ -176,29 +178,26 @@ def gene_epsi_3D(epsi_in_dict, prm):
         )
 
     def verif_epsi(epsi, dim):
-        """Gets the indexes where Lagrangian interpolator starts/ends
-           at each side of each object
-        """
 
         @numba.jit
         def verif(epsi):
-            nxipif = npif * np.ones((max_obj), dtype=np.int64)
-            nxfpif = npif * np.ones_like(nxipif)
-            ising, inum, iflu = 0, -1, 0
+            nxipif = npif * np.ones((max_obj + 1), dtype=np.int64)
+            nxfpif = nxipif.copy()
+            ising, inum, iflu = 0, 0, 0
             if epsi[0]:
                 inum += 1
-            if not epsi[0]:
+            else:
                 iflu += 1
             for i in range(1, epsi.size):
                 if not epsi[i]:
                     iflu += 1
-                if not epsi[i - 1] and epsi[i]:
+                if (not epsi[i - 1]) and (epsi[i]):
                     inum += 1
                     if inum == 0:
                         nxipif[inum] = iflu - izap
                         if iflu - izap < npif:
                             ising += 1
-                        if iflu - izap >= npif:
+                        else:
                             nxipif[inum] = npif
                         iflu = 0
                     else:
@@ -206,7 +205,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
                         nxfpif[inum - 1] = iflu - izap
                         if iflu - izap < npif:
                             ising += 1
-                        if iflu - izap >= npif:
+                        else:
                             nxipif[inum] = npif
                             nxfpif[inum - 1] = npif
                         iflu = 0
@@ -224,7 +223,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
             verif,
             epsi,
             input_core_dims=[[dim]],
-            output_core_dims=[["obj"], ["obj"], ["c"]],
+            output_core_dims=[["obj_aux"], ["obj_aux"], ["c"]],
             vectorize=True,
             dask="parallelized",
             output_dtypes=[np.int64, np.int64, np.int64],
@@ -262,9 +261,11 @@ def gene_epsi_3D(epsi_in_dict, prm):
 
     max_obj = np.max([ds.nobjmax_x.values, ds.nobjmax_y.values, ds.nobjmax_z.values])
     prm.nobjmax = int(max_obj)  # using int to be consistent with traitlets types
-    ds = ds.assign_coords(obj=np.arange(0, max_obj))
+    ds = ds.assign_coords(obj=range(max_obj), obj_aux=range(-1, max_obj))
 
-    for dir, ep, l in zip(["x", "y", "z"], [xepsi, yepsi, zepsi], [prm.xlx, prm.yly, prm.zlz]):
+    for dir, ep, l in zip(
+        ["x", "y", "z"], [xepsi, yepsi, zepsi], [prm.xlx, prm.yly, prm.zlz]
+    ):
 
         ds[f"xi_{dir}"], ds[f"xf_{dir}"] = get_boundaries(ep, dir, max_obj, l)
 
@@ -288,33 +289,42 @@ def gene_epsi_3D(epsi_in_dict, prm):
         )
 
     write_geomcomplex(prm, ds)
-    
+
     return ds
+
 
 def write_geomcomplex(prm, ds) -> None:
     def write_nobj(array, dim) -> None:
-        with open(f"nobj{dim}.dat", "w") as file:
-            for value in array.T.values.flatten():
+        with open(os.path.join(data_path, f"nobj{dim}.dat"), "w", newline="\n") as file:
+            for value in transpose_n_flatten(array):
                 file.write(f"{value:12d}\n")
 
     def write_nxipif(array1, array2, dim) -> None:
-        transpose_order = sorted(array1.dims, reverse= True)
-        _array1 = array1.transpose(*transpose_order).values.flatten()
-        _array2 = array2.transpose(*transpose_order).values.flatten()
-        with open(f"n{dim}ifpif.dat", "w") as file:
+        _array1 = transpose_n_flatten(array1)
+        _array2 = transpose_n_flatten(array2)
+        with open(
+            os.path.join(data_path, f"n{dim}ifpif.dat"), "w", newline="\n"
+        ) as file:
             for value1, value2 in zip(_array1, _array2):
                 file.write(f"{value1:12d}{value2:12d}\n")
-    
+
     def write_xixf(array1, array2, dim) -> None:
-        transpose_order = sorted(array1.dims, reverse= True)
-        _array1 = array1.transpose(*transpose_order).values.flatten()
-        _array2 = array2.transpose(*transpose_order).values.flatten()
-        with open(f"{dim}i{dim}f.dat", "w") as file:
+        _array1 = transpose_n_flatten(array1)
+        _array2 = transpose_n_flatten(array2)
+        with open(
+            os.path.join(data_path, f"{dim}i{dim}f.dat"), "w", newline="\n"
+        ) as file:
             for value1, value2 in zip(_array1, _array2):
-                file.write(f"{value1:14.6e}{value2:14.6e}\n")
+                file.write(f"{value1:14.6E}{value2:14.6E}\n")
+
+    def transpose_n_flatten(array):
+        if len(array.coords) == 3:
+            return array.values.transpose(1, 0, 2).flatten()
+        return array.values.T.flatten()
 
     print("\nWriting...")
-    prm.dataset(ds["epsi"], "epsi.bin")
+    data_path = os.path.join(prm.dataset.data_path, "geometry")
+    prm.dataset.write(ds["epsi"])
     for dir in ["x", "y", "z"]:
         write_nobj(ds[f"nobj_{dir}"], dir)
         write_nxipif(ds[f"nxipif_{dir}"], ds[f"nxfpif_{dir}"], dir)
