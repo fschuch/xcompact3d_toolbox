@@ -115,70 +115,12 @@ def gene_epsi_3D(epsi_in_dict, prm):
             output_dtypes=[np.float64, np.float64],
         )
 
-    def fix_bug(xi, xf, nobjx, nobjxraf, epsi, epsiraf, nraf, max_obj, dim):
-        @numba.jit
-        def fix(xi, xf, nobj, nobjraf, epsi, epsiraf, nraf, max_obj):
-
-            if nobj != nobjraf:
-                iobj = -1
-                if epsi[0]:
-                    iobj += 1
-                for i in range(epsi.size - 1):
-                    if not epsi[i] and epsi[i + 1]:
-                        iobj += 1
-                    if not epsi[i] and not epsi[i + 1]:
-                        iflu = 1
-                    if epsi[i] and epsi[i + 1]:
-                        isol = 1
-                    for iraf in range(nraf):
-                        if (
-                            not epsiraf[iraf + nraf * i]
-                            and epsiraf[iraf + nraf * i + 1]
-                        ):
-                            idebraf = iraf + 1 + nraf * i + 1
-                        if (
-                            epsiraf[iraf + nraf * i]
-                            and not epsiraf[iraf + nraf * i + 1]
-                        ):
-                            ifinraf = iraf + 1 + nraf * i + 1
-                    if (
-                        idebraf != 0
-                        and ifinraf != 0
-                        and idebraf < ifinraf
-                        and iflu == 1
-                    ):
-                        iobj += 1
-                        for ii in range(iobj, max_obj):
-                            xi[ii] = xi[ii + 1]
-                            xf[ii] = xf[ii + 1]
-                        iobj -= 1
-                    if (
-                        idebraf != 0
-                        and ifinraf != 0
-                        and idebraf > ifinraf
-                        and isol == 1
-                    ):
-                        iobj += 1
-                        for ii in range(iobj, max_obj):
-                            xi[ii] = xi[ii + 1]
-                        iobj -= 1
-                        for ii in range(iobj, max_obj):
-                            xf[ii] = xf[ii + 1]
-                    idebraf, ifinraf, iful = 0, 0, 0
-
-        return xr.apply_ufunc(
-            fix,
-            epsiraf,
-            epsiraf[dim],
-            input_core_dims=[[dim], [dim]],
-            output_core_dims=[["obj"], ["obj"]],
-            vectorize=True,
-            dask="parallelized",
-            output_dtypes=[np.float64, np.float64],
+    def fix_bug(*args, **kwargs):
+        raise NotImplementedError(
+            "Not implemented yet. Please, report your test case to https://github.com/fschuch/xcompact3d_toolbox/issues/3"
         )
 
     def verif_epsi(epsi, dim):
-
         @numba.jit
         def verif(epsi):
             nxipif = npif * np.ones((max_obj + 1), dtype=np.int64)
@@ -315,7 +257,7 @@ def write_geomcomplex(prm, ds) -> None:
             os.path.join(data_path, f"{dim}i{dim}f.dat"), "w", newline="\n"
         ) as file:
             for value1, value2 in zip(_array1, _array2):
-                file.write(f"{value1:14.6E}{value2:14.6E}\n")
+                file.write(f"{value1:24.16E}{value2:24.16E}\n")
 
     def transpose_n_flatten(array):
         if len(array.coords) == 3:
