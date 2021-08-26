@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Manipulate physical and computational parameters. It contains variables and
+A class to manipulate the physical and computational parameters. It contains variables and
 methods designed to be a bridge between Xcompact3d and Python applications for
 pre and post-processing.
 """
@@ -38,7 +38,7 @@ class ParametersBasicParam(traitlets.HasTraits):
         http://www.2decomp.org
     """
 
-    itype = traitlets.Int(default_value=10, min=0, max=10).tag(
+    itype = traitlets.Int(default_value=12, min=0, max=12).tag(
         group="BasicParam",
         desc="Flow configuration (1:Lock-exchange, 2:TGV, 3:Channel, and others)",
     )
@@ -49,17 +49,21 @@ class ParametersBasicParam(traitlets.HasTraits):
     * 1 - Turbidity Current in Lock-Release;
     * 2 - Taylor-Green Vortex;
     * 3 - Periodic Turbulent Channel;
+    * 4 - Periodic Hill
     * 5 - Flow around a Cylinder;
     * 6 - Debug Schemes (for developers);
     * 7 - Mixing Layer;
+    * 8 - Jet;
     * 9 - Turbulent Boundary Layer;
-    * 10 - `Sandbox`_.
+    * 10 - ABL;
+    * 11 - Uniform;
+    * 12 - `Sandbox`_.
 
     .. _Xcompact3d/src:
-        https://github.com/fschuch/Xcompact3d/tree/master/src
+        https://github.com/xcompact3d/Incompact3d/tree/master/src
     """
 
-    iin = traitlets.Int(default_value=0, min=0, max=2).tag(
+    iin = traitlets.Int(default_value=0, min=0, max=3).tag(
         group="BasicParam", desc="Defines perturbation at initial condition"
     )
     """int: Defines perturbation at the initial condition:
@@ -68,7 +72,8 @@ class ParametersBasicParam(traitlets.HasTraits):
     * 1 - Random noise with amplitude of :obj:`init_noise`;
     * 2 - Random noise with fixed seed
       (important for reproducibility, development and debugging)
-      and amplitude of :obj:`init_noise`.
+      and amplitude of :obj:`init_noise`;
+    * 3 - Read inflow planes.
 
     Notes
     -----
@@ -179,7 +184,7 @@ class ParametersBasicParam(traitlets.HasTraits):
     """int: Enables Large-Eddy methodologies:
 
         * 0 - No (also forces :obj:`nu0nu` and :obj:`cnu` to 4.0 and 0.44, respectively);
-        * 1 - Yes (alse activates the namespace **LESModel**, with variables like :obj:`jles`).
+        * 1 - Yes (also activates the namespace **LESModel**, with variables like :obj:`jles`).
     """
 
     istret = traitlets.Int(default_value=0, min=0, max=3).tag(
@@ -254,7 +259,7 @@ class ParametersBasicParam(traitlets.HasTraits):
         Only necessary if :obj:`nclx1` is equal to 2.
     """
 
-    iibm = traitlets.Int(default_value=0, min=0, max=2).tag(
+    iibm = traitlets.Int(default_value=0, min=0, max=3).tag(
         group="BasicParam", desc="Flag for immersed boundary method (0: No, 1: Yes)"
     )
     """int: Enables Immersed Boundary Method (IBM):
@@ -264,7 +269,8 @@ class ParametersBasicParam(traitlets.HasTraits):
       it sets velocity to zero inside the solid body;
     * 2 - On with alternating forcing method, i.e, it uses
       Lagrangian Interpolators to define the velocity inside the body
-      and imposes no-slip condition at the solid/fluid interface.
+      and imposes no-slip condition at the solid/fluid interface;
+    * 3 - Cubic Spline Reconstruction;
 
     Any option greater than zero activates the namespace **ibmstuff**, for variables like :obj:`nobjmax` and :obj:`nraf`.
     """
@@ -291,8 +297,35 @@ class ParametersBasicParam(traitlets.HasTraits):
     """float: Component of the unitary vector pointing in the gravity's direction.
     """
 
+    iscalar = traitlets.Int(default_value=0, min=0, max=1).tag(group="BasicParam")
+
+    ilmn = traitlets.Bool(default_value=False).tag(group="BasicParam")
+
+    u1 = traitlets.Float(default_value=2.0).tag(group="BasicParam")
+
+    u2 = traitlets.Float(default_value=1.0).tag(group="BasicParam")
+
+    ifilter = traitlets.Int(default_value=0, min=0, max=3).tag(group="BasicParam")
+
+    C_filter = traitlets.Float(default_value=0.49).tag(group="BasicParam")
+
+    iturbine = traitlets.Int(default_value=0, min=0, max=2).tag(group="BasicParam")
+
     def __init__(self):
         super(ParametersBasicParam, self).__init__()
+
+    @traitlets.validate("iscalar")
+    def _validate_iscalar(self, proposal):
+        if proposal.get("value") == 0 and self.numscalar > 0:
+            raise traitlets.TraitError(f"iscalar can not be zero if numscalar > 0")
+        return proposal.get("value")
+
+    @traitlets.observe("numscalar")
+    def _observe_numscalar(self, change):
+        if change.get("new") == 0:
+            self.iscalar = 0
+        else:
+            self.iscalar = 1
 
 
 class ParametersNumOptions(traitlets.HasTraits):
@@ -319,17 +352,26 @@ class ParametersNumOptions(traitlets.HasTraits):
 
     ipinter = traitlets.Int(3)
 
-    itimescheme = traitlets.Int(default_value=3, min=1, max=7).tag(
+    itimescheme = traitlets.Int(default_value=3, min=1, max=6).tag(
         group="NumOptions",
         desc="Time integration scheme (1: Euler, 2: AB2, 3: AB3, 5: RK3)",
     )
     """int: Time integration scheme:
 
-    * 1 - Euler;
-    * 2 - AB2;
-    * 3 - AB3 (default);
-    * 5 - RK3;
-    * 7 - Semi-implicit.
+    * 1 - Forwards Euler;
+    * 2 - Adams-bashforth 2;
+    * 3 - Adams-bashforth 3 (default);
+    * 4 - Adams-bashforth 4 (Not Implemented);
+    * 5 - Runge-kutta 3;
+    * 6 - Runge-kutta 4 (Not Implemented).
+    """
+
+    iimplicit = traitlets.Int(default_value=0, min=0, max=2).tag(group="NumOptions")
+    """int: Time integration scheme:
+
+    * 0 - Off (default);
+    * 1 - With backward Euler for Y diffusion;
+    * 2 - With CN for Y diffusion.
     """
 
     nu0nu = traitlets.Float(default_value=4, min=0.0).tag(
@@ -348,6 +390,21 @@ class ParametersNumOptions(traitlets.HasTraits):
 
     def __init__(self):
         super(ParametersNumOptions, self).__init__()
+
+    @traitlets.observe("ilesmod")
+    def _observe_ilesmod(self, change):
+        if change["new"] == 0:
+            # It is coded at xcompact3d, look at parameters.f90
+            self.nu0nu, self.cnu = 4.0, 0.44
+
+    @traitlets.validate("nu0nu", "cnu")
+    def _validate_iscalar(self, proposal):
+        if self.ilesmod == 0:
+            # It is coded at xcompact3d, look at parameters.f90
+            raise traitlets.TraitError(
+                f"Can not set new values for nu0nu and cnu if ilesmod = 0"
+            )
+        return proposal.get("value")
 
 
 class ParametersInOutParam(traitlets.HasTraits):
@@ -381,23 +438,17 @@ class ParametersInOutParam(traitlets.HasTraits):
     """int: Frequency for online postprocessing.
     """
 
-    filenamedigits = traitlets.Int(default_value=0, min=0, max=1).tag(
-        group="InOutParam",
-        desc="Controls the way that the output binary files are enumerated",
-    )
-    """int: Controls the way that the output binary files are enumerated:
+    ninflows = traitlets.Int(default_value=1, min=1).tag(group="NumOptions")
 
-    * 0 - Files receive the number according to the current timestep (default);
-    * 1 - Continuous counting.
-    """
+    ntimesteps = traitlets.Int(default_value=1, min=1).tag(group="NumOptions")
 
-    ifilenameformat = traitlets.Unicode(default_value="(I9.9)").tag(
-        group="InOutParam",
-        desc="The number of digits used to name the output binary files",
-    )
-    """str: The number of digits used to name the output binary files,
-    in Fortran format (default is ``(I9.9)``).
-    """
+    inflowpath = traitlets.Unicode(default_value="./")
+
+    ioutflow = traitlets.Int(default_value=0).tag(group="NumOptions")
+
+    output2D = traitlets.Int(default_value=0).tag(group="NumOptions")
+
+    nprobes = traitlets.Int(default_value=0, min=0).tag(group="NumOptions")
 
     def __init__(self):
         super(ParametersInOutParam, self).__init__()
@@ -438,26 +489,6 @@ class ParametersScalarParam(traitlets.HasTraits):
         group="ScalarParam", desc="Upper scalar bound(s), for clipping methodology."
     )
     """:obj:`list` of :obj:`float`: Upper scalar bound(s), for clipping methodology.
-    """
-
-    iibmS = traitlets.Int(default_value=0, min=0, max=3).tag(
-        group="ScalarParam",
-        desc="Enables Immersed Boundary Method (IBM) for scalar field(s) (alpha version)",
-    )
-    """int: Enables Immersed Boundary Method (IBM) for scalar field(s):
-
-    * 0 - Off (default);
-    * 1 - On with direct forcing method, i.e.,
-      it sets scalar concentration to zero inside the solid body;
-    * 2 - On with alternating forcing method, i.e, it uses
-      Lagrangian Interpolators to define the scalar field inside the body
-      and imposes zero value at the solid/fluid interface.
-    * 3 - On with alternating forcing method, but now the Lagrangian
-      Interpolators are set to impose no-flux for the scalar field at the
-      solid/fluid interface.
-
-      .. note:: It is only recommended if the normal vectors to the object's
-            faces are aligned with one of the coordinate axes.
     """
 
     nclxS1 = traitlets.Int(default_value=2, min=0, max=2).tag(
@@ -520,6 +551,13 @@ class ParametersScalarParam(traitlets.HasTraits):
     * 2 - Dirichlet.
     """
 
+    sc_even = traitlets.List(trait=traitlets.Bool()).tag(group="ScalarParam")
+    sc_skew = traitlets.List(trait=traitlets.Bool()).tag(group="ScalarParam")
+    alpha_sc = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam")
+    beta_sc = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam")
+    g_sc = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam")
+    T_ref = trait=traitlets.Float().tag(group="ScalarParam")
+
     def __init__(self):
         super(ParametersScalarParam, self).__init__()
 
@@ -538,6 +576,13 @@ class ParametersLESModel(traitlets.HasTraits):
     * 4 - iSVV.
 
     """
+
+    smagcst = traitlets.Float().tag(group="LESModel")
+    smagwalldamp = traitlets.Int(default_value=0).tag(group="LESModel")
+    nSmag = traitlets.Float(default_value=1.0).tag(group="LESModel")
+    walecst = traitlets.Float().tag(group="LESModel")
+    maxdsmagcst = traitlets.Float().tag(group="LESModel")
+    iwall = traitlets.Int().tag(group="LESModel")
 
     def __init__(self):
         super(ParametersLESModel, self).__init__()
@@ -589,7 +634,7 @@ class ParametersExtras(traitlets.HasTraits):
 
         self._link_mesh_and_parameters()
 
-        self.dataset = Dataset(**dict(_mesh=self.mesh, _prm = self))
+        self.dataset = Dataset(**dict(_mesh=self.mesh, _prm=self))
 
     def _link_mesh_and_parameters(self):
         for dim in "xyz":
@@ -834,12 +879,6 @@ class Parameters(
             except:
                 self.p_row = 0
 
-    @traitlets.observe("ilesmod")
-    def _observe_ilesmod(self, change):
-        if change["new"] == 0:
-            # It is coded at xcompact3d, look at parameters.f90
-            self.nu0nu, self.cnu = 4.0, 0.44
-
     @traitlets.observe(
         "numscalar",
         "nx",
@@ -960,8 +999,8 @@ class Parameters(
         return boundary_condition(self, var)
 
     def set(self, **kwargs):
-        # Boundary conditions are high priority in order to avoid bugs
-        for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn".split():
+        # They are high priority in order to avoid erros with validations and observations
+        for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn numscalar ilesmod".split():
             if bc in kwargs:
                 setattr(self, bc, kwargs.get(bc))
 
