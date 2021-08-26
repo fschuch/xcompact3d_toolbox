@@ -1,5 +1,10 @@
+"""Objects to handle the coordinates and coordinate system.
+Note they are an atribute at :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
+so they work together with all the other parameters. They are presented here for reference.
 """
-"""
+from __future__ import annotations
+
+from typing import Type
 
 import numpy as np
 import traitlets
@@ -8,6 +13,30 @@ from .param import param
 
 
 class Coordinate(traitlets.HasTraits):
+    """A coordinate.
+
+    Parameters
+    ----------
+    length : float
+        Length of the coordinate (default is 1.0).
+    grid_size : int
+        Number of mesh points (default is 17).
+    delta : float
+        Mesh resolution (default is 0.0625).
+    is_periodic : bool
+        Specifies if the boundary condition is periodic (True) or not (False) (default is False).
+
+    Notes
+    -----
+        There is no need to specify both :obj:`length` and :obj:`delta`, because they are
+        a function of each other, the missing value is automatically computed from the other.
+
+    Returns
+    -------
+    :obj:`xcompact3d_toolbox.mesh.Coordinate`
+        Coordinate
+    """
+
     length = traitlets.Float(default_value=1.0, min=0.0, max=1e10)
     grid_size = traitlets.Int(default_value=17)
     delta = traitlets.Float(default_value=0.0625, min=0.0)
@@ -17,11 +46,50 @@ class Coordinate(traitlets.HasTraits):
     _possible_grid_size = traitlets.List(trait=traitlets.Int())
 
     def __init__(self, **kwargs):
+        """Initializes the Coordinate class.
+
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments for attributes, like :obj:`grid_size`, :obj:`length` and so on.
+
+        Raises
+        -------
+        KeyError
+            Exception is raised when an Keyword arguments is not a valid attribute.
+
+        Examples
+        --------
+
+        >>> from xcompact3d_toolbox.mesh import Coordinate
+        >>> coord = Coordinate(length = 1.0, grid_size = 9, is_periodic = False)
+        """
 
         self._possible_grid_size = _possible_size_not_periodic
         self.set(**kwargs)
 
-    def __array__(self):
+    def __array__(self) -> Type(np.ndarray):
+        """This method makes the coordinate automatically work as a numpy
+        like array in any function from numpy.
+
+        Returns
+        -------
+        :obj:`numpy.ndarray`
+            A numpy array.
+        
+        Examples
+        --------
+
+        >>> from xcompact3d_toolbox.mesh import Coordinate
+        >>> import numpy
+        >>> coord = Coordinate(length = 1.0, grid_size = 9)
+        >>> numpy.sin(coord)
+        array([0.        , 0.12467473, 0.24740396, 0.36627253, 0.47942554,
+               0.58509727, 0.68163876, 0.7675435 , 0.84147098])
+        >>> np.cos(coord)
+        array([1.        , 0.99219767, 0.96891242, 0.93050762, 0.87758256,
+                0.81096312, 0.73168887, 0.64099686, 0.54030231])
+        """        
         return np.linspace(
             start=0.0,
             stop=self.length,
@@ -31,13 +99,45 @@ class Coordinate(traitlets.HasTraits):
         )
 
     def __len__(self):
+        """Make the coordinate work with the Python function :obj:`len`.
+
+        Returns
+        -------
+        int
+            Coordinate size (:obj:`grid_size`)
+        
+        Examples
+        --------
+
+        >>> from xcompact3d_toolbox.mesh import Coordinate
+        >>> coord = Coordinate(grid_size = 9)
+        >>> len(coord)
+        9
+        """              
         return self.grid_size
 
     def __repr__(self):
         return f"{self.__class__.__name__}(length = {self.length}, grid_size = {self.grid_size}, is_periodic = {self.is_periodic})"
 
     def set(self, **kwargs) -> None:
-        """[summary]
+        """Set a new value for any parameter after the initialization.
+        
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments for attributes, like :obj:`grid_size`, :obj:`length` and so on.
+
+        Raises
+        -------
+        KeyError
+            Exception is raised when an Keyword arguments is not a valid attribute.
+
+        Examples
+        --------
+
+        >>> from xcompact3d_toolbox.mesh import Coordinate
+        >>> coord = Coordinate()
+        >>> coord.set(length = 1.0, grid_size = 9, is_periodic = False)
         """
         if "is_periodic" in kwargs:
             self.is_periodic = kwargs.get("is_periodic")
@@ -92,19 +192,98 @@ class Coordinate(traitlets.HasTraits):
             self.length = new_length
 
     @property
-    def vector(self) -> type[np.ndarray]:
+    def vector(self) -> Type(np.ndarray):
+        """Construct a vector with :obj:`numpy.linspace` and return it.
+
+        Returns
+        -------
+        :obj:`numpy.ndarray`
+            Numpy array.
+        """
         return self.__array__()
 
     @property
     def size(self) -> int:
+        """An alias for :obj:`grid_size`.
+
+        Returns
+        -------
+        int
+            Grid size
+        """
         return self.grid_size
 
     @property
-    def possible_grid_size(self) -> type[np.ndarray]:
+    def possible_grid_size(self) -> list:
+        """Possible values for grid size.
+
+        Due to restrictions at the FFT library, they must be equal to:
+
+        .. math::
+            n_i = 2^{1+a} \\times 3^b \\times 5^c,
+
+        if the coordinate is periodic, and:
+
+        .. math::
+            n_i = 2^{1+a} \\times 3^b \\times 5^c + 1,
+
+        otherwise, where :math:`a`, :math:`b` and :math:`c` are non negative integers,
+        and :math:`i` representes the three coordinates (**x**, **y** and **z**).
+
+        Aditionally, the derivative's stencil imposes that :math:`n_i \\ge 8` if periodic
+        and :math:`n_i \\ge 9` otherwise.
+
+        Returns
+        -------
+        list
+            Possible values for grid size
+
+        Notes
+        -----
+        There is no upper limit, as long as the restrictions are satisfied.
+
+        Examples
+        --------
+
+        >>> from xcompact3d_toolbox.mesh import Coordinate
+        >>> print(coordinate(is_periodic = True).possible_grid_size)
+        [8, 10, 12, 16, 18, 20, 24, 30, 32, 36, 40, 48, 50, 54, 60, 64, 72, 80, 90, 96, 100, 108, 120, 128, 144, 150, 160, 162, 180, 192, 200, 216, 240, 250, 256, 270, 288, 300, 320, 324, 360, 384, 400, 432, 450, 480, 486, 500, 512, 540, 576, 600, 640, 648, 720, 750, 768, 800, 810, 864, 900, 960, 972, 1000, 1024, 1080, 1152, 1200, 1250, 1280, 1296, 1350, 1440, 1458, 1500, 1536, 1600, 1620, 1728, 1800, 1920, 1944, 2000, 2048, 2160, 2250, 2304, 2400, 2430, 2500, 2560, 2592, 2700, 2880, 2916, 3000, 3072, 3200, 3240, 3456, 3600, 3750, 3840, 3888, 4000, 4050, 4096, 4320, 4374, 4500, 4608, 4800, 4860, 5000, 5120, 5184, 5400, 5760, 5832, 6000, 6144, 6250, 6400, 6480, 6750, 6912, 7200, 7290, 7500, 7680, 7776, 8000, 8100, 8192, 8640, 8748, 9000]
+        >>> print(coordinate(is_periodic = False).possible_grid_size)
+        [9, 11, 13, 17, 19, 21, 25, 31, 33, 37, 41, 49, 51, 55, 61, 65, 73, 81, 91, 97, 101, 109, 121, 129, 145, 151, 161, 163, 181, 193, 201, 217, 241, 251, 257, 271, 289, 301, 321, 325, 361, 385, 401, 433, 451, 481, 487, 501, 513, 541, 577, 601, 641, 649, 721, 751, 769, 801, 811, 865, 901, 961, 973, 1001, 1025, 1081, 1153, 1201, 1251, 1281, 1297, 1351, 1441, 1459, 1501, 1537, 1601, 1621, 1729, 1801, 1921, 1945, 2001, 2049, 2161, 2251, 2305, 2401, 2431, 2501, 2561, 2593, 2701, 2881, 2917, 3001, 3073, 3201, 3241, 3457, 3601, 3751, 3841, 3889, 4001, 4051, 4097, 4321, 4375, 4501, 4609, 4801, 4861, 5001, 5121, 5185, 5401, 5761, 5833, 6001, 6145, 6251, 6401, 6481, 6751, 6913, 7201, 7291, 7501, 7681, 7777, 8001, 8101, 8193, 8641, 8749, 9001]
+        """
         return self._possible_grid_size
 
 
 class StretchedCoordinate(Coordinate):
+    """Another coordinate, as a subclass of :obj:`Coordinate`.
+    It includes parameters and methods to handle with stretched coordinates,
+    which is employed by XCompact3d at the vertical dimension ``y``.
+
+    Parameters
+    ----------
+    length : float
+        Length of the coordinate (default is 1.0).
+    grid_size : int
+        Number of mesh points (default is 17).
+    delta : float
+        Mesh resolution (default is 0.0625).
+    is_periodic : bool
+        Specifies if the boundary condition is periodic (True) or not (False) (default is False).
+    istret : int
+        Type of mesh refinement (0: no, 1: center, 2: both sides, 3: bottom)
+    beta : float
+        Refinement parameter
+
+    Notes
+    -----
+        There is no need to specify both :obj:`length` and :obj:`delta`, because they are
+        a function of each other, the missing value is automatically computed from the other.
+
+    Returns
+    -------
+    :obj:`xcompact3d_toolbox.mesh.StretchedCoordinate`
+        Stretched coordinate
+    """
     istret = traitlets.Int(
         default_value=0,
         min=0,

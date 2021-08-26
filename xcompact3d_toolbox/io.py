@@ -309,6 +309,73 @@ class Dataset(traitlets.HasTraits):
             setattr(self, key, arg)
 
     def load_array(self, filename: str, add_time=True, attrs: dict = None):
+        """This method reads a binary field from Xcompact3d with :obj:`numpy.fromfile`
+        and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
+        coordinates and attributes.
+
+        Data type is defined by :obj:`xcompact3d_toolbox.param["mytype"]`.
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to be read.
+        coords : dict of array_like objects or None, optional
+            Coordinates (tick labels) to use for indexing along each dimension (see
+            :obj:`xarray.DataArray`). If dims=None (default), coordinates are inferred
+            from the folder structure.
+        name : str, optional
+            Name of this array. If name is empty (default), it is inferred
+            from filename.
+        attrs : dict_like, optional
+            Attributes to assign to the new instance. Boundary conditions are
+            automatically included in this method, for derivatives routines.
+
+        Returns
+        -------
+        :obj:`xarray.DataArray`
+            Data array containing values read from the disc. Attributes include
+            the proper boundary conditions for derivatives if the
+            file prefix is ``ux``, ``uy``, ``uz``, ``phi`` or ``pp``.
+
+        Examples
+        -------
+
+        >>> prm = x3d.Parameters()
+
+        >>> xcompact3d_toolbox.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
+        >>> xcompact3d_toolbox.param["mytype"] = np.float32 # otherwise
+
+        In the following cases, coordinates and dimensions are infered from the
+        folder containing the file:
+
+        >>> uy = prm.read_field('./data/xy_planes/uy-00000400.bin')
+        >>> uz = prm.read_field('./data/xz_planes/uz-00000400.bin')
+        >>> ux = prm.read_field('./data/3d_snapshots/ux-00000400.bin')
+
+        It is possible to handle 3D arrays with the filenames from previous X3d's
+        versions:
+
+        >>> ux = x3d.read_field('./data/ux0010')
+
+        If it is a plane and not included in the folder structure presented above,
+        just delete the extra coordinate from the dictionary
+        returned by :obj:`xcompact3d_toolbox.parameters.Parameters.get_mesh` and
+        inform it as an argument. For example, to read a xy-plane:
+
+        >>> mesh = prm.get_mesh
+        >>> del mesh['z']
+        >>> ux = x3d.read_field('./data/uy0010', coords = prm.get_mesh)
+
+        Notes
+        ----
+
+        Take a look at xarray_'s documentation, specially, see `Why xarray?`_.
+        :obj:`xarray.DataArray` includes many useful methods for indexing,
+        comparisons, reshaping and reorganizing, computations and plotting.
+
+        .. _xarray: http://xarray.pydata.org/en/stable/
+        .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
+        """
 
         coords = self._mesh.drop(*self.drop_coords)
 
@@ -416,6 +483,62 @@ class Dataset(traitlets.HasTraits):
         return dataset
 
     def load_time_series(self, array_prefix: str):
+        """Reads all files matching the ``filename_pattern`` with
+        :obj:`xcompact3d_toolbox.parameters.Parameters.read_field` and
+        concatenates them into a time series.
+
+        .. note:: Make sure to have enough memory to load all files at the same time.
+
+        Parameters
+        ----------
+        filename_pattern : str
+            A specified pattern according to the rules used by the Unix shell.
+        steep : str
+            The variable at the parameters class that controls how many time steps
+            are computed between snapshots. Default is ``ioutput``. Only useful
+            if ``filenamedigits = 1``.
+        progress_function : str
+            Activates a progress bar with the options ``tqdm`` or ``notebook``,
+            or turn it off when the string is empty (default).
+        **kwargs :
+            Arguments to be send to :obj:`xcompact3d_toolbox.parameters.Parameters.read_field`,
+            like ``coords``, ``name`` and ``attrs``.
+
+        Returns
+        -------
+        :obj:`xarray.DataArray`
+            Data array containing values read from the disc.
+
+        Examples
+        -------
+
+        >>> prm = x3d.Parameters()
+
+        >>> x3d.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
+        >>> x3d.param["mytype"] = np.float32 # otherwise
+
+        In the following cases, coordinates and dimensions are infered from the
+        folder containing the file and time from the filenames:
+
+        >>> ux = prm.read_all_fields('./data/3d_snapshots/ux-*.bin')
+        >>> uy = prm.read_all_fields('./data/xy_planes/uy-*.bin')
+        >>> uz = prm.read_all_fields('./data/xz_planes/uz-0000??00.bin')
+
+        It is possible to handle 3D arrays with the filenames from previous X3d's
+        versions:
+
+        >>> ux = prm.read_all_fields('./data/ux????')
+
+        If it is a plane and not included in the folder structure presented above,
+        just delete the extra coordinate from the dictionary
+        returned by :obj:`xcompact3d_toolbox.parameters.Parameters.get_mesh` and
+        inform it as an argument. For example, to read a xy-plane:
+
+        >>> mesh = prm.get_mesh
+        >>> del mesh['z']
+        >>> ux = x3d.read_all_fields('./data/uy????', coords = prm.get_mesh)
+
+        """
 
         target_filename = self.filename_properties.get_filename_for_binary(
             array_prefix, "*"
@@ -435,7 +558,41 @@ class Dataset(traitlets.HasTraits):
         )
 
     def write(self, data, file_prefix: str = None):
+        """Write the arrays in this data set to binary files on the disc, in the
+        same order that Xcompact3d would do, so they can be easily read with
+        2DECOMP.
 
+        In order to avoid overwriting any relevant field, only variables with
+        an **attribute** called ``file_name`` will be written.
+
+        See :obj:`xcompact3d_toolbox.array.X3dDataArray` for more information.
+
+        Write the array to binary files on the disc, in the same order that
+        Xcompact3d would do, so they can be easily read with 2DECOMP.
+
+        Coordinates are properly aligned before writing.
+
+        If filename is not provided, it may be obtained from the **attribute**
+        called ``file_name``.
+
+        If ``n`` is a valid coordinate (for scalar fractions) in the array, one
+        numerated binary file will be written for each scalar field.
+
+        If ``t`` is a valid coordinate (for time) in the array, one numerated
+        binary file will be written for each available time.
+
+        Parameters
+        ----------
+        data : [type]
+            [description]
+        file_prefix : str, optional
+            [description], by default None
+
+        Raises
+        ------
+        IOError
+            [description]
+        """        
         if isinstance(data, xr.Dataset):
             self._write_dataset(data)
         elif isinstance(data, xr.DataArray):
@@ -502,7 +659,28 @@ class Dataset(traitlets.HasTraits):
             )
 
     def write_xdmf(self, xdmf_name: str = "snapshots.xdmf",) -> None:
+        """Writes four xdmf files:
 
+        * ``./data/3d_snapshots.xdmf`` for 3D snapshots in ``./data/3d_snapshots/*``;
+        * ``./data/xy_planes.xdmf`` for planes in ``./data/xy_planes/*``;
+        * ``./data/xz_planes.xdmf`` for planes in ``./data/xz_planes/*``;
+        * ``./data/yz_planes.xdmf`` for planes in ``./data/yz_planes/*``.
+
+        Shape and time are inferted from folder structure and filenames.
+        File list is obtained automatically with :obj:`glob`.
+
+        .. note:: For now, this is only compatible with the new filename structure,
+            the conversion is exemplified in `convert_filenames_x3d_toolbox`_.
+
+        .. _`convert_filenames_x3d_toolbox`: https://gist.github.com/fschuch/5a05b8d6e9787d76655ecf25760e7289
+
+        Examples
+        -------
+
+        >>> prm = x3d.Parameters()
+        >>> prm.write_xdmf()
+
+        """
         if self.set_of_variables:
             time_numbers = range(len(self))
             var_names = sorted(list(self.set_of_variables))

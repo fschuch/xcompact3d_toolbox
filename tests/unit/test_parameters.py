@@ -3,6 +3,8 @@ import unittest
 import traitlets
 from xcompact3d_toolbox.parameters import Parameters
 
+# TODO - migrate do Pytest
+# TODO 2 - Test ParametersGui as well
 
 class test_parameters(unittest.TestCase):
     def test_io(self):

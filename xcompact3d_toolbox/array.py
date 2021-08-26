@@ -18,7 +18,7 @@ and :obj:`xarray.Dataset`, all the details are described bellow.
     http://xarray.pydata.org/en/stable/
 """
 
-from .mesh import stretching
+from .mesh import _stretching
 from .param import param
 from .derive import FirstDerivative, SecondDerivative
 import xarray as xr
@@ -354,7 +354,7 @@ class X3dDataArray:
 
             yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
 
-            yp, ppy, pp2y, pp4y = stretching(istret, beta, yly, m, n)
+            yp, ppy, pp2y, pp4y = _stretching(istret, beta, yly, m, n)
 
             da_ppy = xr.DataArray(ppy, coords=[self._data_array[dim]], name="ppy")
 
@@ -453,7 +453,7 @@ class X3dDataArray:
 
             yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
 
-            yp, ppy, pp2y, pp4y = stretching(istret, beta, yly, m, n)
+            yp, ppy, pp2y, pp4y = _stretching(istret, beta, yly, m, n)
 
             da_pp2y = xr.DataArray(pp2y, coords=[self._data_array[dim]], name="pp2y")
             da_pp4y = xr.DataArray(pp4y, coords=[self._data_array[dim]], name="pp4y")

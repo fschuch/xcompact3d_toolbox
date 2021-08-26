@@ -7,7 +7,10 @@ but with `ipywidgets`_.
     https://ipywidgets.readthedocs.io/en/latest/
 """
 
+from __future__ import annotations
+
 import math
+from typing import Type
 
 import ipywidgets as widgets
 import traitlets
@@ -37,7 +40,7 @@ def _divisorGenerator(n):
     Examples
     -------
 
-    >>> print(list(divisorGenerator(8)))
+    >>> list(divisorGenerator(8))
     [0, 1, 2, 4, 8]
 
     """
@@ -313,7 +316,7 @@ class ParametersGui(Parameters):
 
         self.link_widgets()
 
-    def __call__(self, *args):
+    def __call__(self, *args: str) -> Type(widgets.VBox):
         """Returns widgets on demand.
 
         Parameters
@@ -355,7 +358,7 @@ class ParametersGui(Parameters):
             except:
                 self.p_row = 0
 
-    def link_widgets(self):
+    def link_widgets(self) -> None:
         """Creates a two-way link between the value of an attribute and its widget.
         This method is called at initialization, but provides an easy way to link
         any new variable.
@@ -379,10 +382,6 @@ class ParametersGui(Parameters):
                 (self, f"_possible_{name}"), (self._widgets[f"{name}"], "options"),
             )
 
-        # Create two-way link between auxiliar variable for periodicity
-        for dim in ["x", "y", "z"]:
-            link((getattr(self.mesh, dim), "is_periodic"), (self, f"_ncl{dim}"))
-
         # Create two-way link between variables and widgets
         for name in self._widgets.keys():
             link((self, name), (self._widgets[name], "value"))
@@ -393,5 +392,5 @@ class ParametersGui(Parameters):
         #     group = self.trait_metadata(name, "group")
         #     if group == "ScalarParam":
         #         link(
-        #             (self, "_iscalar"), (self._widgets[name], "disabled"),
+        #             (self, "iscalar"), (self._widgets[name], "disabled"),
         #         )
