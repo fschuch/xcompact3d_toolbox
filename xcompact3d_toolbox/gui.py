@@ -14,11 +14,7 @@ import traitlets
 from IPython.display import display
 from traitlets import link
 
-from .mesh import Coordinate
 from .parameters import Parameters
-
-possible_mesh = Coordinate(is_periodic=False)
-possible_mesh_p = Coordinate(is_periodic=True)
 
 
 def _divisorGenerator(n):
@@ -65,78 +61,22 @@ class ParametersGui(Parameters):
 
     _possible_p_row, _possible_p_col = [
         traitlets.List(trait=traitlets.Int(), default_value=list(_divisorGenerator(4)))
-        for i in range(2)
+        for _ in range(2)
     ]
     """:obj:`list` of :obj:`int`: Auxiliar variable for parallel domain decomposition,
         it stores the available options according to :obj:`ncores`.
     """
 
-    def __init__(self, **kargs):
+    def __init__(self, **kwargs):
         """Initializes the Parameters Class.
 
         Parameters
         ----------
         **kwargs
-            Keyword arguments for valid atributes.
-
-        Raises
-        -------
-        KeyError
-            Exception is raised when an Keyword arguments is not a valid atribute.
-
-        Examples
-        -------
-
-        There are a few ways to initialize the class.
-
-        First, calling it with no
-        arguments initializes all variables with default value:
-
-        >>> prm = xcompact3d_toolbox.ParametersGui()
-
-        It is possible to set any values afterwards (including new atributes):
-
-        >>> prm.re = 1e6
-
-        Second, we can specify some values, and let the missing ones be
-        initialized with default value:
-
-        >>> prm = x3d.ParametersGui(
-        ...     filename = 'example.i3d',
-        ...     itype = 10,
-        ...     nx = 257,
-        ...     ny = 129,
-        ...     nz = 32,
-        ...     xlx = 15.0,
-        ...     yly = 10.0,
-        ...     zlz = 3.0,
-        ...     nclx1 = 2,
-        ...     nclxn = 2,
-        ...     ncly1 = 1,
-        ...     nclyn = 1,
-        ...     nclz1 = 0,
-        ...     nclzn = 0,
-        ...     re = 300.0,
-        ...     init_noise = 0.0125,
-        ...     dt = 0.0025,
-        ...     ilast = 45000,
-        ...     ioutput = 200,
-        ...     iprocessing = 50
-        ... )
-
-        And finally, it is possible to read the parameters from the disc:
-
-        >>> prm = xcompact3d_toolbox.ParametersGui(loadfile = 'example.i3d')
-
-        It also supports the previous parameters file format (see `#7`_):
-
-        >>> prm = xcompact3d_toolbox.ParametersGui(loadfile = 'incompact3d.prm')
-
-        .. _#7:
-            https://github.com/fschuch/xcompact3d_toolbox/issues/7
+            Keyword arguments for :obj:`xcompact3d_toolbox.parameters.Parameters`.
 
         """
-        super(ParametersGui, self).__init__()
+        super(ParametersGui, self).__init__(**kwargs)
 
         self._widgets = dict(
             #
@@ -233,14 +173,14 @@ class ParametersGui(Parameters):
             #
             # # ScalarParam
             #
-            iibmS=widgets.Dropdown(
-                options=[
-                    ("Off", 0),
-                    ("Forced to zero", 1),
-                    ("Interpolated to zero", 2),
-                    ("Interpolated to no-flux", 3),
-                ],
-            ),
+            # iibmS=widgets.Dropdown(
+            #     options=[
+            #         ("Off", 0),
+            #         ("Forced to zero", 1),
+            #         ("Interpolated to zero", 2),
+            #         ("Interpolated to no-flux", 3),
+            #     ],
+            # ),
             #
             # # LESModel
             #
@@ -271,7 +211,7 @@ class ParametersGui(Parameters):
             self._widgets[name] = widgets.FloatText(min=-1.0, max=1.0)
 
         for name in "nx ny nz".split():
-            self._widgets[name] = widgets.Dropdown(options=possible_mesh)
+            self._widgets[name] = widgets.Dropdown()
 
         for name in "xlx yly zlz".split():
             self._widgets[name] = widgets.BoundedFloatText(min=0.0, max=1e9)
@@ -362,7 +302,7 @@ class ParametersGui(Parameters):
                 widgets.HBox([self._widgets[f"ncl{d}S1"] for d in dim]),
                 widgets.HBox([self._widgets[f"ncl{d}Sn"] for d in dim]),
                 widgets.HBox([self._widgets[f"grav{d}"] for d in dim]),
-                widgets.HBox([self._widgets[d] for d in "iibmS".split()]),
+                # widgets.HBox([self._widgets[d] for d in "iibmS".split()]),
                 widgets.HTML(
                     value="<strong>cp, us, sc, ri, scalar_lbound & scalar_ubound</strong> are lists with length numscalar, set them properly on the code."
                 ),
@@ -375,10 +315,12 @@ class ParametersGui(Parameters):
 
     def __call__(self, *args):
         """Returns widgets on demand.
+
         Parameters
         ----------
         *args : str
             Name(s) for the desired widget(s).
+        
         Returns
         -------
         :obj:`ipywidgets.VBox`
@@ -395,6 +337,24 @@ class ParametersGui(Parameters):
     def _ipython_display_(self):
         display(self.ipyview)
 
+    @traitlets.observe("p_row", "p_col", "ncores")
+    def _observe_2Decomp(self, change):
+        if change["name"] == "ncores":
+            possible = list(_divisorGenerator(change["new"]))
+            self._possible_p_row = possible
+            self._possible_p_col = possible
+            self.p_row, self.p_col = 0, 0
+        elif change["name"] == "p_row":
+            try:
+                self.p_col = self.ncores // self.p_row
+            except:
+                self.p_col = 0
+        elif change["name"] == "p_col":
+            try:
+                self.p_row = self.ncores // self.p_col
+            except:
+                self.p_row = 0
+
     def link_widgets(self):
         """Creates a two-way link between the value of an attribute and its widget.
         This method is called at initialization, but provides an easy way to link
@@ -409,7 +369,8 @@ class ParametersGui(Parameters):
         # Link the possible mesh values with the respective dropdown widget
         for dim in ["x", "y", "z"]:
             link(
-                (self, f"_possible_mesh_{dim}"), (self._widgets[f"n{dim}"], "options"),
+                (getattr(self.mesh, dim), "_possible_grid_size"),
+                (self._widgets[f"n{dim}"], "options"),
             )
 
         # Link the possible domain decomposition values with the respective dropdown widget
@@ -417,6 +378,10 @@ class ParametersGui(Parameters):
             link(
                 (self, f"_possible_{name}"), (self._widgets[f"{name}"], "options"),
             )
+
+        # Create two-way link between auxiliar variable for periodicity
+        for dim in ["x", "y", "z"]:
+            link((getattr(self.mesh, dim), "is_periodic"), (self, f"_ncl{dim}"))
 
         # Create two-way link between variables and widgets
         for name in self._widgets.keys():

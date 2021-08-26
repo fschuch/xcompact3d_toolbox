@@ -9,13 +9,13 @@ import xcompact3d_toolbox.mesh
 
 def test_coordinate_grid_size_value(possible_mesh):
     coordinate = x3d.mesh.Coordinate(is_periodic=False)
-    assert set(coordinate.get_possible_grid_size_values(0, 9002)) == possible_mesh
+    assert set(coordinate.possible_grid_size) == possible_mesh
 
 
 def test_coordinate_periodic_grid_size_value(possible_mesh_periodic):
     coordinate = x3d.mesh.Coordinate(is_periodic=True)
     assert (
-        set(coordinate.get_possible_grid_size_values(0, 9002)) == possible_mesh_periodic
+        set(coordinate.possible_grid_size) == possible_mesh_periodic
     )
 
 

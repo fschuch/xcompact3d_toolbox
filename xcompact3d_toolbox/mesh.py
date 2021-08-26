@@ -1,5 +1,5 @@
-import warnings
-from collections import OrderedDict
+"""
+"""
 
 import numpy as np
 import traitlets
@@ -12,10 +12,13 @@ class Coordinate(traitlets.HasTraits):
     grid_size = traitlets.Int(default_value=17)
     delta = traitlets.Float(default_value=0.0625, min=0.0)
     is_periodic = traitlets.Bool(default_value=False)
+
     _sub_grid_size = traitlets.Int(default_value=16)
+    _possible_grid_size = traitlets.List(trait=traitlets.Int())
 
     def __init__(self, **kwargs):
 
+        self._possible_grid_size = _possible_size_not_periodic
         self.set(**kwargs)
 
     def __array__(self):
@@ -33,14 +36,6 @@ class Coordinate(traitlets.HasTraits):
     def __repr__(self):
         return f"{self.__class__.__name__}(length = {self.length}, grid_size = {self.grid_size}, is_periodic = {self.is_periodic})"
 
-    def get_possible_grid_size_values(self, start: int = 0, stop: int = 9002) -> list:
-        return list(
-            filter(
-                lambda num: _validate_grid_size(num, self.is_periodic),
-                range(start, stop),
-            )
-        )
-
     def set(self, **kwargs) -> None:
         """[summary]
         """
@@ -49,7 +44,7 @@ class Coordinate(traitlets.HasTraits):
             del kwargs["is_periodic"]
         for key, arg in kwargs.items():
             if key not in self.trait_names():
-                warnings.warn(f"{key} is not a valid parameter and was not loaded")
+                raise KeyError(f"{key} is not a valid parameter")
             setattr(self, key, arg)
 
     @traitlets.validate("grid_size")
@@ -63,9 +58,13 @@ class Coordinate(traitlets.HasTraits):
     @traitlets.observe("is_periodic")
     def _observe_is_periodic(self, change):
         if change.get("new"):
-            self.grid_size -= 1
+            new_grid = self.grid_size - 1
+            self._possible_grid_size = _possible_size_periodic
+            self.grid_size = new_grid
         else:
-            self.grid_size += 1
+            new_grid = self.grid_size + 1
+            self._possible_grid_size = _possible_size_not_periodic
+            self.grid_size = new_grid
 
     @traitlets.observe("_sub_grid_size")
     def _observe_sub_grid_size(self, change):
@@ -93,12 +92,16 @@ class Coordinate(traitlets.HasTraits):
             self.length = new_length
 
     @property
-    def vector(self):
+    def vector(self) -> type[np.ndarray]:
         return self.__array__()
 
     @property
-    def size(self):
+    def size(self) -> int:
         return self.grid_size
+
+    @property
+    def possible_grid_size(self) -> type[np.ndarray]:
+        return self._possible_grid_size
 
 
 class StretchedCoordinate(Coordinate):
@@ -118,7 +121,7 @@ class StretchedCoordinate(Coordinate):
     def __array__(self):
         if self.istret == 0:
             return super().__array__()
-        return stretching(
+        return _stretching(
             istret=self.istret,
             beta=self.beta,
             yly=self.length,
@@ -151,13 +154,13 @@ class Mesh3D(traitlets.HasTraits):
 
     def __init__(self, **kwargs):
 
+        for key in kwargs.keys():
+            if key not in self.trait_names():
+                raise KeyError(f"{key} is not a valid parameter")
+
         self.x = Coordinate(**kwargs.get("x", {}))
         self.y = StretchedCoordinate(**kwargs.get("y", {}))
         self.z = Coordinate(**kwargs.get("z", {}))
-
-        for key in kwargs.keys():
-            if key not in self.trait_names():
-                warnings.warn(f"{key} is not a valid key parameter for Mesh3D")
 
     def __repr__(self):
         return (
@@ -179,14 +182,12 @@ class Mesh3D(traitlets.HasTraits):
             if not arg:
                 continue
             if arg not in self.trait_names():
-                warnings.warn(f"{arg} is not a valid key parameter for Mesh3D")
-        return OrderedDict(
-            {
-                dir: getattr(self, dir).vector
-                for dir in self.trait_names()
-                if dir not in args
-            }
-        )
+                raise KeyError(f"{arg} is not a valid key parameter for Mesh3D")
+        return {
+            dir: getattr(self, dir).vector
+            for dir in self.trait_names()
+            if dir not in args
+        }
 
     def copy(self):
         return Mesh3D(
@@ -220,7 +221,20 @@ def _validate_grid_size(grid_size, is_periodic):
     return True
 
 
-def stretching(istret, beta, yly, my, ny, return_auxiliar_variables=True):
+def _get_possible_grid_values(
+    is_periodic: bool, start: int = 0, end: int = 9002
+) -> list:
+    return list(
+        filter(lambda num: _validate_grid_size(num, is_periodic), range(start, end),)
+    )
+
+
+_possible_size_periodic = _get_possible_grid_values(True)
+
+_possible_size_not_periodic = _get_possible_grid_values(False)
+
+
+def _stretching(istret, beta, yly, my, ny, return_auxiliar_variables=True):
 
     yp = np.zeros(ny, dtype=param["mytype"])
     yeta = np.zeros_like(yp)
