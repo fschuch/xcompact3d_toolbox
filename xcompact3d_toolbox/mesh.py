@@ -14,6 +14,22 @@ from .param import param
 
 class Coordinate(traitlets.HasTraits):
     """A coordinate.
+    
+    Thanks to traitlets_, the attributes can be type checked, validated and also trigger
+    ‘on change’ callbacks. It means that:
+
+    - :obj:`grid_size` is validated to just accept the values expected by XCompact3d
+      (see :obj:`xcompact3d_toolbox.mesh.Coordinate.possible_grid_size`);
+    - :obj:`delta` is updated after any change on :obj:`grid_size` or :obj:`length`;
+    - :obj:`length` is updated after any change on :obj:`delta` (:obj:`grid_size` remais constant);
+    - :obj:`grid_size` is reduced automatically by 1 when :obj:`is_periodic` changes to :obj:`True`
+      and it is added by 1 when :obj:`is_periodic` changes back to :obj:`False`
+      (see :obj:`xcompact3d_toolbox.mesh.Coordinate.possible_grid_size`);
+
+    All these functionalities aim to make a user-friendly interface, where the consistency
+    between different coordinate parameters is ensured even when they change at runtime.
+
+    .. _traitlets: https://traitlets.readthedocs.io/en/stable/index.html
 
     Parameters
     ----------
@@ -34,7 +50,7 @@ class Coordinate(traitlets.HasTraits):
     Returns
     -------
     :obj:`xcompact3d_toolbox.mesh.Coordinate`
-        Coordinate
+        Coordinate    
     """
 
     length = traitlets.Float(default_value=1.0, min=0.0, max=1e10)
@@ -86,7 +102,7 @@ class Coordinate(traitlets.HasTraits):
         >>> numpy.sin(coord)
         array([0.        , 0.12467473, 0.24740396, 0.36627253, 0.47942554,
                0.58509727, 0.68163876, 0.7675435 , 0.84147098])
-        >>> np.cos(coord)
+        >>> numpy.cos(coord)
         array([1.        , 0.99219767, 0.96891242, 0.93050762, 0.87758256,
                 0.81096312, 0.73168887, 0.64099686, 0.54030231])
         """        
@@ -198,7 +214,7 @@ class Coordinate(traitlets.HasTraits):
         Returns
         -------
         :obj:`numpy.ndarray`
-            Numpy array.
+            Numpy array
         """
         return self.__array__()
 
@@ -220,18 +236,17 @@ class Coordinate(traitlets.HasTraits):
         Due to restrictions at the FFT library, they must be equal to:
 
         .. math::
-            n_i = 2^{1+a} \\times 3^b \\times 5^c,
+            n = 2^{1+a} \\times 3^b \\times 5^c,
 
         if the coordinate is periodic, and:
 
         .. math::
-            n_i = 2^{1+a} \\times 3^b \\times 5^c + 1,
+            n = 2^{1+a} \\times 3^b \\times 5^c + 1,
 
-        otherwise, where :math:`a`, :math:`b` and :math:`c` are non negative integers,
-        and :math:`i` representes the three coordinates (**x**, **y** and **z**).
+        otherwise, where :math:`a`, :math:`b` and :math:`c` are non negative integers.
 
-        Aditionally, the derivative's stencil imposes that :math:`n_i \\ge 8` if periodic
-        and :math:`n_i \\ge 9` otherwise.
+        Aditionally, the derivative's stencil imposes that :math:`n \\ge 8` if periodic
+        and :math:`n \\ge 9` otherwise.
 
         Returns
         -------
@@ -246,17 +261,17 @@ class Coordinate(traitlets.HasTraits):
         --------
 
         >>> from xcompact3d_toolbox.mesh import Coordinate
-        >>> print(coordinate(is_periodic = True).possible_grid_size)
-        [8, 10, 12, 16, 18, 20, 24, 30, 32, 36, 40, 48, 50, 54, 60, 64, 72, 80, 90, 96, 100, 108, 120, 128, 144, 150, 160, 162, 180, 192, 200, 216, 240, 250, 256, 270, 288, 300, 320, 324, 360, 384, 400, 432, 450, 480, 486, 500, 512, 540, 576, 600, 640, 648, 720, 750, 768, 800, 810, 864, 900, 960, 972, 1000, 1024, 1080, 1152, 1200, 1250, 1280, 1296, 1350, 1440, 1458, 1500, 1536, 1600, 1620, 1728, 1800, 1920, 1944, 2000, 2048, 2160, 2250, 2304, 2400, 2430, 2500, 2560, 2592, 2700, 2880, 2916, 3000, 3072, 3200, 3240, 3456, 3600, 3750, 3840, 3888, 4000, 4050, 4096, 4320, 4374, 4500, 4608, 4800, 4860, 5000, 5120, 5184, 5400, 5760, 5832, 6000, 6144, 6250, 6400, 6480, 6750, 6912, 7200, 7290, 7500, 7680, 7776, 8000, 8100, 8192, 8640, 8748, 9000]
-        >>> print(coordinate(is_periodic = False).possible_grid_size)
-        [9, 11, 13, 17, 19, 21, 25, 31, 33, 37, 41, 49, 51, 55, 61, 65, 73, 81, 91, 97, 101, 109, 121, 129, 145, 151, 161, 163, 181, 193, 201, 217, 241, 251, 257, 271, 289, 301, 321, 325, 361, 385, 401, 433, 451, 481, 487, 501, 513, 541, 577, 601, 641, 649, 721, 751, 769, 801, 811, 865, 901, 961, 973, 1001, 1025, 1081, 1153, 1201, 1251, 1281, 1297, 1351, 1441, 1459, 1501, 1537, 1601, 1621, 1729, 1801, 1921, 1945, 2001, 2049, 2161, 2251, 2305, 2401, 2431, 2501, 2561, 2593, 2701, 2881, 2917, 3001, 3073, 3201, 3241, 3457, 3601, 3751, 3841, 3889, 4001, 4051, 4097, 4321, 4375, 4501, 4609, 4801, 4861, 5001, 5121, 5185, 5401, 5761, 5833, 6001, 6145, 6251, 6401, 6481, 6751, 6913, 7201, 7291, 7501, 7681, 7777, 8001, 8101, 8193, 8641, 8749, 9001]
+        >>> coordinate(is_periodic = True).possible_grid_size
+        [8, 10, 12, 16, 18, 20, 24, ..., 7776, 8000, 8100, 8192, 8640, 8748, 9000]
+        >>> coordinate(is_periodic = False).possible_grid_size
+        [9, 11, 13, 17, 19, 21, 25, ..., 7777, 8001, 8101, 8193, 8641, 8749, 9001]
         """
         return self._possible_grid_size
 
 
 class StretchedCoordinate(Coordinate):
     """Another coordinate, as a subclass of :obj:`Coordinate`.
-    It includes parameters and methods to handle with stretched coordinates,
+    It includes parameters and methods to handle stretched coordinates,
     which is employed by XCompact3d at the vertical dimension ``y``.
 
     Parameters
@@ -270,9 +285,14 @@ class StretchedCoordinate(Coordinate):
     is_periodic : bool
         Specifies if the boundary condition is periodic (True) or not (False) (default is False).
     istret : int
-        Type of mesh refinement (0: no, 1: center, 2: both sides, 3: bottom)
+        Type of mesh refinement:
+
+            * 0 - No refinement (default);
+            * 1 - Refinement at the center;
+            * 2 - Both sides;
+            * 3 - Just near the bottom.
     beta : float
-        Refinement parameter
+        Refinement parameter.
 
     Notes
     -----
@@ -298,6 +318,27 @@ class StretchedCoordinate(Coordinate):
         return f"{self.__class__.__name__}(length = {self.length}, grid_size = {self.grid_size}, is_periodic = {self.is_periodic}, istret = {self.istret}, beta = {self.beta})"
 
     def __array__(self):
+        """This method makes the coordinate automatically work as a numpy
+        like array in any function from numpy.
+
+        Returns
+        -------
+        :obj:`numpy.ndarray`
+            A numpy array.
+        
+        Examples
+        --------
+
+        >>> from xcompact3d_toolbox.mesh import StretchedCoordinate
+        >>> import numpy
+        >>> coord = StretchedCoordinate(length = 1.0, grid_size = 9)
+        >>> numpy.sin(coord)
+        array([0.        , 0.12467473, 0.24740396, 0.36627253, 0.47942554,
+               0.58509727, 0.68163876, 0.7675435 , 0.84147098])
+        >>> numpy.cos(coord)
+        array([1.        , 0.99219767, 0.96891242, 0.93050762, 0.87758256,
+                0.81096312, 0.73168887, 0.64099686, 0.54030231])
+        """ 
         if self.istret == 0:
             return super().__array__()
         return _stretching(
@@ -327,19 +368,65 @@ class StretchedCoordinate(Coordinate):
 
 
 class Mesh3D(traitlets.HasTraits):
+    """A three-dimensional coordinate system
+
+    Parameters
+    ----------
+    x : :obj:`xcompact3d_toolbox.mesh.Coordinate`
+        Streamwise coordinate
+    y : :obj:`xcompact3d_toolbox.mesh.StretchedCoordinate`
+        Vertical coordinate
+    z : :obj:`xcompact3d_toolbox.mesh.Coordinate`
+        Spanwise coordinate
+
+    Notes
+    -----
+        :obj:`mesh` is in fact an atribute of :obj:`xcompact3d_toolbox.parameters.Parameters`,
+        so there is no need to initialize it manually for most of the common use cases.
+        The features of each coordenate are copled by a two-way link with their corresponding
+        values at the Parameters class. For instance, the length of each of them is copled to
+        :obj:`xlx`, :obj:`yly` and :obj:`zlz`, grid size to :obj:`nx`, :obj:`ny` and :obj:`nz`
+        and so on.
+
+    Returns
+    -------
+    :obj:`xcompact3d_toolbox.mesh.Mesh3D`
+        Coordinate system
+    """
     x = traitlets.Instance(klass=Coordinate)
     y = traitlets.Instance(klass=StretchedCoordinate)
     z = traitlets.Instance(klass=Coordinate)
 
     def __init__(self, **kwargs):
+        """Initializes the 3DMesh class.
 
-        for key in kwargs.keys():
-            if key not in self.trait_names():
-                raise KeyError(f"{key} is not a valid parameter")
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments for each coordinate (x, y and z), containing a :obj:`dict`
+            with the parameters for them, like :obj:`grid_size`, :obj:`length` and so on.
 
-        self.x = Coordinate(**kwargs.get("x", {}))
-        self.y = StretchedCoordinate(**kwargs.get("y", {}))
-        self.z = Coordinate(**kwargs.get("z", {}))
+        Raises
+        -------
+        KeyError
+            Exception is raised when an Keyword arguments is not a valid coordinate.
+
+        Examples
+        --------
+
+        >>> from xcompact3d_toolbox.mesh import Mesh3D
+        >>> mesh = Mesh3D(
+        ...     x = dict(length = 4.0, grid_size = 65, is_periodic = False),
+        ...     y = dict(length = 1.0, grid_size = 17, is_periodic = False, istret = 0),
+        ...     z = dict(length = 1.0, grid_size = 16, is_periodic = True)
+        ... )
+        """
+
+        self.x = Coordinate()
+        self.y = StretchedCoordinate()
+        self.z = Coordinate()
+
+        self.set(**kwargs)
 
     def __repr__(self):
         return (
@@ -351,17 +438,96 @@ class Mesh3D(traitlets.HasTraits):
         )
 
     def __len__(self):
+        """Make the coordinate work with the Python function :obj:`len`.
+
+        Returns
+        -------
+        int
+            Mesh size is calculated by multiplying the size of the three coordinates
+        """ 
         return self.size
 
+    def set(self, **kwargs) -> None:
+        """Set new values for any of the coordinates after the initialization.
+        
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments for each coordinate (x, y and z), containing a :obj:`dict`
+            with the parameters for them, like :obj:`grid_size`, :obj:`length` and so on.
+
+        Raises
+        -------
+        KeyError
+            Exception is raised when an Keyword arguments is not a valid attribute.
+
+        Examples
+        --------
+
+        >>> from xcompact3d_toolbox.mesh import Mesh3D
+        >>> mesh = Mesh3D()
+        >>> mesh.set(
+        ...     x = dict(length = 4.0, grid_size = 65, is_periodic = False),
+        ...     y = dict(length = 1.0, grid_size = 17, is_periodic = False, istret = 0),
+        ...     z = dict(length = 1.0, grid_size = 16, is_periodic = True)
+        ... )
+        """
+        for key in kwargs.keys():
+            if key in self.trait_names():
+                getattr(self, key).set(**kwargs.get(key))
+            else:
+                raise KeyError(f"{key} is not a valid coordinate for Mesh3D")
+
     def get(self) -> dict:
+        """Get the three coordinates in a dictionary, where the keys are their names (x, y and z)
+        and the values are their vectors.
+        
+        Raises
+        -------
+        KeyError
+            Exception is raised when an Keyword arguments is not a valid attribute.
+
+        Returns
+        -------
+        :obj:`dict` of :obj:`numpy.ndarray`
+            A dict containing the coordinates
+        
+        Notes
+        -----
+
+        It is an alias for ``Mesh3D.drop(None)``.
+        """
         return self.drop(None)
 
     def drop(self, *args) -> dict:
+        """Get the coordinates in a dictionary, where the keys are their names and the values
+        are their vectors. It is possible to drop any of the coordinates in case they are
+        needed to process planes. For instance:
+        
+        * Drop ``x`` if working with ``yz`` planes;
+        * Drop ``y`` if working with ``xz`` planes;
+        * Drop ``z`` if working with ``xy`` planes.
+        
+        Parameters
+        ----------
+        *args : str or list of str
+            Name of the coordenate(s) to be dropped
+
+        Raises
+        -------
+        KeyError
+            Exception is raised when an Keyword arguments is not a valid attribute.
+
+        Returns
+        -------
+        :obj:`dict` of :obj:`numpy.ndarray`
+            A dict containing the desired coordinates
+        """
         for arg in args:
             if not arg:
                 continue
             if arg not in self.trait_names():
-                raise KeyError(f"{arg} is not a valid key parameter for Mesh3D")
+                raise KeyError(f"{arg} is not a valid coordinate for Mesh3D")
         return {
             dir: getattr(self, dir).vector
             for dir in self.trait_names()
@@ -369,12 +535,21 @@ class Mesh3D(traitlets.HasTraits):
         }
 
     def copy(self):
+        """Return a copy of the Mesh3D object.
+        """        
         return Mesh3D(
             **{dim: getattr(self, dim).trait_values() for dim in self.trait_names()}
         )
 
     @property
     def size(self):
+        """Mesh size
+
+        Returns
+        -------
+        int
+            Mesh size is calculated by multiplying the size of the three coordinates
+        """ 
         return self.x.size * self.y.size * self.z.size
 
 

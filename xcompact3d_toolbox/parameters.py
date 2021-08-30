@@ -975,7 +975,7 @@ class Parameters(
         Returns
         -------
         :obj:`dict` of :obj:`dict`
-            A dict containg the boundary conditions for the variable specified.
+            A dict containing the boundary conditions for the variable specified.
 
         Examples
         -------
@@ -1099,7 +1099,7 @@ class Parameters(
         ----------
         filename : str
             The filename for the :obj:`.i3d` file. If None, it uses the filename specified
-            in the class. Default is None.
+            in the class (default is :obj:`None`).
 
         Examples
         --------
@@ -1109,7 +1109,7 @@ class Parameters(
         ...     nx = 101,
         ...     ny = 65,
         ...     nz = 11,
-        ...     # end so on...
+        ...     # and so on...
         ... )
         >>> prm.write()
 

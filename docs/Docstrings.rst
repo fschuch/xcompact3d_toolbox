@@ -29,31 +29,28 @@ Mesh
   :show-inheritance:
   :special-members:
 
-Data
-----
+Reading and writing files
+-------------------------
 
 .. automodule:: xcompact3d_toolbox.io
   :members:
   :show-inheritance:
   :special-members:
 
-Data Structures
------------------
+Computation and Plotting
+------------------------
 
 .. automodule:: xcompact3d_toolbox.array
    :members:
-   :show-inheritance:
 
 Sandbox
------------------
+-------
 
 .. automodule:: xcompact3d_toolbox.sandbox
-   :members:
    :show-inheritance:
 
 Genepsi
------------------
+-------
 
 .. automodule:: xcompact3d_toolbox.genepsi
    :members:
-   :show-inheritance:

@@ -1,29 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-Usefull functions to read/write binary fields and parameters files that
-are compatible with XCompact3d.
+Usefull objects to read and write the binary fields produced by XCompact3d.
 
 Notes
-----
+-----
 
-* Writing is handled by the methods at :obj:`xcompact3d_toolbox.array`;
+Take a look at xarray_'s documentation, specially, see `Why xarray?`_
+:obj:`xarray.DataArray` includes many useful methods for indexing,
+comparisons, reshaping and reorganizing, computations and plotting.
 
-* The parameters file ``.i3d`` is handled by the methods at :obj:`xcompact3d_toolbox.parameters.Parameters`.
-
-* The integration with Xcompact3d is in prerelease as well (see `fschuch/Xcompact3d`_).
-  `#3`_ was proposed in order to increase the synergy between Xcompact3d and this
-  Python Package. Following the new folder structure makes it possible to
-  automatically obtain the shape and timestamp for each file.
-  If necessary, the conversion is exemplified in `convert_filenames_x3d_toolbox`_.
-
-.. _`convert_filenames_x3d_toolbox`: https://gist.github.com/fschuch/5a05b8d6e9787d76655ecf25760e7289
-
-.. _#3:
-    https://github.com/fschuch/Xcompact3d/issues/3
-
-.. _fschuch/Xcompact3d:
-    https://github.com/fschuch/Xcompact3d
-
+.. _xarray: http://xarray.pydata.org/en/stable/
+.. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
 """
 
 from __future__ import annotations
@@ -32,15 +19,15 @@ import glob
 import os
 import os.path
 import warnings
-from typing import Type
+from typing import Type, Union
 
 import numpy as np
 import traitlets
 import xarray as xr
 from tqdm.autonotebook import tqdm
 
-from .param import param
 from .mesh import Mesh3D
+from .param import param
 
 
 class FilenameProperties(traitlets.HasTraits):
@@ -52,41 +39,19 @@ class FilenameProperties(traitlets.HasTraits):
     ----------
     separator : str
         The string used as separator between the name of the variable and its numeration, it
-        can be an empty string (default is `"-"`).
+        can be an empty string (default is ``"-"``).
     file_extension : str
         The file extension that identify the raw binary files from XCompact3d, it
-        can be an empty string (default is `".bin"`).
+        can be an empty string (default is ``".bin"``).
     number_of_digits : int
-        Tue number of numerical digits used to identify the time series (default is `3`).
+        Tue number of numerical digits used to identify the time series (default is ``3``).
 
-    Raises
-    ------
-    KeyError
-        Raises an error if the user tries to set an invalid property.
-
-    Examples
-    --------
-
-    If the simulated fields are named like `ux-000.bin`, they are in the default
-    configuration, there is no need to specify filename properties. But just in case,
-    it would be like:
-
-    >>> import xcompact3d_toolbox as x3d
-    >>> prm = x3d.Parameters()
-    >>> prm.dataset.filename_properties.set(
-    ...     separator = "-",
-    ...     file_extension = ".bin",
-    ...     number_of_digits = 3
-    ... )
-
-    If the simulated fields are named like `ux0000`, the parameters are:
-
-    >>> prm.dataset.filename_properties.set(
-    ...     separator = "",
-    ...     file_extension = "",
-    ...     number_of_digits = 4
-    ... )
-
+    Notes
+    -----
+        :obj:`FilenameProperties` is in fact an atribute of
+        :obj:`xcompact3d_toolbox.io.Dataset`, so there is no
+        need to initialize it manually for most of the common
+        use cases.
     """
 
     separator = traitlets.Unicode(default_value="-")
@@ -94,6 +59,47 @@ class FilenameProperties(traitlets.HasTraits):
     number_of_digits = traitlets.Int(default_value=3, min=1)
 
     def __init__(self, **kwargs):
+        """Initializes the object.
+
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments for the parameters, like :obj:`separator`, :obj:`file_extension` and so on.
+
+        Raises
+        ------
+        KeyError
+            Raises an error if the user tries to set an invalid parameter.
+
+        Returns
+        -------
+        :obj:`xcompact3d_toolbox.io.FilenameProperties`
+            Filename properties
+
+        Examples
+        --------
+
+        If the simulated fields are named like `ux-000.bin`, they are in the default
+        configuration, there is no need to specify filename properties. But just in case,
+        it would be like:
+
+        >>> import xcompact3d_toolbox as x3d
+        >>> import xcompact3d_toolbox.io
+        >>> filename_properties = x3d.io.FilenameProperties(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+
+        If the simulated fields are named like `ux0000`, the parameters are:
+
+        >>> filename_properties = x3d.io.FilenameProperties(
+        ...     separator = "",
+        ...     file_extension = "",
+        ...     number_of_digits = 4
+        ... )
+
+        """
         super(FilenameProperties).__init__()
 
         self.set(**kwargs)
@@ -108,13 +114,45 @@ class FilenameProperties(traitlets.HasTraits):
         return string
 
     def set(self, **kwargs) -> None:
-        """Set new values for any of the properties.
+        """Set new values for any of the properties after the initialization.
+
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments for parameters, like :obj:`separator`, :obj:`file_extension` and so on.
+
+        Raises
+        ------
+        KeyError
+            Raises an error if the user tries to set an invalid parameter.
+
+        Examples
+        --------
+
+        If the simulated fields are named like ``ux-000.bin``, they are in the default
+        configuration, there is no need to specify filename properties. But just in case,
+        it would be like:
+
+        >>> import xcompact3d_toolbox as x3d
+        >>> import xcompact3d_toolbox.io
+        >>> filename_properties = x3d.io.FilenameProperties()
+        >>> filename_properties.set(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+
+        If the simulated fields are named like ``ux0000``, the parameters are:
+
+        >>> filename_properties.set(
+        ...     separator = "",
+        ...     file_extension = "",
+        ...     number_of_digits = 4
+        ... )
         """
         for key, arg in kwargs.items():
             if key not in self.trait_names():
-                raise KeyError(
-                    f"{key} is not a valid argument for FilenameProperties"
-                )
+                raise KeyError(f"{key} is not a valid argument for FilenameProperties")
             setattr(self, key, arg)
 
     def get_filename_for_binary(self, prefix: str, counter: int, data_path="") -> str:
@@ -124,13 +162,41 @@ class FilenameProperties(traitlets.HasTraits):
         ----------
         prefix : str
             Name of the array.
-        counter : int
-            The number that identifies this array.
+        counter : int or str
+            The number that identifies this array, it can be the string
+            ``"*"`` if the filename is going to be used with :obj:`glob.glob`.
+        data_path : str
+            Path to the folder where the data is stored.
 
         Returns
         -------
         str
             The filename
+
+        Examples
+        --------
+
+        >>> import xcompact3d_toolbox as x3d
+        >>> import xcompact3d_toolbox.io
+        >>> filename_properties = x3d.io.FilenameProperties(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+        >>> filename_properties.get_filename_for_binary("ux", 10)
+        'ux-010.bin'
+        >>> filename_properties.get_filename_for_binary("ux", "*")
+        'ux-???.bin'
+
+        >>> filename_properties.set(
+        ...     separator = "",
+        ...     file_extension = "",
+        ...     number_of_digits = 4
+        ... )
+        >>> filename_properties.get_filename_for_binary("ux", 10)
+        'ux0010'
+        >>> filename_properties.get_filename_for_binary("ux", "*")
+        'ux????'
         """
         if counter == "*":
             counter = "?" * self.number_of_digits
@@ -140,7 +206,7 @@ class FilenameProperties(traitlets.HasTraits):
         return filename
 
     def get_info_from_filename(self, filename: str) -> tuple[int, str]:
-        """ Get information from the name of an array.
+        """Get information from the name of a binary file.
 
         Parameters
         ----------
@@ -151,6 +217,27 @@ class FilenameProperties(traitlets.HasTraits):
         -------
         tuple[int, str]
             A tuple with the name of the array and the number that identifies it.
+
+        Examples
+        --------
+
+        >>> import xcompact3d_toolbox as x3d
+        >>> import xcompact3d_toolbox.io
+        >>> filename_properties = x3d.io.FilenameProperties(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+        >>> filename_properties.get_info_from_filename('./data/ux-010.bin')
+        (10, 'ux')
+
+        >>> filename_properties.set(
+        ...     separator = "",
+        ...     file_extension = "",
+        ...     number_of_digits = 4
+        ... )
+        >>> filename_properties.get_info_from_filename("ux0010")
+        (10, 'ux')
 
         """
         _filename = os.path.basename(filename)
@@ -164,72 +251,57 @@ class FilenameProperties(traitlets.HasTraits):
         return int(counter), prefix
 
     def get_num_from_filename(self, filename: str) -> int:
-        """Same as get_info_from_filename, but just returns the number
-        """        
+        """Same as :obj:`get_info_from_filename`, but just returns the number.
+        """
         num, _ = self.get_info_from_filename(filename)
         return num
 
-    def get_name_from_filename(self, filename: str) -> int:
-        """Same as get_info_from_filename, but just returns the name
-        """        
+    def get_name_from_filename(self, filename: str) -> str:
+        """Same as :obj:`get_info_from_filename`, but just returns the name.
+        """
         _, name = self.get_info_from_filename(filename)
         return name
 
 
 class Dataset(traitlets.HasTraits):
-    """[summary]
+    """An object to read and write the raw binary files from XCompact3d on-demand.
 
     Parameters
     ----------
     data_path : str
-        The path to the folder where the binary fields are located (default is `"./data/"`).
+        The path to the folder where the binary fields are located (default is ``"./data/"``).
     drop_coords : str
         If working with two-dimensional planes, specify which of the coordinates should be
-        dropped, i.e., `"x"`, `"y"` or `"z"`, or leave it empty for 3D fields (default is `""`).
-    filename_properties : `obj:FilenameProperties`
+        dropped, i.e., ``"x"``, ``"y"`` or ``"z"``, or leave it empty for 3D fields (default is ``""``).
+    filename_properties : :obj:`FilenameProperties`
         Specifies filename properties for the binary files, like the separator, file extension and
         number of digits.
     set_of_variables : set
-        The methods try to find all variables per snapshot, use this parameter
-        to work with just a few specified variables (default is an empty set).
+        The methods in this class will try to find all
+        variables per snapshot, use this parameter
+        to work with just a few specified variables if you
+        need to speedup your application
+        (default is an empty set).
     snapshot_counting : str
         The parameter that controls the number of timesteps used to produce tha datasets
-        (default is `"ilast"`).
+        (default is ``"ilast"``).
     snapshot_step : str
         The parameter that controls the number of timesteps between each snapshot, it is often
-        `"ioutput"` or `"iprocessing"` (default is `"ioutput"`).
+        ``"ioutput"`` or ``"iprocessing"`` (default is ``"ioutput"``).
     stack_scalar : bool
-        When `True`, the scalar fields will be stacked in a new coordinate `n`, otherwise returns one
-        array per scalar fraction (default is `False`).
+        When :obj:`True`, the scalar fields will be stacked in a new coordinate ``n``, otherwise returns one
+        array per scalar fraction (default is :obj:`False`).
     stack_velocity : bool
-        When `True`, the velocity will be stacked in a new coordinate `i` , otherwise returns one
-        array per velocity component (default is `False`).
+        When :obj:`True`, the velocity will be stacked in a new coordinate ``i`` , otherwise returns one
+        array per velocity component (default is obj:`False`).
 
-    Returns
-    -------
-    `obj:Dataset`
-        An object to read and write the raw binary files from XCompact3d on-demand.
+    Notes
+    -----
+        :obj:`Dataset` is in fact an atribute of :obj:`xcompact3d_toolbox.parameters.Parameters`,
+        so there is no need to initialize it manually for most of the common use cases.
 
-    Yields
-    -------
-    `obj:xarray.Dataset`
-        [description]
+    """
 
-    Raises
-    ------
-    TypeError
-        [description]
-    KeyError
-        [description]
-    IOError
-        [description]
-    IOError
-        [description]
-    IOError
-        [description]
-    IOError
-        [description]
-    """    
     data_path = traitlets.Unicode(default_value="./data/")
     drop_coords = traitlets.Unicode(default_value="")
     filename_properties = traitlets.Instance(klass=FilenameProperties)
@@ -245,6 +317,24 @@ class Dataset(traitlets.HasTraits):
     )
 
     def __init__(self, **kwargs):
+        """Initializes the Dataset class.
+
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments for the parameters, like :obj:`data_path`, :obj:`drop_coords` and so on.
+
+        Raises
+        -------
+        KeyError
+            Exception is raised when an Keyword arguments is not a valid parameter.
+
+        Returns
+        -------
+        :obj:`Dataset`
+            An object to read and write the raw binary files from XCompact3d on-demand.
+
+        """
 
         self.set_of_variables = set()
         self.filename_properties = FilenameProperties()
@@ -254,10 +344,43 @@ class Dataset(traitlets.HasTraits):
         self.set(**kwargs)
 
     def __call__(self, *args) -> Type(xr.Dataset):
+        """[summary]
+
+        Parameters
+        ----------
+        *args : int
+            Same arguments used for a :obj:`range`.
+
+        Yields
+        ------
+        :obj:`xarray.Dataset`
+            Dataset containing the arrays loaded from the disc with the appropriate dimensions,
+            coordinates and attributes.
+        """        
         for t in range(*args):
             yield self.load_snapshot(t)
 
-    def __getitem__(self, arg) -> Type(xr.Dataset):
+    def __getitem__(self, arg: Union[int, slice, str]) -> Type(xr.Dataset):
+        """[summary]
+
+        .. note:: Make sure to have enough memory to load many files at the same time.
+
+        Parameters
+        ----------
+        arg : :obj:`int` or :obj:`slice` or :obj:`str`
+            [description]
+
+        Returns
+        -------
+        :obj:`Dataset` or :obj:`xarray.DataArray`
+            Xarray objects containing values loaded from the disc with the appropriate dimensions,
+            coordinates and attributes.
+
+        Raises
+        ------
+        TypeError
+            Raises type error if arg is not an interger, string or slice
+        """        
         if isinstance(arg, int):
             return self.load_snapshot(arg)
         elif isinstance(arg, slice):
@@ -269,7 +392,14 @@ class Dataset(traitlets.HasTraits):
             return self.load_time_series(arg)
         raise TypeError("Dataset indices should be integers, string or slices")
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """Make the dataset work with the Python function :obj:`len`.
+
+        Returns
+        -------
+        int
+            Total of snapshots as a function of :obj:`snapshot_counting` and :obj:`snapshot_step`.
+        """        
         # Test environment
         if self._prm is None:
             return 11
@@ -280,6 +410,13 @@ class Dataset(traitlets.HasTraits):
         )
 
     def __iter__(self):
+        """[summary]
+
+        Yields
+        -------
+        [type]
+            [description]
+        """        
         for t in range(len(self)):
             yield self.load_snapshot(t)
 
@@ -293,23 +430,36 @@ class Dataset(traitlets.HasTraits):
         return string
 
     @property
-    def _time_step(self):
+    def _time_step(self) -> float:
+        """Time step value between snapshots
+        """
         # test environment
         if self._prm is None:
             return 1.0
         return self._prm.dt * getattr(self._prm, self.snapshot_step)
 
     def set(self, **kwargs):
+        """Set new values for any of the properties after the initialization.
+
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments for the parameters, like :obj:`data_path`, :obj:`drop_coords` and so on.
+
+        Raises
+        -------
+        KeyError
+            Exception is raised when an Keyword arguments is not a valid parameter.
+
+        """
 
         for key, arg in kwargs.items():
             if key not in self.trait_names():
-                raise KeyError(
-                    f"{key} is not a valid argument for Dataset"
-                )
+                raise KeyError(f"{key} is not a valid argument for Dataset")
             setattr(self, key, arg)
 
-    def load_array(self, filename: str, add_time=True, attrs: dict = None):
-        """This method reads a binary field from Xcompact3d with :obj:`numpy.fromfile`
+    def load_array(self, filename: str, add_time: bool = True, attrs: dict = None):
+        """This method reads a binary field from XCompact3d with :obj:`numpy.fromfile`
         and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
         coordinates and attributes.
 
@@ -318,63 +468,16 @@ class Dataset(traitlets.HasTraits):
         Parameters
         ----------
         filename : str
-            Name of the file to be read.
-        coords : dict of array_like objects or None, optional
-            Coordinates (tick labels) to use for indexing along each dimension (see
-            :obj:`xarray.DataArray`). If dims=None (default), coordinates are inferred
-            from the folder structure.
-        name : str, optional
-            Name of this array. If name is empty (default), it is inferred
-            from filename.
+            Name of the file.
+        add_time : bool, optional
+            Add time as a coordinate (default is :obj:`True`).
         attrs : dict_like, optional
-            Attributes to assign to the new instance. Boundary conditions are
-            automatically included in this method, for derivatives routines.
+            Attributes to assign to the new instance :obj:`xarray.DataArray`.
 
         Returns
         -------
         :obj:`xarray.DataArray`
-            Data array containing values read from the disc. Attributes include
-            the proper boundary conditions for derivatives if the
-            file prefix is ``ux``, ``uy``, ``uz``, ``phi`` or ``pp``.
-
-        Examples
-        -------
-
-        >>> prm = x3d.Parameters()
-
-        >>> xcompact3d_toolbox.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
-        >>> xcompact3d_toolbox.param["mytype"] = np.float32 # otherwise
-
-        In the following cases, coordinates and dimensions are infered from the
-        folder containing the file:
-
-        >>> uy = prm.read_field('./data/xy_planes/uy-00000400.bin')
-        >>> uz = prm.read_field('./data/xz_planes/uz-00000400.bin')
-        >>> ux = prm.read_field('./data/3d_snapshots/ux-00000400.bin')
-
-        It is possible to handle 3D arrays with the filenames from previous X3d's
-        versions:
-
-        >>> ux = x3d.read_field('./data/ux0010')
-
-        If it is a plane and not included in the folder structure presented above,
-        just delete the extra coordinate from the dictionary
-        returned by :obj:`xcompact3d_toolbox.parameters.Parameters.get_mesh` and
-        inform it as an argument. For example, to read a xy-plane:
-
-        >>> mesh = prm.get_mesh
-        >>> del mesh['z']
-        >>> ux = x3d.read_field('./data/uy0010', coords = prm.get_mesh)
-
-        Notes
-        ----
-
-        Take a look at xarray_'s documentation, specially, see `Why xarray?`_.
-        :obj:`xarray.DataArray` includes many useful methods for indexing,
-        comparisons, reshaping and reorganizing, computations and plotting.
-
-        .. _xarray: http://xarray.pydata.org/en/stable/
-        .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
+            Data array containing values loaded from the disc.
         """
 
         coords = self._mesh.drop(*self.drop_coords)
@@ -402,13 +505,42 @@ class Dataset(traitlets.HasTraits):
 
     def load_snapshot(
         self,
-        numerical_identifier,
+        numerical_identifier: int,
         list_of_variables: list = None,
         add_time: bool = True,
         stack_scalar: bool = None,
         stack_velocity: bool = None,
     ) -> Type[xr.Dataset]:
+        """Load the variables for a given snapshot.
 
+        Parameters
+        ----------
+        numerical_identifier : int
+            The number of the snapshot
+        list_of_variables : list, optional
+            List of variables to be loaded, if None, it uses :obj:`dataset.set_of_variables`,
+            if :obj:`dataset.set_of_variables` is empty, it automatically loads all arrays from
+            this snapshot, by default None.
+        add_time : bool, optional
+            Add time as a coordinate, by default True
+        stack_scalar : bool, optional
+            When true, the scalar fields will be stacked in a new coordinate ``n``, otherwise returns one array per scalar fraction.
+            If none, it uses :obj:`dataset.stack_scalar`, by default None
+        stack_velocity : bool, optional
+            When true, the velocity will be stacked in a new coordinate ``i``, otherwise returns one array per velocity component.
+            If none, it uses :obj:`dataset.stack_scalar`, by default None
+
+        Returns
+        -------
+        :obj:`xarray.Dataset`
+            Dataset containing the arrays loaded from the disc with the appropriate dimensions,
+            coordinates and attributes.
+
+        Raises
+        ------
+        IOError
+            Raises IO error if it does not find any variable for this snapshot.
+        """        
         dataset = xr.Dataset()
 
         if list_of_variables is not None:
@@ -482,64 +614,27 @@ class Dataset(traitlets.HasTraits):
 
         return dataset
 
-    def load_time_series(self, array_prefix: str):
-        """Reads all files matching the ``filename_pattern`` with
-        :obj:`xcompact3d_toolbox.parameters.Parameters.read_field` and
-        concatenates them into a time series.
+    def load_time_series(self, array_prefix: str) -> Type[xr.DataArray]:
+        """Load the entire time series for a given variable.
 
         .. note:: Make sure to have enough memory to load all files at the same time.
 
         Parameters
         ----------
-        filename_pattern : str
-            A specified pattern according to the rules used by the Unix shell.
-        steep : str
-            The variable at the parameters class that controls how many time steps
-            are computed between snapshots. Default is ``ioutput``. Only useful
-            if ``filenamedigits = 1``.
-        progress_function : str
-            Activates a progress bar with the options ``tqdm`` or ``notebook``,
-            or turn it off when the string is empty (default).
-        **kwargs :
-            Arguments to be send to :obj:`xcompact3d_toolbox.parameters.Parameters.read_field`,
-            like ``coords``, ``name`` and ``attrs``.
+        array_prefix : str
+            Name of the variable, for instance ``ux``, ``uy``, ``uz``, ``pp``, ``phi1``.
 
         Returns
         -------
         :obj:`xarray.DataArray`
-            Data array containing values read from the disc.
+            DataArray containing the time series loaded from the disc,
+            with the appropriate dimensions, coordinates and attributes.
 
-        Examples
-        -------
-
-        >>> prm = x3d.Parameters()
-
-        >>> x3d.param["mytype"] = np.float64 # if x3d was compiled with `-DDOUBLE_PREC`
-        >>> x3d.param["mytype"] = np.float32 # otherwise
-
-        In the following cases, coordinates and dimensions are infered from the
-        folder containing the file and time from the filenames:
-
-        >>> ux = prm.read_all_fields('./data/3d_snapshots/ux-*.bin')
-        >>> uy = prm.read_all_fields('./data/xy_planes/uy-*.bin')
-        >>> uz = prm.read_all_fields('./data/xz_planes/uz-0000??00.bin')
-
-        It is possible to handle 3D arrays with the filenames from previous X3d's
-        versions:
-
-        >>> ux = prm.read_all_fields('./data/ux????')
-
-        If it is a plane and not included in the folder structure presented above,
-        just delete the extra coordinate from the dictionary
-        returned by :obj:`xcompact3d_toolbox.parameters.Parameters.get_mesh` and
-        inform it as an argument. For example, to read a xy-plane:
-
-        >>> mesh = prm.get_mesh
-        >>> del mesh['z']
-        >>> ux = x3d.read_all_fields('./data/uy????', coords = prm.get_mesh)
-
-        """
-
+        Raises
+        ------
+        IOError
+            Raises IO error if it does not find any snapshot for this variable.
+        """        
         target_filename = self.filename_properties.get_filename_for_binary(
             array_prefix, "*"
         )
@@ -557,42 +652,37 @@ class Dataset(traitlets.HasTraits):
             dim="t",
         )
 
-    def write(self, data, file_prefix: str = None):
-        """Write the arrays in this data set to binary files on the disc, in the
+    def write(self, data: Union[xr.DataArray, xr.Dataset], file_prefix: str = None):
+        """Write an array or dataset to binary files on the disc, in the
         same order that Xcompact3d would do, so they can be easily read with
         2DECOMP.
 
-        In order to avoid overwriting any relevant field, only variables with
-        an **attribute** called ``file_name`` will be written.
-
-        See :obj:`xcompact3d_toolbox.array.X3dDataArray` for more information.
-
-        Write the array to binary files on the disc, in the same order that
-        Xcompact3d would do, so they can be easily read with 2DECOMP.
+        In order to avoid overwriting any relevant field, only the variables in a dataset
+        with an **attribute** called ``file_name`` will be written.
 
         Coordinates are properly aligned before writing.
 
-        If filename is not provided, it may be obtained from the **attribute**
-        called ``file_name``.
-
         If ``n`` is a valid coordinate (for scalar fractions) in the array, one
         numerated binary file will be written for each scalar field.
+
+        If ``i`` is a valid coordinate (for velocity components) in the array, one
+        binary file will be written for each of them (x, y or z).
 
         If ``t`` is a valid coordinate (for time) in the array, one numerated
         binary file will be written for each available time.
 
         Parameters
         ----------
-        data : [type]
-            [description]
+        data : :obj:`xarray.DataArray` or :obj:`xarray.Dataset`
+            Data to be written
         file_prefix : str, optional
-            [description], by default None
+            filename prefix for the array, if data is :obj:`xarray.DataArray`, by default None
 
         Raises
         ------
         IOError
-            [description]
-        """        
+            Raises IO error data is not an :obj:`xarray.DataArray` or :obj:`xarray.Dataset`.
+        """
         if isinstance(data, xr.Dataset):
             self._write_dataset(data)
         elif isinstance(data, xr.DataArray):
@@ -602,8 +692,8 @@ class Dataset(traitlets.HasTraits):
                 f"Invalid type for data, try with: xarray.Dataset or xarray.DataArray"
             )
 
-    def _write_dataset(self, dataset):
-        
+    def _write_dataset(self, dataset) -> None:
+
         for array_name, array in dataset.items():
             if "file_name" in array.attrs:
                 self._write_array(array)
@@ -658,37 +748,32 @@ class Dataset(traitlets.HasTraits):
                 filename_and_path
             )
 
-    def write_xdmf(self, xdmf_name: str = "snapshots.xdmf",) -> None:
-        """Writes four xdmf files:
+    def write_xdmf(self, xdmf_name: str = "snapshots.xdmf") -> None:
+        """Write the xdmf file, so the results from the simulation and its postprocessing
+        can be opened in an external visualization tool, like Paraview.
 
-        * ``./data/3d_snapshots.xdmf`` for 3D snapshots in ``./data/3d_snapshots/*``;
-        * ``./data/xy_planes.xdmf`` for planes in ``./data/xy_planes/*``;
-        * ``./data/xz_planes.xdmf`` for planes in ``./data/xz_planes/*``;
-        * ``./data/yz_planes.xdmf`` for planes in ``./data/yz_planes/*``.
+        Make sure to set all the parameters in this object properly.
 
-        Shape and time are inferted from folder structure and filenames.
-        File list is obtained automatically with :obj:`glob`.
+        If :obj:`set_of_objects` is empty, the files are obtained automatically with :obj:`glob.glob`.
 
-        .. note:: For now, this is only compatible with the new filename structure,
-            the conversion is exemplified in `convert_filenames_x3d_toolbox`_.
+        Parameters
+        ----------
+        xdmf_name : str, optional
+            Filename for the xdmf file, by default "snapshots.xdmf"
 
-        .. _`convert_filenames_x3d_toolbox`: https://gist.github.com/fschuch/5a05b8d6e9787d76655ecf25760e7289
-
-        Examples
-        -------
-
-        >>> prm = x3d.Parameters()
-        >>> prm.write_xdmf()
-
+        Raises
+        ------
+        IOError
+            Raises IO error if it does not find any file for this simulation.
         """
         if self.set_of_variables:
             time_numbers = range(len(self))
             var_names = sorted(list(self.set_of_variables))
         else:
             filename_pattern = self.filename_properties.get_filename_for_binary(
-                "*", "*", self.data_path
+                prefix = "*", counter = "*", data_path = self.data_path
             )
-            filename_list = glob.iglob(filename_pattern)
+            filename_list = glob.glob(filename_pattern)
 
             if not filename_list:
                 raise IOError(f"No file was found corresponding to {filename_pattern}.")
@@ -712,9 +797,9 @@ class Dataset(traitlets.HasTraits):
 
         if "x" in self.drop_coords:
             nx, dx = 1, 0.0
-        elif "y" in self.drop_coords:
+        if "y" in self.drop_coords:
             ny, dy = 1, 0.0
-        elif "z" in self.drop_coords:
+        if "z" in self.drop_coords:
             nz, dz = 1, 0.0
 
         prec = 8 if param["mytype"] == np.float64 else 4
