@@ -1,16 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Usefull objects to read and write the binary fields produced by XCompact3d.
-
-Notes
------
-
-Take a look at xarray_'s documentation, specially, see `Why xarray?`_
-:obj:`xarray.DataArray` includes many useful methods for indexing,
-comparisons, reshaping and reorganizing, computations and plotting.
-
-.. _xarray: http://xarray.pydata.org/en/stable/
-.. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
 """
 
 from __future__ import annotations
@@ -44,7 +34,9 @@ class FilenameProperties(traitlets.HasTraits):
         The file extension that identify the raw binary files from XCompact3d, it
         can be an empty string (default is ``".bin"``).
     number_of_digits : int
-        Tue number of numerical digits used to identify the time series (default is ``3``).
+        The number of numerical digits used to identify the time series (default is ``3``).
+    scalar_num_of_digits : int
+        The number of numerical digits used to identify each scalar field (default is ``1``).
 
     Notes
     -----
@@ -57,6 +49,7 @@ class FilenameProperties(traitlets.HasTraits):
     separator = traitlets.Unicode(default_value="-")
     file_extension = traitlets.Unicode(default_value=".bin")
     number_of_digits = traitlets.Int(default_value=3, min=1)
+    scalar_num_of_digits = traitlets.Int(default_value=1, min=1)
 
     def __init__(self, **kwargs):
         """Initializes the object.
@@ -264,7 +257,7 @@ class FilenameProperties(traitlets.HasTraits):
 
 
 class Dataset(traitlets.HasTraits):
-    """An object to read and write the raw binary files from XCompact3d on-demand.
+    """An object that reads and writes the raw binary files from XCompact3d on-demand.
 
     Parameters
     ----------
@@ -297,8 +290,26 @@ class Dataset(traitlets.HasTraits):
 
     Notes
     -----
-        :obj:`Dataset` is in fact an atribute of :obj:`xcompact3d_toolbox.parameters.Parameters`,
+        :obj:`Dataset` is in fact an atribute of :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
         so there is no need to initialize it manually for most of the common use cases.
+
+        All arrays are wrapped into Xarray objects (:obj:`xarray.DataArray`
+        or :obj:`xarray.Dataset`), take a look at xarray_'s documentation,
+        specially, see `Why xarray?`_
+        Xarray has many useful methods for indexing, comparisons, reshaping
+        and reorganizing, computations and plotting.
+
+        Consider using hvPlot_ to explore your data interactively,
+        see how to plot `Gridded Data`_.
+
+        .. _xarray: http://xarray.pydata.org/en/stable/
+        .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
+        .. _hvPlot : https://hvplot.holoviz.org/
+        .. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
+
+    Examples
+    --------
+        See :obj:`xcompact3d.parameters.ParametersExtras`.
 
     """
 
@@ -343,8 +354,9 @@ class Dataset(traitlets.HasTraits):
 
         self.set(**kwargs)
 
-    def __call__(self, *args) -> Type(xr.Dataset):
-        """[summary]
+    def __call__(self, *args) -> Type[xr.Dataset]:
+        """Yields selected snapshots, so the application can iterate over them,
+        loading one by one, with the same arguments of a classic Python :obj:`range`.
 
         Parameters
         ----------
@@ -356,23 +368,30 @@ class Dataset(traitlets.HasTraits):
         :obj:`xarray.Dataset`
             Dataset containing the arrays loaded from the disc with the appropriate dimensions,
             coordinates and attributes.
-        """        
+        """
         for t in range(*args):
             yield self.load_snapshot(t)
 
-    def __getitem__(self, arg: Union[int, slice, str]) -> Type(xr.Dataset):
-        """[summary]
+    def __getitem__(self, arg: Union[int, slice, str]) -> Union[Type[xr.DataArray], Type[xr.Dataset]]:
+        """Get specified items from the disc.
 
         .. note:: Make sure to have enough memory to load many files at the same time.
 
         Parameters
         ----------
         arg : :obj:`int` or :obj:`slice` or :obj:`str`
-            [description]
+            Specifies the items to load from the disc, depending on the type of the argument:
+
+            * :obj:`int` returns the specified snapshot in a :obj:`xarray.Dataset`.
+              It is equivalent to :obj:`Dataset.load_snapshot`;
+            * :obj:`slice` returns the specified snapshots in a :obj:`xarray.Dataset`;
+            * :obj:`str` returns the entire time series for a given variable in a
+              :obj:`xarray.DataArray`.
+              It is equivalent to :obj:`Dataset.load_time_series`;
 
         Returns
         -------
-        :obj:`Dataset` or :obj:`xarray.DataArray`
+        :obj:`xarray.Dataset` or :obj:`xarray.DataArray`
             Xarray objects containing values loaded from the disc with the appropriate dimensions,
             coordinates and attributes.
 
@@ -380,7 +399,7 @@ class Dataset(traitlets.HasTraits):
         ------
         TypeError
             Raises type error if arg is not an interger, string or slice
-        """        
+        """
         if isinstance(arg, int):
             return self.load_snapshot(arg)
         elif isinstance(arg, slice):
@@ -399,7 +418,7 @@ class Dataset(traitlets.HasTraits):
         -------
         int
             Total of snapshots as a function of :obj:`snapshot_counting` and :obj:`snapshot_step`.
-        """        
+        """
         # Test environment
         if self._prm is None:
             return 11
@@ -410,13 +429,14 @@ class Dataset(traitlets.HasTraits):
         )
 
     def __iter__(self):
-        """[summary]
+        """Yields all the snapshots, so the application can iterate over them.
 
         Yields
-        -------
-        [type]
-            [description]
-        """        
+        ------
+        :obj:`xarray.Dataset`
+            Dataset containing the arrays loaded from the disc with the appropriate dimensions,
+            coordinates and attributes.
+        """
         for t in range(len(self)):
             yield self.load_snapshot(t)
 
@@ -458,7 +478,7 @@ class Dataset(traitlets.HasTraits):
                 raise KeyError(f"{key} is not a valid argument for Dataset")
             setattr(self, key, arg)
 
-    def load_array(self, filename: str, add_time: bool = True, attrs: dict = None):
+    def load_array(self, filename: str, add_time: bool = True, attrs: dict = None) -> Type[xr.DataArray]:
         """This method reads a binary field from XCompact3d with :obj:`numpy.fromfile`
         and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
         coordinates and attributes.
@@ -516,19 +536,19 @@ class Dataset(traitlets.HasTraits):
         Parameters
         ----------
         numerical_identifier : int
-            The number of the snapshot
+            The number of the snapshot.
         list_of_variables : list, optional
-            List of variables to be loaded, if None, it uses :obj:`dataset.set_of_variables`,
-            if :obj:`dataset.set_of_variables` is empty, it automatically loads all arrays from
+            List of variables to be loaded, if None, it uses :obj:`Dataset.set_of_variables`,
+            if :obj:`Dataset.set_of_variables` is empty, it automatically loads all arrays from
             this snapshot, by default None.
         add_time : bool, optional
-            Add time as a coordinate, by default True
+            Add time as a coordinate, by default True.
         stack_scalar : bool, optional
             When true, the scalar fields will be stacked in a new coordinate ``n``, otherwise returns one array per scalar fraction.
-            If none, it uses :obj:`dataset.stack_scalar`, by default None
+            If none, it uses :obj:`Dataset.stack_scalar`, by default None
         stack_velocity : bool, optional
             When true, the velocity will be stacked in a new coordinate ``i``, otherwise returns one array per velocity component.
-            If none, it uses :obj:`dataset.stack_scalar`, by default None
+            If none, it uses :obj:`Dataset.stack_scalar`, by default None.
 
         Returns
         -------
@@ -540,7 +560,7 @@ class Dataset(traitlets.HasTraits):
         ------
         IOError
             Raises IO error if it does not find any variable for this snapshot.
-        """        
+        """
         dataset = xr.Dataset()
 
         if list_of_variables is not None:
@@ -576,14 +596,20 @@ class Dataset(traitlets.HasTraits):
                 **kwargs,
             )
 
+        def is_scalar(name):
+            if len(name) != (3 + self.filename_properties.scalar_num_of_digits):
+                return False
+            if not name.startswith("phi"):
+                return False
+            if not name.removeprefix("phi").isdigit():
+                return False
+            return True
+
+        def is_velocity(name):
+            return name in {"ux", "uy", "uz"}
+
         if stack_scalar:
-            scalar_variables = sorted(
-                list(
-                    filter(
-                        lambda name: len(name) == 4 and "phi" in name, set_of_variables
-                    )
-                )
-            )
+            scalar_variables = sorted(list(filter(is_scalar, set_of_variables,)))
 
             if scalar_variables:
                 dataset["phi"] = (
@@ -594,9 +620,7 @@ class Dataset(traitlets.HasTraits):
                 set_of_variables -= set(scalar_variables)
 
         if stack_velocity:
-            velocity_variables = sorted(
-                list(filter(lambda name: name in {"ux", "uy", "uz"}, set_of_variables))
-            )
+            velocity_variables = sorted(list(filter(is_velocity, set_of_variables)))
             if velocity_variables:
                 dataset["u"] = (
                     stack_variables(velocity_variables, stack_velocity=False)
@@ -634,7 +658,7 @@ class Dataset(traitlets.HasTraits):
         ------
         IOError
             Raises IO error if it does not find any snapshot for this variable.
-        """        
+        """
         target_filename = self.filename_properties.get_filename_for_binary(
             array_prefix, "*"
         )
@@ -711,7 +735,8 @@ class Dataset(traitlets.HasTraits):
         if "n" in dataArray.dims:
             for n, n_val in enumerate(dataArray.n.data):
                 self._write_array(
-                    dataArray.isel(n=n, drop=True), filename=f"{filename}{n_val}"
+                    dataArray.isel(n=n, drop=True),
+                    filename=f"{filename}{str(n_val).zfill(self.filename_properties.scalar_num_of_digits)}",
                 )
         # If i is a dimension, call write recursively to save
         # ux, uy and uz, for instance
@@ -771,7 +796,7 @@ class Dataset(traitlets.HasTraits):
             var_names = sorted(list(self.set_of_variables))
         else:
             filename_pattern = self.filename_properties.get_filename_for_binary(
-                prefix = "*", counter = "*", data_path = self.data_path
+                prefix="*", counter="*", data_path=self.data_path
             )
             filename_list = glob.glob(filename_pattern)
 

@@ -438,17 +438,17 @@ class ParametersInOutParam(traitlets.HasTraits):
     """int: Frequency for online postprocessing.
     """
 
-    ninflows = traitlets.Int(default_value=1, min=1).tag(group="NumOptions")
+    ioutflow = traitlets.Int(default_value=0).tag(group="InOutParam")
 
-    ntimesteps = traitlets.Int(default_value=1, min=1).tag(group="NumOptions")
+    ninflows = traitlets.Int(default_value=1, min=1).tag(group="InOutParam")
+
+    ntimesteps = traitlets.Int(default_value=1, min=1).tag(group="InOutParam")
 
     inflowpath = traitlets.Unicode(default_value="./")
 
-    ioutflow = traitlets.Int(default_value=0).tag(group="NumOptions")
+    output2D = traitlets.Int(default_value=0).tag(group="InOutParam")
 
-    output2D = traitlets.Int(default_value=0).tag(group="NumOptions")
-
-    nprobes = traitlets.Int(default_value=0, min=0).tag(group="NumOptions")
+    nprobes = traitlets.Int(default_value=0, min=0).tag(group="InOutParam")
 
     def __init__(self):
         super(ParametersInOutParam, self).__init__()
@@ -609,7 +609,7 @@ class ParametersIbmStuff(traitlets.HasTraits):
 
 class ParametersExtras(traitlets.HasTraits):
     """Extra utilities that are not present at the parameters file,
-    but are usefull for Python aplications.
+    but are usefull for Python applications.
     """
 
     filename = traitlets.Unicode(default_value="input.i3d").tag()
@@ -621,7 +621,111 @@ class ParametersExtras(traitlets.HasTraits):
     """
 
     dataset = traitlets.Instance(klass=Dataset)
-    """:obj:`xcompact3d_toolbox.io.Dataset`: Dataset object.
+    """:obj:`xcompact3d_toolbox.io.Dataset`: An object that reads
+    and writes the raw binary files from XCompact3d on-demand.
+
+    Notes
+    -----
+
+    All arrays are wrapped into Xarray objects (:obj:`xarray.DataArray`
+    or :obj:`xarray.Dataset`), take a look at xarray_'s documentation,
+    specially, see `Why xarray?`_
+    Xarray has many useful methods for indexing, comparisons, reshaping
+    and reorganizing, computations and plotting.
+
+    Consider using hvPlot_ to explore your data interactively,
+    see how to plot `Gridded Data`_.
+
+    .. _xarray: http://xarray.pydata.org/en/stable/
+    .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
+    .. _hvPlot: https://hvplot.holoviz.org/
+    .. _`Gridded Data`: https://hvplot.holoviz.org/user_guide/Gridded_Data.html
+
+    Examples
+    --------
+    
+    The first step is specify the filename properties.
+    If the simulated fields are named like ``ux-000.bin``, they are in the default
+    configuration, there is no need to specify filename properties. But just in case,
+    it would be like:
+
+    >>> prm = xcompact3d_toolbox.Parameters()
+    >>> prm.dataset.filename_properties.set(
+    ...     separator = "-",
+    ...     file_extension = ".bin",
+    ...     number_of_digits = 3
+    ... )
+
+    If the simulated fields are named like ``ux0000``, the parameters are:
+
+    >>> prm = xcompact3d_toolbox.Parameters()
+    >>> prm.dataset.filename_properties.set(
+    ...     separator = "",
+    ...     file_extension = "",
+    ...     number_of_digits = 4
+    ... )
+
+    Data type is defined by :obj:`xcompact3d_toolbox.param["mytype"]`.
+
+    Now it is possible to customize the way the dataset
+    will be handled:
+
+    >>> prm.dataset.set(
+    ...     data_path = "./data/",
+    ...     drop_coords = "",
+    ...     set_of_variables = {"ux", "uy", "uz"},
+    ...     snapshot_step = "ioutput",
+    ...     snapshot_counting = "ilast",
+    ...     stack_scalar = True,
+    ...     stack_velocity = False,
+    ... )
+
+    There are many ways to load the arrays produced by
+    your numerical simulation, so you can choose what
+    best suits your post-processing application.
+    See the examples:
+
+    * Load one array from the disc:
+
+      >>> ux = prm.dataset.load_array("ux-0000.bin")
+    
+    * Load the entire time series for a given variable:
+
+      >>> ux = prm.dataset.load_time_series("ux")
+
+      or just:
+
+      >>> ux = prm.dataset["ux"]
+    
+    * Load all variables from a given snapshot:
+
+      >>> snapshot = prm.dataset.load_snapshot(10)
+
+      or just:
+
+      >>> snapshot = prm.dataset[10]
+    
+    * Iterate over all snapshots, loading them one by one:
+
+      >>> for ds in prm.dataset:
+      ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+      ...     prm.dataset.wite(data = vort, file_prefix = "w3")
+
+    * Iterate over some snapshots, loading them one by one, with the same arguments
+      of a classic Python :obj:`range`, for instance, from 0 to 100 with a step of 5:
+
+      >>> for ds in prm.dataset(0, 101, 5):
+      ...     vorticity = ds.uy.differentiate("x") - ds.ux.differentiate("y")
+      ...     prm.dataset.wite(data = vorticity, file_prefix = "w3")
+    
+    * Or simply load all snapshots at once (if you have enough memory):
+
+      >>> ds = prm.dataset[:]
+    
+    And finally, it is possible to produce a new xdmf file, so all data
+    can be visualized on any external tool:
+
+    >>> prm.dataset.write_xdmf()
     """
 
     dx, dy, dz = [traitlets.Float().tag() for _ in "x y z".split()]
@@ -667,7 +771,7 @@ class Parameters(
     dynamically calculated default values, and ‘on change’ callbacks.
     In this way, many of the parameters are validated regarding the type,
     business rules, and the range of values supported by XCompact3d.
-    There are methods to handle the parameters file (:obj:`.i3d` and :obj:`.prm`).
+    There are methods to handle the parameters file (``.i3d`` and ``.prm``).
     
     The parameters are arranged in different classes, but just for organization purposes,
     this class inherits from all of them.
@@ -677,7 +781,7 @@ class Parameters(
 
     After that, it is time to read the binary arrays produced by XCompact3d and also
     to write a new xdmf file, so the  binary fields can be opened in any external
-    visualization tool. See more details in :obj:`xcompact3d_toolbox.io.Dataset`.
+    visualization tool. See more details in :obj:`xcompact3d_toolbox.parameters.ParametersExtras.dataset`.
 
     .. _traitlets:
         https://traitlets.readthedocs.io/en/stable/index.html
@@ -689,7 +793,7 @@ class Parameters(
         This is a work in progress, not all parameters are covered yet.
     """
 
-    def __init__(self, raise_warning:bool = False, **kwargs):
+    def __init__(self, raise_warning: bool = False, **kwargs):
         """Initializes the Parameters Class.
 
         Parameters
@@ -838,6 +942,9 @@ class Parameters(
                 elif isinstance(param, str):
                     param = "'" + param + "'"
                     string += f"{paramkey:>15} = {param:<15} {'! '+description}\n"
+                elif isinstance(param, bool):
+                    param = ".true." if param else ".false."
+                    string += f"{paramkey:>15} = {param:<15} {'! '+description}\n"
                 else:
                     string += f"{paramkey:>15} = {param:<15} {'! '+description}\n"
             string += "\n"
@@ -961,7 +1068,7 @@ class Parameters(
 
         self.size = convert_bytes(count)
 
-    def get_boundary_condition(self, variable_name : str) -> dict:
+    def get_boundary_condition(self, variable_name: str) -> dict:
         """This method returns the appropriate boundary parameters that are
         expected by the derivatives methods.
 
@@ -1000,7 +1107,7 @@ class Parameters(
 
         return boundary_condition(self, variable_name)
 
-    def set(self, raise_warning:bool = False, **kwargs) -> None:
+    def set(self, raise_warning: bool = False, **kwargs) -> None:
         """Set a new value for any parameter after the initialization.
 
         Parameters
@@ -1008,6 +1115,8 @@ class Parameters(
         raise_warning : bool, optional
             Raise a warning instead of an error if an invalid parameter is found.
             By default False.
+        **kwargs
+            Keyword arguments for valid attributes, like ``nx``, ``re`` and so on.
 
         Raises
         ------
@@ -1024,7 +1133,7 @@ class Parameters(
         ...     p_col = 2,
         ... )
 
-        """        
+        """
         # They are high priority in order to avoid erros with validations and observations
         for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn numscalar ilesmod".split():
             if bc in kwargs:
@@ -1038,13 +1147,16 @@ class Parameters(
                     raise KeyError(f"{key} is not a valid parameter")
             setattr(self, key, arg)
 
-    def load(self, raise_warning:bool = False) -> None:
+    def load(self, filename: str = None, raise_warning: bool = False) -> None:
         """Loads the attributes from the parameters file.
 
         It also includes support for the previous format :obj:`.prm`  (see `#7`_).
 
         Parameters
         ----------
+        filename : str, optional
+            The filename for the parameters file. If None, it uses the filename specified
+            in the class (default is :obj:`None`).
         raise_warning : bool, optional
             Raise a warning instead of an error if an invalid parameter is found.
             By default False.
@@ -1062,6 +1174,9 @@ class Parameters(
         >>> prm = xcompact3d_toolbox.Parameters(filename = 'example.i3d')
         >>> prm.load()
 
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> prm.load('example.i3d')
+
         or just:
 
         >>> prm = xcompact3d_toolbox.Parameters(loadfile = 'example.i3d')
@@ -1070,7 +1185,9 @@ class Parameters(
         .. _#7:
             https://github.com/fschuch/xcompact3d_toolbox/issues/7
 
-        """      
+        """
+        if filename is None:
+            filename = self.filename
         if self.filename.split(".")[-1] == "i3d":
             dictionary = {}
 
@@ -1089,7 +1206,7 @@ class Parameters(
 
         self.set(raise_warning, **dictionary)
 
-    def write(self, filename : str = None) -> None:
+    def write(self, filename: str = None) -> None:
         """Write all valid attributes to an :obj:`.i3d` file.
 
         An attribute is considered valid if it has a ``tag`` named ``group``,
@@ -1097,7 +1214,7 @@ class Parameters(
 
         Parameters
         ----------
-        filename : str
+        filename : str, optional
             The filename for the :obj:`.i3d` file. If None, it uses the filename specified
             in the class (default is :obj:`None`).
 
@@ -1105,7 +1222,7 @@ class Parameters(
         --------
 
         >>> prm = xcompact3d_toolbox.Parameters(
-        ...     filename = 'example.i3d'
+        ...     filename = 'example.i3d',
         ...     nx = 101,
         ...     ny = 65,
         ...     nz = 11,
@@ -1115,7 +1232,7 @@ class Parameters(
 
         or just:
 
-        >>> prm.write(filename = example.i3d')
+        >>> prm.write('example.i3d')
 
         """
         if filename is None:

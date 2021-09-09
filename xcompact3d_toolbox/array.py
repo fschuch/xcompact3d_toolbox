@@ -3,9 +3,12 @@
 form of dimensions, coordinates and attributes on top of raw `NumPy`_-like
 arrays, which allows for a more intuitive, more concise, and less error-prone
 developer experience. See `xarray`_'s User Guide for a complete overview about
-its data structures and buit-in functions for indexing, selecting, computing,
+its data structures and built-in functions for indexing, selecting, computing,
 plotting and much more.
 It integrates tightly with `dask`_ for parallel computing.
+
+Consider using hvPlot_ to explore your data interactively,
+see how to plot `Gridded Data`_.
 
 **Xcompact3d_toolbox** adds extra functions on top of :obj:`xarray.DataArray`
 and :obj:`xarray.Dataset`, all the details are described bellow.
@@ -16,6 +19,9 @@ and :obj:`xarray.Dataset`, all the details are described bellow.
     https://numpy.org/
 .. _xarray:
     http://xarray.pydata.org/en/stable/
+.. _hvPlot : https://hvplot.holoviz.org/
+.. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
+
 """
 
 from .mesh import _stretching
@@ -126,7 +132,7 @@ class X3dDataset:
         """Coerce all arrays in this dataset into dask arrays.
 
         It applies ``chunk=-1`` for all coordinates listed in ``args``, which
-        means no decomposition, and ``'auto'`` to the others, resulting in a
+        means no decomposition, and ``"auto"`` to the others, resulting in a
         pencil decomposition for parallel evaluation.
 
         For customized ``chunks`` adjust, see :obj:`xarray.Dataset.chunk`.
@@ -309,13 +315,12 @@ class X3dDataArray:
         ... }
         >>> da.x3d.first_derivative('x')
 
-        Notes
-        -----
-        The **atribute** ``BC`` is automatically defined for ``ux``, ``uy``,
-        ``uz``, ``pp`` and ``phi`` when read from the disc with
-        :obj:`xcompact3d_toolbox.Parameters.read_field` and
-        :obj:`xcompact3d_toolbox.Parameters.read_all_fields` or initialized at
-        :obj:`xcompact3d_toolbox.sandbox.init_dataset`.
+        or just:
+
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> da.attrs['BC'] = prm.get_boundary_condition('ux')
+        >>> da.x3d.first_derivative('x')
+
         """
 
         if dim not in self._Dx:
@@ -410,12 +415,11 @@ class X3dDataArray:
         ... }
         >>> da.x3d.second_derivative('x')
 
-        Notes
-        -----
-        The **atribute** ``BC`` is automatically defined for ``ux``, ``uy``,
-        ``uz``, ``pp`` and ``phi`` when read from the disc with
-        :obj:`xcompact3d_toolbox.io.readfield` or initialized at
-        :obj:`xcompact3d_toolbox.sendbox.init_dataset`.
+        or just:
+
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> da.attrs['BC'] = prm.get_boundary_condition('ux')
+        >>> da.x3d.second_derivative('x')
         """
         if dim not in self._Dxx:
             try:

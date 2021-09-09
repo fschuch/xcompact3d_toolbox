@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-"""The new **Sandbox Flow Configuration** aims to break many of the
+"""The new **Sandbox Flow Configuration** (``itype = 12``) aims to break many of the
 barriers to entry in a Navier-Stokes solver.
-The idea is to easily provide everything that X3d needs from a Python Jupyter
+The idea is to easily provide everything that XCompact3d needs from a Python Jupyter
 Notebook, like initial conditions, solid geometry, boundary conditions, and the
 parameters. For students in computational fluid dynamics, it provides a
 direct hands-on experience and a safe place for practicing and learning, while
 for advanced users and code developers, it works as a rapid prototyping tool.
-
-See https://github.com/fschuch/Xcompact3d/ for more information.
 """
 
 from .array import X3dDataArray, X3dDataset
@@ -18,7 +16,7 @@ import xarray as xr
 
 
 def init_epsi(prm, dask=False):
-    """Initilizes the :math:`\\epsilon` arrays that define the solid geometry
+    """Initializes the :math:`\\epsilon` arrays that define the solid geometry
     for the Immersed Boundary Method.
 
     Parameters
@@ -28,7 +26,7 @@ def init_epsi(prm, dask=False):
 
     dask : bool
         Defines the lazy parallel execution with dask arrays.
-        See :obj:`xcompact3d_toolbox.x3d.pencil_decomp()`.
+        See :obj:`xcompact3d_toolbox.array.x3d.pencil_decomp()`.
 
     Returns
     -------
@@ -51,8 +49,8 @@ def init_epsi(prm, dask=False):
     Examples
     -------
 
-    >>> prm = x3dx.Parameters()
-    >>> epsi = x3d.sandbox.init_epsi(prm)
+    >>> prm = xcompact3d_toolbox.Parameters()
+    >>> epsi = xcompact3d_toolbox.init_epsi(prm)
 
     """
 
@@ -128,7 +126,7 @@ def init_dataset(prm):
 
         * ``bxx1``, ``bxy1``, ``bxz1`` - Inflow boundary condition for ux, uy
           and uz, respectively (if nclx1 = 2);
-        * ``noise_mod_x1`` - for random noise modulation at inflow boudary
+        * ``noise_mod_x1`` - for random noise modulation at inflow boundary
           condition (if nclx1 = 2);
         * ``bxphi1`` - Inflow boundary condition for scalar field(s)
           (if nclx1 = 2 and numscalar > 0);
@@ -148,19 +146,23 @@ def init_dataset(prm):
         written to disc with ``ds.x3d.write()``.
 
     Examples
-    -------
+    --------
 
-    >>> prm = x3dx.Parameters()
-    >>> dataset = x3d.sandbox.init_dataset(prm)
+    >>> prm = xcompact3d_toolbox.Parameters()
+    >>> dataset = xcompact3d_toolbox.init_dataset(prm)
+    >>> # Code here your customized flow configuration
+    >>> prm.dataset.write(dataset) # write the files to the disc
 
     """
 
     from os import makedirs
 
-    makedirs(os.path.join("data"), exist_ok=True)
+    makedirs(prm.dataset.data_path, exist_ok=True)
 
     # Init dataset
-    ds = xr.Dataset(coords=prm.get_mesh()).assign_coords(n = range(prm.numscalar))
+    ds = xr.Dataset(coords=prm.get_mesh()).assign_coords(
+        n=[n + 1 for n in range(prm.numscalar)]
+    )
 
     ds.x.attrs = {"name": "Streamwise coordinate", "long_name": r"$x_1$"}
     ds.y.attrs = {"name": "Vertical coordinate", "long_name": r"$x_2$"}
@@ -177,7 +179,7 @@ def init_dataset(prm):
                 dims=["y", "z"],
                 coords=[ds.y, ds.z],
                 attrs={
-                    "file_name": os.path.join("data", var),
+                    "file_name": var,
                     "name": f"Inflow Plane for {description.get(i,'')} Velocity",
                     "long_name": fr"$u_{i+1} (x_1=0,x_2,x_3)$",
                 },
@@ -194,7 +196,7 @@ def init_dataset(prm):
                 dims=["n", "y", "z"],
                 coords=[ds.n, ds.y, ds.z],
                 attrs={
-                    "file_name": os.path.join("data", "bxphi1"),
+                    "file_name": "bxphi1",
                     "name": "Inflow Plane for Scalar field(s)",
                     "long_name": r"$\varphi (x_1=0,x_2,x_3,n)$",
                 },
@@ -205,7 +207,7 @@ def init_dataset(prm):
                 dims=["n", "x", "z"],
                 coords=[ds.n, ds.x, ds.z],
                 attrs={
-                    "file_name": os.path.join("data", "byphi1"),
+                    "file_name": "byphi1",
                     "name": "Bottom Boundary Condition for Scalar field(s)",
                     "long_name": r"$\varphi (x_1,x_2=0,x_3,n)$",
                 },
@@ -216,7 +218,7 @@ def init_dataset(prm):
                 dims=["n", "x", "z"],
                 coords=[ds.n, ds.x, ds.z],
                 attrs={
-                    "file_name": os.path.join("data", "byphin"),
+                    "file_name": "byphin",
                     "name": "Top Boundary Condition for Scalar field(s)",
                     "long_name": r"$\varphi (x_1,x_2=L_2,x_3,n)$",
                 },
@@ -228,7 +230,7 @@ def init_dataset(prm):
             dims=["x", "y", "z"],
             coords=[ds.x, ds.y, ds.z],
             attrs={
-                "file_name": os.path.join("data", var),
+                "file_name": var,
                 "name": f"Initial Condition for {description.get(i,'')} Velocity",
                 "long_name": fr"$u_{str(i+1)} (x_1,x_2,x_3,t=0)$",
                 "BC": prm.get_boundary_condition(var),
@@ -240,7 +242,7 @@ def init_dataset(prm):
             dims=["n", "x", "y", "z"],
             coords=[ds.n, ds.x, ds.y, ds.z],
             attrs={
-                "file_name": os.path.join("data", "phi"),
+                "file_name": "phi",
                 "name": "Initial Condition for Scalar field(s)",
                 "long_name": r"$\varphi (x_1,x_2,x_3,n,t=0)$",
                 "BC": prm.get_boundary_condition("phi"),
@@ -253,7 +255,7 @@ def init_dataset(prm):
             dims=["x", "y", "z"],
             coords=[ds.x, ds.y, ds.z],
             attrs={
-                "file_name": os.path.join("data", "vol_frc"),
+                "file_name": "vol_frc",
                 "name": "Integral Operator for Flow Rate Control",
             },
         )
@@ -263,7 +265,7 @@ def init_dataset(prm):
 
 @xr.register_dataarray_accessor("geo")
 class Geometry:
-    """An acessor with some standard geometries for :obj:`xarray.DataArray`.
+    """An accessor with some standard geometries for :obj:`xarray.DataArray`.
     Use them in combination with the arrays initialized at
     :obj:`xcompact3d_toolbox.sandbox.init_epsi` and the new
     :obj:`xcompact3d_toolbox.genepsi.gene_epsi_3D`.
@@ -280,9 +282,9 @@ class Geometry:
         radius : float
             Cylinder's radius (the default is 0.5).
         axis : str
-            Cylinder's axis (the default is "z").
+            Cylinder's axis (the default is ``"z"``).
         height : float or None
-            Cylinder's height (the default is None), if None, it will occupates
+            Cylinder's height (the default is None), if None, it will take
             the entire axis, otherwise :math:`\pm h/2` is considered from the center.
         remp : bool
             Adds the geometry to the :obj:`xarray.DataArray` if True and removes
@@ -303,10 +305,10 @@ class Geometry:
         Examples
         -------
 
-        >>> prm = x3d.Parameters()
-        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> epsi = xcompact3d_toolbox.init_epsi(prm)
         >>> for key in epsi.keys():
-        >>>     epsi[key] = epsi[key].geo.cylinder(x=4, y=5)
+        >>>     epsi[key] = epsi[key].geo.cylinder(x=4.0, y=5.0)
 
         """
 
@@ -325,7 +327,7 @@ class Geometry:
 
         if height != None:
             height *= 0.5
-            # Notice that r*10 is just to garantee that the values are larger than r
+            # Notice that r*10 is just to guarantee that the values are larger than r
             # and consequently outside the cylinder
             dis = dis.where(
                 self._data_array[axis] <= kwargs.get(axis, 0.0) + height, radius * 10
@@ -360,8 +362,8 @@ class Geometry:
         Examples
         -------
 
-        >>> prm = x3d.Parameters()
-        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> epsi = xcompact3d_toolbox.init_epsi(prm)
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.box(x=[2,5], y=[0,1])
 
@@ -409,8 +411,8 @@ class Geometry:
         Examples
         -------
 
-        >>> prm = x3d.Parameters()
-        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> epsi = xcompact3d_toolbox.init_epsi(prm)
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.square(x=5, y=2, z=1)
 
@@ -466,8 +468,8 @@ class Geometry:
         Examples
         -------
 
-        >>> prm = x3d.Parameters()
-        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> epsi = xcompact3d_toolbox.init_epsi(prm)
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.sphere(x=1, y=1, z=1)
 
@@ -517,8 +519,8 @@ class Geometry:
         Examples
         -------
 
-        >>> prm = x3d.Parameters()
-        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> epsi = xcompact3d_toolbox.init_epsi(prm)
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.ahmed_body(x=2)
 
@@ -660,9 +662,9 @@ class Geometry:
         x = [1044.00 * s - adj + kwargs["x"], 1044.00 * s + kwargs["x"]]
         y = [338.00 * s + kwargs["y"], 338.00 * s - opo + kwargs["y"]]
 
-        coef = np.polyfit(x, y, 1)
+        coefficients = np.polyfit(x, y, 1)
 
-        cut = self._data_array.x * coef[0] + coef[1]
+        cut = self._data_array.x * coefficients[0] + coefficients[1]
 
         tmp = tmp.where(self._data_array.y <= cut, False)
 
@@ -685,8 +687,8 @@ class Geometry:
         Examples
         -------
 
-        >>> prm = x3d.Parameters()
-        >>> epsi = x3d.sandbox.init_epsi(prm)
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> epsi = xcompact3d_toolbox.init_epsi(prm)
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.cylinder(x=4, y=5).geo.mirror("x")
 
