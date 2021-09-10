@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 Tools to manipulate the physical and computational parameters. It contains variables and
-methods designed to be a link between Xcompact3d and Python applications for
+methods designed to be a link between XCompact3d_ and Python applications for
 pre and post-processing.
+
+.. _XCompact3d:
+    https://github.com/xcompact3d/Incompact3d
 """
 
 import warnings
@@ -29,7 +32,7 @@ class ParametersBasicParam(traitlets.HasTraits):
     Notes
     -----
         The product ``p_row * p_col`` must be equal to the number of
-        computational cores where Xcompact3d will run.
+        computational cores where XCompact3d will run.
         More information can be found at `2DECOMP&FFT`_.
 
         ``p_row = p_col = 0`` activates auto-tunning.
@@ -85,6 +88,11 @@ class ParametersBasicParam(traitlets.HasTraits):
         for name in "x y z".split()
     ]
     """int: Number of mesh points.
+
+    Notes
+    -----
+        See :obj:`xcompact3d_toolbox.mesh.Coordinate.possible_grid_size`
+        for recommended grid sizes.
     """
 
     xlx, yly, zlz = [
@@ -160,7 +168,7 @@ class ParametersBasicParam(traitlets.HasTraits):
         group="BasicParam",
         desc="Enable store snapshots at a frequency ioutput (0: No, 1: Yes)",
     )
-    """int: Enables store snapshots at a frequency :obj:`ioutput`:
+    """int: Enables store snapshots at a frequency :obj:`ParametersInOutParam.ioutput`:
 
         * 0 - No;
         * 1 - Yes (default).
@@ -170,7 +178,7 @@ class ParametersBasicParam(traitlets.HasTraits):
         group="BasicParam",
         desc="Enables online postprocessing at a frequency iprocessing (0: No, 1: Yes)",
     )
-    """int: Enables online postprocessing at a frequency :obj:`iprocessing`:
+    """int: Enables online postprocessing at a frequency :obj:`ParametersInOutParam.iprocessing`:
 
         * 0 - No;
         * 1 - Yes (default).
@@ -183,8 +191,8 @@ class ParametersBasicParam(traitlets.HasTraits):
     )
     """int: Enables Large-Eddy methodologies:
 
-        * 0 - No (also forces :obj:`nu0nu` and :obj:`cnu` to 4.0 and 0.44, respectively);
-        * 1 - Yes (also activates the namespace **LESModel**, with variables like :obj:`jles`).
+        * 0 - No (also forces :obj:`ParametersNumOptions.nu0nu` and :obj:`ParametersNumOptions.cnu` to 4.0 and 0.44, respectively);
+        * 1 - Yes (also activates the namespace **LESModel** (see :obj:`ParametersLESModel`).
     """
 
     istret = traitlets.Int(default_value=0, min=0, max=3).tag(
@@ -244,9 +252,9 @@ class ParametersBasicParam(traitlets.HasTraits):
 
     Notes
     -----
+        Only necessary if :obj:`iin` :math:`\\ne` 0.
         The exactly behavior may be different according to each flow configuration.
 
-        Only necessary if :obj:`iin` :math:`\\ne` 0.
     """
 
     inflow_noise = traitlets.Float(default_value=0.0).tag(
@@ -272,20 +280,16 @@ class ParametersBasicParam(traitlets.HasTraits):
       and imposes no-slip condition at the solid/fluid interface;
     * 3 - Cubic Spline Reconstruction;
 
-    Any option greater than zero activates the namespace **ibmstuff**, for variables like :obj:`nobjmax` and :obj:`nraf`.
+    Any option greater than zero activates the namespace **ibmstuff**, for variables like
+    :obj:`ParametersIbmStuff.nobjmax` and :obj:`ParametersIbmStuff.nraf`.
     """
 
     numscalar = traitlets.Int(default_value=0, min=0, max=9).tag(
         group="BasicParam", desc="Number of scalar fractions"
     )
     """int: Number of scalar fraction, which can have different properties.
-    Any option greater than zero activates the namespace **numscalar**,
-    for variables like :obj:`sc`, :obj:`ri`, :obj:`uset` and others.
+    Any option greater than zero activates the namespace :obj:`ParametersScalarParam`.
 
-    Notes
-    -----
-        More than 9 will bug Xcompact3d, because it handles the I/O for
-        scalar fields with just one digit
     """
 
     gravx, gravy, gravz = [
@@ -556,7 +560,7 @@ class ParametersScalarParam(traitlets.HasTraits):
     alpha_sc = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam")
     beta_sc = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam")
     g_sc = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam")
-    T_ref = trait = traitlets.Float().tag(group="ScalarParam")
+    Tref = traitlets.Float().tag(group="ScalarParam")
 
     def __init__(self):
         super(ParametersScalarParam, self).__init__()
@@ -578,11 +582,22 @@ class ParametersLESModel(traitlets.HasTraits):
     """
 
     smagcst = traitlets.Float().tag(group="LESModel")
+    """float: """
+
     smagwalldamp = traitlets.Int(default_value=0).tag(group="LESModel")
+    """int: """
+
     nSmag = traitlets.Float(default_value=1.0).tag(group="LESModel")
+    """float: """
+
     walecst = traitlets.Float().tag(group="LESModel")
+    """float: """
+
     maxdsmagcst = traitlets.Float().tag(group="LESModel")
+    """float: """
+
     iwall = traitlets.Int().tag(group="LESModel")
+    """int: """
 
     def __init__(self):
         super(ParametersLESModel, self).__init__()
@@ -600,7 +615,24 @@ class ParametersIbmStuff(traitlets.HasTraits):
         group="ibmstuff",
         desc="Level of refinement for iibm==2 to find the surface of the immersed object",
     )
-    """int: "Level of refinement for :obj:`iibm` equals to 2, to find the surface of the immersed object"
+    """int: Level of refinement to find the surface of the immersed object, when
+        :obj:`ParametersBasicParam.iibm` is equal to 2. 
+    """
+
+    izap = traitlets.Int(default_value=1, min=0, max=3).tag(
+        group="ibmstuff",
+        desc="How many points to skip for reconstruction (Range: 0-3) (Recommended: 1)",
+    )
+    """int: How many points to skip for reconstruction ranging from 0 to 3,
+        the recommended is 1.
+    """
+
+    npif = traitlets.Int(default_value=2, min=1, max=3).tag(
+        group="ibmstuff",
+        desc="Number of Points for the Reconstruction (npif=1-3) (Recommended: 2)",
+    )
+    """int: Number of Points for the reconstruction ranging from 1 to 3,
+        the recommended is 2.
     """
 
     def __init__(self):
@@ -665,7 +697,11 @@ class ParametersExtras(traitlets.HasTraits):
     ...     number_of_digits = 4
     ... )
 
-    Data type is defined by :obj:`xcompact3d_toolbox.param["mytype"]`.
+    Data type is defined by :obj:`xcompact3d_toolbox.param`:
+
+    >>> import numpy
+    >>> xcompact3d_toolbox.param["mytype] = numpy.float64 # if double precision
+    >>> xcompact3d_toolbox.param["mytype] = numpy.float32 # if single precision
 
     Now it is possible to customize the way the dataset
     will be handled:
@@ -692,10 +728,20 @@ class ParametersExtras(traitlets.HasTraits):
     * Load the entire time series for a given variable:
 
       >>> ux = prm.dataset.load_time_series("ux")
+      >>> uy = prm.dataset.load_time_series("uy")
+      >>> uz = prm.dataset.load_time_series("uz")
 
       or just:
 
       >>> ux = prm.dataset["ux"]
+      >>> uy = prm.dataset["uy"]
+      >>> uz = prm.dataset["uz"]
+  
+      You can organize them using a dataset:
+  
+      >>> dataset = xarray.Dataset()
+      >>> for var in "ux uy uz".split():
+      ...     dataset[var] = prm.dataset[var]
     
     * Load all variables from a given snapshot:
 
@@ -709,14 +755,14 @@ class ParametersExtras(traitlets.HasTraits):
 
       >>> for ds in prm.dataset:
       ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-      ...     prm.dataset.wite(data = vort, file_prefix = "w3")
+      ...     prm.dataset.write(data = vort, file_prefix = "w3")
 
     * Iterate over some snapshots, loading them one by one, with the same arguments
       of a classic Python :obj:`range`, for instance, from 0 to 100 with a step of 5:
 
       >>> for ds in prm.dataset(0, 101, 5):
-      ...     vorticity = ds.uy.differentiate("x") - ds.ux.differentiate("y")
-      ...     prm.dataset.wite(data = vorticity, file_prefix = "w3")
+      ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+      ...     prm.dataset.write(data = vort, file_prefix = "w3")
     
     * Or simply load all snapshots at once (if you have enough memory):
 
@@ -733,7 +779,7 @@ class ParametersExtras(traitlets.HasTraits):
     """
 
     ncores = traitlets.Int(default_value=4, min=1).tag()
-    """int: Number of computational cores where Xcompact3d will run.
+    """int: Number of computational cores where XCompact3d will run.
     """
 
     size = traitlets.Unicode().tag()
@@ -770,7 +816,7 @@ class Parameters(
     It is a framework that lets Python classes have attributes with type checking,
     dynamically calculated default values, and ‘on change’ callbacks.
     In this way, many of the parameters are validated regarding the type,
-    business rules, and the range of values supported by XCompact3d.
+    business rules, and the range of values supported by XCompact3d_.
     There are methods to handle the parameters file (``.i3d`` and ``.prm``).
     
     The parameters are arranged in different classes, but just for organization purposes,
@@ -779,18 +825,18 @@ class Parameters(
     In addition, there are `ipywidgets`_ for a friendly user interface,
     see :obj:`xcompact3d_toolbox.gui.ParametersGui`.
 
-    After that, it is time to read the binary arrays produced by XCompact3d and also
+    After that, it is time to read the binary arrays produced by XCompact3d_ and also
     to write a new xdmf file, so the  binary fields can be opened in any external
     visualization tool. See more details in :obj:`xcompact3d_toolbox.parameters.ParametersExtras.dataset`.
 
+    .. _XCompact3d:
+        https://github.com/xcompact3d/Incompact3d
     .. _traitlets:
         https://traitlets.readthedocs.io/en/stable/index.html
     .. _ipywidgets:
         https://ipywidgets.readthedocs.io/en/latest/
 
-    Notes
-    -----
-        This is a work in progress, not all parameters are covered yet.
+    .. note:: This is a work in progress, not all parameters are covered yet.
     """
 
     def __init__(self, raise_warning: bool = False, **kwargs):
@@ -870,10 +916,10 @@ class Parameters(
 
         if "loadfile" in kwargs.keys():
             self.filename = kwargs.get("loadfile")
-            self.load(raise_warning)
+            self.load(raise_warning = raise_warning)
             del kwargs["loadfile"]
 
-        self.set(raise_warning, **kwargs)
+        self.set(raise_warning = raise_warning, **kwargs)
 
     def __repr__(self):
         string = f"{self.__class__.__name__}(\n"
@@ -890,7 +936,7 @@ class Parameters(
 
     def __str__(self):
         """Representation of the parameters class, similar to the
-        representation of the .i3d file."""
+        representation of the ``.i3d`` file."""
         # These groups are demanded by Xcompact3d, see parameters.f90
         dictionary = dict(
             BasicParam={}, NumOptions={}, InOutParam={}, Statistics={}, CASE={},
@@ -1204,7 +1250,7 @@ class Parameters(
                 f"{self.filename} is invalid. Supported formats are .i3d and .prm."
             )
 
-        self.set(raise_warning, **dictionary)
+        self.set(raise_warning = raise_warning, **dictionary)
 
     def write(self, filename: str = None) -> None:
         """Write all valid attributes to an :obj:`.i3d` file.
@@ -1244,14 +1290,14 @@ class Parameters(
             raise IOError("Format error, only .i3d is supported")
 
     def get_mesh(self, refined_for_ibm: bool = False) -> dict:
-        """Get mesh point location for the three coordinates. They are stored
+        """Get mesh the three-dimensional coordinate system. The coordinates are stored
         in a dictionary. It supports mesh refinement in **y** when
-        :obj:`istret` :math:`\\ne` 0.
+        :obj:`ParametersBasicParam.istret` :math:`\\ne` 0.
 
         Parameters
         ----------
         refined_for_ibm : bool
-            If True, it returns a refined mesh as a function of :obj:`nraf` (default is False).
+            If True, it returns a refined mesh as a function of :obj:`ParametersIbmStuff.nraf` (default is False).
 
         Returns
         -------

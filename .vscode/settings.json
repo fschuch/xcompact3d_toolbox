@@ -7,6 +7,9 @@
     "python.testing.pytestEnabled": true,
     "cSpell.words": [
         "dask",
+        "decomp",
+        "dtype",
+        "epsi",
         "ipywidgets",
         "mytype",
         "tqdm",

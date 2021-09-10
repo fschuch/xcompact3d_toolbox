@@ -1,9 +1,6 @@
 API reference
 ==================
 
-.. toctree::
-   :maxdepth: 4
-   :glob:
 
 Parameters
 -----------------
@@ -47,7 +44,7 @@ Sandbox
 -------
 
 .. automodule:: xcompact3d_toolbox.sandbox
-   :show-inheritance:
+   :members:
 
 Genepsi
 -------

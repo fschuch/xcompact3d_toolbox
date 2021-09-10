@@ -27,16 +27,16 @@ import xarray as xr
 def gene_epsi_3D(epsi_in_dict, prm):
     """This function generates all the auxiliar files necessary for our
     customize IBM, based on Lagrange reconstructions. The arrays can be
-    initialized with :obj:`xcompact3d_toolbox.sandbox.init_epsi()`, then, some
-    standard geometries are provided by the accessor
-    :obj:`xcompact3d_toolbox.sandbox.geo`.
+    initialized with :obj:`xcompact3d_toolbox.sandbox.init_epsi()`, then,
+    some standard geometries are provided by the accessor
+    :obj:`xcompact3d_toolbox.sandbox.Geometry`.
     Notice that you can apply our own routines for your own objects.
-    The main outputs of the function are written to disc at files obj-x.csv,
-    obj-y.csv and obj-z.csv, they will be used by Xcompact3d and the sandbox
-    flow configuration. The function computes the maximum number of objects
-    in a given direction and updates this value at prm, so, make sure to
-    write the ``.i3d`` file to disc afterwards.
-
+    The main outputs of the function are written to disc at the files
+    ``epsilon.bin``, ``nobjx.dat``, ``nobjy.dat``, ``nobjz.dat``,
+    ``nxifpif.dat``, ``nyifpif.dat``, ``nzifpif.dat``, ``xixf.dat``,
+    ``yiyf.dat`` and ``zizf.dat``.
+    They will be used by Xcompact3d and the sandbox
+    flow configuration.
 
     Parameters
     ----------
@@ -47,9 +47,10 @@ def gene_epsi_3D(epsi_in_dict, prm):
 
     Returns
     -------
-    :obj:`xarray.Dataset`
-        All computed variables are returned in a Data set, but just for
-        reference, since all the relevant values are written to the disc.
+    :obj:`xarray.Dataset` or :obj:`None`
+        All computed variables are returned in a Dataset if ``prm.iibm >= 2``,
+        but just for reference, since all the relevant values are written
+        to the disc.
 
     Examples
     -------
@@ -57,8 +58,13 @@ def gene_epsi_3D(epsi_in_dict, prm):
     >>> prm = x3d.Parameters()
     >>> epsi = x3d.sandbox.init_epsi(prm)
     >>> for key in epsi.keys():
-    >>>     epsi[key] = epsi[key].geo.cylinder(x=4, y=5)
-    >>> x3d.gene_epsi_3D(epsi, prm)
+    ...     epsi[key] = epsi[key].geo.cylinder(x=4, y=5)
+    >>> dataset = x3d.gene_epsi_3D(epsi, prm)
+
+    Remember to set the number of objects after that if ``prm.iibm >= 2``:
+
+    >>> if prm.iibm >= 2:
+    ...     prm.nobjmax = dataset.obj.size
 
     """
 
@@ -171,9 +177,13 @@ def gene_epsi_3D(epsi_in_dict, prm):
             output_dtypes=[np.int64, np.int64, np.int64],
         )
 
-    izap = getattr(prm, "izap", 1)
-    npif = getattr(prm, "npif", 2)
-    nraf = getattr(prm, "nraf", 10)
+    if prm.iibm <= 1:
+        prm.dataset.write(epsi_in_dict["epsi"])
+        return None
+
+    izap = prm.izap
+    npif = prm.npif
+    nraf = prm.nraf
 
     # Dask cannot go further
     epsi = epsi_in_dict["epsi"].compute()

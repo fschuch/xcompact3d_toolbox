@@ -68,30 +68,6 @@ class FilenameProperties(traitlets.HasTraits):
         -------
         :obj:`xcompact3d_toolbox.io.FilenameProperties`
             Filename properties
-
-        Examples
-        --------
-
-        If the simulated fields are named like `ux-000.bin`, they are in the default
-        configuration, there is no need to specify filename properties. But just in case,
-        it would be like:
-
-        >>> import xcompact3d_toolbox as x3d
-        >>> import xcompact3d_toolbox.io
-        >>> filename_properties = x3d.io.FilenameProperties(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
-        ... )
-
-        If the simulated fields are named like `ux0000`, the parameters are:
-
-        >>> filename_properties = x3d.io.FilenameProperties(
-        ...     separator = "",
-        ...     file_extension = "",
-        ...     number_of_digits = 4
-        ... )
-
         """
         super(FilenameProperties).__init__()
 
@@ -126,10 +102,8 @@ class FilenameProperties(traitlets.HasTraits):
         configuration, there is no need to specify filename properties. But just in case,
         it would be like:
 
-        >>> import xcompact3d_toolbox as x3d
-        >>> import xcompact3d_toolbox.io
-        >>> filename_properties = x3d.io.FilenameProperties()
-        >>> filename_properties.set(
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> prm.dataset.filename_properties.set(
         ...     separator = "-",
         ...     file_extension = ".bin",
         ...     number_of_digits = 3
@@ -137,7 +111,8 @@ class FilenameProperties(traitlets.HasTraits):
 
         If the simulated fields are named like ``ux0000``, the parameters are:
 
-        >>> filename_properties.set(
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> prm.dataset.filename_properties.set(
         ...     separator = "",
         ...     file_extension = "",
         ...     number_of_digits = 4
@@ -169,26 +144,25 @@ class FilenameProperties(traitlets.HasTraits):
         Examples
         --------
 
-        >>> import xcompact3d_toolbox as x3d
-        >>> import xcompact3d_toolbox.io
-        >>> filename_properties = x3d.io.FilenameProperties(
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> prm.dataset.filename_properties.set(
         ...     separator = "-",
         ...     file_extension = ".bin",
         ...     number_of_digits = 3
         ... )
-        >>> filename_properties.get_filename_for_binary("ux", 10)
+        >>> prm.dataset.filename_properties.get_filename_for_binary("ux", 10)
         'ux-010.bin'
-        >>> filename_properties.get_filename_for_binary("ux", "*")
+        >>> prm.dataset.filename_properties.get_filename_for_binary("ux", "*")
         'ux-???.bin'
 
-        >>> filename_properties.set(
+        >>> prm.dataset.filename_properties.set(
         ...     separator = "",
         ...     file_extension = "",
         ...     number_of_digits = 4
         ... )
-        >>> filename_properties.get_filename_for_binary("ux", 10)
+        >>> prm.dataset.filename_properties.get_filename_for_binary("ux", 10)
         'ux0010'
-        >>> filename_properties.get_filename_for_binary("ux", "*")
+        >>> prm.dataset.filename_properties.get_filename_for_binary("ux", "*")
         'ux????'
         """
         if counter == "*":
@@ -214,22 +188,21 @@ class FilenameProperties(traitlets.HasTraits):
         Examples
         --------
 
-        >>> import xcompact3d_toolbox as x3d
-        >>> import xcompact3d_toolbox.io
-        >>> filename_properties = x3d.io.FilenameProperties(
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> prm.dataset.filename_properties.set(
         ...     separator = "-",
         ...     file_extension = ".bin",
         ...     number_of_digits = 3
         ... )
-        >>> filename_properties.get_info_from_filename('./data/ux-010.bin')
+        >>> prm.dataset.filename_properties.get_info_from_filename('ux-010.bin')
         (10, 'ux')
 
-        >>> filename_properties.set(
+        >>> prm.dataset.filename_properties.set(
         ...     separator = "",
         ...     file_extension = "",
         ...     number_of_digits = 4
         ... )
-        >>> filename_properties.get_info_from_filename("ux0010")
+        >>> prm.dataset.filename_properties.get_info_from_filename("ux0010")
         (10, 'ux')
 
         """
@@ -286,30 +259,26 @@ class Dataset(traitlets.HasTraits):
         array per scalar fraction (default is :obj:`False`).
     stack_velocity : bool
         When :obj:`True`, the velocity will be stacked in a new coordinate ``i`` , otherwise returns one
-        array per velocity component (default is obj:`False`).
+        array per velocity component (default is :obj:`False`).
 
     Notes
     -----
-        :obj:`Dataset` is in fact an atribute of :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
-        so there is no need to initialize it manually for most of the common use cases.
+        * :obj:`Dataset` is in fact an atribute of :obj:`xcompact3d_toolbox.parameters. ParametersExtras`,
+          so there is no need to initialize it manually for most of the common use cases.
 
-        All arrays are wrapped into Xarray objects (:obj:`xarray.DataArray`
-        or :obj:`xarray.Dataset`), take a look at xarray_'s documentation,
-        specially, see `Why xarray?`_
-        Xarray has many useful methods for indexing, comparisons, reshaping
-        and reorganizing, computations and plotting.
+        * All arrays are wrapped into Xarray objects (:obj:`xarray.DataArray`
+          or :obj:`xarray.Dataset`), take a look at `xarray's documentation`_,
+          specially, see `Why xarray?`_
+          Xarray has many useful methods for indexing, comparisons, reshaping
+          and reorganizing, computations and plotting.
 
-        Consider using hvPlot_ to explore your data interactively,
-        see how to plot `Gridded Data`_.
+        * Consider using hvPlot_ to explore your data interactively,
+          see how to plot `Gridded Data`_.
 
-        .. _xarray: http://xarray.pydata.org/en/stable/
+        .. _`xarray's documentation`: http://xarray.pydata.org/en/stable/
         .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
         .. _hvPlot : https://hvplot.holoviz.org/
         .. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
-
-    Examples
-    --------
-        See :obj:`xcompact3d.parameters.ParametersExtras`.
 
     """
 
@@ -368,6 +337,26 @@ class Dataset(traitlets.HasTraits):
         :obj:`xarray.Dataset`
             Dataset containing the arrays loaded from the disc with the appropriate dimensions,
             coordinates and attributes.
+
+        Examples
+        --------
+
+        Initial setup:
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> prm.dataset.filename_properties.set(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+
+        Iterate over some snapshots, loading them one by one, with the same
+        arguments of a classic Python :obj:`range`, for instance,
+        from 0 to 100 with a step of 5:
+
+          >>> for ds in prm.dataset(0, 101, 5):
+          ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+          ...     prm.dataset.write(data = vort, file_prefix = "w3")
         """
         for t in range(*args):
             yield self.load_snapshot(t)
@@ -399,6 +388,44 @@ class Dataset(traitlets.HasTraits):
         ------
         TypeError
             Raises type error if arg is not an interger, string or slice
+        
+        Examples
+        --------
+
+        Initial setup:
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> prm.dataset.filename_properties.set(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+
+        * Load the entire time series for a given variable:
+
+          >>> ux = prm.dataset["ux"]
+          >>> uy = prm.dataset["uy"]
+          >>> uz = prm.dataset["uz"]
+
+          or organize them using a dataset:
+
+          >>> dataset = xarray.Dataset()
+          >>> for var in "ux uy uz".split():
+          ...     dataset[var] = prm.dataset[var]
+        
+        * Load all variables from a given snapshot:
+
+          >>> snapshot = prm.dataset[10]
+        
+        * Load many snapshots at once with a :obj:`slice`, for instance, from 0 to 100
+          with a step of 10:
+
+          >>> snapshots = prm.dataset[0:101:10]
+        
+        * Or simply load all snapshots at once (if you have enough memory):
+
+          >>> snapshots = prm.dataset[:]
+
         """
         if isinstance(arg, int):
             return self.load_snapshot(arg)
@@ -436,6 +463,24 @@ class Dataset(traitlets.HasTraits):
         :obj:`xarray.Dataset`
             Dataset containing the arrays loaded from the disc with the appropriate dimensions,
             coordinates and attributes.
+        
+        Examples
+        --------
+
+        Initial setup:
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> prm.dataset.filename_properties.set(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+
+        Iterate over all snapshots, loading them one by one:
+
+        >>> for ds in prm.dataset:
+        ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+        ...     prm.dataset.write(data = vort, file_prefix = "w3")
         """
         for t in range(len(self)):
             yield self.load_snapshot(t)
@@ -471,6 +516,16 @@ class Dataset(traitlets.HasTraits):
         KeyError
             Exception is raised when an Keyword arguments is not a valid parameter.
 
+        Examples
+        --------
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> prm.dataset.filename_properties.set(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3,
+        ...     data_path = "./data/"
+        ... )
         """
 
         for key, arg in kwargs.items():
@@ -482,8 +537,6 @@ class Dataset(traitlets.HasTraits):
         """This method reads a binary field from XCompact3d with :obj:`numpy.fromfile`
         and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
         coordinates and attributes.
-
-        Data type is defined by :obj:`xcompact3d_toolbox.param["mytype"]`.
 
         Parameters
         ----------
@@ -498,6 +551,23 @@ class Dataset(traitlets.HasTraits):
         -------
         :obj:`xarray.DataArray`
             Data array containing values loaded from the disc.
+        
+        Examples
+        --------
+
+        Initial setup:
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> prm.dataset.filename_properties.set(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+
+        Load one array from the disc:
+
+        >>> ux = prm.dataset.load_array("ux-0000.bin")
+
         """
 
         coords = self._mesh.drop(*self.drop_coords)
@@ -545,10 +615,10 @@ class Dataset(traitlets.HasTraits):
             Add time as a coordinate, by default True.
         stack_scalar : bool, optional
             When true, the scalar fields will be stacked in a new coordinate ``n``, otherwise returns one array per scalar fraction.
-            If none, it uses :obj:`Dataset.stack_scalar`, by default None
+            If none, it uses :obj:`Dataset.stack_scalar`, by default None.
         stack_velocity : bool, optional
             When true, the velocity will be stacked in a new coordinate ``i``, otherwise returns one array per velocity component.
-            If none, it uses :obj:`Dataset.stack_scalar`, by default None.
+            If none, it uses :obj:`Dataset.stack_velocity`, by default None.
 
         Returns
         -------
@@ -560,6 +630,27 @@ class Dataset(traitlets.HasTraits):
         ------
         IOError
             Raises IO error if it does not find any variable for this snapshot.
+        
+        Examples
+        --------
+
+        Initial setup:
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> prm.dataset.filename_properties.set(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+
+        Load all variables from a given snapshot:
+
+        >>> snapshot = prm.dataset.load_snapshot(10)
+
+        or just
+
+        >>> snapshot = prm.dataset[10]
+
         """
         dataset = xr.Dataset()
 
@@ -658,6 +749,37 @@ class Dataset(traitlets.HasTraits):
         ------
         IOError
             Raises IO error if it does not find any snapshot for this variable.
+        
+        Examples
+        --------
+
+        Initial setup:
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> prm.dataset.filename_properties.set(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+
+        Load the entire time series for a given variable:
+
+        >>> ux = prm.dataset.load_time_series("ux")
+        >>> uy = prm.dataset.load_time_series("uy")
+        >>> uz = prm.dataset.load_time_series("uz")
+
+        or just:
+
+        >>> ux = prm.dataset["ux"]
+        >>> uy = prm.dataset["uy"]
+        >>> uz = prm.dataset["uz"]
+
+        You can organize them using a dataset:
+
+        >>> dataset = xarray.Dataset()
+        >>> for var in "ux uy uz".split():
+        ...     dataset[var] = prm.dataset[var]
+
         """
         target_filename = self.filename_properties.get_filename_for_binary(
             array_prefix, "*"
@@ -677,7 +799,7 @@ class Dataset(traitlets.HasTraits):
         )
 
     def write(self, data: Union[xr.DataArray, xr.Dataset], file_prefix: str = None):
-        """Write an array or dataset to binary files on the disc, in the
+        """Write an array or dataset to raw binary files on the disc, in the
         same order that Xcompact3d would do, so they can be easily read with
         2DECOMP.
 
@@ -706,6 +828,41 @@ class Dataset(traitlets.HasTraits):
         ------
         IOError
             Raises IO error data is not an :obj:`xarray.DataArray` or :obj:`xarray.Dataset`.
+        
+        Examples
+        --------
+
+        Initial setup:
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> prm.dataset.filename_properties.set(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+
+        * From a dataset, write only the variables with the atribute ``file_name``,
+        notice that ``ux`` and ``uy`` will not be overwritten because them do not
+        have the atribute ``file_name``:
+
+          >>> for ds in prm.dataset:
+          ...     ds["vort"] = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.  first_derivative("y")
+          ...     ds["vort"].attrs["file_name"] = "vorticity"
+          ...     prm.dataset.write(ds)
+
+        * Write an array:
+
+          >>> for ds in prm.dataset:
+          ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+          ...     vort.attrs["file_name"] = "vorticity"
+          ...     prm.dataset.write(vort)
+
+          or
+
+          >>> for ds in prm.dataset:
+          ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+          ...     prm.dataset.write(data = vort, file_prefix = "vorticity")
+
         """
         if isinstance(data, xr.Dataset):
             self._write_dataset(data)
@@ -722,14 +879,13 @@ class Dataset(traitlets.HasTraits):
             if "file_name" in array.attrs:
                 self._write_array(array)
             else:
-                warnings.warn(f"Can't write array {array_name}")
+                warnings.warn(f"Can't write array {array_name}, no filename provided")
 
     def _write_array(self, dataArray, filename: str = None) -> None:
         if filename is None:  # Try to get from atributes
             filename = dataArray.attrs.get("file_name", None)
         if filename is None:
-            warnings.warn(f"Can't write field without a filename")
-            return
+            raise IOError(f"Can't write field without a filename")
         # If n is a dimension (for scalar), call write recursively to save
         # phi1, phi2, phi3, for instance.
         if "n" in dataArray.dims:
@@ -790,6 +946,23 @@ class Dataset(traitlets.HasTraits):
         ------
         IOError
             Raises IO error if it does not find any file for this simulation.
+        
+        Examples
+        --------
+
+        Initial setup:
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> prm.dataset.filename_properties.set(
+        ...     separator = "-",
+        ...     file_extension = ".bin",
+        ...     number_of_digits = 3
+        ... )
+
+        It is possible to produce a new xdmf file, so all data
+        can be visualized on any external tool:
+
+        >>> prm.dataset.write_xdmf()
         """
         if self.set_of_variables:
             time_numbers = range(len(self))

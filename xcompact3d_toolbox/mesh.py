@@ -381,9 +381,9 @@ class Mesh3D(traitlets.HasTraits):
 
     Notes
     -----
-        :obj:`mesh` is in fact an atribute of :obj:`xcompact3d_toolbox.parameters.Parameters`,
+        :obj:`mesh` is in fact an atribute of :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
         so there is no need to initialize it manually for most of the common use cases.
-        The features of each coordenate are copled by a two-way link with their corresponding
+        The features of each coordinate are copled by a two-way link with their corresponding
         values at the Parameters class. For instance, the length of each of them is copled to
         :obj:`xlx`, :obj:`yly` and :obj:`zlz`, grid size to :obj:`nx`, :obj:`ny` and :obj:`nz`
         and so on.

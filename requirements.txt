@@ -13,5 +13,4 @@ sphinx>=1.4
 nbsphinx
 sphinx-autobuild
 versioneer
-voila
 tqdm

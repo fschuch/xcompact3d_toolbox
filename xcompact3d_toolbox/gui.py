@@ -125,7 +125,9 @@ class ParametersGui(Parameters):
                     ("Mixing Layer", 7),
                     ("Turbulent Jet", 8),
                     ("Turbulent Boundary Layer", 9),
-                    ("Sandbox", 10),
+                    ("ABL", 10),
+                    ("Uniform", 11),
+                    ("Sandbox", 12),
                 ],
             ),
             nclxn=widgets.Dropdown(

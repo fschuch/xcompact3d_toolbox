@@ -9,7 +9,7 @@ setuptools.setup(
     version=versioneer.get_version(),
     author="Felipe N. Schuch",
     author_email="felipe.schuch@edu.pucrs.br",
-    description="A set of tools for pre and postprocessing prepared for the high-order Navier-Stokes solver Xcompact3d",
+    description="A set of tools for pre and postprocessing prepared for the high-order Navier-Stokes solver XCompact3d",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/fschuch/xcompact3d_toolbox",
@@ -34,7 +34,6 @@ setuptools.setup(
         "xarray>=0.16"
         "dask>=2.22"
         "numba>=0.50",
-        "plotly>=4.8",
         "tqdm",
     ],
 )

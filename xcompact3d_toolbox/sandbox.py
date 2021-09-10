@@ -6,6 +6,11 @@ Notebook, like initial conditions, solid geometry, boundary conditions, and the
 parameters. For students in computational fluid dynamics, it provides a
 direct hands-on experience and a safe place for practicing and learning, while
 for advanced users and code developers, it works as a rapid prototyping tool.
+For more details, see:
+
+   * `"A Jupyter sandbox environment coupled into the high-order Navier-Stokes solver Xcompact3d", by F.N. Schuch, F.D. Vianna, A. Mombach, J.H. Silvestrini. JupyterCon 2020. <https://www.fschuch.com/en/publication/2020-jupytercon/>`_
+
+   * `"Sandbox flow configuration: A rapid prototyping tool inside XCompact3d", by F.N. Schuch. XCompact3d 2021 Online Showcase Event. <https://www.fschuch.com/en/talk/sandbox-flow-configuration-a-rapid-prototyping-tool-inside-xcompact3d/>`_
 """
 
 from .array import X3dDataArray, X3dDataset
@@ -44,7 +49,7 @@ def init_epsi(prm, dask=False):
         into the cartesian domain by the Immersed Boundary Method (IBM).
         They should be set to one (True) at the solid points and stay
         zero (False) at the fluid points, some standard geometries are provided
-        by the accessor xcompact3d_toolbox.sandbox.geo.
+        by the accessor :obj:`xcompact3d_toolbox.sandbox.Geometry`.
 
     Examples
     -------
@@ -108,8 +113,8 @@ def init_epsi(prm, dask=False):
 
 def init_dataset(prm):
     """This function initializes a :obj:`xarray.Dataset` including all variables
-    that should be provided to Xcompact3d and the sandbox flow configuration,
-    according to the provided computational and physical parameters.
+    that should be provided to XCompact3d and the sandbox flow configuration,
+    according to the computational and physical parameters.
 
     Parameters
     ----------
@@ -346,7 +351,7 @@ class Geometry:
         remp : bool
             Adds the geometry to the :obj:`xarray.DataArray` if True and removes
             it if False (the default is True).
-        **kwargs : float
+        **kwargs : tuple of float
             Box's boundaries.
 
         Returns
@@ -365,7 +370,7 @@ class Geometry:
         >>> prm = xcompact3d_toolbox.Parameters()
         >>> epsi = xcompact3d_toolbox.init_epsi(prm)
         >>> for key in epsi.keys():
-        >>>     epsi[key] = epsi[key].geo.box(x=[2,5], y=[0,1])
+        >>>     epsi[key] = epsi[key].geo.box(x=(2,5), y=(0,1))
 
         """
 

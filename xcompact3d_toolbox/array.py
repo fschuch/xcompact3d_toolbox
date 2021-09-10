@@ -2,7 +2,9 @@
 """The data structure is provided by `xarray`_, that introduces labels in the
 form of dimensions, coordinates and attributes on top of raw `NumPy`_-like
 arrays, which allows for a more intuitive, more concise, and less error-prone
-developer experience. See `xarray`_'s User Guide for a complete overview about
+developer experience.
+
+See `xarray`_'s User Guide for a complete overview about
 its data structures and built-in functions for indexing, selecting, computing,
 plotting and much more.
 It integrates tightly with `dask`_ for parallel computing.
@@ -13,12 +15,9 @@ see how to plot `Gridded Data`_.
 **Xcompact3d_toolbox** adds extra functions on top of :obj:`xarray.DataArray`
 and :obj:`xarray.Dataset`, all the details are described bellow.
 
-.. _dask:
-    https://dask.org/
-.. _numpy:
-    https://numpy.org/
-.. _xarray:
-    http://xarray.pydata.org/en/stable/
+.. _dask: https://dask.org/
+.. _numpy: https://numpy.org/
+.. _xarray: http://xarray.pydata.org/en/stable/
 .. _hvPlot : https://hvplot.holoviz.org/
 .. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
 
@@ -43,8 +42,8 @@ class X3dDataset:
         self._data_set = data_set
 
     def cumtrapz(self, dim):
-        """Cumulatively integrate :obj:`xarray.Dataset` in direction ``dim``
-        using the composite trapezoidal rule.
+        """Cumulatively integrate all arrays in this dataset
+        in direction ``dim`` using the composite trapezoidal rule.
         It is a wrapper for :obj:`scipy.integrate.cumtrapz`.
         Initial value is defined to zero.
 
@@ -76,8 +75,8 @@ class X3dDataset:
         )
 
     def simps(self, *args):
-        """Integrate :obj:`xarray.Dataset` in direction(s) ``args`` using the
-        composite Simpson’s rule.
+        """Integrate all arrays in this dataset in direction(s) ``args``
+        using the composite Simpson’s rule.
         It is a wrapper for :obj:`scipy.integrate.simps`.
 
         Parameters

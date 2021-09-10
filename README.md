@@ -6,11 +6,9 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 It is a Python package designed to handle the pre and postprocessing of
-the high-order Navier-Stokes solver Xcompact3d. It aims to help users and
-code developers with a set of tools and automated processes.
-
-**Xcompact3d Toolbox** is still in pre-release, be aware that new features are
-going to be added to it and the current features may change with no further notice.
+the high-order Navier-Stokes solver Xcompact3d_. It aims to help users and
+code developers to build case-specific solutions with a set of tools and
+automated processes.
 
 The physical and computational parameters are built on top of [traitlets](https://traitlets.readthedocs.io/en/stable/index.html),
 a framework that lets Python classes have attributes with type checking, dynamically calculated default values, and ‘on change’ callbacks.
@@ -18,11 +16,126 @@ In addition to [ipywidgets](https://ipywidgets.readthedocs.io/en/latest/) for an
 
 Data structure is provided by [xarray](http://xarray.pydata.org/en/stable/) (see [Why xarray?](http://xarray.pydata.org/en/stable/why-xarray.html)), that introduces labels in the form of dimensions, coordinates and attributes on top of raw [NumPy](https://numpy.org/)-like arrays, which allows for a more intuitive, more concise, and less error-prone developer experience. It integrates tightly with [dask](https://dask.org/) for parallel computing.
 
-Finally, Xcompact3d Toolbox is fully integrated with the new *Sandbox Flow Configuration* (see [fschuch/Xcompact3d](https://github.com/fschuch/Xcompact3d/)). The idea is to easily provide everything that X3d needs from a [Jupyter Notebook](https://jupyter.org/), like initial conditions, solid geometry, boundary conditions, and the parameters ([see examples](https://xcompact3d-toolbox.readthedocs.io/en/latest/tutorial.html#sandbox-examples)). It makes life easier for beginners, that can run any new flow configuration without worrying about Fortran and [2decomp](http://www.2decomp.org/). For developers, it works as a rapid prototyping tool, to test concepts and then compare results to validate any future Fortran implementation.
+Finally, Xcompact3d Toolbox is fully integrated with the new *Sandbox Flow Configuration*.
+The idea is to easily provide everything that X3d needs from a [Jupyter Notebook](https://jupyter.org/), like initial conditions, solid geometry, boundary conditions, and the parameters ([see examples](https://xcompact3d-toolbox.readthedocs.io/en/latest/tutorial.html#sandbox-examples)).
+It makes life easier for beginners, that can run any new flow configuration without worrying about Fortran and [2decomp](http://www.2decomp.org/).
+For developers, it works as a rapid prototyping tool, to test concepts and then compare results to validate any future Fortran implementation.
+
+## Examples
+
+* Importing the package::
+
+   ```python
+   import xcompact3d_toolbox as x3d
+   ```
+
+* Loading the parameters file (both `.i3d` and `.prm` are supported, see [#7](https://github.com/fschuch/xcompact3d_toolbox/issues/7) from the disc::
+
+   ```python
+   prm = x3d.Parameters(loadfile="input.i3d")
+   prm = x3d.Parameters(loadfile="incompact3d.prm")
+   ```
+
+* Specifying how the binary fields from your simulations are named, for instance:
+
+   * If the simulated fields are named like `ux-000.bin`:
+
+      ```python
+      prm.dataset.filename_properties.set(
+         separator = "-",
+         file_extension = ".bin",
+         number_of_digits = 3
+      )
+      ```
+
+   * If the simulated fields are named like `ux0000`:
+
+      ```python
+      prm.dataset.filename_properties.set(
+         separator = "",
+         file_extension = "",
+         number_of_digits = 4
+      )
+      ```
+
+* There are many ways to load the arrays produced by your numerical simulation, so you can choose what best suits your post-processing application.
+  All arrays are wrapped into xarray_ objects, with many useful methods for indexing, comparisons, reshaping and reorganizing, computations and plotting.
+  See the examples:
+
+   * Load one array from the disc:
+
+      ```python
+      ux = prm.dataset.load_array("ux-0000.bin")
+      ```
+   
+   * Load the entire time series for a given variable:
+
+      ```python
+      ux = prm.dataset["ux"]
+      ```
+   
+   * Load all variables from a given snapshot:
+
+      ```python
+      snapshot = prm.dataset[10]
+      ```
+   
+   * Loop through all snapshots, loading them one by one:
+
+      ```python
+      for ds in prm.dataset:
+         # compute something
+         vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+         # write the results to the disc
+         prm.dataset.write(data = vort, file_prefix = "w3")
+      ```
+   
+   * Or simply load all snapshots at once (if you have enough memory):
+
+      ```python
+      ds = prm.dataset[:]
+      ```
+   
+   * It is possible to produce a new xdmf file, so all data can be visualized on any external tool:
+
+      ```python
+      prm.dataset.write_xdmf()
+      ```
+
+
+* User interface for the parameters with IPywidgets:
+
+   ```python
+   prm = x3d.ParametersGui()
+   prm
+   ```
+
+   ![An animation showing the graphical user interface in action](https://www.fschuch.com/en/slides/2021-x3d-dev-meeting/Output.gif)
+
+
 
 ## Installation
 
-`pip install xcompact3d-toolbox`
+It is possible to instal using pip:
+
+```bash
+pip install xcompact3d-toolbox
+```
+
+To install from source, clone de repository::
+
+```bash
+git clone https://github.com/fschuch/xcompact3d_toolbox.git
+```
+
+And then install it interactively with pip::
+
+```bash
+cd xcompact3d_toolbox
+pip install -e .
+```
+
+Now, any change you make at the source code will be available at your local installation, with no need to reinstall the package every time.
 
 ## Useful links
 
