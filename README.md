@@ -29,7 +29,7 @@ For developers, it works as a rapid prototyping tool, to test concepts and then 
    import xcompact3d_toolbox as x3d
    ```
 
-* Loading the parameters file (both `.i3d` and `.prm` are supported, see [#7](https://github.com/fschuch/xcompact3d_toolbox/issues/7) from the disc:
+* Loading the parameters file (both `.i3d` and `.prm` are supported, see [#7](https://github.com/fschuch/xcompact3d_toolbox/issues/7)) from the disc:
 
    ```python
    prm = x3d.Parameters(loadfile="input.i3d")
