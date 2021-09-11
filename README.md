@@ -116,7 +116,7 @@ For developers, it works as a rapid prototyping tool, to test concepts and then 
 
 ## Installation
 
-It is possible to instal using pip:
+It is possible to install using pip:
 
 ```bash
 pip install xcompact3d-toolbox
