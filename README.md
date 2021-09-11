@@ -6,7 +6,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 It is a Python package designed to handle the pre and postprocessing of
-the high-order Navier-Stokes solver Xcompact3d_. It aims to help users and
+the high-order Navier-Stokes solver [XCompact3d](https://github.com/xcompact3d/Incompact3d). It aims to help users and
 code developers to build case-specific solutions with a set of tools and
 automated processes.
 
@@ -14,7 +14,7 @@ The physical and computational parameters are built on top of [traitlets](https:
 a framework that lets Python classes have attributes with type checking, dynamically calculated default values, and ‘on change’ callbacks.
 In addition to [ipywidgets](https://ipywidgets.readthedocs.io/en/latest/) for an user friendly interface.
 
-Data structure is provided by [xarray](http://xarray.pydata.org/en/stable/) (see [Why xarray?](http://xarray.pydata.org/en/stable/why-xarray.html)), that introduces labels in the form of dimensions, coordinates and attributes on top of raw [NumPy](https://numpy.org/)-like arrays, which allows for a more intuitive, more concise, and less error-prone developer experience. It integrates tightly with [dask](https://dask.org/) for parallel computing.
+Data structure is provided by [xarray](http://xarray.pydata.org/en/stable/) (see [Why xarray?](http://xarray.pydata.org/en/stable/why-xarray.html)), that introduces labels in the form of dimensions, coordinates and attributes on top of raw [NumPy](https://numpy.org/)-like arrays, which allows for a more intuitive, more concise, and less error-prone developer experience. It integrates tightly with [dask](https://dask.org/) for parallel computing and [hvplot](https://hvplot.holoviz.org/user_guide/Gridded_Data.html) for interactive data visualization.
 
 Finally, Xcompact3d Toolbox is fully integrated with the new *Sandbox Flow Configuration*.
 The idea is to easily provide everything that XCompact3d needs from a [Jupyter Notebook](https://jupyter.org/), like initial conditions, solid geometry, boundary conditions, and the parameters ([see examples](https://xcompact3d-toolbox.readthedocs.io/en/latest/tutorial.html#sandbox-examples)).
@@ -23,13 +23,13 @@ For developers, it works as a rapid prototyping tool, to test concepts and then 
 
 ## Examples
 
-* Importing the package::
+* Importing the package:
 
    ```python
    import xcompact3d_toolbox as x3d
    ```
 
-* Loading the parameters file (both `.i3d` and `.prm` are supported, see [#7](https://github.com/fschuch/xcompact3d_toolbox/issues/7) from the disc::
+* Loading the parameters file (both `.i3d` and `.prm` are supported, see [#7](https://github.com/fschuch/xcompact3d_toolbox/issues/7) from the disc:
 
    ```python
    prm = x3d.Parameters(loadfile="input.i3d")
@@ -59,7 +59,7 @@ For developers, it works as a rapid prototyping tool, to test concepts and then 
       ```
 
 * There are many ways to load the arrays produced by your numerical simulation, so you can choose what best suits your post-processing application.
-  All arrays are wrapped into xarray_ objects, with many useful methods for indexing, comparisons, reshaping and reorganizing, computations and plotting.
+  All arrays are wrapped into [xarray](http://xarray.pydata.org/en/stable/) objects, with many useful methods for indexing, comparisons, reshaping and reorganizing, computations and plotting.
   See the examples:
 
    * Load one array from the disc:
@@ -122,13 +122,13 @@ It is possible to instal using pip:
 pip install xcompact3d-toolbox
 ```
 
-To install from source, clone de repository::
+To install from source, clone de repository:
 
 ```bash
 git clone https://github.com/fschuch/xcompact3d_toolbox.git
 ```
 
-And then install it interactively with pip::
+And then install it interactively with pip:
 
 ```bash
 cd xcompact3d_toolbox
