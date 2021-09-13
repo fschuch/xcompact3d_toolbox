@@ -30,6 +30,44 @@ any new flow configuration without worrying about Fortran and 2decomp_. For
 developers, it works as a rapid prototyping tool, to test concepts and then
 compare results to validate any future Fortran implementations.
 
+Useful links
+------------
+
+* `View on GitHub`_;
+* `Changelog`_;
+* `Suggestions for new features and bug report`_;
+* `See what is coming next (Project page)`_.
+
+Installation
+------------
+
+It is possible to install using pip::
+
+   pip install xcompact3d-toolbox
+
+There are other dependency sets for extra functionality::
+
+   pip install xcompact3d-toolbox[visu] # interactive visualization with hvplot and others
+   pip install xcompact3d-toolbox[doc]  # dependencies to build the documentation
+   pip install xcompact3d-toolbox[dev]  # tools for development
+   pip install xcompact3d-toolbox[test] # tools for testing
+   pip install xcompact3d-toolbox[all]  # all the above
+
+To install from source, clone de repository::
+
+   git clone https://github.com/fschuch/xcompact3d_toolbox.git
+
+And then install it interactively with pip::
+
+   cd xcompact3d_toolbox
+   pip install -e .
+
+You can install all dependencies as well::
+
+   pip install -e .[all]
+
+Now, any change you make at the source code will be available at your local installation, with no need to reinstall the package every time.
+
 Examples
 --------
 
@@ -99,34 +137,6 @@ Examples
    prm
 
 .. image:: https://www.fschuch.com/en/slides/2021-x3d-dev-meeting/Output.gif
-
-
-
-Installation
-------------
-
-It is possible to install using pip::
-
-   pip install xcompact3d-toolbox
-
-To install from source, clone de repository::
-
-   git clone https://github.com/fschuch/xcompact3d_toolbox.git
-
-And then install it interactively with pip::
-
-   cd xcompact3d_toolbox
-   pip install -e .
-
-Now, any change you make at the source code will be available at your local installation, with no need to reinstall the package every time.
-
-Useful links
-------------
-
-* `View on GitHub`_;
-* `Changelog`_;
-* `Suggestions for new features and bug report`_;
-* `See what is coming next (Project page)`_.
 
 .. _`View on GitHub`: https://github.com/fschuch/xcompact3d_toolbox
 .. _`Changelog`: https://github.com/fschuch/xcompact3d_toolbox/blob/master/CHANGELOG.md
