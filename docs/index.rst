@@ -19,9 +19,10 @@ In addition to ipywidgets_ for an user friendly interface.
 Data structure is provided by xarray_ (see `Why xarray?`_), that introduces labels
 in the form of dimensions, coordinates and attributes on top of raw NumPy_-like
 arrays, which allows for a more intuitive, more concise, and less error-prone
-developer experience. It integrates tightly with dask_ for parallel computing.
+developer experience. It integrates tightly with dask_ for parallel computing and
+hvplot_ for interactive data visualization.
 
-Finally, Xcompact3d Toolbox is fully integrated with the new *Sandbox Flow Configuration*.
+Finally, Xcompact3d-toolbox is fully integrated with the new *Sandbox Flow Configuration*.
 The idea is to easily provide everything that Xcompact3d needs
 from a `Jupyter Notebook`_, like initial conditions, solid geometry, boundary
 conditions, and the parameters. It makes life easier for beginners, that can run
@@ -104,7 +105,7 @@ Examples
 Installation
 ------------
 
-It is possible to instal using pip::
+It is possible to install using pip::
 
    pip install xcompact3d-toolbox
 
@@ -134,6 +135,7 @@ Useful links
 
 .. _2decomp: http://www.2decomp.org/
 .. _dask: https://dask.org/
+.. _hvplot: https://hvplot.holoviz.org/user_guide/Gridded_Data.html
 .. _ipywidgets: https://ipywidgets.readthedocs.io/en/latest/
 .. _`Jupyter Notebook`: https://jupyter.org/
 .. _Numpy: https://numpy.org/

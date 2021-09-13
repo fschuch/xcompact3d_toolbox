@@ -147,15 +147,14 @@ def init_dataset(prm):
           I = sum(vol_frc * ux) and them will correct streamwise velocity
           as ux = ux / I, so, set ``vol_frc`` properly.
 
-        After setting all values for your flow configuration, the dataset can be
-        written to disc with ``ds.x3d.write()``.
-
     Examples
     --------
 
     >>> prm = xcompact3d_toolbox.Parameters()
     >>> dataset = xcompact3d_toolbox.init_dataset(prm)
+    >>> #
     >>> # Code here your customized flow configuration
+    >>> #
     >>> prm.dataset.write(dataset) # write the files to the disc
 
     """

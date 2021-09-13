@@ -201,8 +201,7 @@ class ParametersGui(Parameters):
             #
             # # ibmstuff
             #
-            # Disabled because nobjmax is defined automatically at genepsi.py
-            nobjmax=widgets.IntText(disabled=True, min=0, max=1e9),
+            nobjmax=widgets.BoundedIntText(min=1, max=1e9),
             nraf=widgets.IntSlider(min=1, max=25),
             #
             # # Auxiliar for user interface, not included at the .i3d file

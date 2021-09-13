@@ -751,13 +751,13 @@ class ParametersExtras(traitlets.HasTraits):
 
       >>> snapshot = prm.dataset[10]
     
-    * Iterate over all snapshots, loading them one by one:
+    * Loop through all snapshots, loading them one by one:
 
       >>> for ds in prm.dataset:
       ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
       ...     prm.dataset.write(data = vort, file_prefix = "w3")
 
-    * Iterate over some snapshots, loading them one by one, with the same arguments
+    * Loop through some snapshots, loading them one by one, with the same arguments
       of a classic Python :obj:`range`, for instance, from 0 to 100 with a step of 5:
 
       >>> for ds in prm.dataset(0, 101, 5):

@@ -12,7 +12,7 @@ It integrates tightly with `dask`_ for parallel computing.
 Consider using hvPlot_ to explore your data interactively,
 see how to plot `Gridded Data`_.
 
-**Xcompact3d_toolbox** adds extra functions on top of :obj:`xarray.DataArray`
+Xcompact3d-toolbox adds extra functions on top of :obj:`xarray.DataArray`
 and :obj:`xarray.Dataset`, all the details are described bellow.
 
 .. _dask: https://dask.org/
@@ -276,7 +276,7 @@ class X3dDataArray:
         """Compute first derivative with the 4th order accurate centered scheme.
 
         It is fully functional with all boundary conditions available on
-        Xcompact3d and stretched mesh in y direction.
+        XCompact3d and stretched mesh in the vertical direction (y).
         The **atribute** ``BC`` is used to store Boundary Condition information
         in a dictionary (see examples), default is ``ncl1 = ncln = 2`` and
         ``npaire = 1``.
