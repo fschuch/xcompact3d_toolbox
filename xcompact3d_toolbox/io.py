@@ -14,7 +14,7 @@ from typing import Type, Union
 import numpy as np
 import traitlets
 import xarray as xr
-from tqdm.autonotebook import tqdm
+from tqdm.auto import tqdm
 
 from .mesh import Mesh3D
 from .param import param
