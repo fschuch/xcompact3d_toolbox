@@ -13,11 +13,13 @@ For more details, see:
    * `"Sandbox flow configuration: A rapid prototyping tool inside XCompact3d", by F.N. Schuch. XCompact3d 2021 Online Showcase Event. <https://www.fschuch.com/en/talk/sandbox-flow-configuration-a-rapid-prototyping-tool-inside-xcompact3d/>`_
 """
 
+import os.path
+
+import numpy as np
+import xarray as xr
+
 from .array import X3dDataArray, X3dDataset
 from .param import param
-import numpy as np
-import os.path
-import xarray as xr
 
 
 def init_epsi(prm, dask=False):

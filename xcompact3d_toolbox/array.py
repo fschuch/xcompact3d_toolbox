@@ -23,19 +23,17 @@ and :obj:`xarray.Dataset`, all the details are described bellow.
 
 """
 
+import xarray as xr
+from scipy.integrate import cumtrapz, simps
+
+from .derive import FirstDerivative, SecondDerivative
 from .mesh import _stretching
 from .param import param
-from .derive import FirstDerivative, SecondDerivative
-import xarray as xr
-import numpy as np
-import os.path
-from scipy.integrate import simps
-from scipy.integrate import cumtrapz
+
 
 @xr.register_dataset_accessor("x3d")
 class X3dDataset:
-    """An accessor with extra utilities for :obj:`xarray.Dataset`.
-    """
+    """An accessor with extra utilities for :obj:`xarray.Dataset`."""
 
     def __init__(self, data_set):
 
@@ -172,8 +170,7 @@ class X3dDataset:
 
 @xr.register_dataarray_accessor("x3d")
 class X3dDataArray:
-    """An accessor with extra utilities for :obj:`xarray.DataArray`.
-    """
+    """An accessor with extra utilities for :obj:`xarray.DataArray`."""
 
     def __init__(self, data_array):
         self._data_array = data_array
@@ -461,12 +458,16 @@ class X3dDataArray:
             da_pp2y = xr.DataArray(pp2y, coords=[self._data_array[dim]], name="pp2y")
             da_pp4y = xr.DataArray(pp4y, coords=[self._data_array[dim]], name="pp4y")
 
-            return da_pp2y * xr.apply_ufunc(
-                lambda f: self._Dxx[dim].dot(f),
-                self._data_array,
-                input_core_dims=[[dim]],
-                output_core_dims=[[dim]],
-                dask="parallelized",
-                vectorize=True,
-                output_dtypes=[param["mytype"]],
-            ) - da_pp4y * self._data_array.x3d.first_derivative(dim)
+            return (
+                da_pp2y
+                * xr.apply_ufunc(
+                    lambda f: self._Dxx[dim].dot(f),
+                    self._data_array,
+                    input_core_dims=[[dim]],
+                    output_core_dims=[[dim]],
+                    dask="parallelized",
+                    vectorize=True,
+                    output_dtypes=[param["mytype"]],
+                )
+                - da_pp4y * self._data_array.x3d.first_derivative(dim)
+            )

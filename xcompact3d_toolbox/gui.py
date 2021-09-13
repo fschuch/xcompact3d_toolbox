@@ -324,7 +324,7 @@ class ParametersGui(Parameters):
         ----------
         *args : str
             Name(s) for the desired widget(s).
-        
+
         Returns
         -------
         :obj:`ipywidgets.VBox`
@@ -380,7 +380,8 @@ class ParametersGui(Parameters):
         # Link the possible domain decomposition values with the respective dropdown widget
         for name in ["p_row", "p_col"]:
             link(
-                (self, f"_possible_{name}"), (self._widgets[f"{name}"], "options"),
+                (self, f"_possible_{name}"),
+                (self._widgets[f"{name}"], "options"),
             )
 
         # Create two-way link between variables and widgets

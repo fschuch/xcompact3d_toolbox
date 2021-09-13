@@ -818,7 +818,7 @@ class Parameters(
     In this way, many of the parameters are validated regarding the type,
     business rules, and the range of values supported by XCompact3d_.
     There are methods to handle the parameters file (``.i3d`` and ``.prm``).
-    
+
     The parameters are arranged in different classes, but just for organization purposes,
     this class inherits from all of them.
 
@@ -916,10 +916,10 @@ class Parameters(
 
         if "loadfile" in kwargs.keys():
             self.filename = kwargs.get("loadfile")
-            self.load(raise_warning = raise_warning)
+            self.load(raise_warning=raise_warning)
             del kwargs["loadfile"]
 
-        self.set(raise_warning = raise_warning, **kwargs)
+        self.set(raise_warning=raise_warning, **kwargs)
 
     def __repr__(self):
         string = f"{self.__class__.__name__}(\n"
@@ -939,7 +939,11 @@ class Parameters(
         representation of the ``.i3d`` file."""
         # These groups are demanded by Xcompact3d, see parameters.f90
         dictionary = dict(
-            BasicParam={}, NumOptions={}, InOutParam={}, Statistics={}, CASE={},
+            BasicParam={},
+            NumOptions={},
+            InOutParam={},
+            Statistics={},
+            CASE={},
         )
         for name in self.trait_names():
             # if skip_default:
@@ -1168,7 +1172,7 @@ class Parameters(
         ------
         KeyError
             Exception is raised when an Keyword arguments is not a valid attribute.
-        
+
         Examples
         -------
 
@@ -1250,7 +1254,7 @@ class Parameters(
                 f"{self.filename} is invalid. Supported formats are .i3d and .prm."
             )
 
-        self.set(raise_warning = raise_warning, **dictionary)
+        self.set(raise_warning=raise_warning, **dictionary)
 
     def write(self, filename: str = None) -> None:
         """Write all valid attributes to an :obj:`.i3d` file.

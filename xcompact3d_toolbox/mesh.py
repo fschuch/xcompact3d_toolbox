@@ -14,7 +14,7 @@ from .param import param
 
 class Coordinate(traitlets.HasTraits):
     """A coordinate.
-    
+
     Thanks to traitlets_, the attributes can be type checked, validated and also trigger
     ‘on change’ callbacks. It means that:
 
@@ -50,7 +50,7 @@ class Coordinate(traitlets.HasTraits):
     Returns
     -------
     :obj:`xcompact3d_toolbox.mesh.Coordinate`
-        Coordinate    
+        Coordinate
     """
 
     length = traitlets.Float(default_value=1.0, min=0.0, max=1e10)
@@ -92,7 +92,7 @@ class Coordinate(traitlets.HasTraits):
         -------
         :obj:`numpy.ndarray`
             A numpy array.
-        
+
         Examples
         --------
 
@@ -105,7 +105,7 @@ class Coordinate(traitlets.HasTraits):
         >>> numpy.cos(coord)
         array([1.        , 0.99219767, 0.96891242, 0.93050762, 0.87758256,
                 0.81096312, 0.73168887, 0.64099686, 0.54030231])
-        """        
+        """
         return np.linspace(
             start=0.0,
             stop=self.length,
@@ -121,7 +121,7 @@ class Coordinate(traitlets.HasTraits):
         -------
         int
             Coordinate size (:obj:`grid_size`)
-        
+
         Examples
         --------
 
@@ -129,7 +129,7 @@ class Coordinate(traitlets.HasTraits):
         >>> coord = Coordinate(grid_size = 9)
         >>> len(coord)
         9
-        """              
+        """
         return self.grid_size
 
     def __repr__(self):
@@ -137,7 +137,7 @@ class Coordinate(traitlets.HasTraits):
 
     def set(self, **kwargs) -> None:
         """Set a new value for any parameter after the initialization.
-        
+
         Parameters
         ----------
         **kwargs
@@ -324,6 +324,7 @@ class StretchedCoordinate(Coordinate):
     :obj:`xcompact3d_toolbox.mesh.StretchedCoordinate`
         Stretched coordinate
     """
+
     istret = traitlets.Int(
         default_value=0,
         min=0,
@@ -345,7 +346,7 @@ class StretchedCoordinate(Coordinate):
         -------
         :obj:`numpy.ndarray`
             A numpy array.
-        
+
         Examples
         --------
 
@@ -358,7 +359,7 @@ class StretchedCoordinate(Coordinate):
         >>> numpy.cos(coord)
         array([1.        , 0.99219767, 0.96891242, 0.93050762, 0.87758256,
                 0.81096312, 0.73168887, 0.64099686, 0.54030231])
-        """ 
+        """
         if self.istret == 0:
             return super().__array__()
         return _stretching(
@@ -413,6 +414,7 @@ class Mesh3D(traitlets.HasTraits):
     :obj:`xcompact3d_toolbox.mesh.Mesh3D`
         Coordinate system
     """
+
     x = traitlets.Instance(klass=Coordinate)
     y = traitlets.Instance(klass=StretchedCoordinate)
     z = traitlets.Instance(klass=Coordinate)
@@ -464,12 +466,12 @@ class Mesh3D(traitlets.HasTraits):
         -------
         int
             Mesh size is calculated by multiplying the size of the three coordinates
-        """ 
+        """
         return self.size
 
     def set(self, **kwargs) -> None:
         """Set new values for any of the coordinates after the initialization.
-        
+
         Parameters
         ----------
         **kwargs
@@ -501,7 +503,7 @@ class Mesh3D(traitlets.HasTraits):
     def get(self) -> dict:
         """Get the three coordinates in a dictionary, where the keys are their names (x, y and z)
         and the values are their vectors.
-        
+
         Raises
         -------
         KeyError
@@ -511,7 +513,7 @@ class Mesh3D(traitlets.HasTraits):
         -------
         :obj:`dict` of :obj:`numpy.ndarray`
             A dict containing the coordinates
-        
+
         Notes
         -----
 
@@ -523,11 +525,11 @@ class Mesh3D(traitlets.HasTraits):
         """Get the coordinates in a dictionary, where the keys are their names and the values
         are their vectors. It is possible to drop any of the coordinates in case they are
         needed to process planes. For instance:
-        
+
         * Drop ``x`` if working with ``yz`` planes;
         * Drop ``y`` if working with ``xz`` planes;
         * Drop ``z`` if working with ``xy`` planes.
-        
+
         Parameters
         ----------
         *args : str or list of str
@@ -555,8 +557,7 @@ class Mesh3D(traitlets.HasTraits):
         }
 
     def copy(self):
-        """Return a copy of the Mesh3D object.
-        """        
+        """Return a copy of the Mesh3D object."""
         return Mesh3D(
             **{dim: getattr(self, dim).trait_values() for dim in self.trait_names()}
         )
@@ -569,7 +570,7 @@ class Mesh3D(traitlets.HasTraits):
         -------
         int
             Mesh size is calculated by multiplying the size of the three coordinates
-        """ 
+        """
         return self.x.size * self.y.size * self.z.size
 
 
@@ -599,7 +600,10 @@ def _get_possible_grid_values(
     is_periodic: bool, start: int = 0, end: int = 9002
 ) -> list:
     return list(
-        filter(lambda num: _validate_grid_size(num, is_periodic), range(start, end),)
+        filter(
+            lambda num: _validate_grid_size(num, is_periodic),
+            range(start, end),
+        )
     )
 
 

@@ -1,5 +1,6 @@
-from .param import param
 import scipy.sparse as sp
+
+from .param import param
 
 
 def SecondDerivative(n, d=None, ncl1=2, ncln=2, npaire=1, coord=None):

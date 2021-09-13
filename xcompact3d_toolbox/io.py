@@ -217,14 +217,12 @@ class FilenameProperties(traitlets.HasTraits):
         return int(counter), prefix
 
     def get_num_from_filename(self, filename: str) -> int:
-        """Same as :obj:`get_info_from_filename`, but just returns the number.
-        """
+        """Same as :obj:`get_info_from_filename`, but just returns the number."""
         num, _ = self.get_info_from_filename(filename)
         return num
 
     def get_name_from_filename(self, filename: str) -> str:
-        """Same as :obj:`get_info_from_filename`, but just returns the name.
-        """
+        """Same as :obj:`get_info_from_filename`, but just returns the name."""
         _, name = self.get_info_from_filename(filename)
         return name
 
@@ -361,7 +359,9 @@ class Dataset(traitlets.HasTraits):
         for t in range(*args):
             yield self.load_snapshot(t)
 
-    def __getitem__(self, arg: Union[int, slice, str]) -> Union[Type[xr.DataArray], Type[xr.Dataset]]:
+    def __getitem__(
+        self, arg: Union[int, slice, str]
+    ) -> Union[Type[xr.DataArray], Type[xr.Dataset]]:
         """Get specified items from the disc.
 
         .. note:: Make sure to have enough memory to load many files at the same time.
@@ -388,7 +388,7 @@ class Dataset(traitlets.HasTraits):
         ------
         TypeError
             Raises type error if arg is not an interger, string or slice
-        
+
         Examples
         --------
 
@@ -412,16 +412,16 @@ class Dataset(traitlets.HasTraits):
           >>> dataset = xarray.Dataset()
           >>> for var in "ux uy uz".split():
           ...     dataset[var] = prm.dataset[var]
-        
+
         * Load all variables from a given snapshot:
 
           >>> snapshot = prm.dataset[10]
-        
+
         * Load many snapshots at once with a :obj:`slice`, for instance, from 0 to 100
           with a step of 10:
 
           >>> snapshots = prm.dataset[0:101:10]
-        
+
         * Or simply load all snapshots at once (if you have enough memory):
 
           >>> snapshots = prm.dataset[:]
@@ -463,7 +463,7 @@ class Dataset(traitlets.HasTraits):
         :obj:`xarray.Dataset`
             Dataset containing the arrays loaded from the disc with the appropriate dimensions,
             coordinates and attributes.
-        
+
         Examples
         --------
 
@@ -496,8 +496,7 @@ class Dataset(traitlets.HasTraits):
 
     @property
     def _time_step(self) -> float:
-        """Time step value between snapshots
-        """
+        """Time step value between snapshots"""
         # test environment
         if self._prm is None:
             return 1.0
@@ -533,7 +532,9 @@ class Dataset(traitlets.HasTraits):
                 raise KeyError(f"{key} is not a valid argument for Dataset")
             setattr(self, key, arg)
 
-    def load_array(self, filename: str, add_time: bool = True, attrs: dict = None) -> Type[xr.DataArray]:
+    def load_array(
+        self, filename: str, add_time: bool = True, attrs: dict = None
+    ) -> Type[xr.DataArray]:
         """This method reads a binary field from XCompact3d with :obj:`numpy.fromfile`
         and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
         coordinates and attributes.
@@ -551,7 +552,7 @@ class Dataset(traitlets.HasTraits):
         -------
         :obj:`xarray.DataArray`
             Data array containing values loaded from the disc.
-        
+
         Examples
         --------
 
@@ -630,7 +631,7 @@ class Dataset(traitlets.HasTraits):
         ------
         IOError
             Raises IO error if it does not find any variable for this snapshot.
-        
+
         Examples
         --------
 
@@ -700,7 +701,14 @@ class Dataset(traitlets.HasTraits):
             return name in {"ux", "uy", "uz"}
 
         if stack_scalar:
-            scalar_variables = sorted(list(filter(is_scalar, set_of_variables,)))
+            scalar_variables = sorted(
+                list(
+                    filter(
+                        is_scalar,
+                        set_of_variables,
+                    )
+                )
+            )
 
             if scalar_variables:
                 dataset["phi"] = (
@@ -749,7 +757,7 @@ class Dataset(traitlets.HasTraits):
         ------
         IOError
             Raises IO error if it does not find any snapshot for this variable.
-        
+
         Examples
         --------
 
@@ -828,7 +836,7 @@ class Dataset(traitlets.HasTraits):
         ------
         IOError
             Raises IO error data is not an :obj:`xarray.DataArray` or :obj:`xarray.Dataset`.
-        
+
         Examples
         --------
 
@@ -913,7 +921,8 @@ class Dataset(traitlets.HasTraits):
                 self._write_array(
                     dataArray.isel(t=k, drop=True),
                     self.filename_properties.get_filename_for_binary(
-                        prefix=filename, counter=int(time / dt),
+                        prefix=filename,
+                        counter=int(time / dt),
                     ),
                 )
         # and finally writes to the disc
@@ -946,7 +955,7 @@ class Dataset(traitlets.HasTraits):
         ------
         IOError
             Raises IO error if it does not find any file for this simulation.
-        
+
         Examples
         --------
 
@@ -977,7 +986,10 @@ class Dataset(traitlets.HasTraits):
                 raise IOError(f"No file was found corresponding to {filename_pattern}.")
 
             properties = zip(
-                *map(self.filename_properties.get_info_from_filename, filename_list,)
+                *map(
+                    self.filename_properties.get_info_from_filename,
+                    filename_list,
+                )
             )
             time_numbers, var_names = properties
             time_numbers = sorted(list(set(time_numbers)))
