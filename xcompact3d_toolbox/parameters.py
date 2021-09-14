@@ -343,7 +343,7 @@ class ParametersNumOptions(traitlets.HasTraits):
     """
 
     isecondder = traitlets.Int(default_value=4, min=1, max=5).tag(
-        group="NumOptions", desc="Scheme for first order derivative"
+        group="NumOptions", desc="Scheme for second order derivative"
     )
     """int: Scheme for second order derivative:
 
