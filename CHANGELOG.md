@@ -7,13 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2021-09-14
+
+Xcompact3d-toolbox has evolved considerably in the last year.
+The pre-release version has been employed in CFD research projects, and the feedback from the users helped to improve its interfaces and functionalities.
+The integration between this Python package and the numerical solver [XCompact3d](https://github.com/xcompact3d/Incompact3d) were experimental, and many of the functionalities were only available in a forked repository for a test of concept ([fschuch/Xcompact3d](https://github.com/fschuch/Xcompact3d)). These features are now part of the main repository [XCompact3d](https://github.com/xcompact3d/Incompact3d) (see [PR #51](https://github.com/xcompact3d/Incompact3d/pull/51)).
+With this, Xcompact3d-toolbox is ready for its first stable release.
+
 ### Added
 
-- Support for stretched mesh at the xdmf writer, by [@fschuch](https://github.com/fschuch).
-- A class to handle the binaries filenames and its tests. Now all methods support different filenames, like the classic `ux000`, or the new `ux-0000.bin`, and some combinations between them. By [@fschuch](https://github.com/fschuch).
-- A class to handle the coordinates and its tests, so they can be moved out of the parameters class, by [@fschuch](https://github.com/fschuch).
-- New class for the 3D mesh, with useful methods and its testes, by [@fschuch](https://github.com/fschuch).
-- Add `class Dataset` to read the binary files from XCompact3d on-demand, it is possible to loop through the snapshots, select any of them or read the entire time-series for a given variable. It returns them in a proper xarray.Dataset, by [@fschuch](https://github.com/fschuch).
+- Support for stretched mesh at the xdmf writer and automatized tests for it, by [@fschuch](https://github.com/fschuch).
+- A class to handle the binary filenames and its tests. Now all methods support different filenames, like the classic `ux000`, or the new `ux-0000.bin`, besides some combinations between them. By [@fschuch](https://github.com/fschuch).
+- Classes to handle the coordinates and their tests, so they can be moved out of the parameters class, by [@fschuch](https://github.com/fschuch).
+- New class for the 3D coordinate system, with useful methods and its testes, by [@fschuch](https://github.com/fschuch).
+- Add `class Dataset` to read the binary files from XCompact3d on-demand, it is possible to loop through the snapshots, select any of them or read the entire time-series for a given variable. It returns them in a proper `xarray.Dataset`, by [@fschuch](https://github.com/fschuch).
+- Dependency sets for extra functionalities, by [@fschuch](https://github.com/fschuch).
+- More parameters are now covered in the Parameters class, by [@fschuch](https://github.com/fschuch).
+- Add type hints to many functions and class methods, for a better development experience using modern IDEs, by [@fschuch](https://github.com/fschuch).
+
+### Modified
+
+- Writing methods for the binary files were moved from the xarray accessors to the Dataset class, by [@fschuch](https://github.com/fschuch).
+- The new sandbox flow configuration is now set with `itype = 12`, following its addition the XCompact3d's main repository (see [#51](https://github.com/xcompact3d/Incompact3d/pull/51)), by [@fschuch](https://github.com/fschuch).
+- The documentation was improved, by [@fschuch](https://github.com/fschuch).
+
+### Fixed
+
+- Not installing all dependencies with `pip install`, by [@fschuch](https://github.com/fschuch).
+- Suppressed warning from `tqdm`, by [@fschuch](https://github.com/fschuch).
+- The output format from `gene_epsi_3D` has changed, fixing some compatibility issues with XCompact3d as well (see [#51](https://github.com/xcompact3d/Incompact3d/pull/51)), by [@fschuch](https://github.com/fschuch).
 
 ## [0.1.11] - 2021-02-12
 
@@ -118,7 +140,8 @@ No changes, just trying to get familiar with workflows and the release to Pypi.
 - Support to *Sandbox Flow Configuration* (see [fschuch/Xcompact3d](https://github.com/fschuch/Xcompact3d/)), by [@fschuch](https://github.com/fschuch).
 - Ahmed body as benchmark geometry, mirror and plotting tools, by [@momba98](https://github.com/momba98).
 
-[Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.11...HEAD
+[Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.11...v1.0.0
 [0.1.11]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.10...v0.1.11
 [0.1.10]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.9...v0.1.10
 [0.1.9]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.8...v0.1.9
