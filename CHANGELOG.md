@@ -21,7 +21,7 @@ With this, Xcompact3d-toolbox is ready for its first stable release.
 - Classes to handle the coordinates and their tests, so they can be moved out of the parameters class, by [@fschuch](https://github.com/fschuch).
 - New class for the 3D coordinate system, with useful methods and its testes, by [@fschuch](https://github.com/fschuch).
 - Add `class Dataset` to read the binary files from XCompact3d on-demand, it is possible to loop through the snapshots, select any of them or read the entire time-series for a given variable. It returns them in a proper `xarray.Dataset`, by [@fschuch](https://github.com/fschuch).
-- Dependency sets for extra functionalities, by [@fschuch](https://github.com/fschuch).
+- Sets of dependencies for extra functionalities, like docs, tests and visu, by [@fschuch](https://github.com/fschuch).
 - More parameters are now covered in the Parameters class, by [@fschuch](https://github.com/fschuch).
 - Add type hints to many functions and class methods, for a better development experience using modern IDEs, by [@fschuch](https://github.com/fschuch).
 
