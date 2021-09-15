@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Modified
+
+- Rename the default branch to `main`, by [@fschuch](https://github.com/fschuch).
+
 ## [1.0.0] - 2021-09-14
 
 Xcompact3d-toolbox has evolved considerably in the last year.
