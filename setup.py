@@ -17,7 +17,7 @@ extras_require = dict(
         "holoviews>=1.14",
     ],
     docs=["sphinx>=1.4", "nbsphinx", "sphinx-autobuild", "sphinx-rtd-theme"],
-    dev=["versioneer", "black>=21.7", "jupyterlab>=3.1"],
+    dev=["versioneer", "black", "jupyterlab>=3.1"],
     test=["pytest>=3.8", "hypothesis>=4.53"],
 )
 

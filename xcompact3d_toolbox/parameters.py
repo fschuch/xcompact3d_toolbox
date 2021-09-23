@@ -638,6 +638,13 @@ class ParametersIbmStuff(traitlets.HasTraits):
     def __init__(self):
         super(ParametersIbmStuff, self).__init__()
 
+class ParametersALMParam(traitlets.HasTraits):
+    iturboutput = traitlets.Int(default_value=1, min=1).tag(
+        group="ALMParam"
+    )
+
+    def __init__(self):
+        super(ParametersALMParam, self).__init__()
 
 class ParametersExtras(traitlets.HasTraits):
     """Extra utilities that are not present at the parameters file,
@@ -810,6 +817,7 @@ class Parameters(
     ParametersScalarParam,
     ParametersLESModel,
     ParametersIbmStuff,
+    ParametersALMParam,
     ParametersExtras,
 ):
     """The physical and computational parameters are built on top of `traitlets`_.
@@ -939,11 +947,7 @@ class Parameters(
         representation of the ``.i3d`` file."""
         # These groups are demanded by Xcompact3d, see parameters.f90
         dictionary = dict(
-            BasicParam={},
-            NumOptions={},
-            InOutParam={},
-            Statistics={},
-            CASE={},
+            BasicParam={}, NumOptions={}, InOutParam={}, Statistics={}, CASE={},
         )
         for name in self.trait_names():
             # if skip_default:
@@ -966,6 +970,10 @@ class Parameters(
         # This block is not handled by x3d if numscalar is 0
         if "ScalarParam" in dictionary.keys() and self.numscalar == 0:
             del dictionary["ScalarParam"]
+
+        # This block is not handled by x3d if iturbine is not 1
+        if "ALMParam" in dictionary.keys() and self.iturbine != 1:
+            del dictionary["ALMParam"]
 
         string = ""
 

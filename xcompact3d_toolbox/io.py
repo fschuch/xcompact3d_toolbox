@@ -12,6 +12,7 @@ import warnings
 from typing import Type, Union
 
 import numpy as np
+import pandas as pd
 import traitlets
 import xarray as xr
 from tqdm.auto import tqdm
@@ -701,14 +702,7 @@ class Dataset(traitlets.HasTraits):
             return name in {"ux", "uy", "uz"}
 
         if stack_scalar:
-            scalar_variables = sorted(
-                list(
-                    filter(
-                        is_scalar,
-                        set_of_variables,
-                    )
-                )
-            )
+            scalar_variables = sorted(list(filter(is_scalar, set_of_variables,)))
 
             if scalar_variables:
                 dataset["phi"] = (
@@ -805,6 +799,67 @@ class Dataset(traitlets.HasTraits):
             ],
             dim="t",
         )
+
+    def load_wind_turbine_data(self, file_pattern: str) -> Type[xr.Dataset]:
+        """Load the data produced by wind turbine simulations.
+
+        .. note:: This feature is experimental
+
+        Parameters
+        ----------
+        file_pattern : str
+            A filename pattern used to locate the files with :obj:`glob.glob`.
+
+        Returns
+        -------
+        :obj:`xarray.Dataset`
+            A dataset with all variables as a function of the time
+
+        Examples
+        --------
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="NREL-5MW.i3d")
+        >>> ds = prm.dataset.load_wind_turbine_data("*.perf")
+        >>> ds
+        <xarray.Dataset>
+        Dimensions:          (t: 21)
+        Coordinates:
+        * t                (t) float64 0.0 2.0 4.0 6.0 8.0 ... 34.0 36.0 38.0 40.0
+        Data variables: (12/14)
+            Number of Revs   (t) float64 0.0 0.4635 0.9281 1.347 ... 7.374 7.778 8.181
+            GeneratorSpeed   (t) float64 0.0 149.3 133.6 123.2 ... 122.9 122.9 123.0
+            GeneratorTorque  (t) float64 0.0 2.972e+04 3.83e+04 ... 4.31e+04 4.309e+04
+            BladePitch1      (t) float64 0.0 12.0 14.21 13.21 ... 11.44 11.44 11.44
+            BladePitch2      (t) float64 0.0 12.0 14.21 13.21 ... 11.44 11.44 11.44
+            BladePitch3      (t) float64 0.0 12.0 14.21 13.21 ... 11.44 11.44 11.44
+            ...               ...
+            Ux               (t) float64 0.0 15.0 15.0 15.0 15.0 ... 15.0 15.0 15.0 15.0
+            Uy               (t) float64 0.0 -1.562e-05 2.541e-05 ... 7.28e-07 7.683e-07
+            Uz               (t) float64 0.0 1.55e-06 ... -1.828e-06 2.721e-06
+            Thrust           (t) float64 9.39e+05 1.826e+05 ... 4.084e+05 4.066e+05
+            Torque           (t) float64 8.78e+06 1.268e+06 ... 4.231e+06 4.203e+06
+            Power            (t) float64 1.112e+07 1.952e+06 ... 5.362e+06 5.328e+06
+        """
+        def get_dataset(filename):
+
+            time = os.path.basename(filename).split("_")[0]
+
+            time = int(time) * self._prm.iturboutput * self._prm.dt
+
+            ds = xr.Dataset(coords=dict(t=[time]))
+
+            for name, values in pd.read_csv(filename).to_dict().items():
+                ds[name.strip()] = xr.DataArray(
+                    data=np.float64(values[1]),
+                    coords=ds.t.coords,
+                    attrs=dict(units=values[0].strip()[1:-1]),
+                )
+
+            return ds
+
+        filenames = glob.glob(file_pattern)
+
+        return xr.concat([get_dataset(file) for file in filenames], dim="t").sortby("t")
 
     def write(self, data: Union[xr.DataArray, xr.Dataset], file_prefix: str = None):
         """Write an array or dataset to raw binary files on the disc, in the
@@ -921,8 +976,7 @@ class Dataset(traitlets.HasTraits):
                 self._write_array(
                     dataArray.isel(t=k, drop=True),
                     self.filename_properties.get_filename_for_binary(
-                        prefix=filename,
-                        counter=int(time / dt),
+                        prefix=filename, counter=int(time / dt),
                     ),
                 )
         # and finally writes to the disc
@@ -986,10 +1040,7 @@ class Dataset(traitlets.HasTraits):
                 raise IOError(f"No file was found corresponding to {filename_pattern}.")
 
             properties = zip(
-                *map(
-                    self.filename_properties.get_info_from_filename,
-                    filename_list,
-                )
+                *map(self.filename_properties.get_info_from_filename, filename_list,)
             )
             time_numbers, var_names = properties
             time_numbers = sorted(list(set(time_numbers)))
