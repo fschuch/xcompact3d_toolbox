@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2021-09-23
+
+### Added
+
+- Add `load_wind_turbine_data` that reads the files from the disc and wraps the data into a `xarray.Dataset`, by [@fschuch](https://github.com/fschuch).
+
 ## [1.0.0] - 2021-09-14
 
 Xcompact3d-toolbox has evolved considerably in the last year.
@@ -140,7 +146,8 @@ No changes, just trying to get familiar with workflows and the release to Pypi.
 - Support to *Sandbox Flow Configuration* (see [fschuch/Xcompact3d](https://github.com/fschuch/Xcompact3d/)), by [@fschuch](https://github.com/fschuch).
 - Ahmed body as benchmark geometry, mirror and plotting tools, by [@momba98](https://github.com/momba98).
 
-[Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/fschuch/xcompact3d_toolbox/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.11...v1.0.0
 [0.1.11]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.10...v0.1.11
 [0.1.10]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.9...v0.1.10
