@@ -12,5 +12,6 @@ numba
 sphinx>=1.4
 nbsphinx
 sphinx-autobuild
+numpy-stl
 versioneer
 tqdm

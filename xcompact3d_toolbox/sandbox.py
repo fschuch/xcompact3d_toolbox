@@ -15,7 +15,9 @@ For more details, see:
 
 import os.path
 
+import numba
 import numpy as np
+import stl
 import xarray as xr
 
 from .array import X3dDataArray, X3dDataset
@@ -89,7 +91,7 @@ def init_epsi(prm, dask=False):
     # for integer ao float as well
     for key, (x, y, z) in fields.items():
         epsi[key] = xr.DataArray(
-            np.zeros((x.size, y.size, z.size), dtype=np.bool),
+            np.zeros((x.size, y.size, z.size), dtype=bool),
             dims=["x", "y", "z"],
             coords={"x": x, "y": y, "z": z},
             name=key,
@@ -279,6 +281,73 @@ class Geometry:
 
     def __init__(self, data_array):
         self._data_array = data_array
+
+    def from_stl(
+        self,
+        filename: str = None,
+        stl_mesh: stl.mesh.Mesh = None,
+        translate: dict = None,
+        rotate: dict = None,
+        scale: float = None,
+        user_tol: float = 1.0,
+        remp: bool = True,
+    ):
+        """[summary]
+
+        Parameters
+        ----------
+        filename : str, optional
+            [description], by default None
+        stl_mesh : stl.mesh.Mesh, optional
+            [description], by default None
+        translate : dict, optional
+            [description], by default None
+        rotate : dict, optional
+            [description], by default None
+        scale : float, optional
+            [description], by default None
+        user_tol : float, optional
+            [description], by default 1.0
+        remp : bool, optional
+            [description], by default True
+        """
+
+        def get_boundary(mesh_coord, coord):
+            min = coord.searchsorted(mesh_coord.min(), "left")
+            max = coord.searchsorted(mesh_coord.max(), "right")
+            return min, max
+
+        if filename is not None:
+            stl_mesh = stl.mesh.Mesh.from_file(filename)
+
+        if translate is not None:
+            stl_mesh.x += translate.get("x", 0.0)
+            stl_mesh.y += translate.get("y", 0.0)
+            stl_mesh.z += translate.get("z", 0.0)
+
+        if rotate is not None:
+            stl_mesh.rotate(**rotate)
+
+        if scale is not None:
+            stl_mesh.vectors *= scale
+
+        x = self._data_array.x.data
+        y = self._data_array.y.data
+        z = self._data_array.z.data
+
+        return self._data_array.where(
+            ~_geometry_inside_mesh(
+                stl_mesh.vectors,
+                x,
+                y,
+                z,
+                user_tol,
+                get_boundary(stl_mesh.x, x),
+                get_boundary(stl_mesh.y, y),
+                get_boundary(stl_mesh.z, z),
+            ),
+            remp,
+        )
 
     def cylinder(self, radius=0.5, axis="z", height=None, remp=True, **kwargs):
         """Draw a cylinder.
@@ -703,3 +772,60 @@ class Geometry:
             self._data_array[dim] <= self._data_array[dim][-1] / 2.0,
             self._data_array[{dim: slice(None, None, -1)}].values,
         )
+
+
+@numba.njit
+def _geometry_inside_mesh(triangles, x, y, z, user_tol, lim_x, lim_y, lim_z):
+
+    result = np.zeros((x.size, y.size, z.size), dtype=numba.boolean)
+
+    for i in range(*lim_x):
+        for j in range(*lim_y):
+            for k in range(*lim_z):
+                result[i, j, k] = _point_in_geometry(
+                    triangles, x[i], y[j], z[k], user_tol
+                )
+
+    return result
+
+
+@numba.njit
+def _anorm2(X):
+    # Compute euclidean norm
+    return np.sqrt(np.sum(X ** 2.0))
+
+
+@numba.njit
+def _adet(X, Y, Z):
+    # Compute 3x3 determinant
+    ret = np.multiply(np.multiply(X[0], Y[1]), Z[2])
+    ret += np.multiply(np.multiply(Y[0], Z[1]), X[2])
+    ret += np.multiply(np.multiply(Z[0], X[1]), Y[2])
+    ret -= np.multiply(np.multiply(Z[0], Y[1]), X[2])
+    ret -= np.multiply(np.multiply(Y[0], X[1]), Z[2])
+    ret -= np.multiply(np.multiply(X[0], Z[1]), Y[2])
+    return ret
+
+
+@numba.njit
+def _point_in_geometry(triangles, x, y, z, user_tol):
+
+    X = np.array((x, y, z), dtype=triangles.dtype)
+
+    # One generalized winding number per input vertex
+    ret = triangles.dtype.type(0.0)
+
+    # Accumulate generalized winding number for each triangle
+    for U, V, W in triangles:
+        A, B, C = U - X, V - X, W - X
+        omega = _adet(A, B, C)
+
+        a, b, c = _anorm2(A), _anorm2(B), _anorm2(C)
+        d = a * b * c
+        d += c * np.sum(np.multiply(A, B))
+        d += a * np.sum(np.multiply(B, C))
+        d += b * np.sum(np.multiply(C, A))
+
+        ret += np.arctan2(omega, d)
+
+    return ret >= (2.0 * np.pi) * user_tol

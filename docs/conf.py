@@ -60,6 +60,7 @@ intersphinx_mapping = {
     "traitlest": ("https://traitlets.readthedocs.io/en/stable/", None,),
     "numpy": ("https://numpy.org/doc/stable/", None,),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None,),
+    "stl": ("https://numpy-stl.readthedocs.io/en/stable/", None),
 }
 
 napoleon_include_special_with_doc = True

@@ -54,6 +54,7 @@ setuptools.setup(
         "dask[complete]>=2.22",
         "numba>=0.50",
         "tqdm>=4.62",
+        "numpy-stl>=2.16.3",
     ],
     extras_require=extras_require,
     tests_require=["pytest"],
