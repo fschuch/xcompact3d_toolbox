@@ -13,5 +13,6 @@ sphinx>=1.4
 nbsphinx
 sphinx-autobuild
 numpy-stl
+hypothesis
 versioneer
 tqdm
