@@ -286,30 +286,85 @@ class Geometry:
         self,
         filename: str = None,
         stl_mesh: stl.mesh.Mesh = None,
-        translate: dict = None,
+        origin: dict = None,
         rotate: dict = None,
         scale: float = None,
-        user_tol: float = 1.0,
+        user_tol: float = 2.0 * np.pi,
         remp: bool = True,
     ):
-        """[summary]
+        """Load a STL file and compute if the points of the computational
+        mesh are inside or outside the object. In this way, the
+        customized geometry can be used at the flow solver.
+
+        The methodology is based on the work of:
+
+        * Jacobson, A., Kavan, L., & Sorkine-Hornung,
+          O. (2013). Robust inside-outside segmentation
+          using generalized winding numbers. ACM
+          Transactions on Graphics (TOG), 32(4), 1-12.
+
+        The Python implementation is an adaptation of
+        `inside-3d-mesh <https://github.com/marmakoide/inside-3d-mesh>`_,
+        by `Devert Alexandre <https://github.com/marmakoide`_,
+        licensed under the MIT License.
+
+        .. note:: The precision of the method is influenced by the
+        complexity of the STL mesh, there is no guarantee it will work
+        for all geometries. This feature is experimental, its
+        interface may change in future releases.
+
 
         Parameters
         ----------
         filename : str, optional
-            [description], by default None
-        stl_mesh : stl.mesh.Mesh, optional
-            [description], by default None
-        translate : dict, optional
-            [description], by default None
-        rotate : dict, optional
-            [description], by default None
+            Filename of the STL file to be loaded and included in the cartesian domain, by default None
         scale : float, optional
-            [description], by default None
+            This parameters can be used to scale up the object when greater than one and scale it down when smaller than one, by default None
+        rotate : dict, optional
+            Rotate the object, including keyword arguments that are
+            expected by :obj:`stl.mesh.Mesh.rotate`, like :obj:`axis`
+            and :obj:`theta`.
+            For more details, see `numpy-stl's documentation`_.
+            By default None.
+        origin : dict, optional
+            Specify the location of the origin point for the geometry.
+            It is considered as the minimum value computed from all
+            points in the object for each coordinate, after scaling
+            and rotating them. The keys of the dictionary are the
+            coordinate names (x, y and z) and the values are the
+            origin on that coordinate.
+            For missing keys, the value will be assumed as zero.
+            By default None
+        stl_mesh : stl.mesh.Mesh, optional
+            For very customizable control over the 3D object, you
+            can provide it directly. Note that none of the arguments
+            above are applied in this case.
+            For more details about how to create and modify the
+            geometry, see `numpy-stl's documentation`_.
+            By default None
         user_tol : float, optional
-            [description], by default 1.0
+            Control the tolerance used to compute if a mesh node is
+            inside or outside the object. Values smaller than the default may reduce the number of false negatives.
+            By default 2 * pi
         remp : bool, optional
-            [description], by default True
+            Add the geometry to the :obj:`xarray.DataArray` if
+            :obj:`True` and removes it if :obj:`False`, by default True
+
+        Examples
+        --------
+
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> epsi = xcompact3d_toolbox.init_epsi(prm)
+        >>> for key in epsi.keys():
+        >>>     epsi[key] = epsi[key].geo.from_stl(
+        ...         "My_file.stl",
+        ...         scale=1.0,
+        ...         rotate=dict(axis=[0, 0.5, 0], theta=math.radians(90)),
+        ...         origin=dict(x=2, y=1, z=0),
+        ...     )
+
+        . _`numpy-stl's documentation`: https://numpy-stl.readthedocs.io/en/latest/
+
         """
 
         def get_boundary(mesh_coord, coord):
@@ -317,19 +372,24 @@ class Geometry:
             max = coord.searchsorted(mesh_coord.max(), "right")
             return min, max
 
-        if filename is not None:
+        if filename is not None and stl_mesh is None:
             stl_mesh = stl.mesh.Mesh.from_file(filename)
 
-        if translate is not None:
-            stl_mesh.x += translate.get("x", 0.0)
-            stl_mesh.y += translate.get("y", 0.0)
-            stl_mesh.z += translate.get("z", 0.0)
+            if scale is not None:
+                stl_mesh.vectors *= scale
 
-        if rotate is not None:
-            stl_mesh.rotate(**rotate)
+            if rotate is not None:
+                stl_mesh.rotate(**rotate)
 
-        if scale is not None:
-            stl_mesh.vectors *= scale
+            if origin is None:
+                origin = {}
+
+            stl_mesh.x += origin.get("x", 0.0) - stl_mesh.x.min()
+            stl_mesh.y += origin.get("y", 0.0) - stl_mesh.y.min()
+            stl_mesh.z += origin.get("z", 0.0) - stl_mesh.z.min()
+
+        if stl_mesh is None:
+            raise ValueError("Please, specify filename or stl_mesh")
 
         x = self._data_array.x.data
         y = self._data_array.y.data
@@ -337,10 +397,10 @@ class Geometry:
 
         return self._data_array.where(
             ~_geometry_inside_mesh(
-                stl_mesh.vectors,
-                x,
-                y,
-                z,
+                stl_mesh.vectors.astype(np.longdouble),
+                x.astype(np.longdouble),
+                y.astype(np.longdouble),
+                z.astype(np.longdouble),
                 user_tol,
                 get_boundary(stl_mesh.x, x),
                 get_boundary(stl_mesh.y, y),
@@ -809,7 +869,19 @@ def _adet(X, Y, Z):
 
 @numba.njit
 def _point_in_geometry(triangles, x, y, z, user_tol):
+    """
+    The methodology is based on the work of:
 
+    * Jacobson, A., Kavan, L., & Sorkine-Hornung,
+        O. (2013). Robust inside-outside segmentation
+        using generalized winding numbers. ACM
+        Transactions on Graphics (TOG), 32(4), 1-12.
+
+    The Python implementation is an adaptation of
+    `inside-3d-mesh <https://github.com/marmakoide/inside-3d-mesh>`_,
+    by `Devert Alexandre <https://github.com/marmakoide`_,
+    licensed under the MIT License.
+    """
     X = np.array((x, y, z), dtype=triangles.dtype)
 
     # One generalized winding number per input vertex
@@ -828,4 +900,4 @@ def _point_in_geometry(triangles, x, y, z, user_tol):
 
         ret += np.arctan2(omega, d)
 
-    return ret >= (2.0 * np.pi) * user_tol
+    return ret >= user_tol
