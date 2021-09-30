@@ -305,7 +305,7 @@ class Geometry:
 
         The Python implementation is an adaptation of
         `inside-3d-mesh <https://github.com/marmakoide/inside-3d-mesh>`_,
-        by `Devert Alexandre <https://github.com/marmakoide`_,
+        by `@marmakoide <https://github.com/marmakoide>`_,
         licensed under the MIT License.
 
         .. note:: The precision of the method is influenced by the
@@ -349,6 +349,16 @@ class Geometry:
         remp : bool, optional
             Add the geometry to the :obj:`xarray.DataArray` if
             :obj:`True` and removes it if :obj:`False`, by default True
+
+        Returns
+        -------
+        :obj:`xarray.DataArray`
+            Array with(out) the customized geometry
+
+        Raises
+        -------
+        ValueError("Please, specify filename or stl_mesh")
+            If neither the :obj:`filename` or :obj:`stl_mesh` are specified
 
         Examples
         --------
