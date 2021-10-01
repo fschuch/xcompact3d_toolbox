@@ -292,7 +292,7 @@ class Geometry:
         user_tol: float = 2.0 * np.pi,
         remp: bool = True,
     ):
-        """Load a STL file and compute if the points of the computational
+        """Load a STL file and compute if the nodes of the computational
         mesh are inside or outside the object. In this way, the
         customized geometry can be used at the flow solver.
 
@@ -303,15 +303,21 @@ class Geometry:
           using generalized winding numbers. ACM
           Transactions on Graphics (TOG), 32(4), 1-12.
 
-        The Python implementation is an adaptation of
-        `inside-3d-mesh <https://github.com/marmakoide/inside-3d-mesh>`_,
-        by `@marmakoide <https://github.com/marmakoide>`_,
-        licensed under the MIT License.
+        The Python implementation is an adaptation from
+        `inside-3d-mesh <https://github.com/marmakoide/inside-3d-mesh>`_
+        (licensed under the MIT License),
+        by `@marmakoide <https://github.com/marmakoide>`_.
+
+        To maximize the performance here at the toolbox, :obj:`from_stl` is powered by
+        `Numba`_, that translates Python functions to optimized machine code at runtime.
+        This method is compatible with `Dask`_ for parallel computation.
+        In addition, just the subdomain near the object is tested, to save computational
+        time.
 
         .. note:: The precision of the method is influenced by the
-        complexity of the STL mesh, there is no guarantee it will work
-        for all geometries. This feature is experimental, its
-        interface may change in future releases.
+           complexity of the STL mesh, there is no guarantee it will work
+           for all geometries. This feature is experimental, its
+           interface may change in future releases.
 
 
         Parameters
@@ -322,18 +328,18 @@ class Geometry:
             This parameters can be used to scale up the object when greater than one and scale it down when smaller than one, by default None
         rotate : dict, optional
             Rotate the object, including keyword arguments that are
-            expected by :obj:`stl.mesh.Mesh.rotate`, like :obj:`axis`
-            and :obj:`theta`.
+            expected by :obj:`stl.mesh.Mesh.rotate`, like ``axis``,
+            ``theta`` and ``point``.
             For more details, see `numpy-stl's documentation`_.
-            By default None.
+            By default None
         origin : dict, optional
             Specify the location of the origin point for the geometry.
             It is considered as the minimum value computed from all
             points in the object for each coordinate, after scaling
             and rotating them. The keys of the dictionary are the
-            coordinate names (x, y and z) and the values are the
+            coordinate names (``x``, ``y`` and ``z``) and the values are the
             origin on that coordinate.
-            For missing keys, the value will be assumed as zero.
+            For missing keys, the value is assumed as zero.
             By default None
         stl_mesh : stl.mesh.Mesh, optional
             For very customizable control over the 3D object, you
@@ -345,7 +351,7 @@ class Geometry:
         user_tol : float, optional
             Control the tolerance used to compute if a mesh node is
             inside or outside the object. Values smaller than the default may reduce the number of false negatives.
-            By default 2 * pi
+            By default :math:`2\pi`
         remp : bool, optional
             Add the geometry to the :obj:`xarray.DataArray` if
             :obj:`True` and removes it if :obj:`False`, by default True
@@ -357,14 +363,20 @@ class Geometry:
 
         Raises
         -------
-        ValueError("Please, specify filename or stl_mesh")
-            If neither the :obj:`filename` or :obj:`stl_mesh` are specified
+        ValueError
+            If neither :obj:`filename` or :obj:`stl_mesh` are specified
+        ValueError
+            If :obj:`stl_mesh` is not valid, the test is performed by :obj:`stl.mesh.Mesh.check`
+        ValueError
+            If :obj:`stl_mesh` is not closed, the test is performed by
+            :obj:`stl.mesh.Mesh.is_closed`
+
 
         Examples
         --------
 
         >>> prm = xcompact3d_toolbox.Parameters()
-        >>> epsi = xcompact3d_toolbox.init_epsi(prm)
+        >>> epsi = xcompact3d_toolbox.init_epsi(prm, dask = True)
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.from_stl(
         ...         "My_file.stl",
@@ -373,11 +385,17 @@ class Geometry:
         ...         origin=dict(x=2, y=1, z=0),
         ...     )
 
-        . _`numpy-stl's documentation`: https://numpy-stl.readthedocs.io/en/latest/
+        .. _`Dask`: https://dask.org/
+        .. _`numpy-stl's documentation`: https://numpy-stl.readthedocs.io/en/latest/
+        .. _`Numba`: http://numba.pydata.org/
 
         """
 
         def get_boundary(mesh_coord, coord):
+            """Get the boundaries of the subdomain for a given direction (x, y, z)
+            near the object. It returns a tuple of integers, representing the min and max
+            indexes of the coordinate where we need to loop through.
+            """
             min = coord.searchsorted(mesh_coord.min(), "left")
             max = coord.searchsorted(mesh_coord.max(), "right")
             return min, max
@@ -394,12 +412,22 @@ class Geometry:
             if origin is None:
                 origin = {}
 
-            stl_mesh.x += origin.get("x", 0.0) - stl_mesh.x.min()
-            stl_mesh.y += origin.get("y", 0.0) - stl_mesh.y.min()
-            stl_mesh.z += origin.get("z", 0.0) - stl_mesh.z.min()
+            stl_mesh.translate(
+                [
+                    origin.get("x", 0.0) - stl_mesh.x.min(),
+                    origin.get("y", 0.0) - stl_mesh.y.min(),
+                    origin.get("z", 0.0) - stl_mesh.z.min(),
+                ]
+            )
 
         if stl_mesh is None:
             raise ValueError("Please, specify filename or stl_mesh")
+
+        if not stl_mesh.check():
+            raise ValueError("stl_mesh is not valid")
+
+        if not stl_mesh.is_closed():
+            raise ValueError("stl_mesh is not closed")
 
         x = self._data_array.x.data
         y = self._data_array.y.data
