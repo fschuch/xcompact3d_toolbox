@@ -134,4 +134,4 @@ xcompact3d
 *.o
 *.mod
 *.out
-*.dat
+# *.dat

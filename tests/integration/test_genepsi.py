@@ -11,7 +11,7 @@ def set_up():
     prm = x3d.Parameters(loadfile="tests/integration/data/input.i3d", raise_warning = True)
     epsi = x3d.sandbox.init_epsi(prm)
     for key in epsi.keys():
-        epsi[key] = epsi[key].geo.cylinder(x=5.0, y=3.0)
+        epsi[key] = epsi[key].geo.cylinder(x=3.0, y=5.0)
     x3d.genepsi.gene_epsi_3D(epsi, prm)
 
 @pytest.mark.parametrize(

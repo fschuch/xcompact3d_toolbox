@@ -121,9 +121,72 @@ def gene_epsi_3D(epsi_in_dict, prm):
             output_dtypes=[np.float64, np.float64],
         )
 
-    def fix_bug(*args, **kwargs):
-        raise NotImplementedError(
-            "Not implemented yet. Please, report your test case to https://github.com/fschuch/xcompact3d_toolbox/issues/3"
+    def fix_bug(xi, xf, nraf, nobjmax, nobjx, nobjxraf, epsi, refepsi, dim):
+        @numba.njit
+        def fix(xi_in, xf_in, nobjx, nobjxraf, epsi, refepsi, nraf, nobjmax):
+            xi = xi_in.copy()
+            xf = xf_in.copy()
+            if nobjx != nobjxraf:
+                iobj = -1
+                isol = 0
+                if epsi[0]:
+                    iobj += 1
+                for i in range(epsi.size - 1):
+                    idebraf = 0
+                    ifinraf = 0
+                    iflu = 0
+                    if not epsi[i] and epsi[i + 1]:
+                        iobj += 1
+                    if not epsi[i] and not epsi[i + 1]:
+                        iflu = 1
+                    if epsi[i] and epsi[i + 1]:
+                        isol = 1
+                    for iraf in range(nraf):
+                        iiraf = iraf + nraf * i
+                        if not refepsi[iiraf] and refepsi[iiraf + 1]:
+                            idebraf = iiraf + 1
+                        if refepsi[iiraf] and not refepsi[iiraf + 1]:
+                            ifinraf = iiraf + 1
+                    if (
+                        idebraf != 0
+                        and ifinraf != 0
+                        and idebraf < ifinraf
+                        and iflu == 1
+                    ):
+                        iobj += 1
+                        for ii in range(iobj, nobjmax - 1):
+                            xi[ii] = xi[ii + 1]
+                            xf[ii] = xf[ii + 1]
+                        iobj -= 1
+                    if (
+                        idebraf != 0
+                        and ifinraf != 0
+                        and idebraf > ifinraf
+                        and isol == 1
+                    ):
+                        iobj += 1
+                        for ii in range(iobj, nobjmax - 1):
+                            xi[ii] = xi[ii + 1]
+                        iobj -= 1
+                        for i in range(iobj, nobjmax - 1):
+                            xf[ii] = xf[ii + 1]
+
+            return xi, xf
+
+        return xr.apply_ufunc(
+            fix,
+            xi,
+            xf,
+            nobjx,
+            nobjxraf,
+            epsi,
+            refepsi,
+            kwargs=dict(nraf=nraf, nobjmax=nobjmax),
+            input_core_dims=[["obj"], ["obj"], [], [], [dim], [dim + "_raf"]],
+            output_core_dims=[["obj"], ["obj"]],
+            vectorize=True,
+            dask="parallelized",
+            output_dtypes=[np.float64, np.float64],
         )
 
     def verif_epsi(epsi, dim):
@@ -224,12 +287,12 @@ def gene_epsi_3D(epsi_in_dict, prm):
             ds[f"xi_{dir}"], ds[f"xf_{dir}"] = fix_bug(
                 ds[f"xi_{dir}"],
                 ds[f"xf_{dir}"],
+                nraf,
+                int(max_obj),
                 ds[f"nobj_{dir}"],
                 ds[f"nobjmaxraf_{dir}"],
                 epsi,
-                ep,
-                nraf,
-                max_obj,
+                ep.rename(**{dir: dir + "_raf"}),
                 dir,
             )
 

@@ -14,7 +14,7 @@ p_col=2               ! Column partition
 ! Mesh
 nx=129               ! X-direction nodes
 ny=65                ! Y-direction nodes
-nz=65                ! Z-direction nodes
+nz=9                 ! Z-direction nodes
 istret = 0           ! y mesh refinement (0:no, 1:center, 2:both sides, 3:bottom)
 beta = 0.259065151   ! Refinement parameter (beta)
 
@@ -128,11 +128,11 @@ SmagWallDamp = 1      ! Smagorinsky damping function for ABL if 1
  ubcy=0.0       ! Prescribed Velocity (uy)
  ubcz=0.0       ! Prescribed Velocity (uz)
 
- cex=5.        ! when simulating a cylinder x coordinate of the center
- cey=3.        ! when simulating a cylinder y coordinate of the center
+ cex=3.        ! when simulating a cylinder x coordinate of the center
+ cey=5.        ! when simulating a cylinder y coordinate of the center
  ra=0.5         ! when simulating a cylinder, radius
  nraf=10         ! level of refinement for (iibm=2 0r iibm=4) to find the surface of the immersed object
- nobjmax=2      ! number of immersed objects (DO NOT USE ZERO OBJECTS)
+ nobjmax=1      ! number of immersed objects (DO NOT USE ZERO OBJECTS)
  npif=2         ! Number of Points for the Reconstruction (npif=1-3) (Recomended: 2)
  izap=1         ! How many points to skip for reconstruction (Range: 0-3) (Reccomended: 1)
  ianal=0        ! Boundary position approximation? (0: Refinement Approximation, 1: Analytical)
