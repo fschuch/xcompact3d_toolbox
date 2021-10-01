@@ -917,7 +917,7 @@ def _point_in_geometry(triangles, x, y, z, user_tol):
 
     The Python implementation is an adaptation of
     `inside-3d-mesh <https://github.com/marmakoide/inside-3d-mesh>`_,
-    by `Devert Alexandre <https://github.com/marmakoide`_,
+    by `Devert Alexandre <https://github.com/marmakoide>`_,
     licensed under the MIT License.
     """
     X = np.array((x, y, z), dtype=triangles.dtype)
