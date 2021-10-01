@@ -212,7 +212,6 @@ def gene_epsi_3D(epsi_in_dict, prm):
         print(f'           bug : {ds[f"ibug_{dir}"].values}\n')
 
     max_obj = np.max([ds.nobjmax_x.values, ds.nobjmax_y.values, ds.nobjmax_z.values])
-    prm.nobjmax = int(max_obj)  # using int to be consistent with traitlets types
     ds = ds.assign_coords(obj=range(max_obj), obj_aux=range(-1, max_obj))
 
     for dir, ep, l in zip(
