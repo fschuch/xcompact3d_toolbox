@@ -1206,13 +1206,20 @@ def prm_to_dict(filename="incompact3d.prm"):
     return dict_outer
 
 
-def i3d_to_dict(filename="input.i3d"):
+def i3d_to_dict(filename="input.i3d", string = None):
 
-    f = open(filename)
+    if string is None:
+        with open(filename, "r") as f:
+            string = f.read()
+
+    return i3d_string_to_dict(string)
+
+
+def i3d_string_to_dict(string):
 
     dict_outer = {}
 
-    for line in f:
+    for line in io.StringIO(string):
         # Remove comments
         line = line.partition("!")[0].replace(" ", "")
         # Remove spaces

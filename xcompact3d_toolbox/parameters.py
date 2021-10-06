@@ -1205,7 +1205,18 @@ class Parameters(
                     raise KeyError(f"{key} is not a valid parameter")
             setattr(self, key, arg)
 
-    def load(self, filename: str = None, raise_warning: bool = False) -> None:
+    def from_string(self, string: str, raise_warning: bool = False) -> None:
+
+        dictionary = {}
+
+        # unpacking the nested dictionary
+        for key_out, value_out in i3d_to_dict(string = string).items():
+            for key_in, value_in in value_out.items():
+                dictionary[key_in] = value_in
+
+        self.set(raise_warning=raise_warning, **dictionary)
+
+    def from_file(self, filename: str = None, raise_warning: bool = False) -> None:
         """Loads the attributes from the parameters file.
 
         It also includes support for the previous format :obj:`.prm`  (see `#7`_).
@@ -1263,6 +1274,11 @@ class Parameters(
             )
 
         self.set(raise_warning=raise_warning, **dictionary)
+
+    def load(self, *arg, **kwarg) -> None:
+        """An alias for :obj:`Parameters.from_file`
+        """
+        self.from_file(*arg, **kwarg)
 
     def write(self, filename: str = None) -> None:
         """Write all valid attributes to an :obj:`.i3d` file.
