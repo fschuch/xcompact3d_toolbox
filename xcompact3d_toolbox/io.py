@@ -525,7 +525,6 @@ class Dataset(traitlets.HasTraits):
         ...     separator = "-",
         ...     file_extension = ".bin",
         ...     number_of_digits = 3,
-        ...     data_path = "./data/"
         ... )
         """
 
@@ -576,7 +575,7 @@ class Dataset(traitlets.HasTraits):
         coords = self._mesh.drop(*self.drop_coords)
 
         if add_time:
-        time_int, name = self.filename_properties.get_info_from_filename(filename)
+            time_int, name = self.filename_properties.get_info_from_filename(filename)
             coords["t"] = [param["mytype"](self._time_step * time_int)]
         else:
             name = None
@@ -704,7 +703,14 @@ class Dataset(traitlets.HasTraits):
             return name in {"ux", "uy", "uz"}
 
         if stack_scalar:
-            scalar_variables = sorted(list(filter(is_scalar, set_of_variables,)))
+            scalar_variables = sorted(
+                list(
+                    filter(
+                        is_scalar,
+                        set_of_variables,
+                    )
+                )
+            )
 
             if scalar_variables:
                 dataset["phi"] = (
@@ -842,6 +848,7 @@ class Dataset(traitlets.HasTraits):
             Torque           (t) float64 8.78e+06 1.268e+06 ... 4.231e+06 4.203e+06
             Power            (t) float64 1.112e+07 1.952e+06 ... 5.362e+06 5.328e+06
         """
+
         def get_dataset(filename):
 
             time = os.path.basename(filename).split("_")[0]
@@ -980,7 +987,8 @@ class Dataset(traitlets.HasTraits):
                 self._write_array(
                     dataArray.isel(t=k, drop=True),
                     self.filename_properties.get_filename_for_binary(
-                        prefix=filename, counter=int(time / dt),
+                        prefix=filename,
+                        counter=int(time / dt),
                     ),
                 )
         # and finally writes to the disc
@@ -1044,7 +1052,10 @@ class Dataset(traitlets.HasTraits):
                 raise IOError(f"No file was found corresponding to {filename_pattern}.")
 
             properties = zip(
-                *map(self.filename_properties.get_info_from_filename, filename_list,)
+                *map(
+                    self.filename_properties.get_info_from_filename,
+                    filename_list,
+                )
             )
             time_numbers, var_names = properties
             time_numbers = sorted(list(set(time_numbers)))
