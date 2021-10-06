@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 import warnings
 
 import xarray as xr
+
 from .parameters import Parameters
 
-xr.tutorial.external_urls["cylinder"] = "https://github.com/fschuch/xcompact3d_toolbox_data/raw/main/cylinder.nc"
+xr.tutorial.external_urls[
+    "cylinder"
+] = "https://github.com/fschuch/xcompact3d_toolbox_data/raw/main/cylinder.nc"
+
 
 def open_dataset(name: str, **kws) -> tuple[xr.Dataset, Parameters]:
     """
@@ -33,7 +39,7 @@ def open_dataset(name: str, **kws) -> tuple[xr.Dataset, Parameters]:
 
     if "prm" in ds.attrs:
         with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=UserWarning)
+            warnings.filterwarnings("ignore", category=UserWarning)
             prm.from_string(ds.attrs.get("prm"), raise_warning=True)
         del ds.attrs["prm"]
 
