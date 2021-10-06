@@ -17,7 +17,7 @@ extras_require = dict(
         "holoviews>=1.14",
     ],
     docs=["sphinx>=1.4", "nbsphinx", "sphinx-autobuild", "sphinx-rtd-theme"],
-    dev=["versioneer", "black", "jupyterlab>=3.1"],
+    dev=["versioneer", "black", "jupyterlab>=3.1", "pooch"],
     test=["pytest>=3.8", "hypothesis>=4.53"],
 )
 
@@ -44,7 +44,7 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "numpy>=1.19",
+        "numpy==1.20", # because of numba
         "scipy>=1.5",
         "traitlets>=4.3",
         "ipywidgets>=7.5",
