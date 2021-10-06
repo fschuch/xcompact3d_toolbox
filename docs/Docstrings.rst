@@ -51,3 +51,9 @@ Genepsi
 
 .. automodule:: xcompact3d_toolbox.genepsi
    :members:
+
+Sample Data
+-----------
+
+.. automodule:: xcompact3d_toolbox.tutorial
+   :members:

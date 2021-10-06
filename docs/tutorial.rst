@@ -4,6 +4,8 @@ Tutorials
 .. toctree::
 
    tutorial/parameters.ipynb
+   tutorial/io.ipynb
+   tutorial/computing_and_plotting.ipynb
 
 Sandbox Examples
 -----------------
