@@ -1206,6 +1206,22 @@ class Parameters(
             setattr(self, key, arg)
 
     def from_string(self, string: str, raise_warning: bool = False) -> None:
+        """Loads the attributes from a string.
+
+        Parameters
+        ----------
+        filename : str, optional
+            The filename for the parameters file. If None, it uses the filename specified
+            in the class (default is :obj:`None`).
+        raise_warning : bool, optional
+            Raise a warning instead of an error if an invalid parameter is found.
+            By default False.
+
+        Raises
+        ------
+        KeyError
+            Exception is raised when an attributes is invalid.
+        """
 
         dictionary = {}
 
