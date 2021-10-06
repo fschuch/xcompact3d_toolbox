@@ -6,6 +6,7 @@ Usefull objects to read and write the binary fields produced by XCompact3d.
 from __future__ import annotations
 
 import glob
+import io
 import os
 import os.path
 import warnings
@@ -1269,7 +1270,5 @@ def i3d_string_to_dict(string):
             dict_inner[param].append(value)
         else:  # Not a list
             dict_inner[param] = value
-
-    f.close()
 
     return dict_outer
