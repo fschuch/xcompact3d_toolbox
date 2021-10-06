@@ -9,6 +9,7 @@ pandas
 xarray
 dask[complete]
 numba
+hvplot
 sphinx>=1.4
 nbsphinx
 sphinx-autobuild
