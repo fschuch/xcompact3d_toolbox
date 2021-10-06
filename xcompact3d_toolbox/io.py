@@ -568,16 +568,17 @@ class Dataset(traitlets.HasTraits):
 
         Load one array from the disc:
 
-        >>> ux = prm.dataset.load_array("ux-0000.bin")
+        >>> ux = prm.dataset.load_array("ux-000.bin")
 
         """
 
         coords = self._mesh.drop(*self.drop_coords)
 
-        time_int, name = self.filename_properties.get_info_from_filename(filename)
-
         if add_time:
+        time_int, name = self.filename_properties.get_info_from_filename(filename)
             coords["t"] = [param["mytype"](self._time_step * time_int)]
+        else:
+            name = None
 
         # We obtain the shape for np.fromfile from the coordinates
         shape = [len(value) for value in coords.values()]
