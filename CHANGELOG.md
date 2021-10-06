@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `fix_bug` at [gene_epsi_3D](xcompact3d-toolbox/genepsi.py) was not working properly (#3), by [@fschuch](https://github.com/fschuch).
+- The default return from `xcompact3d.param.boundary_condition` now takes in consideration if the domain is periodic or not, by [@fschuch](https://github.com/fschuch).
 
 ## [1.0.1] - 2021-09-23
 

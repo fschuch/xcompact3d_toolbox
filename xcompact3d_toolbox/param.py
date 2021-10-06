@@ -4,8 +4,14 @@ param = {"mytype": float64}
 
 
 def boundary_condition(prm, var=None):
-
-    default = {d: {"ncl1": 2, "ncln": 2, "npaire": 1} for d in ["x", "y", "z"]}
+    default = {
+        d: {
+            "ncl1": 0 if getattr(prm.mesh, d).is_periodic else 2,
+            "ncln": 0 if getattr(prm.mesh, d).is_periodic else 2,
+            "npaire": 1,
+        }
+        for d in ["x", "y", "z"]
+    }
     default["y"]["istret"] = prm.istret
     default["y"]["beta"] = prm.beta
 
