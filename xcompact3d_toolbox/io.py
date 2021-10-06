@@ -434,7 +434,7 @@ class Dataset(traitlets.HasTraits):
         elif isinstance(arg, slice):
             start, stop, step = arg.indices(len(self))
             return xr.concat(
-                [self.load_snapshot(t) for t in range(start, stop, step)], "t"
+                (self.load_snapshot(t) for t in range(start, stop, step)), "t"
             )
         elif isinstance(arg, str):
             return self.load_time_series(arg)
@@ -801,10 +801,10 @@ class Dataset(traitlets.HasTraits):
             raise IOError(f"No file was found corresponding to {filename_pattern}.")
 
         return xr.concat(
-            [
+            (
                 self.load_array(file, add_time=True)
                 for file in tqdm(filename_list, desc=filename_pattern)
-            ],
+            ),
             dim="t",
         )
 
@@ -868,7 +868,7 @@ class Dataset(traitlets.HasTraits):
 
         filenames = glob.glob(file_pattern)
 
-        return xr.concat([get_dataset(file) for file in filenames], dim="t").sortby("t")
+        return xr.concat((get_dataset(file) for file in filenames), dim="t").sortby("t")
 
     def write(self, data: Union[xr.DataArray, xr.Dataset], file_prefix: str = None):
         """Write an array or dataset to raw binary files on the disc, in the
