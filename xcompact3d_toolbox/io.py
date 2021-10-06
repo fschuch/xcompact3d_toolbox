@@ -929,8 +929,10 @@ class Dataset(traitlets.HasTraits):
 
         """
         if isinstance(data, xr.Dataset):
+            os.makedirs(self.data_path, exist_ok = True)
             self._write_dataset(data)
         elif isinstance(data, xr.DataArray):
+            os.makedirs(self.data_path, exist_ok = True)
             self._write_array(data, file_prefix)
         else:
             raise IOError(
