@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add `sandbox.Geometry.from_stl`. It reads a `stl` file and is able to compute what mesh points are inside or outside the geometry, so we can specify the geometry for a very customized immersed boundary method. By [@fschuch](https://github.com/fschuch) and [@nbeb](https://github.com/nbeb).
+- Add `xcompact3d_toolbox.tutorial`, making it easier to get datasets for documentation and tutorials, by [@fschuch](https://github.com/fschuch).
 
 ### Fixed
 

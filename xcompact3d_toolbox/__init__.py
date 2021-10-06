@@ -1,3 +1,4 @@
+from . import tutorial
 from ._version import get_versions
 from .array import X3dDataArray, X3dDataset
 from .genepsi import gene_epsi_3D
