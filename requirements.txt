@@ -10,6 +10,7 @@ xarray
 dask[complete]
 numba
 hvplot
+datashader
 sphinx>=1.4
 nbsphinx
 sphinx-autobuild
