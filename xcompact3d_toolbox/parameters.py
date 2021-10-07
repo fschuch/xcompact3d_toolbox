@@ -8,6 +8,7 @@ pre and post-processing.
     https://github.com/xcompact3d/Incompact3d
 """
 
+import os.path
 import warnings
 
 import numpy as np
@@ -638,13 +639,13 @@ class ParametersIbmStuff(traitlets.HasTraits):
     def __init__(self):
         super(ParametersIbmStuff, self).__init__()
 
+
 class ParametersALMParam(traitlets.HasTraits):
-    iturboutput = traitlets.Int(default_value=1, min=1).tag(
-        group="ALMParam"
-    )
+    iturboutput = traitlets.Int(default_value=1, min=1).tag(group="ALMParam")
 
     def __init__(self):
         super(ParametersALMParam, self).__init__()
+
 
 class ParametersExtras(traitlets.HasTraits):
     """Extra utilities that are not present at the parameters file,
@@ -723,6 +724,12 @@ class ParametersExtras(traitlets.HasTraits):
     ...     stack_velocity = False,
     ... )
 
+    .. note :: For convenience, ``data_path`` is set as
+       ``"./data/"`` relative to the ``filename`` of the parameters file
+       when creating a new instance of :obj:`Parameters`
+       (i.g., if ``filename = "./example/input.i3d"`` then
+       ``data_path = "./example/data/"``).
+
     There are many ways to load the arrays produced by
     your numerical simulation, so you can choose what
     best suits your post-processing application.
@@ -798,7 +805,6 @@ class ParametersExtras(traitlets.HasTraits):
         self.mesh = Mesh3D()
 
         self._link_mesh_and_parameters()
-
         self.dataset = Dataset(**dict(_mesh=self.mesh, _prm=self))
 
     def _link_mesh_and_parameters(self):
@@ -923,11 +929,13 @@ class Parameters(
         super(Parameters, self).__init__()
 
         if "loadfile" in kwargs.keys():
-            self.filename = kwargs.get("loadfile")
+            self.filename = kwargs.pop("loadfile")
             self.load(raise_warning=raise_warning)
-            del kwargs["loadfile"]
 
         self.set(raise_warning=raise_warning, **kwargs)
+
+        data_path = os.path.join(os.path.dirname(self.filename), "data")
+        self.dataset.set(data_path=data_path)
 
     def __repr__(self):
         string = f"{self.__class__.__name__}(\n"
@@ -947,7 +955,11 @@ class Parameters(
         representation of the ``.i3d`` file."""
         # These groups are demanded by Xcompact3d, see parameters.f90
         dictionary = dict(
-            BasicParam={}, NumOptions={}, InOutParam={}, Statistics={}, CASE={},
+            BasicParam={},
+            NumOptions={},
+            InOutParam={},
+            Statistics={},
+            CASE={},
         )
         for name in self.trait_names():
             # if skip_default:
@@ -1143,7 +1155,7 @@ class Parameters(
             A dict containing the boundary conditions for the variable specified.
 
         Examples
-        -------
+        --------
 
         >>> prm = xcompact3d_toolbox.Parameters()
         >>> prm.get_boundary_condition('ux')
@@ -1226,7 +1238,7 @@ class Parameters(
         dictionary = {}
 
         # unpacking the nested dictionary
-        for key_out, value_out in i3d_to_dict(string = string).items():
+        for key_out, value_out in i3d_to_dict(string=string).items():
             for key_in, value_in in value_out.items():
                 dictionary[key_in] = value_in
 
@@ -1292,8 +1304,7 @@ class Parameters(
         self.set(raise_warning=raise_warning, **dictionary)
 
     def load(self, *arg, **kwarg) -> None:
-        """An alias for :obj:`Parameters.from_file`
-        """
+        """An alias for :obj:`Parameters.from_file`"""
         self.from_file(*arg, **kwarg)
 
     def write(self, filename: str = None) -> None:

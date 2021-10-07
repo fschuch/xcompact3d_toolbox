@@ -1,10 +1,12 @@
 import unittest
-
+import os.path
+import pytest
 import traitlets
 from xcompact3d_toolbox.parameters import Parameters
 
 # TODO - migrate do Pytest
 # TODO 2 - Test ParametersGui as well
+
 
 class test_parameters(unittest.TestCase):
     def test_io(self):
@@ -78,6 +80,20 @@ class test_parameters(unittest.TestCase):
                 self.assertEqual(getattr(prm, f"n{dim}"), 201)
                 self.assertEqual(getattr(prm, f"d{dim}"), 0.005)
                 self.assertEqual(getattr(prm, f"{dim}l{dim}"), 1.0)
+
+
+@pytest.mark.parametrize(
+    "i3d_path, data_path",
+    [
+        ("./example/input.i3d", "./example/data/"),
+        ("../tutorial/case/input.i3d", "../tutorial/case/data/"),
+        ("input.i3d", "./data/"),
+    ],
+)
+def test_initial_datapath(i3d_path, data_path):
+    prm = Parameters(filename=i3d_path)
+    assert os.path.normpath(prm.dataset.data_path) == os.path.normpath(data_path)
+
 
 if __name__ == "__main__":
     unittest.main()

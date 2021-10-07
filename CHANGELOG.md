@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add tutorial *Computing and Plotting*, by [@fschuch](https://github.com/fschuch).
 - Add tutorial *Reading and writing files*, by [@fschuch](https://github.com/fschuch).
 
+### Modified
+
+- `io.Dataset.data_path` is now obtained automatically from `parameters.Parameter.filename` at initialization (i.g., if `filename = "./example/input.i3d"` then `data_path = "./example/data/"`). Of course, `data_path` can be changed to any value after data. By [@fschuch](https://github.com/fschuch).
+
 ### Fixed
 
 - `fix_bug` at [gene_epsi_3D](xcompact3d-toolbox/genepsi.py) was not working properly (#3), by [@fschuch](https://github.com/fschuch).

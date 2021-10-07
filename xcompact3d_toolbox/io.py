@@ -236,6 +236,8 @@ class Dataset(traitlets.HasTraits):
     ----------
     data_path : str
         The path to the folder where the binary fields are located (default is ``"./data/"``).
+        .. note :: the default ``"./data/"`` is relative to the path to the parameters
+           file when initialized from :obj:`xcompact3d_toolbox.parameters.ParametersExtras`.
     drop_coords : str
         If working with two-dimensional planes, specify which of the coordinates should be
         dropped, i.e., ``"x"``, ``"y"`` or ``"z"``, or leave it empty for 3D fields (default is ``""``).
