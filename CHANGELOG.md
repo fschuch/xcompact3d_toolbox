@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2021-10-07
+
 ### Added
 
 - Add `sandbox.Geometry.from_stl`. It reads a `stl` file and is able to compute what mesh points are inside or outside the geometry, so we can specify the geometry for a very customized immersed boundary method. By [@fschuch](https://github.com/fschuch) and [@nbeb](https://github.com/nbeb).
@@ -17,14 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Modified
 
-- `io.Dataset.data_path` is now obtained automatically from `parameters.Parameter.filename` at initialization (i.g., if `filename = "./example/input.i3d"` then `data_path = "./example/data/"`). Of course, `data_path` can be changed to any value after data. By [@fschuch](https://github.com/fschuch).
+- `io.Dataset.data_path` is now obtained automatically from `parameters.Parameter.filename` at initialization (i.g., if `filename = "./example/input.i3d"` then `data_path = "./example/data/"`). Of course, `data_path` can be changed to any value after that. By [@fschuch](https://github.com/fschuch).
 - `io.Dataset.load_wind_turbine_data` now have a default location for `file_pattern`. Atributes were included for the coordinate time. By [@fschuch](https://github.com/fschuch).
 - `io.Dataset.set` now accepts keyword arguments to send to `io.FilenameProperties.set`, for a more concise sintaxe. By [@fschuch](https://github.com/fschuch).
+- The default return from `xcompact3d.param.boundary_condition` now takes in consideration if the domain is periodic or not, by [@fschuch](https://github.com/fschuch).
 
 ### Fixed
 
-- `fix_bug` at [gene_epsi_3D](xcompact3d-toolbox/genepsi.py) was not working properly (#3), by [@fschuch](https://github.com/fschuch).
-- The default return from `xcompact3d.param.boundary_condition` now takes in consideration if the domain is periodic or not, by [@fschuch](https://github.com/fschuch).
+- `fix_bug` at [gene_epsi_3D](xcompact3d-toolbox/genepsi.py) was not working properly ([#3](https://github.com/fschuch/xcompact3d_toolbox/issues/3)), by [@fschuch](https://github.com/fschuch).
 - `xcompact3d.io.Dataset.load_array` was not working for files that do not change in time, like `./data/geometry/epsilon.bin`, by [@fschuch](https://github.com/fschuch).
 
 ## [1.0.1] - 2021-09-23
@@ -174,7 +176,8 @@ No changes, just trying to get familiar with workflows and the release to Pypi.
 - Support to *Sandbox Flow Configuration* (see [fschuch/Xcompact3d](https://github.com/fschuch/Xcompact3d/)), by [@fschuch](https://github.com/fschuch).
 - Ahmed body as benchmark geometry, mirror and plotting tools, by [@momba98](https://github.com/momba98).
 
-[Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/fschuch/xcompact3d_toolbox/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/fschuch/xcompact3d_toolbox/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/fschuch/xcompact3d_toolbox/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.11...v1.0.0
 [0.1.11]: https://github.com/fschuch/xcompact3d_toolbox/compare/v0.1.10...v0.1.11
