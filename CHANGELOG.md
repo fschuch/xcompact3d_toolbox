@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `io.Dataset.data_path` is now obtained automatically from `parameters.Parameter.filename` at initialization (i.g., if `filename = "./example/input.i3d"` then `data_path = "./example/data/"`). Of course, `data_path` can be changed to any value after data. By [@fschuch](https://github.com/fschuch).
 - `io.Dataset.load_wind_turbine_data` now have a default location for `file_pattern`. Atributes were included for the coordinate time. By [@fschuch](https://github.com/fschuch).
+- `io.Dataset.set` now accepts keyword arguments to send to `io.FilenameProperties.set`, for a more concise sintaxe. By [@fschuch](https://github.com/fschuch).
 
 ### Fixed
 

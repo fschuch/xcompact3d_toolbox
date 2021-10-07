@@ -251,7 +251,7 @@ class Dataset(traitlets.HasTraits):
         need to speedup your application
         (default is an empty set).
     snapshot_counting : str
-        The parameter that controls the number of timesteps used to produce tha datasets
+        The parameter that controls the number of timesteps used to produce the datasets
         (default is ``"ilast"``).
     snapshot_step : str
         The parameter that controls the number of timesteps between each snapshot, it is often
@@ -265,7 +265,7 @@ class Dataset(traitlets.HasTraits):
 
     Notes
     -----
-        * :obj:`Dataset` is in fact an atribute of :obj:`xcompact3d_toolbox.parameters. ParametersExtras`,
+        * :obj:`Dataset` is in fact an atribute of :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
           so there is no need to initialize it manually for most of the common use cases.
 
         * All arrays are wrapped into Xarray objects (:obj:`xarray.DataArray`
@@ -303,6 +303,9 @@ class Dataset(traitlets.HasTraits):
 
         Parameters
         ----------
+        filename_properties : dict, optional
+            Keyword arguments for :obj:`FilenamePropertie`, like
+            :obj:`separator`, :obj:`file_extension` and so on.
         **kwargs
             Keyword arguments for the parameters, like :obj:`data_path`, :obj:`drop_coords` and so on.
 
@@ -346,10 +349,14 @@ class Dataset(traitlets.HasTraits):
         Initial setup:
 
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
-        >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
+        >>> prm.dataset.set(
+        ...     filename_properties=dict(
+        ...         separator="-",
+        ...         file_extension=".bin",
+        ...         number_of_digits=3
+        ...     ),
+        ...     stack_scalar=True,
+        ...     stack_velocity=True,
         ... )
 
         Iterate over some snapshots, loading them one by one, with the same
@@ -399,10 +406,15 @@ class Dataset(traitlets.HasTraits):
         Initial setup:
 
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
-        >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
+        >>> prm.dataset.set(
+        ...     filename_properties=dict(
+        ...         separator="-",
+        ...         file_extension=".bin",
+        ...         number_of_digits=3
+        ...     ),
+        ...     drop_coords="z",
+        ...     stack_scalar=True,
+        ...     stack_velocity=True,
         ... )
 
         * Load the entire time series for a given variable:
@@ -474,10 +486,14 @@ class Dataset(traitlets.HasTraits):
         Initial setup:
 
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
-        >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
+        >>> prm.dataset.set(
+        ...     filename_properties=dict(
+        ...         separator="-",
+        ...         file_extension=".bin",
+        ...         number_of_digits=3
+        ...     ),
+        ...     stack_scalar=True,
+        ...     stack_velocity=True,
         ... )
 
         Iterate over all snapshots, loading them one by one:
@@ -511,11 +527,14 @@ class Dataset(traitlets.HasTraits):
 
         Parameters
         ----------
+        filename_properties : dict, optional
+            Keyword arguments for :obj:`FilenameProperties`, like
+            :obj:`separator`, :obj:`file_extension` and so on.
         **kwargs
             Keyword arguments for the parameters, like :obj:`data_path`, :obj:`drop_coords` and so on.
 
         Raises
-        -------
+        ------
         KeyError
             Exception is raised when an Keyword arguments is not a valid parameter.
 
@@ -523,12 +542,19 @@ class Dataset(traitlets.HasTraits):
         --------
 
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
-        >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3,
+        >>> prm.dataset.set(
+        ...     filename_properties=dict(
+        ...         separator="-",
+        ...         file_extension=".bin",
+        ...         number_of_digits=3
+        ...     ),
+        ...     stack_scalar=True,
+        ...     stack_velocity=True,
         ... )
         """
+
+        if "filename_properties" in kwargs:
+            self.filename_properties.set(**kwargs.pop("filename_properties"))
 
         for key, arg in kwargs.items():
             if key not in self.trait_names():
@@ -562,10 +588,14 @@ class Dataset(traitlets.HasTraits):
         Initial setup:
 
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
-        >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
+        >>> prm.dataset.set(
+        ...     filename_properties=dict(
+        ...         separator="-",
+        ...         file_extension=".bin",
+        ...         number_of_digits=3
+        ...     ),
+        ...     stack_scalar=True,
+        ...     stack_velocity=True,
         ... )
 
         Load one array from the disc:
@@ -642,10 +672,14 @@ class Dataset(traitlets.HasTraits):
         Initial setup:
 
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
-        >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
+        >>> prm.dataset.set(
+        ...     filename_properties=dict(
+        ...         separator="-",
+        ...         file_extension=".bin",
+        ...         number_of_digits=3
+        ...     ),
+        ...     stack_scalar=True,
+        ...     stack_velocity=True,
         ... )
 
         Load all variables from a given snapshot:
@@ -768,10 +802,14 @@ class Dataset(traitlets.HasTraits):
         Initial setup:
 
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
-        >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
+        >>> prm.dataset.set(
+        ...     filename_properties=dict(
+        ...         separator="-",
+        ...         file_extension=".bin",
+        ...         number_of_digits=3
+        ...     ),
+        ...     stack_scalar=True,
+        ...     stack_velocity=True,
         ... )
 
         Load the entire time series for a given variable:
@@ -917,10 +955,14 @@ class Dataset(traitlets.HasTraits):
         Initial setup:
 
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
-        >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
+        >>> prm.dataset.set(
+        ...     filename_properties=dict(
+        ...         separator="-",
+        ...         file_extension=".bin",
+        ...         number_of_digits=3
+        ...     ),
+        ...     stack_scalar=True,
+        ...     stack_velocity=True,
         ... )
 
         * From a dataset, write only the variables with the atribute ``file_name``,
@@ -945,12 +987,17 @@ class Dataset(traitlets.HasTraits):
           ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
           ...     prm.dataset.write(data = vort, file_prefix = "vorticity")
 
+        .. note :: It is not recomended to load the arrays with
+           ``add_time = False`` when planning to write the results in a
+           time series (e.g., `vort-000.bin`, `vort-001.bin`, `vort-002.bin`, ...)
+
+
         """
         if isinstance(data, xr.Dataset):
-            os.makedirs(self.data_path, exist_ok = True)
+            os.makedirs(self.data_path, exist_ok=True)
             self._write_dataset(data)
         elif isinstance(data, xr.DataArray):
-            os.makedirs(self.data_path, exist_ok = True)
+            os.makedirs(self.data_path, exist_ok=True)
             self._write_array(data, file_prefix)
         else:
             raise IOError(
@@ -1038,10 +1085,14 @@ class Dataset(traitlets.HasTraits):
         Initial setup:
 
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
-        >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
+        >>> prm.dataset.set(
+        ...     filename_properties=dict(
+        ...         separator="-",
+        ...         file_extension=".bin",
+        ...         number_of_digits=3
+        ...     ),
+        ...     stack_scalar=True,
+        ...     stack_velocity=True,
         ... )
 
         It is possible to produce a new xdmf file, so all data
@@ -1231,7 +1282,7 @@ def prm_to_dict(filename="incompact3d.prm"):
     return dict_outer
 
 
-def i3d_to_dict(filename="input.i3d", string = None):
+def i3d_to_dict(filename="input.i3d", string=None):
 
     if string is None:
         with open(filename, "r") as f:
