@@ -810,15 +810,19 @@ class Dataset(traitlets.HasTraits):
             dim="t",
         )
 
-    def load_wind_turbine_data(self, file_pattern: str) -> Type[xr.Dataset]:
+    def load_wind_turbine_data(self, file_pattern: str = None) -> Type[xr.Dataset]:
         """Load the data produced by wind turbine simulations.
 
         .. note:: This feature is experimental
 
         Parameters
         ----------
-        file_pattern : str
-            A filename pattern used to locate the files with :obj:`glob.glob`.
+        file_pattern : str, optional
+            A filename pattern used to locate the files with :obj:`glob.iglob`.
+            If None, it is obtained from ``datapath``, i.g.,
+            if ``datapath = ./examples/Wind-Turbine/data`` then
+            ``file_pattern = ./examples/Wind-Turbine/data/../*.perf``.
+            By default None.
 
         Returns
         -------
@@ -829,7 +833,7 @@ class Dataset(traitlets.HasTraits):
         --------
 
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="NREL-5MW.i3d")
-        >>> ds = prm.dataset.load_wind_turbine_data("*.perf")
+        >>> ds = prm.dataset.load_wind_turbine_data()
         >>> ds
         <xarray.Dataset>
         Dimensions:          (t: 21)
@@ -855,9 +859,10 @@ class Dataset(traitlets.HasTraits):
 
             time = os.path.basename(filename).split("_")[0]
 
-            time = int(time) * self._prm.iturboutput * self._prm.dt
+            time = float(time) * self._prm.iturboutput * self._prm.dt
 
             ds = xr.Dataset(coords=dict(t=[time]))
+            ds.t.attrs = dict(name="t", long_name="Time", units="s")
 
             for name, values in pd.read_csv(filename).to_dict().items():
                 ds[name.strip()] = xr.DataArray(
@@ -868,7 +873,10 @@ class Dataset(traitlets.HasTraits):
 
             return ds
 
-        filenames = glob.glob(file_pattern)
+        if file_pattern is None:
+            file_pattern = os.path.join(self.data_path, "..", "*.perf")
+
+        filenames = glob.iglob(file_pattern)
 
         return xr.concat((get_dataset(file) for file in filenames), dim="t").sortby("t")
 
