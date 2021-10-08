@@ -116,6 +116,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
             dataArray[dim],
             input_core_dims=[[dim], [dim]],
             output_core_dims=[["obj"], ["obj"]],
+            dask_gufunc_kwargs=dict(output_sizes=dict(obj=max_obj)),
             vectorize=True,
             dask="parallelized",
             output_dtypes=[np.float64, np.float64],
@@ -235,6 +236,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
             epsi,
             input_core_dims=[[dim]],
             output_core_dims=[["obj_aux"], ["obj_aux"], ["c"]],
+            dask_gufunc_kwargs=dict(output_sizes=dict(obj_aux=max_obj + 1, c=1)),
             vectorize=True,
             dask="parallelized",
             output_dtypes=[np.int64, np.int64, np.int64],
@@ -248,11 +250,10 @@ def gene_epsi_3D(epsi_in_dict, prm):
     npif = prm.npif
     nraf = prm.nraf
 
-    # Dask cannot go further
-    epsi = epsi_in_dict["epsi"].compute()
-    xepsi = epsi_in_dict["xepsi"].compute()
-    yepsi = epsi_in_dict["yepsi"].compute()
-    zepsi = epsi_in_dict["zepsi"].compute()
+    epsi = epsi_in_dict["epsi"]
+    xepsi = epsi_in_dict["xepsi"]
+    yepsi = epsi_in_dict["yepsi"]
+    zepsi = epsi_in_dict["zepsi"]
 
     ds = epsi.to_dataset(name="epsi")
 

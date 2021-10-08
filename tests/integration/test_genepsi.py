@@ -9,7 +9,8 @@ import xcompact3d_toolbox.genepsi
 @pytest.fixture
 def set_up():
     prm = x3d.Parameters(loadfile="tests/integration/data/input.i3d", raise_warning = True)
-    epsi = x3d.sandbox.init_epsi(prm)
+    prm.dataset.set(data_path = "./data/")
+    epsi = x3d.sandbox.init_epsi(prm, dask = True)
     for key in epsi.keys():
         epsi[key] = epsi[key].geo.cylinder(x=3.0, y=5.0)
     x3d.genepsi.gene_epsi_3D(epsi, prm)

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Modified
+
+- Support for parallel computing with dask was extended at `genepsi.gene_epsi_3D`, by [@fschuch](https://github.com/fschuch).
+
 ## [1.1.0] - 2021-10-07
 
 ### Added
