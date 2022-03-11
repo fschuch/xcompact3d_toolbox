@@ -88,7 +88,7 @@ def init_epsi(prm, dask=False):
 
     # Data type defined to boolean for simplicity, since epsi should be zero at
     # the fluid points and one at the solid points. The algorithm should work
-    # for integer ao float as well
+    # for integer or float as well
     for key, (x, y, z) in fields.items():
         epsi[key] = xr.DataArray(
             np.zeros((x.size, y.size, z.size), dtype=bool),
@@ -323,7 +323,7 @@ class Geometry:
         Parameters
         ----------
         filename : str, optional
-            Filename of the STL file to be loaded and included in the cartesian domain, by default None
+            Filename of the STL file to be loaded and included in the Cartesian domain, by default None
         scale : float, optional
             This parameters can be used to scale up the object when greater than one and scale it down when smaller than one, by default None
         rotate : dict, optional
