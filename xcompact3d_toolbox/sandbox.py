@@ -77,7 +77,7 @@ def init_epsi(prm, dask=False):
     # the epsi array in the standard mesh (nx, ny, nz)
     fields = {"epsi": (mesh["x"], mesh["y"], mesh["z"])}
 
-    if prm.iibm == 2:
+    if prm.iibm >= 2:
         # Getting refined mesh
         mesh_raf = prm.get_mesh(refined_for_ibm=True)
         # Three additional versions are needed if iibm = 2,
