@@ -2,7 +2,7 @@ import unittest
 import os.path
 import pytest
 import traitlets
-from xcompact3d_toolbox.parameters import Parameters
+from xcompact3d_toolbox.parameters.parameters import Parameters
 
 # TODO - migrate do Pytest
 # TODO 2 - Test ParametersGui as well

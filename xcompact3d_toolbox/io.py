@@ -295,7 +295,7 @@ class Dataset(traitlets.HasTraits):
 
     _mesh = traitlets.Instance(klass=Mesh3D)
     _prm = traitlets.Instance(
-        klass="xcompact3d_toolbox.parameters.Parameters", allow_none=True
+        klass="xcompact3d_toolbox.parameters.parameters.Parameters", allow_none=True
     )
 
     def __init__(self, **kwargs):

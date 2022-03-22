@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from xcompact3d_toolbox.parameters import Parameters
+from xcompact3d_toolbox.parameters.parameters import Parameters
 from xcompact3d_toolbox.sandbox import init_dataset
 
 

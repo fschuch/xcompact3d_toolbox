@@ -14,9 +14,9 @@ import warnings
 import numpy as np
 import traitlets
 
-from .io import Dataset, i3d_to_dict, prm_to_dict
-from .mesh import Mesh3D
-from .param import boundary_condition, param
+from ..io import Dataset, i3d_to_dict, prm_to_dict
+from ..mesh import Mesh3D
+from ..param import boundary_condition, param
 
 
 class ParametersBasicParam(traitlets.HasTraits):

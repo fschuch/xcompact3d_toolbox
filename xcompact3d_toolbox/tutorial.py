@@ -4,7 +4,7 @@ import warnings
 
 import xarray as xr
 
-from .parameters import Parameters
+from .parameters.parameters import Parameters
 
 xr.tutorial.external_urls[
     "cylinder"
