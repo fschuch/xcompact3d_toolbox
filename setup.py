@@ -44,7 +44,7 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "numpy==1.20", # because of numba
+        "numpy==1.22.0", # because of numba
         "scipy>=1.5",
         "traitlets>=4.3",
         "ipywidgets>=7.5",
