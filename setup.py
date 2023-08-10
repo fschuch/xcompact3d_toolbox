@@ -44,13 +44,13 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "numpy==1.20", # because of numba
+        "numpy>=1.20",  # because of numba
         "scipy>=1.5",
         "traitlets>=4.3",
         "ipywidgets>=7.5",
         "pandas>=1.1",
         "xarray>=0.16",
-        "netcdf4",
+        "netcdf4>=1.6.3",
         "dask[complete]>=2.22",
         "numba>=0.50",
         "tqdm>=4.62",
