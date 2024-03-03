@@ -122,19 +122,19 @@ Click on any link above to launch [Binder](https://mybinder.org/) and interact w
       ```python
       ux = prm.dataset.load_array("ux-0000.bin")
       ```
-   
+
    * Load the entire time series for a given variable:
 
       ```python
       ux = prm.dataset["ux"]
       ```
-   
+
    * Load all variables from a given snapshot:
 
       ```python
       snapshot = prm.dataset[10]
       ```
-   
+
    * Loop through all snapshots, loading them one by one:
 
       ```python
@@ -144,13 +144,13 @@ Click on any link above to launch [Binder](https://mybinder.org/) and interact w
          # write the results to the disc
          prm.dataset.write(data = vort, file_prefix = "w3")
       ```
-   
+
    * Or simply load all snapshots at once (if you have enough memory):
 
       ```python
       ds = prm.dataset[:]
       ```
-   
+
    * It is possible to produce a new xdmf file, so all data can be visualized on any external tool:
 
       ```python

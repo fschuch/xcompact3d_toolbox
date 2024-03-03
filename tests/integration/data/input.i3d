@@ -83,7 +83,7 @@ nvisu = 1             ! Size for visualisation collection
 !=================
 
 nstat = 1             ! Size arrays for statistic collection
-initstat = 6         ! Time steps after which statistics are collected 
+initstat = 6         ! Time steps after which statistics are collected
 
 /End
 
