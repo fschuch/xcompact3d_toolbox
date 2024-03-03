@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tools to manipulate the physical and computational parameters. It contains variables and
 methods designed to be a link between XCompact3d_ and Python applications for
@@ -7,6 +6,7 @@ pre and post-processing.
 .. _XCompact3d:
     https://github.com/xcompact3d/Incompact3d
 """
+from __future__ import annotations
 
 import os.path
 import warnings
@@ -14,20 +14,19 @@ import warnings
 import numpy as np
 import traitlets
 
-from .io import Dataset, i3d_to_dict, prm_to_dict
-from .mesh import Mesh3D
-from .param import boundary_condition, param
+from xcompact3d_toolbox.io import Dataset, i3d_to_dict, prm_to_dict
+from xcompact3d_toolbox.mesh import Istret, Mesh3D
+from xcompact3d_toolbox.param import boundary_condition, param
 
 
 class ParametersBasicParam(traitlets.HasTraits):
-
-    p_row, p_col = [
+    p_row, p_col = (
         traitlets.Int(default_value=0, min=0).tag(
             group="BasicParam",
             desc=f"{name} for domain decomposition and parallel computation",
         )
         for name in ["Row partition", "Column partition"]
-    ]
+    )
     """int: Defines the domain decomposition for (large-scale) parallel computation.
 
     Notes
@@ -84,10 +83,9 @@ class ParametersBasicParam(traitlets.HasTraits):
         The exactly behavior may be different according to each flow configuration.
     """
 
-    nx, ny, nz = [
-        traitlets.Int().tag(group="BasicParam", desc=f"{name.upper()}-direction nodes")
-        for name in "x y z".split()
-    ]
+    nx, ny, nz = (
+        traitlets.Int().tag(group="BasicParam", desc=f"{name.upper()}-direction nodes") for name in "x y z".split()
+    )
     """int: Number of mesh points.
 
     Notes
@@ -96,12 +94,10 @@ class ParametersBasicParam(traitlets.HasTraits):
         for recommended grid sizes.
     """
 
-    xlx, yly, zlz = [
-        traitlets.Float().tag(
-            group="BasicParam", desc=f"Size of the box in {name}-direction"
-        )
+    xlx, yly, zlz = (
+        traitlets.Float().tag(group="BasicParam", desc=f"Size of the box in {name}-direction")
         for name in "x y z".split()
-    ]
+    )
     """float: Domain size.
     """
 
@@ -192,11 +188,12 @@ class ParametersBasicParam(traitlets.HasTraits):
     )
     """int: Enables Large-Eddy methodologies:
 
-        * 0 - No (also forces :obj:`ParametersNumOptions.nu0nu` and :obj:`ParametersNumOptions.cnu` to 4.0 and 0.44, respectively);
+        * 0 - No (also forces :obj:`ParametersNumOptions.nu0nu` and :obj:`ParametersNumOptions.cnu`
+          to 4.0 and 0.44, respectively);
         * 1 - Yes (also activates the namespace **LESModel** (see :obj:`ParametersLESModel`).
     """
 
-    istret = traitlets.Int(default_value=0, min=0, max=3).tag(
+    istret = traitlets.UseEnum(Istret, default_value=0).tag(
         group="BasicParam",
         desc="y mesh refinement (0:no, 1:center, 2:both sides, 3:bottom)",
     )
@@ -212,9 +209,7 @@ class ParametersBasicParam(traitlets.HasTraits):
         See :obj:`beta`.
     """
 
-    beta = traitlets.Float(default_value=1.0, min=0).tag(
-        group="BasicParam", desc="Refinement parameter"
-    )
+    beta = traitlets.Float(default_value=1.0, min=0).tag(group="BasicParam", desc="Refinement parameter")
     """float: Refinement factor in **y**.
 
     Notes
@@ -222,27 +217,19 @@ class ParametersBasicParam(traitlets.HasTraits):
         Only necessary if :obj:`istret` :math:`\\ne` 0.
     """
 
-    dt = traitlets.Float(default_value=1e-3, min=0.0).tag(
-        group="BasicParam", desc="Time step"
-    )
+    dt = traitlets.Float(default_value=1e-3, min=0.0).tag(group="BasicParam", desc="Time step")
     """float: Time step :math:`(\\Delta t)`.
     """
 
-    ifirst = traitlets.Int(default_value=0, min=0).tag(
-        group="BasicParam", desc="The number for the first iteration"
-    )
+    ifirst = traitlets.Int(default_value=0, min=0).tag(group="BasicParam", desc="The number for the first iteration")
     """int: The number for the first iteration.
     """
 
-    ilast = traitlets.Int(default_value=0, min=0).tag(
-        group="BasicParam", desc="The number for the last iteration"
-    )
+    ilast = traitlets.Int(default_value=0, min=0).tag(group="BasicParam", desc="The number for the last iteration")
     """int: The number for the last iteration.
     """
 
-    re = traitlets.Float(default_value=1e3).tag(
-        group="BasicParam", desc="Reynolds number"
-    )
+    re = traitlets.Float(default_value=1e3).tag(group="BasicParam", desc="Reynolds number")
     """float: Reynolds number :math:`(Re)`.
     """
 
@@ -285,20 +272,16 @@ class ParametersBasicParam(traitlets.HasTraits):
     :obj:`ParametersIbmStuff.nobjmax` and :obj:`ParametersIbmStuff.nraf`.
     """
 
-    numscalar = traitlets.Int(default_value=0, min=0, max=9).tag(
-        group="BasicParam", desc="Number of scalar fractions"
-    )
+    numscalar = traitlets.Int(default_value=0, min=0, max=9).tag(group="BasicParam", desc="Number of scalar fractions")
     """int: Number of scalar fraction, which can have different properties.
     Any option greater than zero activates the namespace :obj:`ParametersScalarParam`.
 
     """
 
-    gravx, gravy, gravz = [
-        traitlets.Float(default_value=0.0).tag(
-            group="BasicParam", desc=f"Gravity unitary vector in {name}-direction"
-        )
+    gravx, gravy, gravz = (
+        traitlets.Float(default_value=0.0).tag(group="BasicParam", desc=f"Gravity unitary vector in {name}-direction")
         for name in "x y z".split()
-    ]
+    )
     """float: Component of the unitary vector pointing in the gravity's direction.
     """
 
@@ -317,12 +300,13 @@ class ParametersBasicParam(traitlets.HasTraits):
     iturbine = traitlets.Int(default_value=0, min=0, max=2).tag(group="BasicParam")
 
     def __init__(self):
-        super(ParametersBasicParam, self).__init__()
+        super().__init__()
 
     @traitlets.validate("iscalar")
     def _validate_iscalar(self, proposal):
         if proposal.get("value") == 0 and self.numscalar > 0:
-            raise traitlets.TraitError(f"iscalar can not be zero if numscalar > 0")
+            msg = "iscalar can not be zero if numscalar > 0"
+            raise traitlets.TraitError(msg)
         return proposal.get("value")
 
     @traitlets.observe("numscalar")
@@ -394,7 +378,7 @@ class ParametersNumOptions(traitlets.HasTraits):
     """
 
     def __init__(self):
-        super(ParametersNumOptions, self).__init__()
+        super().__init__()
 
     @traitlets.observe("ilesmod")
     def _observe_ilesmod(self, change):
@@ -406,9 +390,8 @@ class ParametersNumOptions(traitlets.HasTraits):
     def _validate_iscalar(self, proposal):
         if self.ilesmod == 0:
             # It is coded at xcompact3d, look at parameters.f90
-            raise traitlets.TraitError(
-                f"Can not set new values for nu0nu and cnu if ilesmod = 0"
-            )
+            msg = "Can not set new values for nu0nu and cnu if ilesmod = 0"
+            raise traitlets.TraitError(msg)
         return proposal.get("value")
 
 
@@ -419,9 +402,7 @@ class ParametersInOutParam(traitlets.HasTraits):
     """int: Reads initial flow field if equals to 1.
     """
 
-    nvisu = traitlets.Int(default_value=1, min=1).tag(
-        group="InOutParam", desc="Size for visualization collection"
-    )
+    nvisu = traitlets.Int(default_value=1, min=1).tag(group="InOutParam", desc="Size for visualization collection")
     """int: Size for visual collection.
     """
 
@@ -431,9 +412,7 @@ class ParametersInOutParam(traitlets.HasTraits):
     """int: Frequency for writing restart file.
     """
 
-    ioutput = traitlets.Int(default_value=1000, min=1).tag(
-        group="InOutParam", desc="Frequency for visualization file"
-    )
+    ioutput = traitlets.Int(default_value=1000, min=1).tag(group="InOutParam", desc="Frequency for visualization file")
     """int: Frequency for visualization (3D snapshots).
     """
 
@@ -451,36 +430,28 @@ class ParametersInOutParam(traitlets.HasTraits):
 
     inflowpath = traitlets.Unicode(default_value="./")
 
-    output2D = traitlets.Int(default_value=0).tag(group="InOutParam")
+    output2D = traitlets.Int(default_value=0).tag(group="InOutParam")  # N815
 
     nprobes = traitlets.Int(default_value=0, min=0).tag(group="InOutParam")
 
     def __init__(self):
-        super(ParametersInOutParam, self).__init__()
+        super().__init__()
 
 
 class ParametersScalarParam(traitlets.HasTraits):
-    sc = traitlets.List(trait=traitlets.Float()).tag(
-        group="ScalarParam", desc="Schmidt number(s)"
-    )
+    sc = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam", desc="Schmidt number(s)")
     """:obj:`list` of :obj:`float`: Schmidt number(s).
     """
 
-    ri = traitlets.List(trait=traitlets.Float()).tag(
-        group="ScalarParam", desc="Richardson number(s)"
-    )
+    ri = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam", desc="Richardson number(s)")
     """:obj:`list` of :obj:`float`: Richardson number(s).
     """
 
-    uset = traitlets.List(trait=traitlets.Float()).tag(
-        group="ScalarParam", desc="Settling velocity(ies)"
-    )
+    uset = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam", desc="Settling velocity(ies)")
     """:obj:`list` of :obj:`float`: Settling velocity(s).
     """
 
-    cp = traitlets.List(trait=traitlets.Float()).tag(
-        group="ScalarParam", desc="Initial concentration(s)"
-    )
+    cp = traitlets.List(trait=traitlets.Float()).tag(group="ScalarParam", desc="Initial concentration(s)")
     """:obj:`list` of :obj:`float`: Initial concentration(s).
     """
 
@@ -564,7 +535,7 @@ class ParametersScalarParam(traitlets.HasTraits):
     Tref = traitlets.Float().tag(group="ScalarParam")
 
     def __init__(self):
-        super(ParametersScalarParam, self).__init__()
+        super().__init__()
 
 
 class ParametersLESModel(traitlets.HasTraits):
@@ -601,7 +572,7 @@ class ParametersLESModel(traitlets.HasTraits):
     """int: """
 
     def __init__(self):
-        super(ParametersLESModel, self).__init__()
+        super().__init__()
 
 
 class ParametersIbmStuff(traitlets.HasTraits):
@@ -609,7 +580,7 @@ class ParametersIbmStuff(traitlets.HasTraits):
         group="ibmstuff", desc="Maximum number of objects in any direction"
     )
     """int: Maximum number of objects in any direction. It is defined
-        automatically at :obj:`gene_epsi_3D`.
+        automatically at :obj:`gene_epsi_3d`.
     """
 
     nraf = traitlets.Int(default_value=10, min=1).tag(
@@ -637,19 +608,19 @@ class ParametersIbmStuff(traitlets.HasTraits):
     """
 
     def __init__(self):
-        super(ParametersIbmStuff, self).__init__()
+        super().__init__()
 
 
 class ParametersALMParam(traitlets.HasTraits):
     iturboutput = traitlets.Int(default_value=1, min=1).tag(group="ALMParam")
 
     def __init__(self):
-        super(ParametersALMParam, self).__init__()
+        super().__init__()
 
 
 class ParametersExtras(traitlets.HasTraits):
     """Extra utilities that are not present at the parameters file,
-    but are usefull for Python applications.
+    but are useful for Python applications.
     """
 
     filename = traitlets.Unicode(default_value="input.i3d").tag()
@@ -788,7 +759,7 @@ class ParametersExtras(traitlets.HasTraits):
     >>> prm.dataset.write_xdmf()
     """
 
-    dx, dy, dz = [traitlets.Float().tag() for _ in "x y z".split()]
+    dx, dy, dz = (traitlets.Float().tag() for _ in "x y z".split())
     """float: Mesh resolution.
     """
 
@@ -797,15 +768,15 @@ class ParametersExtras(traitlets.HasTraits):
     """
 
     size = traitlets.Unicode().tag()
-    """str: Auxiliar variable indicating the demand for storage.
+    """str: Auxiliary variable indicating the demand for storage.
     """
 
     def __init__(self):
-        super(ParametersExtras, self).__init__()
+        super().__init__()
         self.mesh = Mesh3D()
 
         self._link_mesh_and_parameters()
-        self.dataset = Dataset(**dict(_mesh=self.mesh, _prm=self))
+        self.dataset = Dataset(_mesh=self.mesh, _prm=self)
 
     def _link_mesh_and_parameters(self):
         for dim in "xyz":
@@ -828,7 +799,7 @@ class Parameters(
 ):
     """The physical and computational parameters are built on top of `traitlets`_.
     It is a framework that lets Python classes have attributes with type checking,
-    dynamically calculated default values, and ‘on change’ callbacks.
+    dynamically calculated default values, and "on change" callbacks.
     In this way, many of the parameters are validated regarding the type,
     business rules, and the range of values supported by XCompact3d_.
     There are methods to handle the parameters file (``.i3d`` and ``.prm``).
@@ -853,7 +824,7 @@ class Parameters(
     .. note:: This is a work in progress, not all parameters are covered yet.
     """
 
-    def __init__(self, raise_warning: bool = False, **kwargs):
+    def __init__(self, *, raise_warning: bool = False, **kwargs):
         """Initializes the Parameters Class.
 
         Parameters
@@ -882,53 +853,53 @@ class Parameters(
 
         >>> prm.re = 1e6
         >>> prm.set(
-        ...     iibm = 0,
-        ...     p_row = 4,
-        ...     p_col = 2,
+        ...     iibm=0,
+        ...     p_row=4,
+        ...     p_col=2,
         ... )
 
         Second, we can specify some values, and let the missing ones be
         initialized with default value:
 
         >>> prm = x3d.Parameters(
-        ...     filename = 'example.i3d',
-        ...     itype = 12,
-        ...     nx = 257,
-        ...     ny = 129,
-        ...     nz = 32,
-        ...     xlx = 15.0,
-        ...     yly = 10.0,
-        ...     zlz = 3.0,
-        ...     nclx1 = 2,
-        ...     nclxn = 2,
-        ...     ncly1 = 1,
-        ...     nclyn = 1,
-        ...     nclz1 = 0,
-        ...     nclzn = 0,
-        ...     re = 300.0,
-        ...     init_noise = 0.0125,
-        ...     dt = 0.0025,
-        ...     ilast = 45000,
-        ...     ioutput = 200,
-        ...     iprocessing = 50
+        ...     filename="example.i3d",
+        ...     itype=12,
+        ...     nx=257,
+        ...     ny=129,
+        ...     nz=32,
+        ...     xlx=15.0,
+        ...     yly=10.0,
+        ...     zlz=3.0,
+        ...     nclx1=2,
+        ...     nclxn=2,
+        ...     ncly1=1,
+        ...     nclyn=1,
+        ...     nclz1=0,
+        ...     nclzn=0,
+        ...     re=300.0,
+        ...     init_noise=0.0125,
+        ...     dt=0.0025,
+        ...     ilast=45000,
+        ...     ioutput=200,
+        ...     iprocessing=50,
         ... )
 
         And finally, it is possible to read the parameters from the disc:
 
-        >>> prm = xcompact3d_toolbox.Parameters(loadfile = 'example.i3d')
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="example.i3d")
 
         It also supports the previous parameters file format (see `#7`_):
 
-        >>> prm = xcompact3d_toolbox.Parameters(loadfile = 'incompact3d.prm')
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="incompact3d.prm")
 
         .. _#7:
             https://github.com/fschuch/xcompact3d_toolbox/issues/7
 
         """
 
-        super(Parameters, self).__init__()
+        super().__init__()
 
-        if "loadfile" in kwargs.keys():
+        if "loadfile" in kwargs:
             self.filename = kwargs.pop("loadfile")
             self.load(raise_warning=raise_warning)
 
@@ -954,37 +925,37 @@ class Parameters(
         """Representation of the parameters class, similar to the
         representation of the ``.i3d`` file."""
         # These groups are demanded by Xcompact3d, see parameters.f90
-        dictionary = dict(
-            BasicParam={},
-            NumOptions={},
-            InOutParam={},
-            Statistics={},
-            CASE={},
-        )
+        dictionary = {
+            "BasicParam": {},
+            "NumOptions": {},
+            "InOutParam": {},
+            "Statistics": {},
+            "CASE": {},
+        }
         for name in self.trait_names():
             # if skip_default:
             #     if getattr(self, name) == self.trait_defaults(name):
             #         continue
             group = self.trait_metadata(name, "group")
             if group is not None:
-                if group not in dictionary.keys():
+                if group not in dictionary:
                     dictionary[group] = {}
                 dictionary[group][name] = getattr(self, name)
 
         # This block is not handled by x3d if ilesmod is off
-        if "LESModel" in dictionary.keys() and self.ilesmod == 0:
+        if "LESModel" in dictionary and self.ilesmod == 0:
             del dictionary["LESModel"]
 
         # This block is not handled by x3d if iibm is off
-        if "ibmstuff" in dictionary.keys() and self.iibm == 0:
+        if "ibmstuff" in dictionary and self.iibm == 0:
             del dictionary["ibmstuff"]
 
         # This block is not handled by x3d if numscalar is 0
-        if "ScalarParam" in dictionary.keys() and self.numscalar == 0:
+        if "ScalarParam" in dictionary and self.numscalar == 0:
             del dictionary["ScalarParam"]
 
         # This block is not handled by x3d if iturbine is not 1
-        if "ALMParam" in dictionary.keys() and self.iturbine != 1:
+        if "ALMParam" in dictionary and self.iturbine != 1:
             del dictionary["ALMParam"]
 
         string = ""
@@ -992,31 +963,30 @@ class Parameters(
         string += "! -*- mode: f90 -*-\n"
 
         for blockkey, block in dictionary.items():
-
             string += "\n"
             string += "!===================\n"
             string += "&" + blockkey + "\n"
             string += "!===================\n"
             string += "\n"
 
-            for paramkey, param in block.items():
+            for paramkey, paramvalue in block.items():
                 # get description to print together with the values
                 description = self.trait_metadata(paramkey, "desc")
                 if description is None:
                     description = ""
                 # Check if param is a list or not
-                if isinstance(param, list):
-                    for n, p in enumerate(param):
+                if isinstance(paramvalue, list):
+                    for n, p in enumerate(paramvalue):
                         string += f"{paramkey+'('+str(n+1)+')':>15} = {p:<15} {'! '+description}\n"
                 # Check if param is a string
-                elif isinstance(param, str):
-                    param = "'" + param + "'"
-                    string += f"{paramkey:>15} = {param:<15} {'! '+description}\n"
-                elif isinstance(param, bool):
-                    param = ".true." if param else ".false."
-                    string += f"{paramkey:>15} = {param:<15} {'! '+description}\n"
+                elif isinstance(paramvalue, str):
+                    new_paramvalue = "'" + paramvalue + "'"
+                    string += f"{paramkey:>15} = {new_paramvalue:<15} {'! '+description}\n"
+                elif isinstance(paramvalue, bool):
+                    new_paramvalue = ".true." if paramvalue else ".false."
+                    string += f"{paramkey:>15} = {new_paramvalue:<15} {'! '+description}\n"
                 else:
-                    string += f"{paramkey:>15} = {param:<15} {'! '+description}\n"
+                    string += f"{paramkey:>15} = {paramvalue:<15} {'! '+description}\n"
             string += "\n"
             string += "/End\n"
 
@@ -1041,28 +1011,28 @@ class Parameters(
         dim = change["name"][3]  # It will be x, y or z
         #
         if change["new"] == 0:
-            for BC in f"ncl{dim}1 ncl{dim}n ncl{dim}S1 ncl{dim}Sn".split():
-                setattr(self, BC, 0)
+            for boundary_condition in f"ncl{dim}1 ncl{dim}n ncl{dim}S1 ncl{dim}Sn".split():
+                setattr(self, boundary_condition, 0)
                 getattr(self.mesh, dim)
-            setattr(getattr(self.mesh, dim), "is_periodic", True)
+            getattr(self.mesh, dim).is_periodic = True
         if change["old"] == 0 and change["new"] != 0:
-            for BC in f"ncl{dim}1 ncl{dim}n ncl{dim}S1 ncl{dim}Sn".split():
-                setattr(self, BC, change["new"])
-            setattr(getattr(self.mesh, dim), "is_periodic", False)
+            for boundary_condition in f"ncl{dim}1 ncl{dim}n ncl{dim}S1 ncl{dim}Sn".split():
+                setattr(self, boundary_condition, change["new"])
+            getattr(self.mesh, dim).is_periodic = False
 
     @traitlets.observe("p_row", "p_col", "ncores")
-    def _observe_2Decomp(self, change):
+    def _observe_2decomp(self, change):
         if change["name"] == "ncores":
             self.p_row, self.p_col = 0, 0
         elif change["name"] == "p_row":
             try:
                 self.p_col = self.ncores // self.p_row
-            except:
+            except ZeroDivisionError:
                 self.p_col = 0
         elif change["name"] == "p_col":
             try:
                 self.p_row = self.ncores // self.p_col
-            except:
+            except ZeroDivisionError:
                 self.p_row = 0
 
     @traitlets.observe(
@@ -1076,7 +1046,7 @@ class Parameters(
         "iprocessing",
         "ilast",
     )
-    def _observe_size(self, change):
+    def _observe_size(self, _):
         def convert_bytes(num):
             """
             this function will convert bytes to MB.... GB... etc
@@ -1085,8 +1055,9 @@ class Parameters(
 
             for x in ["bytes", "KB", "MB", "GB", "TB"]:
                 if num < step_unit:
-                    return "%3.1f %s" % (num, x)
+                    return f"{num:3.1f} {x}"
                 num /= step_unit
+            return None
 
         prec = 4 if param["mytype"] == np.float32 else 8
 
@@ -1095,46 +1066,20 @@ class Parameters(
         # Previous time-step if necessary
         if self.itimescheme in [3, 7]:
             count *= 3
-        elif self.itimescheme == 2:
+        elif self.itimescheme == 2:  # noqa: PLR2004
             count *= 2
         count += 1  # pp
-        count *= (
-            self.nx * self.ny * self.nz * prec * (self.ilast // self.icheckpoint - 1)
-        )
+        count *= self.nx * self.ny * self.nz * prec * (self.ilast // self.icheckpoint - 1)
 
         # 3D from visu.f90: ux, uy, uz, pp and phi
-        count += (
-            (4 + self.numscalar)
-            * self.nx
-            * self.ny
-            * self.nz
-            * prec
-            * self.ilast
-            // self.ioutput
-        )
+        count += (4 + self.numscalar) * self.nx * self.ny * self.nz * prec * self.ilast // self.ioutput
 
         # 2D planes from BC.Sandbox.f90
-        if self.itype == 10:
+        if self.itype == 10:  # noqa: PLR2004
             # xy planes avg and central plane for ux, uy, uz and phi
-            count += (
-                2
-                * (3 + self.numscalar)
-                * self.nx
-                * self.ny
-                * prec
-                * self.ilast
-                // self.iprocessing
-            )
+            count += 2 * (3 + self.numscalar) * self.nx * self.ny * prec * self.ilast // self.iprocessing
             # xz planes avg, top and bot for ux, uy, uz and phi
-            count += (
-                3
-                * (3 + self.numscalar)
-                * self.nx
-                * self.nz
-                * prec
-                * self.ilast
-                // self.iprocessing
-            )
+            count += 3 * (3 + self.numscalar) * self.nx * self.nz * prec * self.ilast // self.iprocessing
 
         self.size = convert_bytes(count)
 
@@ -1158,7 +1103,7 @@ class Parameters(
         --------
 
         >>> prm = xcompact3d_toolbox.Parameters()
-        >>> prm.get_boundary_condition('ux')
+        >>> prm.get_boundary_condition("ux")
         {'x': {'ncl1': 1, 'ncln': 1, 'npaire': 0},
         'y': {'ncl1': 1, 'ncln': 2, 'npaire': 1, 'istret': 0, 'beta': 0.75},
         'z': {'ncl1': 0, 'ncln': 0, 'npaire': 1}}
@@ -1166,18 +1111,18 @@ class Parameters(
         It is possible to store this information as an attribute in any
         :obj:`xarray.DataArray`:
 
-        >>> DataArray.attrs['BC'] = prm.get_boundary_condition('ux')
+        >>> DataArray.attrs["BC"] = prm.get_boundary_condition("ux")
 
         So the correct boundary conditions will be used to compute the derivatives:
 
-        >>> DataArray.x3d.first_derivative('x')
-        >>> DataArray.x3d.second_derivative('x')
+        >>> DataArray.x3d.first_derivative("x")
+        >>> DataArray.x3d.second_derivative("x")
 
         """
 
         return boundary_condition(self, variable_name)
 
-    def set(self, raise_warning: bool = False, **kwargs) -> None:
+    def set(self, *, raise_warning: bool = False, **kwargs) -> None:
         """Set a new value for any parameter after the initialization.
 
         Parameters
@@ -1198,13 +1143,13 @@ class Parameters(
 
         >>> prm = xcompact3d_toolbox.Parameters()
         >>> prm.set(
-        ...     iibm = 0,
-        ...     p_row = 4,
-        ...     p_col = 2,
+        ...     iibm=0,
+        ...     p_row=4,
+        ...     p_col=2,
         ... )
 
         """
-        # They are high priority in order to avoid erros with validations and observations
+        # They are high priority in order to avoid errors with validations and observations
         for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn numscalar ilesmod".split():
             if bc in kwargs:
                 setattr(self, bc, kwargs.get(bc))
@@ -1212,12 +1157,13 @@ class Parameters(
         for key, arg in kwargs.items():
             if key not in self.trait_names():
                 if raise_warning:
-                    warnings.warn(f"{key} is not a valid parameter and was not loaded")
+                    warnings.warn(f"{key} is not a valid parameter and was not loaded", stacklevel=1)
                 else:
-                    raise KeyError(f"{key} is not a valid parameter")
+                    msg = f"{key} is not a valid parameter"
+                    raise KeyError(msg)
             setattr(self, key, arg)
 
-    def from_string(self, string: str, raise_warning: bool = False) -> None:
+    def from_string(self, string: str, *, raise_warning: bool = False) -> None:
         """Loads the attributes from a string.
 
         Parameters
@@ -1238,13 +1184,13 @@ class Parameters(
         dictionary = {}
 
         # unpacking the nested dictionary
-        for key_out, value_out in i3d_to_dict(string=string).items():
+        for value_out in i3d_to_dict(string=string).values():
             for key_in, value_in in value_out.items():
                 dictionary[key_in] = value_in
 
         self.set(raise_warning=raise_warning, **dictionary)
 
-    def from_file(self, filename: str = None, raise_warning: bool = False) -> None:
+    def from_file(self, filename: str | None = None, *, raise_warning: bool = False) -> None:
         """Loads the attributes from the parameters file.
 
         It also includes support for the previous format :obj:`.prm`  (see `#7`_).
@@ -1268,16 +1214,16 @@ class Parameters(
         Examples
         -------
 
-        >>> prm = xcompact3d_toolbox.Parameters(filename = 'example.i3d')
+        >>> prm = xcompact3d_toolbox.Parameters(filename="example.i3d")
         >>> prm.load()
 
         >>> prm = xcompact3d_toolbox.Parameters()
-        >>> prm.load('example.i3d')
+        >>> prm.load("example.i3d")
 
         or just:
 
-        >>> prm = xcompact3d_toolbox.Parameters(loadfile = 'example.i3d')
-        >>> prm = xcompact3d_toolbox.Parameters(loadfile = 'incompact3d.prm')
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="example.i3d")
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="incompact3d.prm")
 
         .. _#7:
             https://github.com/fschuch/xcompact3d_toolbox/issues/7
@@ -1289,7 +1235,7 @@ class Parameters(
             dictionary = {}
 
             # unpacking the nested dictionary
-            for key_out, value_out in i3d_to_dict(self.filename).items():
+            for value_out in i3d_to_dict(self.filename).values():
                 for key_in, value_in in value_out.items():
                     dictionary[key_in] = value_in
 
@@ -1297,9 +1243,8 @@ class Parameters(
             dictionary = prm_to_dict(self.filename)
 
         else:
-            raise IOError(
-                f"{self.filename} is invalid. Supported formats are .i3d and .prm."
-            )
+            msg = f"{self.filename} is invalid. Supported formats are .i3d and .prm."
+            raise OSError(msg)
 
         self.set(raise_warning=raise_warning, **dictionary)
 
@@ -1307,7 +1252,7 @@ class Parameters(
         """An alias for :obj:`Parameters.from_file`"""
         self.from_file(*arg, **kwarg)
 
-    def write(self, filename: str = None) -> None:
+    def write(self, filename: str | None = None) -> None:
         """Write all valid attributes to an :obj:`.i3d` file.
 
         An attribute is considered valid if it has a ``tag`` named ``group``,
@@ -1323,17 +1268,17 @@ class Parameters(
         --------
 
         >>> prm = xcompact3d_toolbox.Parameters(
-        ...     filename = 'example.i3d',
-        ...     nx = 101,
-        ...     ny = 65,
-        ...     nz = 11,
+        ...     filename="example.i3d",
+        ...     nx=101,
+        ...     ny=65,
+        ...     nz=11,
         ...     # and so on...
         ... )
         >>> prm.write()
 
         or just:
 
-        >>> prm.write('example.i3d')
+        >>> prm.write("example.i3d")
 
         """
         if filename is None:
@@ -1342,9 +1287,10 @@ class Parameters(
             with open(filename, "w", encoding="utf-8") as file:
                 file.write(self.__str__())
         else:
-            raise IOError("Format error, only .i3d is supported")
+            msg = "Format error, only .i3d is supported"
+            raise OSError(msg)
 
-    def get_mesh(self, refined_for_ibm: bool = False) -> dict:
+    def get_mesh(self, *, refined_for_ibm: bool = False) -> dict:
         """Get mesh the three-dimensional coordinate system. The coordinates are stored
         in a dictionary. It supports mesh refinement in **y** when
         :obj:`ParametersBasicParam.istret` :math:`\\ne` 0.
@@ -1378,7 +1324,7 @@ class Parameters(
         if refined_for_ibm and self.iibm != 0:
             copy = self.mesh.copy()
             for dim in copy.trait_names():
-                new_grid_size = getattr(self.mesh, dim)._sub_grid_size * self.nraf
+                new_grid_size = getattr(self.mesh, dim)._sub_grid_size * self.nraf  # noqa: SLF001
                 if not getattr(self.mesh, dim).is_periodic:
                     new_grid_size += 1
                 getattr(copy, dim).set(grid_size=new_grid_size)

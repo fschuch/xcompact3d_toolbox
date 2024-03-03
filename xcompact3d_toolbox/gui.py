@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Manipulate the physical and computational parameters, just like :obj:`xcompact3d_toolbox.parameters.Parameters`,
 but with `ipywidgets`_.
@@ -10,17 +9,16 @@ but with `ipywidgets`_.
 from __future__ import annotations
 
 import math
-from typing import Type
 
 import ipywidgets as widgets
 import traitlets
 from IPython.display import display
 from traitlets import link
 
-from .parameters import Parameters
+from xcompact3d_toolbox.parameters import Parameters
 
 
-def _divisorGenerator(n):
+def _divisor_generator(n):
     """Yields the possibles divisors for ``n``.
 
     Especially useful to compute the possible values for :obj:`p_row` and :obj:`p_col`
@@ -62,11 +60,10 @@ class ParametersGui(Parameters):
 
     """
 
-    _possible_p_row, _possible_p_col = [
-        traitlets.List(trait=traitlets.Int(), default_value=list(_divisorGenerator(4)))
-        for _ in range(2)
-    ]
-    """:obj:`list` of :obj:`int`: Auxiliar variable for parallel domain decomposition,
+    _possible_p_row, _possible_p_col = (
+        traitlets.List(trait=traitlets.Int(), default_value=list(_divisor_generator(4))) for _ in range(2)
+    )
+    """:obj:`list` of :obj:`int`: Auxiliary variable for parallel domain decomposition,
         it stores the available options according to :obj:`ncores`.
     """
 
@@ -79,33 +76,33 @@ class ParametersGui(Parameters):
             Keyword arguments for :obj:`xcompact3d_toolbox.parameters.Parameters`.
 
         """
-        super(ParametersGui, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
-        self._widgets = dict(
+        self._widgets = {
             #
             # # BasicParam
             #
-            beta=widgets.BoundedFloatText(min=0.0, max=1e9),
-            dt=widgets.BoundedFloatText(min=1e-9, max=1e9),
-            ifirst=widgets.BoundedIntText(min=0, max=1e9),
-            iibm=widgets.Dropdown(
+            "beta": widgets.BoundedFloatText(min=0.0, max=1e9),
+            "dt": widgets.BoundedFloatText(min=1e-9, max=1e9),
+            "ifirst": widgets.BoundedIntText(min=0, max=1e9),
+            "iibm": widgets.Dropdown(
                 options=[
                     ("Off", 0),
                     ("Forced to zero", 1),
                     ("Interpolated to zero", 2),
                 ],
             ),
-            iin=widgets.Dropdown(
+            "iin": widgets.Dropdown(
                 options=[
                     ("No random noise", 0),
                     ("Random noise", 1),
                     ("Random noise with fixed seed", 2),
                 ],
             ),
-            ilast=widgets.BoundedIntText(min=0, max=1e9),
-            inflow_noise=widgets.FloatText(min=-1e9, max=1e9),
-            init_noise=widgets.FloatText(min=-1e9, max=1e9),
-            istret=widgets.Dropdown(
+            "ilast": widgets.BoundedIntText(min=0, max=1e9),
+            "inflow_noise": widgets.FloatText(min=-1e9, max=1e9),
+            "init_noise": widgets.FloatText(min=-1e9, max=1e9),
+            "istret": widgets.Dropdown(
                 options=[
                     ("No refinement", 0),
                     ("Refinement at the center", 1),
@@ -113,7 +110,7 @@ class ParametersGui(Parameters):
                     ("Just near the bottom", 3),
                 ],
             ),
-            itype=widgets.Dropdown(
+            "itype": widgets.Dropdown(
                 options=[
                     ("User", 0),
                     ("Lock-exchange", 1),
@@ -130,21 +127,21 @@ class ParametersGui(Parameters):
                     ("Sandbox", 12),
                 ],
             ),
-            nclxn=widgets.Dropdown(
+            "nclxn": widgets.Dropdown(
                 options=[("Periodic", 0), ("Free-slip", 1), ("Outflow", 2)],
             ),
-            nclx1=widgets.Dropdown(
+            "nclx1": widgets.Dropdown(
                 options=[("Periodic", 0), ("Free-slip", 1), ("Inflow", 2)],
             ),
-            numscalar=widgets.IntSlider(min=0, max=9, continuous_update=False),
-            p_col=widgets.Dropdown(options=self._possible_p_col),
-            p_row=widgets.Dropdown(options=self._possible_p_row),
-            re=widgets.FloatText(min=0.0, max=1e9),
+            "numscalar": widgets.IntSlider(min=0, max=9, continuous_update=False),
+            "p_col": widgets.Dropdown(options=self._possible_p_col),
+            "p_row": widgets.Dropdown(options=self._possible_p_row),
+            "re": widgets.FloatText(min=0.0, max=1e9),
             #
             # # NumOptions
             #
-            cnu=widgets.BoundedFloatText(min=0.0, max=1e6),  # , disabled=True
-            ifirstder=widgets.Dropdown(
+            "cnu": widgets.BoundedFloatText(min=0.0, max=1e6),  # , disabled=True
+            "ifirstder": widgets.Dropdown(
                 options=[
                     ("2nd central", 1),
                     ("4th central", 1),
@@ -152,7 +149,7 @@ class ParametersGui(Parameters):
                     ("6th compact", 4),
                 ],
             ),
-            isecondder=widgets.Dropdown(
+            "isecondder": widgets.Dropdown(
                 disabled=True,
                 options=[
                     # '2nd central', 1),
@@ -160,7 +157,7 @@ class ParametersGui(Parameters):
                     ("hyperviscous 6th", 5),
                 ],
             ),
-            itimescheme=widgets.Dropdown(
+            "itimescheme": widgets.Dropdown(
                 options=[
                     ("Euler", 1),
                     ("AB2", 2),
@@ -169,12 +166,12 @@ class ParametersGui(Parameters):
                     ("Semi-implicit", 7),
                 ],
             ),
-            nu0nu=widgets.BoundedFloatText(min=0.0, max=1e6),  # , disabled=True
+            "nu0nu": widgets.BoundedFloatText(min=0.0, max=1e6),  # , disabled=True
             #
             # # InOutParam
             #
-            irestart=widgets.Dropdown(options=[("Off", 0), ("On", 1)]),
-            nvisu=widgets.BoundedIntText(min=1, max=1e9, disabled=True),
+            "irestart": widgets.Dropdown(options=[("Off", 0), ("On", 1)]),
+            "nvisu": widgets.BoundedIntText(min=1, max=1e9, disabled=True),
             #
             # # ScalarParam
             #
@@ -189,7 +186,7 @@ class ParametersGui(Parameters):
             #
             # # LESModel
             #
-            jles=widgets.Dropdown(
+            "jles": widgets.Dropdown(
                 options=[
                     ("DNS", 0),
                     ("Phys Smag", 1),
@@ -201,15 +198,15 @@ class ParametersGui(Parameters):
             #
             # # ibmstuff
             #
-            nobjmax=widgets.BoundedIntText(min=1, max=1e9),
-            nraf=widgets.IntSlider(min=1, max=25),
+            "nobjmax": widgets.BoundedIntText(min=1, max=1e9),
+            "nraf": widgets.IntSlider(min=1, max=25),
             #
-            # # Auxiliar for user interface, not included at the .i3d file
+            # # Auxiliary for user interface, not included at the .i3d file
             #
-            filename=widgets.Text(),
-            ncores=widgets.BoundedIntText(value=0, min=0, max=1e9),
-            size=widgets.Text(value="", disabled=True),
-        )
+            "filename": widgets.Text(),
+            "ncores": widgets.BoundedIntText(value=0, min=0, max=1e9),
+            "size": widgets.Text(value="", disabled=True),
+        }
 
         for name in "gravx gravy gravz".split():
             self._widgets[name] = widgets.FloatText(min=-1.0, max=1.0)
@@ -240,11 +237,11 @@ class ParametersGui(Parameters):
             self._widgets[name] = widgets.BoundedFloatText(min=0.0, max=1e6)
 
         # Add a name to all widgets (same as dictionary key)
-        for name in self._widgets.keys():
+        for name in self._widgets:
             self._widgets[name].description = name
 
         # Try to add a description
-        for name in self._widgets.keys():
+        for name in self._widgets:
             # get description to include together with widgets
             description = self.trait_metadata(name, "desc")
             if description is not None:
@@ -259,33 +256,22 @@ class ParametersGui(Parameters):
                 widgets.HBox(
                     [
                         self._widgets["filename"],
-                        widgets.Button(
-                            description="Read", disabled=True, icon="file-upload"
-                        ),
-                        widgets.Button(
-                            description="Write", disabled=True, icon="file-download"
-                        ),
+                        widgets.Button(description="Read", disabled=True, icon="file-upload"),
+                        widgets.Button(description="Write", disabled=True, icon="file-download"),
                         widgets.Button(description="Run", disabled=True, icon="rocket"),
                         widgets.Button(description="Sync", disabled=True, icon="sync"),
                     ]
                 ),
                 widgets.HTML(value="<h2>BasicParam</h2>"),
                 widgets.HBox([self._widgets[d] for d in "itype re".split()]),
-                widgets.HBox(
-                    [self._widgets[d] for d in "iin init_noise inflow_noise".split()]
-                ),
+                widgets.HBox([self._widgets[d] for d in "iin init_noise inflow_noise".split()]),
                 widgets.HTML(value="<h3>Domain Decomposition</h3>"),
                 widgets.HBox([self._widgets[d] for d in "ncores p_row p_col".split()]),
                 widgets.HTML(value="<h3>Temporal discretization</h3>"),
                 widgets.HBox([self._widgets[d] for d in "ifirst ilast dt".split()]),
                 widgets.HTML(value="<h3>InOutParam</h3>"),
                 widgets.HBox([self._widgets[d] for d in "irestart nvisu size".split()]),
-                widgets.HBox(
-                    [
-                        self._widgets[d]
-                        for d in "icheckpoint ioutput iprocessing".split()
-                    ]
-                ),
+                widgets.HBox([self._widgets[d] for d in "icheckpoint ioutput iprocessing".split()]),
                 widgets.HTML(value="<h3>Spatial discretization</h3>"),
                 widgets.HBox([self._widgets[f"n{d}"] for d in dim]),
                 widgets.HBox([self._widgets[f"{d}l{d}"] for d in dim]),
@@ -294,12 +280,7 @@ class ParametersGui(Parameters):
                 widgets.HBox([self._widgets[f"ncl{d}n"] for d in dim]),
                 widgets.HBox([self._widgets[d] for d in "istret beta".split()]),
                 widgets.HTML(value="<h2>NumOptions</h2>"),
-                widgets.HBox(
-                    [
-                        self._widgets[d]
-                        for d in "ifirstder isecondder itimescheme".split()
-                    ]
-                ),
+                widgets.HBox([self._widgets[d] for d in "ifirstder isecondder itimescheme".split()]),
                 widgets.HBox([self._widgets[d] for d in "ilesmod nu0nu cnu".split()]),
                 widgets.HTML(value="<h2>ScalarParam</h2>"),
                 widgets.HBox([self._widgets["numscalar"]]),
@@ -308,7 +289,10 @@ class ParametersGui(Parameters):
                 widgets.HBox([self._widgets[f"grav{d}"] for d in dim]),
                 # widgets.HBox([self._widgets[d] for d in "iibmS".split()]),
                 widgets.HTML(
-                    value="<strong>cp, us, sc, ri, scalar_lbound & scalar_ubound</strong> are lists with length numscalar, set them properly on the code."
+                    value=(
+                        "<strong>cp, us, sc, ri, scalar_lbound & scalar_ubound</strong> are lists "
+                        "with length numscalar, set them properly on the code."
+                    ),
                 ),
                 widgets.HTML(value="<h2>IBMStuff</h2>"),
                 widgets.HBox([self._widgets[d] for d in "iibm nraf nobjmax".split()]),
@@ -317,7 +301,7 @@ class ParametersGui(Parameters):
 
         self.link_widgets()
 
-    def __call__(self, *args: str) -> Type(widgets.VBox):
+    def __call__(self, *args: str) -> widgets.VBox:
         """Returns widgets on demand.
 
         Parameters
@@ -333,7 +317,7 @@ class ParametersGui(Parameters):
         Examples
         -------
         >>> prm = xcompact3d_toolbox.ParametersGui()
-        >>> prm('nx', 'xlx', 'dx', 'nclx1', 'nclxn')
+        >>> prm("nx", "xlx", "dx", "nclx1", "nclxn")
         """
 
         return widgets.VBox([self._widgets[name] for name in args])
@@ -342,21 +326,21 @@ class ParametersGui(Parameters):
         display(self.ipyview)
 
     @traitlets.observe("p_row", "p_col", "ncores")
-    def _observe_2Decomp(self, change):
+    def _observe_2decomp(self, change):
         if change["name"] == "ncores":
-            possible = list(_divisorGenerator(change["new"]))
+            possible = list(_divisor_generator(change["new"]))
             self._possible_p_row = possible
             self._possible_p_col = possible
             self.p_row, self.p_col = 0, 0
         elif change["name"] == "p_row":
             try:
                 self.p_col = self.ncores // self.p_row
-            except:
+            except ZeroDivisionError:
                 self.p_col = 0
         elif change["name"] == "p_col":
             try:
                 self.p_row = self.ncores // self.p_col
-            except:
+            except ZeroDivisionError:
                 self.p_row = 0
 
     def link_widgets(self) -> None:
@@ -366,7 +350,7 @@ class ParametersGui(Parameters):
 
         Examples
         -------
-        >>> prm = xcompact3d_toolbox.ParametersGui(loadfile = 'example.i3d')
+        >>> prm = xcompact3d_toolbox.ParametersGui(loadfile="example.i3d")
         >>> prm.link_widgets()
         """
 
@@ -385,7 +369,7 @@ class ParametersGui(Parameters):
             )
 
         # Create two-way link between variables and widgets
-        for name in self._widgets.keys():
+        for name in self._widgets:
             link((self, name), (self._widgets[name], "value"))
 
         # for name in self._widgets.keys():

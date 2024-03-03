@@ -1,11 +1,8 @@
-from . import tutorial
-from ._version import get_versions
-from .array import X3dDataArray, X3dDataset
-from .genepsi import gene_epsi_3D
-from .gui import ParametersGui
-from .param import param
-from .parameters import Parameters
-from .sandbox import init_dataset, init_epsi
-
-__version__ = get_versions()["version"]
-del get_versions
+from xcompact3d_toolbox import tutorial
+from xcompact3d_toolbox._version import __version__
+from xcompact3d_toolbox.array import X3dDataArray, X3dDataset
+from xcompact3d_toolbox.genepsi import gene_epsi_3d
+from xcompact3d_toolbox.gui import ParametersGui
+from xcompact3d_toolbox.param import param
+from xcompact3d_toolbox.parameters import Parameters
+from xcompact3d_toolbox.sandbox import init_dataset, init_epsi

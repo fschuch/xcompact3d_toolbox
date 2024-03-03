@@ -3,8 +3,8 @@ import filecmp
 import numpy as np
 import pytest
 import xarray as xr
+
 import xcompact3d_toolbox as x3d
-import xcompact3d_toolbox.io
 
 
 @pytest.fixture
@@ -17,12 +17,8 @@ def filename_properties():
 @pytest.mark.parametrize("separator", ["", "-"])
 @pytest.mark.parametrize("extension", ["", ".bin"])
 @pytest.mark.parametrize("number_of_digits", [3, 6])
-def test_set_get_filename_from_bin(
-    filename_properties, prefix, counter, separator, extension, number_of_digits
-):
-    filename_properties.set(
-        separator=separator, file_extension=extension, number_of_digits=number_of_digits
-    )
+def test_set_get_filename_from_bin(filename_properties, prefix, counter, separator, extension, number_of_digits):
+    filename_properties.set(separator=separator, file_extension=extension, number_of_digits=number_of_digits)
     assert (counter, prefix) == filename_properties.get_info_from_filename(
         filename_properties.get_filename_for_binary(prefix, counter)
     )
@@ -30,13 +26,11 @@ def test_set_get_filename_from_bin(
 
 @pytest.fixture
 def dataset():
-    return x3d.io.Dataset(
-        **dict(stack_velocity=True, stack_scalar=True)
-    )
+    return x3d.io.Dataset(stack_velocity=True, stack_scalar=True)
 
 
 def test_write_read_field(dataset):
-    coords = dataset._mesh.get()
+    coords = dataset._mesh.get()  # noqa: SLF001
     shape = [len(x) for x in coords.values()]
     numpy_array = np.random.random(size=shape).astype(x3d.param["mytype"])
     filename = dataset.filename_properties.get_filename_for_binary("ux", 0)
@@ -57,11 +51,11 @@ def snapshot(dataset):
             numpy_array(**kwargs),
             coords=kwargs,
             dims=kwargs.keys(),
-            attrs=dict(file_name=file_name),
+            attrs={"file_name": file_name},
         )
 
-    coords = dict(dataset._mesh.get())
-    coords["t"] = [dataset._time_step * k for k in range(len(dataset))]
+    coords = dict(dataset._mesh.get())  # noqa: SLF001
+    coords["t"] = [dataset._time_step * k for k in range(len(dataset))]  # noqa: SLF001
 
     ds = xr.Dataset()
 
@@ -75,41 +69,33 @@ def snapshot(dataset):
 
 
 def test_dataset_getitem_int(dataset, snapshot):
-
     for k, time in enumerate(snapshot.t.values):
         ds = dataset[k]
-        xr.testing.assert_equal(
-            snapshot.sel(t=time, drop=True), ds.sel(t=time, drop=True)
-        )
+        xr.testing.assert_equal(snapshot.sel(t=time, drop=True), ds.sel(t=time, drop=True))
 
 
 def test_dataset_getitem_str(dataset, snapshot):
-
     xr.testing.assert_equal(snapshot["pp"], dataset["pp"])
 
 
 @pytest.mark.parametrize(
-    "slice",
+    "slice_value",
     [slice(None, None, None), slice(0, -1, 2), slice(-1, 0, -2), slice(0, 9, 3)],
 )
-def test_dataset_getitem_slice(dataset, snapshot, slice):
-
-    xr.testing.assert_equal(snapshot.isel(t=slice), dataset[slice])
+def test_dataset_getitem_slice(dataset, snapshot, slice_value):
+    xr.testing.assert_equal(snapshot.isel(t=slice_value), dataset[slice_value])
 
 
 def test_dataset_iter(dataset, snapshot):
-
     for k, ds in enumerate(dataset):
         xr.testing.assert_equal(snapshot.sel(t=k, drop=True), ds.sel(t=k, drop=True))
 
+
 @pytest.mark.parametrize("istret", [0, 1])
-def test_dataset_write_xdmf(dataset, snapshot, istret):
-    ds = snapshot
-    dataset._mesh.y.istret = istret
+def test_dataset_write_xdmf(dataset, snapshot, istret):  # noqa: ARG001
+    dataset._mesh.y.istret = istret  # noqa: SLF001
 
     filename = f"snapshots_istret_{istret}.xdmf"
 
     dataset.write_xdmf(filename)
-    assert filecmp.cmp(
-        filename, f"./tests/unit/data/{filename}"
-    )
+    assert filecmp.cmp(filename, f"./tests/unit/data/{filename}")

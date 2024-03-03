@@ -13,7 +13,7 @@ automated processes.
 
 The physical and computational parameters are built on top of traitlets_,
 a framework that lets Python classes have attributes with type checking, dynamically
-calculated default values, and ‘on change’ callbacks.
+calculated default values, and "on change" callbacks.
 In addition to ipywidgets_ for an user friendly interface.
 
 Data structure is provided by xarray_ (see `Why xarray?`_), that introduces labels
@@ -153,20 +153,3 @@ Examples
 .. _xarray: http://xarray.pydata.org/en/stable/
 .. _Xcompact3d: https://github.com/xcompact3d/Incompact3d
 .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
-
-Table of Content
-==================
-
-.. toctree::
-   :maxdepth: 4
-   :glob:
-
-   Docstrings
-   tutorial
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

@@ -3,6 +3,7 @@ import os.path
 
 import numpy as np
 import pytest
+
 import xcompact3d_toolbox as x3d
 import xcompact3d_toolbox.mesh
 
@@ -14,9 +15,7 @@ def test_coordinate_grid_size_value(possible_mesh):
 
 def test_coordinate_periodic_grid_size_value(possible_mesh_periodic):
     coordinate = x3d.mesh.Coordinate(is_periodic=True)
-    assert (
-        set(coordinate.possible_grid_size) == possible_mesh_periodic
-    )
+    assert set(coordinate.possible_grid_size) == possible_mesh_periodic
 
 
 @pytest.fixture
@@ -34,7 +33,7 @@ def test_coordinate_properties(coordinate, length, grid_size, is_periodic):
     delta = length / grid_size if is_periodic else length / (grid_size - 1)
     coordinate.set(is_periodic=is_periodic, grid_size=grid_size, length=length)
 
-    assert (sub_grid_size, delta) == (coordinate._sub_grid_size, coordinate.delta)
+    assert (sub_grid_size, delta) == (coordinate._sub_grid_size, coordinate.delta)  # noqa: SLF001
 
     new_length = coordinate.length / 2.0
     coordinate.delta /= 2.0
@@ -47,9 +46,7 @@ def stretched_coordinate():
     return x3d.mesh.StretchedCoordinate()
 
 
-@pytest.mark.parametrize(
-    "filename", glob.glob(os.path.join("tests", "unit", "data", "yp", "*.dat"))
-)
+@pytest.mark.parametrize("filename", glob.glob(os.path.join("tests", "unit", "data", "yp", "*.dat")))
 def test_stretched_coordinate(stretched_coordinate, filename):
     """In order to test the stretched mesh, three values for istret:
 
@@ -79,9 +76,7 @@ def test_stretched_coordinate(stretched_coordinate, filename):
         grid_size=coord_ref.size,
     )
 
-    np.testing.assert_allclose(
-        actual=stretched_coordinate, desired=coord_ref, rtol=1e-5, atol=1e-8
-    )
+    np.testing.assert_allclose(actual=stretched_coordinate, desired=coord_ref, rtol=1e-5, atol=1e-8)
 
 
 @pytest.fixture

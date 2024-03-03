@@ -1,10 +1,9 @@
-import math
-
 import hypothesis
 import numpy as np
 import pytest
 import stl
 import xarray as xr
+
 import xcompact3d_toolbox as x3d
 import xcompact3d_toolbox.sandbox
 
@@ -26,7 +25,7 @@ def cube():
             [+1, -1, +1],
             [+1, +1, +1],
             [-1, +1, +1],
-        ]
+        ],
     )
     # Define the 12 triangles composing the cube
     faces = np.array(
@@ -57,26 +56,18 @@ def cube():
 
 @hypothesis.settings(deadline=None)
 @hypothesis.given(
-    x=hypothesis.strategies.floats(
-        min_value=-1e6, max_value=1e6, allow_nan=False, allow_infinity=False
-    ),
-    y=hypothesis.strategies.floats(
-        min_value=-1e6, max_value=1e6, allow_nan=False, allow_infinity=False
-    ),
-    z=hypothesis.strategies.floats(
-        min_value=-1e6, max_value=1e6, allow_nan=False, allow_infinity=False
-    ),
+    x=hypothesis.strategies.floats(min_value=-1e6, max_value=1e6, allow_nan=False, allow_infinity=False),
+    y=hypothesis.strategies.floats(min_value=-1e6, max_value=1e6, allow_nan=False, allow_infinity=False),
+    z=hypothesis.strategies.floats(min_value=-1e6, max_value=1e6, allow_nan=False, allow_infinity=False),
 )
 @hypothesis.example(x=1.0, y=1.0, z=1.0)  # edge case
 def test_point_is_inside_geometry(cube, x, y, z):
-    inside_cube = all([-1.0 <= dim <= 1.0 for dim in [x, y, z]])
-    assert x3d.sandbox._point_in_geometry(cube.vectors, x, y, z, 0.05) == inside_cube
+    inside_cube = all(-1.0 <= dim <= 1.0 for dim in [x, y, z])
+    assert x3d.sandbox._point_in_geometry(cube.vectors, x, y, z, 0.05) == inside_cube  # noqa: SLF001
 
 
 def test_geometry_from_stl(cube):
     prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=2)
     ds_stl = x3d.init_epsi(prm)["epsi"].geo.from_stl(stl_mesh=cube, user_tol=0.05)
-    ds_box = x3d.init_epsi(prm)["epsi"].geo.box(
-        x=(-1.0, 1.0), y=(-1.0, 1.0), z=(-1.0, 1.0)
-    )
+    ds_box = x3d.init_epsi(prm)["epsi"].geo.box(x=(-1.0, 1.0), y=(-1.0, 1.0), z=(-1.0, 1.0))
     xr.testing.assert_equal(ds_stl, ds_box)

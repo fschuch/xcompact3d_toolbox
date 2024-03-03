@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The new **Sandbox Flow Configuration** (``itype = 12``) aims to break many of the
 barriers to entry in a Navier-Stokes solver.
 The idea is to easily provide everything that XCompact3d needs from a Python Jupyter
@@ -8,10 +7,15 @@ direct hands-on experience and a safe place for practicing and learning, while
 for advanced users and code developers, it works as a rapid prototyping tool.
 For more details, see:
 
-   * `"A Jupyter sandbox environment coupled into the high-order Navier-Stokes solver Xcompact3d", by F.N. Schuch, F.D. Vianna, A. Mombach, J.H. Silvestrini. JupyterCon 2020. <https://www.fschuch.com/en/publication/2020-jupytercon/>`_
+   * `"A Jupyter sandbox environment coupled into the high-order Navier-Stokes\
+   solver Xcompact3d", by F.N. Schuch, F.D. Vianna, A. Mombach, J.H. Silvestrini.\
+   JupyterCon 2020. <https://www.fschuch.com/en/publication/2020-jupytercon/>`_
 
-   * `"Sandbox flow configuration: A rapid prototyping tool inside XCompact3d", by F.N. Schuch. XCompact3d 2021 Online Showcase Event. <https://www.fschuch.com/en/talk/sandbox-flow-configuration-a-rapid-prototyping-tool-inside-xcompact3d/>`_
+   * `"Sandbox flow configuration: A rapid prototyping tool inside XCompact3d",\
+   by F.N. Schuch. XCompact3d 2021 Online Showcase Event.\
+   <https://www.fschuch.com/en/talk/sandbox-flow-configuration-a-rapid-prototyping-tool-inside-xcompact3d/>`_
 """
+from __future__ import annotations
 
 import os.path
 
@@ -20,11 +24,10 @@ import numpy as np
 import stl
 import xarray as xr
 
-from .array import X3dDataArray, X3dDataset
-from .param import param
+from xcompact3d_toolbox.param import param
 
 
-def init_epsi(prm, dask=False):
+def init_epsi(prm, *, dask=False):
     """Initializes the :math:`\\epsilon` arrays that define the solid geometry
     for the Immersed Boundary Method.
 
@@ -77,7 +80,7 @@ def init_epsi(prm, dask=False):
     # the epsi array in the standard mesh (nx, ny, nz)
     fields = {"epsi": (mesh["x"], mesh["y"], mesh["z"])}
 
-    if prm.iibm == 2:
+    if prm.iibm == 2:  # noqa: PLR2004
         # Getting refined mesh
         mesh_raf = prm.get_mesh(refined_for_ibm=True)
         # Three additional versions are needed if iibm = 2,
@@ -102,8 +105,8 @@ def init_epsi(prm, dask=False):
     epsi["epsi"].attrs = {"file_name": os.path.join("geometry", "epsilon")}
 
     # Turns on lazy parallel execution with dask arrays
-    if dask == True:
-        for key in epsi.keys():
+    if dask is True:
+        for key in epsi:
             if key == "epsi":
                 # Decomposition in any direction would work for epsi
                 epsi[key] = epsi[key].x3d.pencil_decomp("x")
@@ -159,7 +162,7 @@ def init_dataset(prm):
     >>> #
     >>> # Code here your customized flow configuration
     >>> #
-    >>> prm.dataset.write(dataset) # write the files to the disc
+    >>> prm.dataset.write(dataset)  # write the files to the disc
 
     """
 
@@ -168,9 +171,7 @@ def init_dataset(prm):
     makedirs(prm.dataset.data_path, exist_ok=True)
 
     # Init dataset
-    ds = xr.Dataset(coords=prm.get_mesh()).assign_coords(
-        n=[n + 1 for n in range(prm.numscalar)]
-    )
+    ds = xr.Dataset(coords=prm.get_mesh()).assign_coords(n=[n + 1 for n in range(prm.numscalar)])
 
     ds.x.attrs = {"name": "Streamwise coordinate", "long_name": r"$x_1$"}
     ds.y.attrs = {"name": "Vertical coordinate", "long_name": r"$x_2$"}
@@ -180,7 +181,7 @@ def init_dataset(prm):
     description = {0: "Streamwise", 1: "Vertical", 2: "Spanwise"}
 
     # Boundary conditions
-    if prm.nclx1 == 2:
+    if prm.nclx1 == 2:  # noqa: PLR2004
         for i, var in enumerate("bxx1 bxy1 bxz1 noise_mod_x1".split()):
             ds[var] = xr.DataArray(
                 param["mytype"](0.0),
@@ -189,16 +190,14 @@ def init_dataset(prm):
                 attrs={
                     "file_name": var,
                     "name": f"Inflow Plane for {description.get(i,'')} Velocity",
-                    "long_name": fr"$u_{i+1} (x_1=0,x_2,x_3)$",
+                    "long_name": rf"$u_{i+1} (x_1=0,x_2,x_3)$",
                 },
             )
-        ds.noise_mod_x1.attrs[
-            "name"
-        ] = "Modulation function for Random Numbers at Inflow Plane"
+        ds.noise_mod_x1.attrs["name"] = "Modulation function for Random Numbers at Inflow Plane"
         ds.noise_mod_x1.attrs["long_name"] = r"mod $ (x_1=0,x_2,x_3)$"
 
     if prm.numscalar != 0:
-        if prm.nclxS1 == 2:
+        if prm.nclxS1 == 2:  # noqa: PLR2004
             ds["bxphi1"] = xr.DataArray(
                 param["mytype"](0.0),
                 dims=["n", "y", "z"],
@@ -209,7 +208,7 @@ def init_dataset(prm):
                     "long_name": r"$\varphi (x_1=0,x_2,x_3,n)$",
                 },
             )
-        if prm.nclyS1 == 2:
+        if prm.nclyS1 == 2:  # noqa: PLR2004
             ds["byphi1"] = xr.DataArray(
                 param["mytype"](0.0),
                 dims=["n", "x", "z"],
@@ -220,7 +219,7 @@ def init_dataset(prm):
                     "long_name": r"$\varphi (x_1,x_2=0,x_3,n)$",
                 },
             )
-        if prm.nclySn == 2:
+        if prm.nclySn == 2:  # noqa: PLR2004
             ds["byphin"] = xr.DataArray(
                 param["mytype"](0.0),
                 dims=["n", "x", "z"],
@@ -240,7 +239,7 @@ def init_dataset(prm):
             attrs={
                 "file_name": var,
                 "name": f"Initial Condition for {description.get(i,'')} Velocity",
-                "long_name": fr"$u_{str(i+1)} (x_1,x_2,x_3,t=0)$",
+                "long_name": rf"$u_{i+1!s} (x_1,x_2,x_3,t=0)$",
                 "BC": prm.get_boundary_condition(var),
             },
         )
@@ -276,7 +275,7 @@ class Geometry:
     """An accessor with some standard geometries for :obj:`xarray.DataArray`.
     Use them in combination with the arrays initialized at
     :obj:`xcompact3d_toolbox.sandbox.init_epsi` and the new
-    :obj:`xcompact3d_toolbox.genepsi.gene_epsi_3D`.
+    :obj:`xcompact3d_toolbox.genepsi.gene_epsi_3d`.
     """
 
     def __init__(self, data_array):
@@ -284,15 +283,16 @@ class Geometry:
 
     def from_stl(
         self,
-        filename: str = None,
-        stl_mesh: stl.mesh.Mesh = None,
-        origin: dict = None,
-        rotate: dict = None,
-        scale: float = None,
+        *,
+        filename: str | None = None,
+        stl_mesh: stl.mesh.Mesh | None = None,
+        origin: dict | None = None,
+        rotate: dict | None = None,
+        scale: float | None = None,
         user_tol: float = 2.0 * np.pi,
         remp: bool = True,
     ):
-        """Load a STL file and compute if the nodes of the computational
+        r"""Load a STL file and compute if the nodes of the computational
         mesh are inside or outside the object. In this way, the
         customized geometry can be used at the flow solver.
 
@@ -323,9 +323,11 @@ class Geometry:
         Parameters
         ----------
         filename : str, optional
-            Filename of the STL file to be loaded and included in the cartesian domain, by default None
+            Filename of the STL file to be loaded and included in the cartesian
+            domain, by default None
         scale : float, optional
-            This parameters can be used to scale up the object when greater than one and scale it down when smaller than one, by default None
+            This parameters can be used to scale up the object when greater than
+            one and scale it down when smaller than one, by default None
         rotate : dict, optional
             Rotate the object, including keyword arguments that are
             expected by :obj:`stl.mesh.Mesh.rotate`, like ``axis``,
@@ -376,10 +378,10 @@ class Geometry:
         --------
 
         >>> prm = xcompact3d_toolbox.Parameters()
-        >>> epsi = xcompact3d_toolbox.init_epsi(prm, dask = True)
+        >>> epsi = xcompact3d_toolbox.init_epsi(prm, dask=True)
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.from_stl(
-        ...         "My_file.stl",
+        ...         filename="My_file.stl",
         ...         scale=1.0,
         ...         rotate=dict(axis=[0, 0.5, 0], theta=math.radians(90)),
         ...         origin=dict(x=2, y=1, z=0),
@@ -396,9 +398,9 @@ class Geometry:
             near the object. It returns a tuple of integers, representing the min and max
             indexes of the coordinate where we need to loop through.
             """
-            min = coord.searchsorted(mesh_coord.min(), "left")
-            max = coord.searchsorted(mesh_coord.max(), "right")
-            return min, max
+            min_val = coord.searchsorted(mesh_coord.min(), "left")
+            max_val = coord.searchsorted(mesh_coord.max(), "right")
+            return min_val, max_val
 
         if filename is not None and stl_mesh is None:
             stl_mesh = stl.mesh.Mesh.from_file(filename)
@@ -421,13 +423,16 @@ class Geometry:
             )
 
         if stl_mesh is None:
-            raise ValueError("Please, specify filename or stl_mesh")
+            msg = "Please, specify filename or stl_mesh"
+            raise ValueError(msg)
 
         if not stl_mesh.check():
-            raise ValueError("stl_mesh is not valid")
+            msg = "stl_mesh is not valid"
+            raise ValueError(msg)
 
         if not stl_mesh.is_closed():
-            raise ValueError("stl_mesh is not closed")
+            msg = "stl_mesh is not closed"
+            raise ValueError(msg)
 
         x = self._data_array.x.data
         y = self._data_array.y.data
@@ -447,8 +452,8 @@ class Geometry:
             remp,
         )
 
-    def cylinder(self, radius=0.5, axis="z", height=None, remp=True, **kwargs):
-        """Draw a cylinder.
+    def cylinder(self, *, radius=0.5, axis="z", height=None, remp=True, **kwargs):
+        r"""Draw a cylinder.
 
         Parameters
         ----------
@@ -485,11 +490,10 @@ class Geometry:
 
         """
 
-        for key in kwargs.keys():
-            if not key in self._data_array.dims:
-                raise KeyError(
-                    f'Invalid key for "kwargs", it should be a valid dimension'
-                )
+        for key in kwargs:
+            if key not in self._data_array.dims:
+                msg = 'Invalid key for "kwargs", it should be a valid dimension'
+                raise KeyError(msg)
 
         dis = 0.0
         for d in self._data_array.dims:
@@ -498,20 +502,16 @@ class Geometry:
             dis = dis + (self._data_array[d] - kwargs.get(d, 0.0)) ** 2.0
         dis = np.sqrt(dis)
 
-        if height != None:
+        if height is not None:
             height *= 0.5
             # Notice that r*10 is just to guarantee that the values are larger than r
             # and consequently outside the cylinder
-            dis = dis.where(
-                self._data_array[axis] <= kwargs.get(axis, 0.0) + height, radius * 10
-            )
-            dis = dis.where(
-                self._data_array[axis] >= kwargs.get(axis, 0.0) - height, radius * 10
-            )
+            dis = dis.where(self._data_array[axis] <= kwargs.get(axis, 0.0) + height, radius * 10)
+            dis = dis.where(self._data_array[axis] >= kwargs.get(axis, 0.0) - height, radius * 10)
 
         return self._data_array.where(dis > radius, remp)
 
-    def box(self, remp=True, **kwargs):
+    def box(self, *, remp=True, **kwargs):
         """Draw a box.
 
         Parameters
@@ -542,11 +542,10 @@ class Geometry:
 
         """
 
-        for key in kwargs.keys():
-            if not key in self._data_array.dims:
-                raise KeyError(
-                    f'Invalid key for "kwargs", it should be a valid dimension'
-                )
+        for key in kwargs:
+            if key not in self._data_array.dims:
+                msg = 'Invalid key for "kwargs", it should be a valid dimension'
+                raise KeyError(msg)
 
         tmp = xr.zeros_like(self._data_array)
 
@@ -556,7 +555,7 @@ class Geometry:
 
         return self._data_array.where(tmp, remp)
 
-    def square(self, length=1.0, thickness=0.1, remp=True, **kwargs):
+    def square(self, *, length=1.0, thickness=0.1, remp=True, **kwargs):
         """Draw a squared frame.
 
         Parameters
@@ -564,7 +563,7 @@ class Geometry:
         length : float
             Frame's external length (the default is 1).
         thickness : float
-            Frames's tickness (the default is 0.1).
+            Frames's thickness (the default is 0.1).
         remp : bool
             Adds the geometry to the :obj:`xarray.DataArray` if True and removes
             it if False (the default is True).
@@ -590,11 +589,10 @@ class Geometry:
         >>>     epsi[key] = epsi[key].geo.square(x=5, y=2, z=1)
 
         """
-        for key in kwargs.keys():
-            if not key in self._data_array.dims:
-                raise KeyError(
-                    f'Invalid key for "kwargs", it should be a valid dimension'
-                )
+        for key in kwargs:
+            if key not in self._data_array.dims:
+                msg = 'Invalid key for "kwargs", it should be a valid dimension'
+                raise KeyError(msg)
 
         center = {kwargs.get(key, 0.0) for key in self._data_array.dims}
 
@@ -615,7 +613,7 @@ class Geometry:
         #
         return self._data_array.where(tmp, remp)
 
-    def sphere(self, radius=0.5, remp=True, **kwargs):
+    def sphere(self, *, radius=0.5, remp=True, **kwargs):
         """Draw a sphere.
 
         Parameters
@@ -647,11 +645,10 @@ class Geometry:
         >>>     epsi[key] = epsi[key].geo.sphere(x=1, y=1, z=1)
 
         """
-        for key in kwargs.keys():
-            if not key in self._data_array.dims:
-                raise KeyError(
-                    f'Invalid key for "kwargs", it should be a valid dimension'
-                )
+        for key in kwargs:
+            if key not in self._data_array.dims:
+                msg = 'Invalid key for "kwargs", it should be a valid dimension'
+                raise KeyError(msg)
 
         dis = 0.0
         for d in self._data_array.dims:
@@ -660,7 +657,7 @@ class Geometry:
 
         return self._data_array.where(dis > radius, remp)
 
-    def ahmed_body(self, scale=1.0, angle=45.0, wheels=False, remp=True, **kwargs):
+    def ahmed_body(self, *, scale=1.0, angle=45.0, wheels=False, remp=True, **kwargs):
         """Draw an Ahmed body.
 
         Parameters
@@ -703,24 +700,25 @@ class Geometry:
 
         s = scale / 288.0  # adimensional and scale factor
 
-        for key in kwargs.keys():
-            if not key in self._data_array.dims:
-                raise KeyError(
-                    f'Invalid key for "kwargs", it should be a valid dimension'
-                )
+        for key in kwargs:
+            if key not in self._data_array.dims:
+                msg = 'Invalid key for "kwargs", it should be a valid dimension'
+                raise KeyError(msg)
 
-        if not "x" in kwargs:
+        if "x" not in kwargs:
             kwargs["x"] = 1.0
-        if not "y" in kwargs:
+        if "y" not in kwargs:
             kwargs["y"] = 0.0
-        if not "z" in kwargs:
+        if "z" not in kwargs:
             kwargs["z"] = 0.5 * self._data_array.z[-1].values - ((389.0 * s) / 2.0)
         else:
             # That is because of the mirror in Z
-            raise NotImplementedError("Unsupported: Body must be centered in Z")
+            msg = "Unsupported: Body must be centered in Z"
+            raise NotImplementedError(msg)
 
         if scale != 1:
-            raise NotImplementedError("Unsupported: Not prepared yet for scale != 1")
+            msg = "Unsupported: Not prepared yet for scale != 1"
+            raise NotImplementedError(msg)
 
         tmp = xr.zeros_like(self._data_array)
         tmp2 = xr.zeros_like(self._data_array)
@@ -874,34 +872,31 @@ class Geometry:
 
 @numba.njit
 def _geometry_inside_mesh(triangles, x, y, z, user_tol, lim_x, lim_y, lim_z):
-
     result = np.zeros((x.size, y.size, z.size), dtype=numba.boolean)
 
     for i in range(*lim_x):
         for j in range(*lim_y):
             for k in range(*lim_z):
-                result[i, j, k] = _point_in_geometry(
-                    triangles, x[i], y[j], z[k], user_tol
-                )
+                result[i, j, k] = _point_in_geometry(triangles, x[i], y[j], z[k], user_tol)
 
     return result
 
 
 @numba.njit
-def _anorm2(X):
+def _anorm2(x):
     # Compute euclidean norm
-    return np.sqrt(np.sum(X ** 2.0))
+    return np.sqrt(np.sum(x**2.0))
 
 
 @numba.njit
-def _adet(X, Y, Z):
+def _adet(x, y, z):
     # Compute 3x3 determinant
-    ret = np.multiply(np.multiply(X[0], Y[1]), Z[2])
-    ret += np.multiply(np.multiply(Y[0], Z[1]), X[2])
-    ret += np.multiply(np.multiply(Z[0], X[1]), Y[2])
-    ret -= np.multiply(np.multiply(Z[0], Y[1]), X[2])
-    ret -= np.multiply(np.multiply(Y[0], X[1]), Z[2])
-    ret -= np.multiply(np.multiply(X[0], Z[1]), Y[2])
+    ret = np.multiply(np.multiply(x[0], y[1]), z[2])
+    ret += np.multiply(np.multiply(y[0], z[1]), x[2])
+    ret += np.multiply(np.multiply(z[0], x[1]), y[2])
+    ret -= np.multiply(np.multiply(z[0], y[1]), x[2])
+    ret -= np.multiply(np.multiply(y[0], x[1]), z[2])
+    ret -= np.multiply(np.multiply(x[0], z[1]), y[2])
     return ret
 
 
@@ -920,21 +915,21 @@ def _point_in_geometry(triangles, x, y, z, user_tol):
     by `Devert Alexandre <https://github.com/marmakoide>`_,
     licensed under the MIT License.
     """
-    X = np.array((x, y, z), dtype=triangles.dtype)
+    array_x = np.array((x, y, z), dtype=triangles.dtype)
 
     # One generalized winding number per input vertex
     ret = triangles.dtype.type(0.0)
 
     # Accumulate generalized winding number for each triangle
-    for U, V, W in triangles:
-        A, B, C = U - X, V - X, W - X
-        omega = _adet(A, B, C)
+    for array_u, array_v, array_w in triangles:
+        array_a, array_b, array_c = array_u - array_x, array_v - array_x, array_w - array_x
+        omega = _adet(array_a, array_b, array_c)
 
-        a, b, c = _anorm2(A), _anorm2(B), _anorm2(C)
+        a, b, c = _anorm2(array_a), _anorm2(array_b), _anorm2(array_c)
         d = a * b * c
-        d += c * np.sum(np.multiply(A, B))
-        d += a * np.sum(np.multiply(B, C))
-        d += b * np.sum(np.multiply(C, A))
+        d += c * np.sum(np.multiply(array_a, array_b))
+        d += a * np.sum(np.multiply(array_b, array_c))
+        d += b * np.sum(np.multiply(array_c, array_a))
 
         ret += np.arctan2(omega, d)
 

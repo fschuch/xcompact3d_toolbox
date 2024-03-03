@@ -15,7 +15,7 @@ def boundary_condition(prm, var=None):
     default["y"]["istret"] = prm.istret
     default["y"]["beta"] = prm.beta
 
-    BC = {
+    boundary_conditions = {
         "ux": {
             "x": {"ncl1": prm.nclx1, "ncln": prm.nclxn, "npaire": 0},
             "y": {"ncl1": prm.ncly1, "ncln": prm.nclyn, "npaire": 1},
@@ -51,15 +51,14 @@ def boundary_condition(prm, var=None):
     }
 
     if prm.numscalar > 0:
-
-        BC["phi"] = {
+        boundary_conditions["phi"] = {
             "x": {"ncl1": prm.nclxS1, "ncln": prm.nclxS1, "npaire": 1},
             "y": {"ncl1": prm.nclyS1, "ncln": prm.nclySn, "npaire": 1},
             "z": {"ncl1": prm.nclzS1, "ncln": prm.nclzSn, "npaire": 1},
         }
 
-    for key, value in BC.items():
+    for value in boundary_conditions.values():
         value["y"]["istret"] = prm.istret
         value["y"]["beta"] = prm.beta
 
-    return BC.get(var.lower(), default)
+    return boundary_conditions.get(var.lower(), default)

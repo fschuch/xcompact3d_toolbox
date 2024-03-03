@@ -1,10 +1,30 @@
 {
-    "python.testing.pytestArgs": [
-        "tests"
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports.ruff": "explicit"
+        }
+    },
+    "editor.rulers": [
+        80,
+        120
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.nosetestsEnabled": false,
     "python.testing.pytestEnabled": true,
+    "autoDocstring.docstringFormat": "numpy",
+    "files.exclude": {
+        "**/.coverage": true,
+        "**/.hatch": true,
+        "**/.hypothesis": true,
+        "**/.mypy_cache": true,
+        "**/.pytest_cache": true,
+        "**/.ruff_cache": true,
+        "**/build": true
+    },
+    "cSpell.enabled": true,
+    "cSpell.language": "en",
     "cSpell.words": [
         "dask",
         "decomp",
@@ -16,5 +36,6 @@
         "write",
         "xdmf",
         "zfill"
-    ]
+    ],
+    "python.envFile": "${workspaceFolder}/.hatch/xcompact3d-toolbox"
 }
