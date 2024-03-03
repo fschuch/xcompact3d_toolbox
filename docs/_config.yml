@@ -31,7 +31,6 @@ repository:
 html:
   use_issues_button: true
   use_repository_button: true
-  announcement: "<p class='mystyle'>Some custom HTML!</p>"
 
 launch_buttons:
   notebook_interface: "jupyterlab"
