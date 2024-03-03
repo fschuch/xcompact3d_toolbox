@@ -617,7 +617,7 @@ class ParametersIbmStuff(traitlets.HasTraits):
         desc="Level of refinement for iibm==2 to find the surface of the immersed object",
     )
     """int: Level of refinement to find the surface of the immersed object, when
-        :obj:`ParametersBasicParam.iibm` is equal to 2. 
+        :obj:`ParametersBasicParam.iibm` is equal to 2.
     """
 
     izap = traitlets.Int(default_value=1, min=0, max=3).tag(
@@ -683,7 +683,7 @@ class ParametersExtras(traitlets.HasTraits):
 
     Examples
     --------
-    
+
     The first step is specify the filename properties.
     If the simulated fields are named like ``ux-000.bin``, they are in the default
     configuration, there is no need to specify filename properties. But just in case,
@@ -738,7 +738,7 @@ class ParametersExtras(traitlets.HasTraits):
     * Load one array from the disc:
 
       >>> ux = prm.dataset.load_array("ux-0000.bin")
-    
+
     * Load the entire time series for a given variable:
 
       >>> ux = prm.dataset.load_time_series("ux")
@@ -750,13 +750,13 @@ class ParametersExtras(traitlets.HasTraits):
       >>> ux = prm.dataset["ux"]
       >>> uy = prm.dataset["uy"]
       >>> uz = prm.dataset["uz"]
-  
+
       You can organize them using a dataset:
-  
+
       >>> dataset = xarray.Dataset()
       >>> for var in "ux uy uz".split():
       ...     dataset[var] = prm.dataset[var]
-    
+
     * Load all variables from a given snapshot:
 
       >>> snapshot = prm.dataset.load_snapshot(10)
@@ -764,7 +764,7 @@ class ParametersExtras(traitlets.HasTraits):
       or just:
 
       >>> snapshot = prm.dataset[10]
-    
+
     * Loop through all snapshots, loading them one by one:
 
       >>> for ds in prm.dataset:
@@ -777,11 +777,11 @@ class ParametersExtras(traitlets.HasTraits):
       >>> for ds in prm.dataset(0, 101, 5):
       ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
       ...     prm.dataset.write(data = vort, file_prefix = "w3")
-    
+
     * Or simply load all snapshots at once (if you have enough memory):
 
       >>> ds = prm.dataset[:]
-    
+
     And finally, it is possible to produce a new xdmf file, so all data
     can be visualized on any external tool:
 

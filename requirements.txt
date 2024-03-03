@@ -1,3 +1,4 @@
+.
 notebook
 ipykernel
 numpy
@@ -15,6 +16,7 @@ sphinx>=1.4
 nbsphinx
 sphinx-autobuild
 numpy-stl
+sphinx-rtd-theme
 hypothesis
 versioneer
 tqdm

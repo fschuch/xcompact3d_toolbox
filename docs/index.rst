@@ -105,15 +105,15 @@ Examples
    * Load one array from the disc::
 
       ux = prm.dataset.load_array("ux-0000.bin")
-   
+
    * Load the entire time series for a given variable::
 
       ux = prm.dataset["ux"]
-   
+
    * Load all variables from a given snapshot::
 
       snapshot = prm.dataset[10]
-   
+
    * Loop through all snapshots, loading them one by one::
 
       for ds in prm.dataset:
@@ -121,11 +121,11 @@ Examples
          vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
          # write the results to the disc
          prm.dataset.write(data = vort, file_prefix = "w3")
-   
+
    * Or simply load all snapshots at once (if you have enough memory)::
 
       ds = prm.dataset[:]
-   
+
    * It is possible to produce a new xdmf file, so all data can be visualized on any external tool::
 
       prm.dataset.write_xdmf()
