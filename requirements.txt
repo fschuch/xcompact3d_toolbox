@@ -1,3 +1,4 @@
+.
 notebook
 ipykernel
 numpy
