@@ -82,53 +82,53 @@ Examples
 
 * Specifying how the binary fields from your simulations are named, for instance:
 
-   * If the simulated fields are named like ``ux-000.bin``::
+  * If the simulated fields are named like ``ux-000.bin``::
 
-      prm.dataset.filename_properties.set(
-         separator = "-",
-         file_extension = ".bin",
-         number_of_digits = 3
-      )
+     prm.dataset.filename_properties.set(
+        separator = "-",
+        file_extension = ".bin",
+        number_of_digits = 3
+     )
 
-   * If the simulated fields are named like ``ux0000``::
+  * If the simulated fields are named like ``ux0000``::
 
-      prm.dataset.filename_properties.set(
-         separator = "",
-         file_extension = "",
-         number_of_digits = 4
-      )
+     prm.dataset.filename_properties.set(
+        separator = "",
+        file_extension = "",
+        number_of_digits = 4
+     )
 
 * There are many ways to load the arrays produced by your numerical simulation, so you can choose what best suits your post-processing application.
   All arrays are wrapped into xarray_ objects, with many useful methods for indexing, comparisons, reshaping and reorganizing, computations and plotting.
   See the examples:
 
-   * Load one array from the disc::
+  * Load one array from the disc::
 
-      ux = prm.dataset.load_array("ux-0000.bin")
+     ux = prm.dataset.load_array("ux-0000.bin")
 
-   * Load the entire time series for a given variable::
+  * Load the entire time series for a given variable::
 
-      ux = prm.dataset["ux"]
+     ux = prm.dataset["ux"]
 
-   * Load all variables from a given snapshot::
+  * Load all variables from a given snapshot::
 
-      snapshot = prm.dataset[10]
+     snapshot = prm.dataset[10]
 
-   * Loop through all snapshots, loading them one by one::
+  * Loop through all snapshots, loading them one by one::
 
-      for ds in prm.dataset:
-         # compute something
-         vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-         # write the results to the disc
-         prm.dataset.write(data = vort, file_prefix = "w3")
+     for ds in prm.dataset:
+        # compute something
+        vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+        # write the results to the disc
+        prm.dataset.write(data = vort, file_prefix = "w3")
 
-   * Or simply load all snapshots at once (if you have enough memory)::
+  * Or simply load all snapshots at once (if you have enough memory)::
 
-      ds = prm.dataset[:]
+     ds = prm.dataset[:]
 
-   * It is possible to produce a new xdmf file, so all data can be visualized on any external tool::
+* It is possible to produce a new xdmf file, so all data can be visualized on any external tool::
 
-      prm.dataset.write_xdmf()
+     prm.dataset.write_xdmf()
 
 
 * User interface for the parameters with IPywidgets::
@@ -150,6 +150,6 @@ Examples
 .. _`Jupyter Notebook`: https://jupyter.org/
 .. _Numpy: https://numpy.org/
 .. _traitlets: https://traitlets.readthedocs.io/en/stable/index.html
-.. _xarray: http://xarray.pydata.org/en/stable/
+.. _xarray: https://docs.xarray.dev/en/stable/
 .. _Xcompact3d: https://github.com/xcompact3d/Incompact3d
-.. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
+.. _`Why xarray?`: https://docs.xarray.dev/en/stable/getting-started-guide/why-xarray.html

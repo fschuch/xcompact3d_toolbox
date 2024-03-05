@@ -218,63 +218,58 @@ class FilenameProperties(traitlets.HasTraits):
 class Dataset(traitlets.HasTraits):
     """An object that reads and writes the raw binary files from XCompact3d on-demand.
 
-        Parameters
-        ----------
-        data_path : str
-            The path to the folder where the binary fields are located (default is ``"./data/"``).
+    Parameters
+    ----------
+    data_path : str
+        The path to the folder where the binary fields are located (default is ``"./data/"``).
 
-        .. note::
-            The default ``"./data/"`` is relative to the path to the parameters
-            file when initialized from :obj:`xcompact3d_toolbox.parameters.ParametersExtras`.
+    .. note::
+        The default ``"./data/"`` is relative to the path to the parameters
+        file when initialized from :obj:`xcompact3d_toolbox.parameters.ParametersExtras`.
 
-        drop_coords : str
-            If working with two-dimensional planes, specify which of the coordinates should be
-            dropped, i.e., ``"x"``, ``"y"`` or ``"z"``, or leave it empty for 3D fields (default is ``""``).
-        filename_properties : :obj:`FilenameProperties`
-            Specifies filename properties for the binary files, like the separator, file extension and
-            number of digits.
-        set_of_variables : set
-            The methods in this class will try to find all
-            variables per snapshot, use this parameter
-            to work with just a few specified variables if you
-            need to speedup your application
-            (default is an empty set).
-        snapshot_counting : str
-            The parameter that controls the number of timesteps used to produce the datasets
-            (default is ``"ilast"``).
-        snapshot_step : str
-            The parameter that controls the number of timesteps between each snapshot, it is often
-            ``"ioutput"`` or ``"iprocessing"`` (default is ``"ioutput"``).
-        stack_scalar : bool
-            When :obj:`True`, the scalar fields will be stacked in a new coordinate ``n``, otherwise returns one
-            array per scalar fraction (default is :obj:`False`).
-        stack_velocity : bool
-            When :obj:`True`, the velocity will be stacked in a new coordinate ``i`` , otherwise returns one
-            array per velocity component (default is :obj:`False`).
+    drop_coords : str
+        If working with two-dimensional planes, specify which of the coordinates should be
+        dropped, i.e., ``"x"``, ``"y"`` or ``"z"``, or leave it empty for 3D fields (default is ``""``).
+    filename_properties : :obj:`FilenameProperties`
+        Specifies filename properties for the binary files, like the separator, file extension and
+        number of digits.
+    set_of_variables : set
+        The methods in this class will try to find all
+        variables per snapshot, use this parameter
+        to work with just a few specified variables if you
+        need to speedup your application
+        (default is an empty set).
+    snapshot_counting : str
+        The parameter that controls the number of timesteps used to produce the datasets
+        (default is ``"ilast"``).
+    snapshot_step : str
+        The parameter that controls the number of timesteps between each snapshot, it is often
+        ``"ioutput"`` or ``"iprocessing"`` (default is ``"ioutput"``).
+    stack_scalar : bool
+        When :obj:`True`, the scalar fields will be stacked in a new coordinate ``n``, otherwise returns one
+        array per scalar fraction (default is :obj:`False`).
+    stack_velocity : bool
+        When :obj:`True`, the velocity will be stacked in a new coordinate ``i`` , otherwise returns one
+        array per velocity component (default is :obj:`False`).
 
-        Notes
-        -----
-    <<<<<<< Updated upstream
-        * :obj:`Dataset` is in fact an attribute of :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
-          so there is no need to initialize it manually for most of the common use cases.
-    =======
-            * :obj:`Dataset` is in fact an attribute of :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
-              so there is no need to initialize it manually for most of the common use cases.
-    >>>>>>> Stashed changes
+    Notes
+    -----
+    * :obj:`Dataset` is in fact an attribute of :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
+      so there is no need to initialize it manually for most of the common use cases.
 
-        * All arrays are wrapped into Xarray objects (:obj:`xarray.DataArray`
-          or :obj:`xarray.Dataset`), take a look at `xarray's documentation`_,
-          specially, see `Why xarray?`_
-          Xarray has many useful methods for indexing, comparisons, reshaping
-          and reorganizing, computations and plotting.
+    * All arrays are wrapped into Xarray objects (:obj:`xarray.DataArray`
+      or :obj:`xarray.Dataset`), take a look at `xarray's documentation`_,
+      specially, see `Why xarray?`_
+      Xarray has many useful methods for indexing, comparisons, reshaping
+      and reorganizing, computations and plotting.
 
-        * Consider using hvPlot_ to explore your data interactively,
-          see how to plot `Gridded Data`_.
+    * Consider using hvPlot_ to explore your data interactively,
+      see how to plot `Gridded Data`_.
 
-        .. _`xarray's documentation`: http://xarray.pydata.org/en/stable/
-        .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
-        .. _hvPlot : https://hvplot.holoviz.org/
-        .. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
+    .. _`xarray's documentation`: http://xarray.pydata.org/en/stable/
+    .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
+    .. _hvPlot : https://hvplot.holoviz.org/
+    .. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
     """
 
     data_path = traitlets.Unicode(default_value="./data/")
@@ -359,7 +354,7 @@ class Dataset(traitlets.HasTraits):
         for t in range(*args):
             yield self.load_snapshot(t)
 
-    def __getitem__(self, arg: int | slice | str) -> type[xr.DataArray | xr.Dataset]:
+    def __getitem__(self, arg: int | slice | str) -> xr.DataArray | xr.Dataset:
         """Get specified items from the disc.
 
         .. note:: Make sure to have enough memory to load many files at the same time.
@@ -693,11 +688,12 @@ class Dataset(traitlets.HasTraits):
             )
 
         def is_scalar(name):
-            if len(name) != (3 + self.filename_properties.scalar_num_of_digits):
+            prefix = "phi"
+            if len(name) != (len(prefix) + self.filename_properties.scalar_num_of_digits):
                 return False
-            if not name.startswith("phi"):
+            if not name.startswith(prefix):
                 return False
-            if not name.removeprefix("phi").isdigit():
+            if not name[len(prefix) :].isdigit():
                 return False
             return True
 

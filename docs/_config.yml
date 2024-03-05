@@ -50,7 +50,7 @@ sphinx:
       - "https://docs.python.org/3"
       - null
     xarray:
-      - "http://xarray.pydata.org/en/stable/"
+      - "https://docs.xarray.dev/en/stable/"
       - null
     ipywidgets:
       - "https://ipywidgets.readthedocs.io/en/stable/"
