@@ -22,18 +22,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  qa:
-    # pre-commit.ci already runs it on every push and pull request, let's just ensure it runs on every tag and schedule
-    if: (github.event_name == 'push' && github.ref_type == 'tag') || github.event_name == 'schedule'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-      - uses: pre-commit/action@v3.0.1
-
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -104,7 +92,7 @@ jobs:
           name: built-bdist
 
   release:
-    needs: [build, qa]
+    needs: build
     # upload to PyPI on every tag
     if: github.event_name == 'push' && github.ref_type == 'tag' && github.repository == 'fschuch/xcompact3d_toolbox'
     runs-on: ubuntu-latest

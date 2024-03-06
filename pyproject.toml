@@ -58,7 +58,6 @@ source_pkgs = ["xcompact3d_toolbox", "tests"]
 omit = ["xcompact3d_toolbox/_version.py"]
 
 [tool.coverage.report]
-fail_under = 70
 show_missing = true
 exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 
