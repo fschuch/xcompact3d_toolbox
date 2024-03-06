@@ -73,5 +73,5 @@ check = "towncrier check {args}"
 config-path = "ruff_defaults.toml"
 
 [dirs.env]
-virtual = ".hatch"
-pip-compile = ".hatch"
+virtual = ".venv"
+pip-compile = ".venv"

@@ -97,5 +97,5 @@ def test_dataset_write_xdmf(dataset, snapshot, istret):  # noqa: ARG001
 
     filename = f"snapshots_istret_{istret}.xdmf"
 
-    dataset.write_xdmf(filename)
+    dataset.write_xdmf(filename, float_precision=6)
     assert filecmp.cmp(filename, f"./tests/unit/data/{filename}")

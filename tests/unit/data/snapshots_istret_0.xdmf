@@ -12,7 +12,7 @@
          </DataItem>
          <!-- DxDyDz -->
          <DataItem Format="XML" Dimensions="3">
-           0.0625  0.0625  0.0625
+           6.250000e-02 6.250000e-02 6.250000e-02
          </DataItem>
      </Geometry>
 
@@ -20,7 +20,7 @@
          <Time TimeType="HyperSlab">
              <DataItem Format="XML" NumberType="Float" Dimensions="3">
              <!--Start, Stride, Count-->
-             0.0 1.0
+             0.0 1.000000e+00
              </DataItem>
          </Time>
 

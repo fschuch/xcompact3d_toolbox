@@ -15,6 +15,7 @@ For more details, see:
    by F.N. Schuch. XCompact3d 2021 Online Showcase Event.\
    <https://www.fschuch.com/en/talk/sandbox-flow-configuration-a-rapid-prototyping-tool-inside-xcompact3d/>`_
 """
+
 from __future__ import annotations
 
 import os.path
@@ -440,10 +441,10 @@ class Geometry:
 
         return self._data_array.where(
             ~_geometry_inside_mesh(
-                stl_mesh.vectors.astype(np.longdouble),
-                x.astype(np.longdouble),
-                y.astype(np.longdouble),
-                z.astype(np.longdouble),
+                stl_mesh.vectors.astype(np.double),
+                x.astype(np.double),
+                y.astype(np.double),
+                z.astype(np.double),
                 user_tol,
                 get_boundary(stl_mesh.x, x),
                 get_boundary(stl_mesh.y, y),

@@ -38,8 +38,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.8", "3.9"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -70,6 +70,11 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: coverage-report
+      - name: Set project version
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "sonar.projectVersion=${{ github.ref }}" >> sonar-project.properties
+          fi
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

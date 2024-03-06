@@ -1005,7 +1005,7 @@ class Dataset(traitlets.HasTraits):
             filename_and_path = os.path.join(self.data_path, filename)
             data_array.values.astype(param["mytype"]).transpose(align).tofile(filename_and_path)
 
-    def write_xdmf(self, xdmf_name: str = "snapshots.xdmf") -> None:
+    def write_xdmf(self, xdmf_name: str = "snapshots.xdmf", *, float_precision: int | None = None) -> None:
         """Write the xdmf file, so the results from the simulation and its postprocessing
         can be opened in an external visualization tool, like Paraview.
 
@@ -1017,6 +1017,9 @@ class Dataset(traitlets.HasTraits):
         ----------
         xdmf_name : str, optional
             Filename for the xdmf file, by default "snapshots.xdmf"
+        float_precision : int, optional
+            Number of digits for the float precision on the output file, by default None.
+            If None, it uses 8 for single precision and 16 for double precision arrays.
 
         Raises
         ------
@@ -1078,6 +1081,10 @@ class Dataset(traitlets.HasTraits):
             nz, dz = 1, 0.0
 
         prec = 8 if param["mytype"] == np.float64 else 4
+        if float_precision is None:
+            float_precision = 2 * prec
+
+        float_format = f".{float_precision}e"
 
         def get_filename(var_name, num):
             return self.filename_properties.get_filename_for_binary(var_name, num, self.data_path)
@@ -1098,7 +1105,8 @@ class Dataset(traitlets.HasTraits):
                 f.write("         </DataItem>\n")
                 f.write("         <!-- DxDyDz -->\n")
                 f.write('         <DataItem Format="XML" Dimensions="3">\n')
-                f.write(f"           {dz}  {dy}  {dx}\n")
+                array = " ".join(format(i, float_format) for i in (dz, dy, dx))
+                f.write(f"           {array}\n")
                 f.write("         </DataItem>\n")
                 f.write("     </Geometry>\n")
             else:
@@ -1107,13 +1115,16 @@ class Dataset(traitlets.HasTraits):
                 f.write("     </Topology>\n")
                 f.write('     <Geometry name="geo" Type="VXVYVZ">\n')
                 f.write(f'         <DataItem Dimensions="{nx}" NumberType="Float" Precision="{prec}" Format="XML">\n')
-                f.write(f'         {" ".join(map(str, self._mesh.x.vector)) if nx > 1 else 0.0}\n')
+                array = " ".join(format(i, float_format) for i in self._mesh.x.vector) if nx > 1 else "0.0"
+                f.write(f"         {array}\n")
                 f.write("          </DataItem>\n")
                 f.write(f'         <DataItem Dimensions="{ny}" NumberType="Float" Precision="{prec}" Format="XML">\n')
-                f.write(f'         {" ".join(map(str, self._mesh.y.vector)) if ny > 1 else 0.0}')
+                array = " ".join(format(j, float_format) for j in self._mesh.y.vector) if ny > 1 else "0.0"
+                f.write(f"         {array}\n")
                 f.write("          </DataItem>\n")
                 f.write(f'         <DataItem Dimensions="{nz}" NumberType="Float" Precision="{prec}" Format="XML">\n')
-                f.write(f'         {" ".join(map(str, self._mesh.z.vector)) if nz > 1 else 0.0}')
+                array = " ".join(format(k, float_format) for k in self._mesh.z.vector) if nz > 1 else "0.0"
+                f.write(f"         {array}\n")
                 f.write("         </DataItem>\n")
                 f.write("     </Geometry>\n")
             f.write("\n")
@@ -1121,7 +1132,7 @@ class Dataset(traitlets.HasTraits):
             f.write('         <Time TimeType="HyperSlab">\n')
             f.write('             <DataItem Format="XML" NumberType="Float" Dimensions="3">\n')
             f.write("             <!--Start, Stride, Count-->\n")
-            f.write(f"             0.0 {dt}\n")
+            f.write(f"             0.0 {format(dt, float_format)}\n")
             f.write("             </DataItem>\n")
             f.write("         </Time>\n")
             for suffix in tqdm(time_numbers, desc=xdmf_name):
