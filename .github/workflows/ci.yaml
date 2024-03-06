@@ -53,12 +53,11 @@ jobs:
         run: hatch run +py=${{ matrix.python-version }} test:pip freeze
       - name: Run tests
         run: |
-          hatch run +py=${{ matrix.python-version }} test:extended --cov-report=xml:coverage.${{ runner.os }}.${{ matrix.python-version }}.xml
-
+          hatch run +py=${{ matrix.python-version }} test:extended --cov-report=xml:coverage.${{ matrix.os }}.${{ matrix.python-version }}.xml
       - uses: actions/upload-artifact@v4
         with:
+          name: coverage-${{ matrix.os }}-${{ matrix.python-version }}
           path: coverage.*.xml
-          name: coverage-report
 
   sonarcloud:
     needs: test
@@ -69,7 +68,8 @@ jobs:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - uses: actions/download-artifact@v4
         with:
-          name: coverage-report
+          name: coverage-*
+          merge-multiple: true
       - name: Set project version
         run: |
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
