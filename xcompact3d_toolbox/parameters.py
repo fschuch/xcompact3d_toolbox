@@ -6,6 +6,7 @@ pre and post-processing.
 .. _XCompact3d:
     https://github.com/xcompact3d/Incompact3d
 """
+
 from __future__ import annotations
 
 import os.path
@@ -16,7 +17,7 @@ import traitlets
 
 from xcompact3d_toolbox.io import Dataset, i3d_to_dict, prm_to_dict
 from xcompact3d_toolbox.mesh import Istret, Mesh3D
-from xcompact3d_toolbox.param import boundary_condition, param
+from xcompact3d_toolbox.param import COORDS, boundary_condition, param
 
 
 class ParametersBasicParam(traitlets.HasTraits):
@@ -83,9 +84,7 @@ class ParametersBasicParam(traitlets.HasTraits):
         The exactly behavior may be different according to each flow configuration.
     """
 
-    nx, ny, nz = (
-        traitlets.Int().tag(group="BasicParam", desc=f"{name.upper()}-direction nodes") for name in "x y z".split()
-    )
+    nx, ny, nz = (traitlets.Int().tag(group="BasicParam", desc=f"{name.upper()}-direction nodes") for name in COORDS)
     """int: Number of mesh points.
 
     Notes
@@ -95,8 +94,7 @@ class ParametersBasicParam(traitlets.HasTraits):
     """
 
     xlx, yly, zlz = (
-        traitlets.Float().tag(group="BasicParam", desc=f"Size of the box in {name}-direction")
-        for name in "x y z".split()
+        traitlets.Float().tag(group="BasicParam", desc=f"Size of the box in {name}-direction") for name in COORDS
     )
     """float: Domain size.
     """
@@ -280,7 +278,7 @@ class ParametersBasicParam(traitlets.HasTraits):
 
     gravx, gravy, gravz = (
         traitlets.Float(default_value=0.0).tag(group="BasicParam", desc=f"Gravity unitary vector in {name}-direction")
-        for name in "x y z".split()
+        for name in COORDS
     )
     """float: Component of the unitary vector pointing in the gravity's direction.
     """
@@ -759,7 +757,7 @@ class ParametersExtras(traitlets.HasTraits):
     >>> prm.dataset.write_xdmf()
     """
 
-    dx, dy, dz = (traitlets.Float().tag() for _ in "x y z".split())
+    dx, dy, dz = (traitlets.Float().tag() for _ in COORDS)
     """float: Mesh resolution.
     """
 

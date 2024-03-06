@@ -5,6 +5,7 @@ import pytest
 import xarray as xr
 
 import xcompact3d_toolbox as x3d
+from xcompact3d_toolbox.param import COORDS
 
 
 @pytest.fixture
@@ -60,7 +61,7 @@ def snapshot(dataset):
     ds = xr.Dataset()
 
     ds["pp"] = xr_array("pp", **coords)
-    ds["u"] = xr_array("u", i="x y z".split(), **coords)
+    ds["u"] = xr_array("u", i=COORDS, **coords)
     ds["phi"] = xr_array("phi", n=[n + 1 for n in range(3)], **coords)
 
     dataset.write(ds)

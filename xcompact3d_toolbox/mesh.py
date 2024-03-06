@@ -2,9 +2,12 @@
 Note they are an attribute at :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
 so they work together with all the other parameters. They are presented here for reference.
 """
+
 from __future__ import annotations
 
 from enum import IntEnum
+from functools import partial
+from math import isclose
 
 import numpy as np
 import traitlets
@@ -485,7 +488,7 @@ class Mesh3D(traitlets.HasTraits):
         self.set(**kwargs)
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(\n" f"    x = {self.x},\n" f"    y = {self.y},\n" f"    z = {self.z},\n" ")"
+        return f"{self.__class__.__name__}(x = {self.x}, y = {self.y}, z = {self.z})"
 
     def __len__(self):
         """Make the coordinate work with the Python function :obj:`len`.
@@ -634,6 +637,8 @@ _possible_size_not_periodic = _get_possible_grid_values(is_periodic=False)
 
 
 def _stretching(istret, beta, yly, my, ny, *, return_auxiliary_variables=True):
+    close_enough = partial(isclose, abs_tol=1e-8, rel_tol=1e-8)
+
     yp = np.zeros(ny, dtype=param["mytype"])
     yeta = np.zeros_like(yp)
     ypi = np.zeros_like(yp)
@@ -649,7 +654,7 @@ def _stretching(istret, beta, yly, my, ny, *, return_auxiliary_variables=True):
     den = 2.0 * beta * yinf
     xnum = -yinf - np.sqrt(np.pi * np.pi * beta * beta + yinf * yinf)
     alpha = np.abs(xnum / den)
-    if alpha != 0.0:  # noqa: PLR2004
+    if not close_enough(alpha, 0.0):
         if istret == Istret.CENTER_REFINEMENT:
             yp[0] = 0.0
         if istret == Istret.BOTH_SIDES_REFINEMENT:
@@ -679,34 +684,34 @@ def _stretching(istret, beta, yly, my, ny, *, return_auxiliary_variables=True):
             if istret == Istret.CENTER_REFINEMENT:
                 if yeta[j] < 0.5:  # noqa: PLR2004
                     yp[j] = xnum1 - cst - yinf
-                if yeta[j] == 0.5:  # noqa: PLR2004
+                if close_enough(yeta[j], 0.5):
                     yp[j] = -yinf
                 if yeta[j] > 0.5:  # noqa: PLR2004
                     yp[j] = xnum1 + cst - yinf
             elif istret == Istret.BOTH_SIDES_REFINEMENT:
                 if yeta[j] < 0.5:  # noqa: PLR2004
                     yp[j] = xnum1 - cst + yly
-                if yeta[j] == 0.5:  # noqa: PLR2004
+                if close_enough(yeta[j], 0.5):
                     yp[j] = yly
                 if yeta[j] > 0.5:  # noqa: PLR2004
                     yp[j] = xnum1 + cst + yly
             elif istret == Istret.BOTTOM_REFINEMENT:
                 if yeta[j] < 0.5:  # noqa: PLR2004
                     yp[j] = (xnum1 - cst + yly) * 2.0
-                if yeta[j] == 0.5:  # noqa: PLR2004
+                if close_enough(yeta[j], 0.5):
                     yp[j] = yly * 2.0
                 if yeta[j] > 0.5:  # noqa: PLR2004
                     yp[j] = (xnum1 + cst + yly) * 2.0
             else:
                 msg = "Unsupported: invalid value for istret"
                 raise NotImplementedError(msg)
-    if alpha == 0.0:  # noqa: PLR2004
+    if close_enough(alpha, 0.0):
         yp[0] = -1.0e10
         for j in range(1, ny):
             yeta[j] = j / ny
             yp[j] = -beta * np.cos(np.pi * yeta[j]) / np.sin(yeta[j] * np.pi)
 
-    if alpha != 0.0:  # noqa: PLR2004
+    if not close_enough(alpha, 0.0):
         for j in range(ny):
             if istret == Istret.CENTER_REFINEMENT:
                 yetai[j] = (j + 0.5) * (1.0 / my)
@@ -724,26 +729,26 @@ def _stretching(istret, beta, yly, my, ny, *, return_auxiliary_variables=True):
             if istret == Istret.CENTER_REFINEMENT:
                 if yetai[j] < 0.5:  # noqa: PLR2004
                     ypi[j] = xnum1 - cst - yinf
-                elif yetai[j] == 0.5:  # noqa: PLR2004
+                elif close_enough(yetai[j], 0.5):
                     ypi[j] = 0.0 - yinf
                 elif yetai[j] > 0.5:  # noqa: PLR2004
                     ypi[j] = xnum1 + cst - yinf
             elif istret == Istret.BOTH_SIDES_REFINEMENT:
                 if yetai[j] < 0.5:  # noqa: PLR2004
                     ypi[j] = xnum1 - cst + yly
-                elif yetai[j] == 0.5:  # noqa: PLR2004
+                elif close_enough(yetai[j], 0.5):
                     ypi[j] = 0.0 + yly
                 elif yetai[j] > 0.5:  # noqa: PLR2004
                     ypi[j] = xnum1 + cst + yly
             elif istret == Istret.BOTTOM_REFINEMENT:
                 if yetai[j] < 0.5:  # noqa: PLR2004
                     ypi[j] = (xnum1 - cst + yly) * 2.0
-                elif yetai[j] == 0.5:  # noqa: PLR2004
+                elif close_enough(yetai[j], 0.5):
                     ypi[j] = (0.0 + yly) * 2.0
                 elif yetai[j] > 0.5:  # noqa: PLR2004
                     ypi[j] = (xnum1 + cst + yly) * 2.0
 
-    if alpha == 0.0:  # noqa: PLR2004
+    if close_enough(alpha, 0.0):
         ypi[0] = -1e10
         for j in range(1, ny):
             yetai[j] = j * (1.0 / ny)

@@ -15,6 +15,7 @@ import traitlets
 from IPython.display import display
 from traitlets import link
 
+from xcompact3d_toolbox.param import COORDS
 from xcompact3d_toolbox.parameters import Parameters
 
 
@@ -248,7 +249,7 @@ class ParametersGui(Parameters):
                 self._widgets[name].description_tooltip = description
 
         # Creating an arrange with all widgets
-        dim = "x y z".split()
+        dim = COORDS
 
         self.ipyview = widgets.VBox(
             [

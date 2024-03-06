@@ -3,6 +3,7 @@ import unittest
 
 import pytest
 
+from xcompact3d_toolbox.param import COORDS
 from xcompact3d_toolbox.parameters import Parameters
 
 
@@ -21,7 +22,7 @@ def test_io(tmp_path):
     assert expected_values == actual_values
 
 
-@pytest.mark.parametrize("dimension", "x y z".split())
+@pytest.mark.parametrize("dimension", COORDS)
 def test_observe_resolution_and_bc(dimension: str):
     prm = Parameters()
 

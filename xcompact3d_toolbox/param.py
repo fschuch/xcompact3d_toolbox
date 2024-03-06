@@ -3,6 +3,9 @@ from numpy import float64
 param = {"mytype": float64}
 
 
+COORDS = ["x", "y", "z"]
+
+
 def boundary_condition(prm, var=None):
     default = {
         d: {
