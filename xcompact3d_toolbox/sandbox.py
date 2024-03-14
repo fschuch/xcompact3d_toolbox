@@ -28,6 +28,14 @@ import xarray as xr
 from xcompact3d_toolbox.param import param
 
 
+class DimensionNotFoundError(KeyError):
+    """Raised when a dimension is not found in the DataArray."""
+
+    def __init__(self, dim):
+        self.dim = dim
+        super().__init__('Invalid key for "kwargs", "{dim}" is not a valid dimension')
+
+
 def init_epsi(prm, *, dask=False):
     """Initializes the :math:`\\epsilon` arrays that define the solid geometry
     for the Immersed Boundary Method.
@@ -493,8 +501,7 @@ class Geometry:
 
         for key in kwargs:
             if key not in self._data_array.dims:
-                msg = 'Invalid key for "kwargs", it should be a valid dimension'
-                raise KeyError(msg)
+                raise DimensionNotFoundError(key)
 
         dis = 0.0
         for d in self._data_array.dims:
@@ -545,8 +552,7 @@ class Geometry:
 
         for key in kwargs:
             if key not in self._data_array.dims:
-                msg = 'Invalid key for "kwargs", it should be a valid dimension'
-                raise KeyError(msg)
+                raise KeyError(key)
 
         tmp = xr.zeros_like(self._data_array)
 
@@ -592,8 +598,7 @@ class Geometry:
         """
         for key in kwargs:
             if key not in self._data_array.dims:
-                msg = 'Invalid key for "kwargs", it should be a valid dimension'
-                raise KeyError(msg)
+                raise DimensionNotFoundError(key)
 
         center = {kwargs.get(key, 0.0) for key in self._data_array.dims}
 
@@ -648,8 +653,7 @@ class Geometry:
         """
         for key in kwargs:
             if key not in self._data_array.dims:
-                msg = 'Invalid key for "kwargs", it should be a valid dimension'
-                raise KeyError(msg)
+                raise DimensionNotFoundError(key)
 
         dis = 0.0
         for d in self._data_array.dims:
@@ -703,8 +707,7 @@ class Geometry:
 
         for key in kwargs:
             if key not in self._data_array.dims:
-                msg = 'Invalid key for "kwargs", it should be a valid dimension'
-                raise KeyError(msg)
+                raise DimensionNotFoundError(key)
 
         if "x" not in kwargs:
             kwargs["x"] = 1.0
