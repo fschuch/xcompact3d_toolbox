@@ -21,6 +21,7 @@ import os.path
 import numba
 import numpy as np
 import xarray as xr
+from loguru import logger
 
 
 def gene_epsi_3d(epsi_in_dict, prm):
@@ -256,11 +257,12 @@ def gene_epsi_3d(epsi_in_dict, prm):
             xr.zeros_like(ds[f"nobj_{direction}"]).where(ds[f"nobj_{direction}"] == ds[f"nobjraf_{direction}"], 1).sum()
         )
 
-        # TODO: Add logging
-        # print(f"{direction}")
-        # print(f'       nobjraf : {ds[f"nobjmax_{direction}"].values}')
-        # print(f'    nobjmaxraf : {ds[f"nobjmaxraf_{direction}"].values}')
-        # print(f'           bug : {ds[f"ibug_{direction}"].values}\n')
+        logger.debug(
+            f"{direction}\n"
+            f"       nobjraf : {ds[f'nobjmax_{direction}'].values}\n"
+            f"    nobjmaxraf : {ds[f'nobjmaxraf_{direction}'].values}\n"
+            f"           bug : {ds[f'ibug_{direction}'].values}\n"
+        )
 
     max_obj = np.max([ds.nobjmax_x.values, ds.nobjmax_y.values, ds.nobjmax_z.values])
     ds = ds.assign_coords(obj=range(max_obj), obj_aux=range(-1, max_obj))
@@ -283,8 +285,7 @@ def gene_epsi_3d(epsi_in_dict, prm):
 
         ds[f"nxipif_{direction}"], ds[f"nxfpif_{direction}"], ising = verif_epsi(epsi, direction)
 
-        # TODO: Add logging
-        # print(f"number of points with potential problem in {direction} : {ising.sum().values}")
+        logger.debug(f"number of points with potential problem in {direction} : {ising.sum().values}")
 
     write_geomcomplex(prm, ds)
 

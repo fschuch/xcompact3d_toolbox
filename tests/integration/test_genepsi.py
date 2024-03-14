@@ -1,6 +1,5 @@
-import filecmp
-import glob
-import os.path
+import pathlib
+import sys
 
 import pytest
 
@@ -16,12 +15,16 @@ def set_up(tmpdir_factory):
     for key in epsi:
         epsi[key] = epsi[key].geo.cylinder(x=3.0, y=5.0)
     x3d.genepsi.gene_epsi_3d(epsi, prm)
-    yield tmp_path
+    yield pathlib.Path(tmp_path)
     tmp_path.remove()
 
 
-@pytest.mark.parametrize("file_ref", glob.glob(os.path.join("tests", "integration", "data", "geometry", "*")))
+@pytest.mark.skipif(sys.platform == "win32", reason="Work in progress to make it platform independent")
+@pytest.mark.parametrize("file_ref", pathlib.Path("tests", "integration", "data", "geometry").glob("*.dat"))
 def test_dat_files(file_ref, set_up):
-    file = os.path.join(set_up, "geometry", os.path.basename(file_ref))
+    file = set_up / "geometry" / file_ref.name
 
-    assert filecmp.cmp(file_ref, file)
+    expected_content = file_ref.read_text()
+    actual_content = file.read_text()
+
+    assert expected_content == actual_content

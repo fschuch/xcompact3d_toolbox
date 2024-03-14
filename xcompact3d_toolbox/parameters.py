@@ -10,10 +10,10 @@ pre and post-processing.
 from __future__ import annotations
 
 import os.path
-import warnings
 
 import numpy as np
 import traitlets
+from loguru import logger
 
 from xcompact3d_toolbox.io import Dataset, i3d_to_dict, prm_to_dict
 from xcompact3d_toolbox.mesh import Istret, Mesh3D
@@ -1155,7 +1155,7 @@ class Parameters(
         for key, arg in kwargs.items():
             if key not in self.trait_names():
                 if raise_warning:
-                    warnings.warn(f"{key} is not a valid parameter and was not loaded", stacklevel=1)
+                    logger.warning(f"{key} is not a valid parameter and was not loaded")
                 else:
                     msg = f"{key} is not a valid parameter"
                     raise KeyError(msg)
