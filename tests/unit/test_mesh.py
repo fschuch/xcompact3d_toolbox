@@ -23,6 +23,15 @@ def coordinate():
     return x3d.mesh.Coordinate()
 
 
+def test_coordinate_set__fail_invalid_name(coordinate):
+    with pytest.raises(KeyError, match=".* is not a valid parameter"):
+        coordinate.set(invalid_name=None)
+
+
+def test_coordinate_len(coordinate):
+    assert len(coordinate) == coordinate.grid_size
+
+
 @pytest.mark.parametrize("length", [1.0, 10.0, 100.0])
 @pytest.mark.parametrize("grid_size", [101, 201])
 @pytest.mark.parametrize("is_periodic", [True, False])

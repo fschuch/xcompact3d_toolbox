@@ -32,6 +32,13 @@ def test_data_simps(array, dataset, dims):
     dataset.x3d.simps(*dims)
 
 
+def test_data_simps__invalid_dims(array, dataset):
+    with pytest.raises(ValueError, match='Invalid value for "args", it should be a valid dimension'):
+        array.x3d.simps("not-a-dim")
+    with pytest.raises(ValueError, match='Invalid value for "args", it should be a valid dimension'):
+        dataset.x3d.simps("not-a-dim")
+
+
 @pytest.mark.parametrize("dims", ["x", "y", "z"])
 def test_data_first_derivative(array, dims):
     array.x3d.first_derivative(*dims)
@@ -40,3 +47,10 @@ def test_data_first_derivative(array, dims):
 @pytest.mark.parametrize("dims", ["x", "y", "z"])
 def test_data_second_derivative(array, dims):
     array.x3d.second_derivative(*dims)
+
+
+def test_data_pencil_decomposition__invalid_dims(array, dataset):
+    with pytest.raises(ValueError, match='Invalid value for "args", it should be a valid dimension'):
+        array.x3d.pencil_decomp("not-a-dim")
+    with pytest.raises(ValueError, match='Invalid value for "args", it should be a valid dimension'):
+        dataset.x3d.pencil_decomp("not-a-dim")

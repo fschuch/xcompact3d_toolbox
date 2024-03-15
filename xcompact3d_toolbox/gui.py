@@ -43,7 +43,8 @@ def _divisor_generator(n):
     [0, 1, 2, 4, 8]
 
     """
-    large_divisors = [0]
+    large_divisors = []
+    yield 0
     for i in range(1, int(math.sqrt(n) + 1)):
         if n % i == 0:
             yield i
@@ -328,21 +329,22 @@ class ParametersGui(Parameters):
 
     @traitlets.observe("p_row", "p_col", "ncores")
     def _observe_2decomp(self, change):
-        if change["name"] == "ncores":
-            possible = list(_divisor_generator(change["new"]))
-            self._possible_p_row = possible
-            self._possible_p_col = possible
-            self.p_row, self.p_col = 0, 0
-        elif change["name"] == "p_row":
-            try:
-                self.p_col = self.ncores // self.p_row
-            except ZeroDivisionError:
-                self.p_col = 0
-        elif change["name"] == "p_col":
-            try:
-                self.p_row = self.ncores // self.p_col
-            except ZeroDivisionError:
-                self.p_row = 0
+        with self.hold_trait_notifications():
+            if change["name"] == "ncores":
+                possible = list(_divisor_generator(change["new"]))
+                self.p_row, self.p_col = 0, 0
+                self._possible_p_row = possible
+                self._possible_p_col = possible
+            elif change["name"] == "p_row":
+                try:
+                    self.p_col = self.ncores // self.p_row
+                except ZeroDivisionError:
+                    self.p_col = 0
+            elif change["name"] == "p_col":
+                try:
+                    self.p_row = self.ncores // self.p_col
+                except ZeroDivisionError:
+                    self.p_row = 0
 
     def link_widgets(self) -> None:
         """Creates a two-way link between the value of an attribute and its widget.

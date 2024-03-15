@@ -54,6 +54,20 @@ def cube():
     return cube
 
 
+def test_init_epsi__no_ibm():
+    prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=0)
+    expected_result = {}
+    actual_result = x3d.init_epsi(prm)
+    assert expected_result == actual_result
+
+
+def test_init_epsi__ibm():
+    prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=1)
+
+    actual_result = x3d.init_epsi(prm)
+    assert actual_result.keys() == {"epsi"}
+
+
 @hypothesis.settings(deadline=None)
 @hypothesis.given(
     x=hypothesis.strategies.floats(min_value=-1e6, max_value=1e6, allow_nan=False, allow_infinity=False),

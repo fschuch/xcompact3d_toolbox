@@ -20,9 +20,15 @@ def filename_properties():
 @pytest.mark.parametrize("number_of_digits", [3, 6])
 def test_set_get_filename_from_bin(filename_properties, prefix, counter, separator, extension, number_of_digits):
     filename_properties.set(separator=separator, file_extension=extension, number_of_digits=number_of_digits)
-    assert (counter, prefix) == filename_properties.get_info_from_filename(
-        filename_properties.get_filename_for_binary(prefix, counter)
-    )
+    filename = filename_properties.get_filename_for_binary(prefix, counter)
+    assert (counter, prefix) == filename_properties.get_info_from_filename(filename)
+    assert counter == filename_properties.get_num_from_filename(filename)
+    assert prefix == filename_properties.get_name_from_filename(filename)
+
+
+def test_file_name_properties_set__fail_invalid_name(filename_properties):
+    with pytest.raises(KeyError, match=".* is not a valid argument for FilenameProperties"):
+        filename_properties.set(invalid_name=None)
 
 
 @pytest.fixture
@@ -85,6 +91,12 @@ def test_dataset_getitem_str(dataset, snapshot):
 )
 def test_dataset_getitem_slice(dataset, snapshot, slice_value):
     xr.testing.assert_equal(snapshot.isel(t=slice_value), dataset[slice_value])
+
+
+@pytest.mark.parametrize("slice_value", [None, 3.5])
+def test_dataset_getitem_slice__type_error(dataset, slice_value):
+    with pytest.raises(TypeError, match="Dataset indices should be integers, string or slices"):
+        dataset[slice_value]
 
 
 def test_dataset_iter(dataset, snapshot):
