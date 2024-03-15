@@ -1,4 +1,5 @@
 import filecmp
+from textwrap import dedent
 
 import numpy as np
 import pytest
@@ -112,3 +113,36 @@ def test_dataset_write_xdmf(dataset, snapshot, istret):  # noqa: ARG001
 
     dataset.write_xdmf(filename, float_precision=6)
     assert filecmp.cmp(filename, f"./tests/unit/data/{filename}")
+
+
+def test_prm_to_dict(tmp_path):
+    prm_content = dedent(
+        """
+        # Comments
+        32 # nx # some explanation
+        64 # ny # some explanation
+        128 # nz # some explanation
+        'bar' # foo
+        .false. # flag
+        2.5 # float
+        1 # my_list(1)
+        2 # my_list(2)
+        3 # my_list(3)
+        # More comments
+        """
+    )
+    prm_file = tmp_path / "test.prm"
+    prm_file.write_text(prm_content)
+
+    expected = {
+        "nx": 32,
+        "ny": 64,
+        "nz": 128,
+        "foo": "bar",
+        "flag": False,
+        "float": 2.5,
+        "my_list": [1, 2, 3],
+    }
+    actual = x3d.io.prm_to_dict(prm_file)
+
+    assert expected == actual
