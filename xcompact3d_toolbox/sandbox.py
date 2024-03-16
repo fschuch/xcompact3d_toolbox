@@ -33,7 +33,7 @@ class DimensionNotFoundError(KeyError):
 
     def __init__(self, dim):
         self.dim = dim
-        super().__init__('Invalid key for "kwargs", "{dim}" is not a valid dimension')
+        super().__init__(f'Invalid key for "kwargs", "{dim}" is not a valid dimension')
 
 
 def init_epsi(prm, *, dask=False):
