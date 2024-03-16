@@ -34,7 +34,7 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 - `io.Dataset.data_path` is now obtained automatically from `parameters.Parameter.filename` at initialization (i.g., if `filename = "./example/input.i3d"` then `data_path = "./example/data/"`). Of course, `data_path` can be changed to any value after that. By [@fschuch](https://github.com/fschuch).
 - `io.Dataset.load_wind_turbine_data` now have a default location for `file_pattern`. attributes were included for the coordinate time. By [@fschuch](https://github.com/fschuch).
-- `io.Dataset.set` now accepts keyword arguments to send to `io.FilenameProperties.set`, for a more concise sintaxe. By [@fschuch](https://github.com/fschuch).
+- `io.Dataset.set` now accepts keyword arguments to send to `io.FilenameProperties.set`, for a more concise syntax. By [@fschuch](https://github.com/fschuch).
 - The default return from `xcompact3d.param.boundary_condition` now takes into consideration whether the domain is periodic or not, by [@fschuch](https://github.com/fschuch).
 
 ### Fixed
