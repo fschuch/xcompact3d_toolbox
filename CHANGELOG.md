@@ -14,7 +14,7 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 ### Fixed
 
-- Specified the version for netcdf4, to avoid a issues with the latest version ([#13](https://github.com/fschuch/xcompact3d_toolbox/issues/13)), by [@fschuch](https://github.com/fschuch).
+- Specified the version for netcdf4, to avoid issues with the latest version ([#13](https://github.com/fschuch/xcompact3d_toolbox/issues/13)), by [@fschuch](https://github.com/fschuch).
 
 ### Modified
 
