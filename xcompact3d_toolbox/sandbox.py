@@ -552,7 +552,7 @@ class Geometry:
 
         for key in kwargs:
             if key not in self._data_array.dims:
-                raise KeyError(key)
+                raise DimensionNotFoundError(key)
 
         tmp = xr.zeros_like(self._data_array)
 

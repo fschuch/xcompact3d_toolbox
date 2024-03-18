@@ -43,6 +43,10 @@ visu = [
 ]
 
 [project.urls]
+Changelog = "https://github.com/fschuch/xcompact3d_toolbox/blob/main/CHANGELOG.md"
+Documentation = "https://xcompact3d-toolbox.readthedocs.io/"
+Issues = "https://github.com/fschuch/xcompact3d_toolbox/issues"
+Repository = "https://github.com/fschuch/xcompact3d_toolbox"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
@@ -55,7 +59,7 @@ minversion = "8.0"
 
 [tool.coverage.run]
 branch = true
-source_pkgs = ["xcompact3d_toolbox", "tests"]
+source = ["xcompact3d_toolbox", "tests"]
 omit = ["xcompact3d_toolbox/_version.py"]
 
 [tool.coverage.report]

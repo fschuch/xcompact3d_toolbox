@@ -10,6 +10,8 @@ on:
 jobs:
   prepare-for-release:
     runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ github.event.inputs.version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -22,10 +24,10 @@ jobs:
         run: python -m pip install hatch
 
       - name: Update Package Version
-        run: hatch version ${{ github.event.inputs.version }}
+        run: hatch version "$VERSION"
 
       - name: Update Changelog
-        run: hatch run changelog:build --yes --version ${{ github.event.inputs.version }}
+        run: hatch run changelog:build --yes --version "$VERSION"
 
       - uses: peter-evans/create-pull-request@v4
         name: Create Pull Request

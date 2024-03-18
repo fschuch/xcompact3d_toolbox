@@ -26,13 +26,13 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 - Add `sandbox.Geometry.from_stl`. It reads a `stl` file and is able to compute what mesh points are inside or outside the geometry, so we can specify the geometry for a very customized immersed boundary method. By [@fschuch](https://github.com/fschuch) and [@nbeb](https://github.com/nbeb).
 - Add `xcompact3d_toolbox.tutorial`, making it easier to get datasets for documentation and tutorials, by [@fschuch](https://github.com/fschuch).
-- Add `xcompact3d_toolbox.Parameters.from_string`, an useful method to get the parameters from the datasets at the tutorials, by [@fschuch](https://github.com/fschuch).
+- Add `xcompact3d_toolbox.Parameters.from_string`, a useful method to get the parameters from the datasets at the tutorials, by [@fschuch](https://github.com/fschuch).
 - Add tutorial *Computing and Plotting*, by [@fschuch](https://github.com/fschuch).
 - Add tutorial *Reading and writing files*, by [@fschuch](https://github.com/fschuch).
 
 ### Modified
 
-- `io.Dataset.data_path` is now obtained automatically from `parameters.Parameter.filename` at initialization (i.g., if `filename = "./example/input.i3d"` then `data_path = "./example/data/"`). Of course, `data_path` can be changed to any value after that. By [@fschuch](https://github.com/fschuch).
+- `io.Dataset.data_path` is now obtained automatically from `parameters.Parameter.filename` at initialization (e.g., if `filename = "./example/input.i3d"` then `data_path = "./example/data/"`). Of course, `data_path` can be changed to any value after that. By [@fschuch](https://github.com/fschuch).
 - `io.Dataset.load_wind_turbine_data` now have a default location for `file_pattern`. Attributes were included for the coordinate time. By [@fschuch](https://github.com/fschuch).
 - `io.Dataset.set` now accepts keyword arguments to send to `io.FilenameProperties.set`, for a more concise syntax. By [@fschuch](https://github.com/fschuch).
 - The default return from `xcompact3d.param.boundary_condition` now takes into consideration whether the domain is periodic or not, by [@fschuch](https://github.com/fschuch).
