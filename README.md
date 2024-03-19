@@ -16,7 +16,7 @@ The physical and computational parameters are built on top of [traitlets](https:
 a framework that lets Python classes have attributes with type checking, dynamically calculated default values, and ‘on change’ callbacks.
 In addition to [ipywidgets](https://ipywidgets.readthedocs.io/en/latest/) for an user friendly interface.
 
-Data structure is provided by [xarray](http://xarray.pydata.org/en/stable/) (see [Why xarray?](http://xarray.pydata.org/en/stable/why-xarray.html)), that introduces labels in the form of dimensions, coordinates and attributes on top of raw [NumPy](https://numpy.org/)-like arrays, which allows for a more intuitive, more concise, and less error-prone developer experience. It integrates tightly with [dask](https://dask.org/) for parallel computing and [hvplot](https://hvplot.holoviz.org/user_guide/Gridded_Data.html) for interactive data visualization.
+Data structure is provided by [xarray](https://docs.xarray.dev/en/stable) (see [Why xarray?](https://docs.xarray.dev/en/stable/getting-started-guide/why-xarray.html)), that introduces labels in the form of dimensions, coordinates and attributes on top of raw [NumPy](https://numpy.org/)-like arrays, which allows for a more intuitive, more concise, and less error-prone developer experience. It integrates tightly with [dask](https://dask.org/) for parallel computing and [hvplot](https://hvplot.holoviz.org/user_guide/Gridded_Data.html) for interactive data visualization.
 
 Finally, Xcompact3d-toolbox is fully integrated with the new *Sandbox Flow Configuration*.
 The idea is to easily provide everything that XCompact3d needs from a [Jupyter Notebook](https://jupyter.org/), like initial conditions, solid geometry, boundary conditions, and the parameters ([see examples](https://xcompact3d-toolbox.readthedocs.io/en/latest/tutorial.html#sandbox-examples)).
@@ -111,7 +111,7 @@ Click on any link above to launch [Binder](https://mybinder.org/) and interact w
   ```
 
 - There are many ways to load the arrays produced by your numerical simulation, so you can choose what best suits your post-processing application.
-  All arrays are wrapped into [xarray](http://xarray.pydata.org/en/stable/) objects, with many useful methods for indexing, comparisons, reshaping and reorganizing, computations and plotting.
+  All arrays are wrapped into [xarray](http://docs.xarray.dev/en/stable) objects, with many useful methods for indexing, comparisons, reshaping and reorganizing, computations and plotting.
   See the examples:
 
 - Load one array from the disc:

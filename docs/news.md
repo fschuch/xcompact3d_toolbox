@@ -1,16 +1,15 @@
-# Changelog
+# What’s New
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this page.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Intended Effort Versioning](https://jacobtomlinson.dev/effver/) (EffVer for short).
-
-This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the changes for the upcoming release can be found in [changelog.d](https://github.com/fschuch/xcompact3d_toolbox/tree/main/changelog.d/).
+The changes for the upcoming release can be found in [changelog.d](https://github.com/fschuch/xcompact3d_toolbox/tree/main/changelog.d/).
 
 <!-- WARNING: This file is auto-generated. Do not manually update this file. -->
 
 <!-- towncrier release notes start -->
 
-## [1.1.1](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/1.1.1) - 2023-08-10
+## [1.1.1](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.1.1) - 2023-08-10
 
 ### Fixed
 
@@ -18,9 +17,9 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 ### Modified
 
-- Support for parallel computing with dask was extended at `genepsi.gene_epsi_3D`, by [@fschuch](https://github.com/fschuch).
+- Support for parallel computing with dask was extended at `xcompact3d_toolbox.genepsi.gene_epsi_3D`, by [@fschuch](https://github.com/fschuch).
 
-## [1.1.0](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/1.1.0) - 2021-10-07
+## [1.1.0](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.1.0) - 2021-10-07
 
 ### Added
 
@@ -35,14 +34,14 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 - `io.Dataset.data_path` is now obtained automatically from `parameters.Parameter.filename` at initialization (e.g., if `filename = "./example/input.i3d"` then `data_path = "./example/data/"`). Of course, `data_path` can be changed to any value after that. By [@fschuch](https://github.com/fschuch).
 - `io.Dataset.load_wind_turbine_data` now have a default location for `file_pattern`. Attributes were included for the coordinate time. By [@fschuch](https://github.com/fschuch).
 - `io.Dataset.set` now accepts keyword arguments to send to `io.FilenameProperties.set`, for a more concise syntax. By [@fschuch](https://github.com/fschuch).
-- The default return from `xcompact3d.param.boundary_condition` now takes into consideration whether the domain is periodic or not, by [@fschuch](https://github.com/fschuch).
+- The default return from `xcompact3d_toolbox.param.boundary_condition` now takes into consideration whether the domain is periodic or not, by [@fschuch](https://github.com/fschuch).
 
 ### Fixed
 
-- `fix_bug` at [gene_epsi_3D](xcompact3d-toolbox/genepsi.py) was not working properly ([#3](https://github.com/fschuch/xcompact3d_toolbox/issues/3)), by [@fschuch](https://github.com/fschuch).
+- `fix_bug` at `xcompact3d-toolbox.gene_epsi_3D` was not working properly ([#3](https://github.com/fschuch/xcompact3d_toolbox/issues/3)), by [@fschuch](https://github.com/fschuch).
 - `xcompact3d.io.Dataset.load_array` was not working for files that do not change in time, like `./data/geometry/epsilon.bin`, by [@fschuch](https://github.com/fschuch).
 
-## [1.0.1](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/1.0.1) - 2021-09-23
+## [1.0.1](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.0.1) - 2021-09-23
 
 ### Modified
 
@@ -56,7 +55,7 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 - `Black` version was not working properly at `setup.py`, by [@fschuch](https://github.com/fschuch).
 
-## [1.0.0](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/1.0.0) - 2021-09-14
+## [1.0.0](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.0.0) - 2021-09-14
 
 Xcompact3d-toolbox has evolved considerably in the last year.
 The pre-release version has been employed in CFD research projects, and the feedback from the users helped to improve its interfaces and functionalities.
@@ -86,13 +85,13 @@ With this, Xcompact3d-toolbox is ready for its first stable release.
 - Suppressed warning from `tqdm`, by [@fschuch](https://github.com/fschuch).
 - The output format from `gene_epsi_3D` has changed, fixing some compatibility issues with XCompact3d as well (see [#51](https://github.com/xcompact3d/Incompact3d/pull/51)), by [@fschuch](https://github.com/fschuch).
 
-## [0.1.11](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.1.11) - 2021-02-12
+## [0.1.11](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.11) - 2021-02-12
 
 ### Fixed
 
 - Fix #8, a little incompatibility problem with xcompact3d was fixed, by [@fschuch](https://github.com/fschuch).
 
-## [0.1.10](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.1.10) - 2021-02-11
+## [0.1.10](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.10) - 2021-02-11
 
 ### Added
 
@@ -112,7 +111,7 @@ With this, Xcompact3d-toolbox is ready for its first stable release.
 - Fix #5, Bug at Ahmed body when using double precision, by [@fschuch](https://github.com/fschuch).
 - Fix #6, The files describing the geometry are incompatible when running on Linux, by [@fschuch](https://github.com/fschuch).
 
-## [0.1.9](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.1.9) - 2020-10-09
+## [0.1.9](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.9) - 2020-10-09
 
 ### Added
 
@@ -128,25 +127,25 @@ With this, Xcompact3d-toolbox is ready for its first stable release.
 
 - First derivative was incorrect when `ncl1=1` and `ncln=2`. by [@fschuch](https://github.com/fschuch).
 
-## [0.1.8](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.1.8) - 2020-09-29
+## [0.1.8](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.8) - 2020-09-29
 
 ### Fixed
 
 - `param.mytype` was not updating properly [#4](https://github.com/fschuch/xcompact3d_toolbox/issues/4), by [@fschuch](https://github.com/fschuch).
 
-## [0.1.7](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.1.7) - 2020-08-28
+## [0.1.7](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.7) - 2020-08-28
 
 ### Fixed
 
-- BC parameters at ([param.py](xcompact3d_toolbox%5Cparam.py)), by [@fschuch](https://github.com/fschuch).
+- BC parameters at `xcompact3d_toolbox.param`, by [@fschuch](https://github.com/fschuch).
 
-## [0.1.6](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.1.6) - 2020-08-28
+## [0.1.6](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.6) - 2020-08-28
 
 ### Fixed
 
-- [python-publish](.github/workflows/python-package.yml) action does not trigger if the release was first drafted, then published, by [@fschuch](https://github.com/fschuch).
+- `.github/workflows/python-package.yml` action does not trigger if the release was first drafted, then published, by [@fschuch](https://github.com/fschuch).
 
-## [0.1.5](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.1.5) - 2020-08-28
+## [0.1.5](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.5) - 2020-08-28
 
 ### Added
 
@@ -157,7 +156,7 @@ With this, Xcompact3d-toolbox is ready for its first stable release.
 - `get_mesh`, by [@fschuch](https://github.com/fschuch).
 - `write_xdmf`, by [@fschuch](https://github.com/fschuch).
 
-## [0.1.4](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.1.4) - 2020-08-20
+## [0.1.4](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.4) - 2020-08-20
 
 ### Added
 
@@ -167,46 +166,46 @@ With this, Xcompact3d-toolbox is ready for its first stable release.
 
 - Examples for Sandbox flow configuration (by [@fschuch](https://github.com/fschuch)):
 
-  - [Turbidity Current in Axisymmetric Configuration](docs%5Cexamples%5CAxisymmetric_flow.ipynb);
-  - [Flow Around a Complex Body](docs%5Cexamples%5CCylinder.ipynb).
+  - Turbidity Current in Axisymmetric Configuration: `docs/examples/Axisymmetric_flow.ipynb`;
+  - Flow Around a Complex Body: `docs/examples/Cylinder.ipynb`.
 
 - Tutorials (by [@fschuch](https://github.com/fschuch)):
 
-  - [Parameters](docs%5Ctutorial%5Cparameters.ipynb).
+  - Parameters: `docs/tutorial/parameters.ipynb`.
 
 - Integration with [Read the Docs](https://xcompact3d-toolbox.readthedocs.io/en/latest/), by [@fschuch](https://github.com/fschuch).
 
 ### Changed
 
 - Code style changed to [black](https://github.com/psf/black), by [@fschuch](https://github.com/fschuch).
-- `param = {'mytype': np.float64}` changed to just `mytype = float64` ([param.py](xcompact3d_toolbox%5Cparam.py)), by [@fschuch](https://github.com/fschuch).
+- `param = {'mytype': np.float64}` changed to just `mytype = float64` in `xcompact3d_toolbox.param.py`, by [@fschuch](https://github.com/fschuch).
 
-## [0.1.3](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.1.3) - 2020-08-17
+## [0.1.3](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.3) - 2020-08-17
 
 No changes, just trying to get familiar with workflows and the release to Pypi.
 
-## [0.1.2](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.1.2) - 2020-08-17
+## [0.1.2](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.2) - 2020-08-17
 
 ### Added
 
-- Unittest for observations and validations at [parameters.py](./xcompact3d_toolbox/parameters.py), by [@fschuch](https://github.com/fschuch).
+- Unittest for observations and validations at `xcompact3d_toolbox.parameters`, by [@fschuch](https://github.com/fschuch).
 
 ### Changed
 
 - Temporarily disabling the link between parameters and their widgets (see [#2](https://github.com/fschuch/xcompact3d_toolbox/issues/2)), by [@fschuch](https://github.com/fschuch).
 
-## [0.1.1](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.1.1) - 2020-08-14
+## [0.1.1](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.1) - 2020-08-14
 
 No changes, just trying to get familiar with workflows and the release to Pypi.
 
-## [0.0.0](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/0.0.0) - 2020-08-14
+## [0.0.0](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.0.0) - 2020-08-14
 
 ### Added
 
 - CHANGELOG.md by [@fschuch](https://github.com/fschuch).
 - `class Parameters`  built on top of [traitlets](https://traitlets.readthedocs.io/en/stable/index.html), for type checking, dynamically calculated default values, and ‘on change’ callbacks, by [@fschuch](https://github.com/fschuch).
 - [ipywidgets](https://ipywidgets.readthedocs.io/en/latest/) for all relevant parameters and two-ways linking with [traitlets](https://traitlets.readthedocs.io/en/stable/index.html) variables, by [@fschuch](https://github.com/fschuch).
-- Accessors for [xarray](http://xarray.pydata.org/en/stable/)'s `Dataset` and `DataArray`, making possible high-order derivatives (with appropriated boundary conditions), I/O, parallel execution with pencil decomposition (powered by [dask](https://dask.org/)) and integration with `scipy.integrate.simps` and `scipy.integrate.cumtrapz`. By [@fschuch](https://github.com/fschuch).
+- Accessors for [xarray](https://docs.xarray.dev/en/stable)'s `Dataset` and `DataArray`, making possible high-order derivatives (with appropriated boundary conditions), I/O, parallel execution with pencil decomposition (powered by [dask](https://dask.org/)) and integration with `scipy.integrate.simps` and `scipy.integrate.cumtrapz`. By [@fschuch](https://github.com/fschuch).
 - Ported genepsi.f90 to genepsi.py (powered by [Numba](http://numba.pydata.org/)), generating all the files necessary for our customized Immersed Boundary Method, by [@fschuch](https://github.com/fschuch).
 - Support to *Sandbox Flow Configuration* (see [fschuch/Xcompact3d](https://github.com/fschuch/Xcompact3d/)), by [@fschuch](https://github.com/fschuch).
 - Ahmed body as benchmark geometry, mirror and plotting tools, by [@momba98](https://github.com/momba98).

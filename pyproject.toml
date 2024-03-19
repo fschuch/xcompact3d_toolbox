@@ -43,7 +43,7 @@ visu = [
 ]
 
 [project.urls]
-Changelog = "https://github.com/fschuch/xcompact3d_toolbox/blob/main/CHANGELOG.md"
+Changelog = "https://github.com/fschuch/xcompact3d_toolbox/blob/main/docs/news.md"
 Documentation = "https://xcompact3d-toolbox.readthedocs.io/"
 Issues = "https://github.com/fschuch/xcompact3d_toolbox/issues"
 Repository = "https://github.com/fschuch/xcompact3d_toolbox"

@@ -11,6 +11,7 @@
 # - sphinx>=1.4
 # - dask[complete]>=2.22
 # - ipywidgets>=7.5
+# - loguru>=0.6
 # - netcdf4>=1.6.3
 # - numba>=0.50
 # - numpy-stl>=2.16.3
@@ -208,6 +209,8 @@ locket==1.0.0
     # via
     #   distributed
     #   partd
+loguru==0.7.2
+    # via hatch.envs.docs
 lz4==4.3.3
     # via dask
 markdown==3.5.2

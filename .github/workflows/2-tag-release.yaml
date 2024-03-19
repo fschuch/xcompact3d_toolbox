@@ -47,4 +47,4 @@ jobs:
       - uses: rickstaa/action-create-tag@v1
         name: Create and Push Tag
         with:
-          tag: ${{ steps.get-tag.outputs.result }}
+          tag: v${{ steps.get-tag.outputs.result }}

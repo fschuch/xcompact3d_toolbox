@@ -5,11 +5,15 @@ title: Xcompact3d-toolbox
 author: Felipe N. Schuch
 logo: logo.png
 copyright: "2021"
+description: A set of tools for pre and postprocessing prepared for the high-order Navier-Stokes solver XCompact3d
 
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html
 execute:
   execute_notebooks: cache
+  stderr_output: remove
+  allow_errors: false
+  timeout: 120
 
 # Define the name of the latex output file for PDF builds
 latex:
@@ -29,18 +33,23 @@ repository:
 # Add GitHub buttons to your book
 # See https://jupyterbook.org/customize/config.html#add-a-link-to-your-repository
 html:
+  home_page_in_navbar: false
+  use_edit_page_button: true
   use_issues_button: true
   use_repository_button: true
 
 launch_buttons:
   notebook_interface: "jupyterlab"
   binderhub_url: "https://mybinder.org"
+  colab_url: "https://colab.research.google.com"
 
 sphinx:
+  config:
+    #https://github.com/executablebooks/jupyter-book/issues/1950#issuecomment-1454801479
+    suppress_warnings: ["mystnb.unknown_mime_type"]
   extra_extensions:
     - nbsphinx
     - sphinx.ext.autodoc
-    - sphinx.ext.coverage
     - sphinx.ext.intersphinx
     - sphinx.ext.mathjax
     - sphinx.ext.napoleon

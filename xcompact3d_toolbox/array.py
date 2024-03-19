@@ -16,7 +16,7 @@ and :obj:`xarray.Dataset`, all the details are described below.
 
 .. _dask: https://dask.org/
 .. _numpy: https://numpy.org/
-.. _xarray: http://xarray.pydata.org/en/stable/
+.. _xarray: http://docs.xarray.dev/en/stable
 .. _hvPlot : https://hvplot.holoviz.org/
 .. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
 

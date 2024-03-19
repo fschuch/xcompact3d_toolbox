@@ -266,8 +266,8 @@ class Dataset(traitlets.HasTraits):
     * Consider using hvPlot_ to explore your data interactively,
       see how to plot `Gridded Data`_.
 
-    .. _`xarray's documentation`: http://xarray.pydata.org/en/stable/
-    .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
+    .. _`xarray's documentation`: http://docs.xarray.dev/en/stable
+    .. _`Why xarray?`: http://docs.xarray.dev/en/stablewhy-xarray.html
     .. _hvPlot : https://hvplot.holoviz.org/
     .. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
     """

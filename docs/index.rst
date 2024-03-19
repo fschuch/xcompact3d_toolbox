@@ -1,10 +1,4 @@
-.. Xcompact3d_toolbox documentation master file, created by
-   sphinx-quickstart on Mon Aug 17 09:28:19 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to Xcompact3d-toolbox's documentation!
-==============================================
+**Welcome to Xcompact3d-toolbox's documentation!**
 
 It is a Python package designed to handle the pre and postprocessing of
 the high-order Navier-Stokes solver Xcompact3d_. It aims to help users and
@@ -30,13 +24,15 @@ any new flow configuration without worrying about Fortran and 2decomp_. For
 developers, it works as a rapid prototyping tool, to test concepts and then
 compare results to validate any future Fortran implementations.
 
-Useful links
-------------
+**Useful links**
 
 * `View on GitHub`_;
 * `Changelog`_;
 * `Suggestions for new features and bug report`_;
 * `See what is coming next (Project page)`_.
+
+Getting Started
+===============
 
 Installation
 ------------

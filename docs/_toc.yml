@@ -3,6 +3,20 @@
 
 format: jb-book
 root: index
-chapters:
-  - file: Docstrings
-  - file: tutorial
+parts:
+  - caption: Tutorials
+    chapters:
+      - file: tutorial/parameters.ipynb
+      - file: tutorial/io.ipynb
+      - file: tutorial/computing_and_plotting.ipynb
+  - caption: Sandbox Examples
+    chapters:
+      - file: examples/Axisymmetric_flow.ipynb
+      - file: examples/Cylinder.ipynb
+      - file: examples/Square.ipynb
+      - file: examples/Heat-exchanger.ipynb
+  - caption: References
+    chapters:
+      - file: news.md
+      - file: how-to-contribute.md
+      - file: Docstrings.rst
