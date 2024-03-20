@@ -1,9 +1,13 @@
 # What’s New
 
+<!-- markdown-link-check-disable -->
+
 All notable changes to this project will be documented in this page.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Intended Effort Versioning](https://jacobtomlinson.dev/effver/) (EffVer for short).
 The changes for the upcoming release can be found in [changelog.d](https://github.com/fschuch/xcompact3d_toolbox/tree/main/changelog.d/).
+
+<!-- markdown-link-check-enable -->
 
 <!-- WARNING: This file is auto-generated. Do not manually update this file. -->
 
@@ -173,7 +177,7 @@ With this, Xcompact3d-toolbox is ready for its first stable release.
 
   - Parameters: `docs/tutorial/parameters.ipynb`.
 
-- Integration with [Read the Docs](https://xcompact3d-toolbox.readthedocs.io/en/latest/), by [@fschuch](https://github.com/fschuch).
+- Integration with [Read the Docs](https://xcompact3d-toolbox.readthedocs.io), by [@fschuch](https://github.com/fschuch).
 
 ### Changed
 
