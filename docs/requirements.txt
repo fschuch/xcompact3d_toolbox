@@ -359,7 +359,7 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
-pyarrow==15.0.0
+pyarrow==15.0.2
     # via dask
 pyarrow-hotfix==0.6
     # via dask
