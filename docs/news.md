@@ -14,7 +14,8 @@ The changes for the upcoming release can be found in [changelog.d](https://githu
 <!-- towncrier release notes start -->
 
 ## [1.2.0rc0](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.2.0rc0) - 2024-03-21
-================================================================================================
+
+\================================================================================================
 
 ### Added
 
@@ -25,9 +26,13 @@ The changes for the upcoming release can be found in [changelog.d](https://githu
 ### Changed
 
 - Boolean arguments in all functions and methods changed to keyword only
+
 - Changed all arguments on `xcompact3d_toolbox.sandbox.Geometry` to keyword only
+
 - Changed the project versioning schema to [Intended Effort Versioning](https://jacobtomlinson.dev/effver/)
+
 - Function `xcompact3d_toolbox.gene_epsi_3D` was renamed to `xcompact3d_toolbox.gene_epsi_3d`
+
 - Modified the way of working on the project by applying the [Wizard-Template](https://github.com/fschuch/wizard-template):
 
   - [Hatch](https://hatch.pypa.io) now manages Python installations, virtual environments, dependencies, maintenance scripts, and builds
@@ -50,7 +55,6 @@ The changes for the upcoming release can be found in [changelog.d](https://githu
 ### Documentation
 
 - Replaced documentation framework by [Jupyter Books](https://jupyterbook.org/en/stable/intro.html) to enhance interactive tutorials
-
 
 ## [1.1.1](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.1.1) - 2023-08-10
 
