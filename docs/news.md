@@ -35,7 +35,7 @@ The changes for the upcoming release can be found in [changelog.d](https://githu
 
 ### Modified
 
-- `io.Dataset.data_path` is now obtained automatically from `parameters.Parameter.filename` at initialization (e.g., if `filename = "./example/input.i3d"` then `data_path = "./example/data/"`). Of course, `data_path` can be changed to any value after that. By [@fschuch](https://github.com/fschuch).
+- Automatically obtain `io.Dataset.data_path` from `parameters.Parameter.filename` during initialization (e.g., if `filename = "./example/input.i3d"` then `data_path = "./example/data/"`). Of course, `data_path` can be changed to any value after that. By [@fschuch](https://github.com/fschuch).
 - `io.Dataset.load_wind_turbine_data` now have a default location for `file_pattern`. Attributes were included for the coordinate time. By [@fschuch](https://github.com/fschuch).
 - `io.Dataset.set` now accepts keyword arguments to send to `io.FilenameProperties.set`, for a more concise syntax. By [@fschuch](https://github.com/fschuch).
 - The default return from `xcompact3d_toolbox.param.boundary_condition` now takes into consideration whether the domain is periodic or not, by [@fschuch](https://github.com/fschuch).
