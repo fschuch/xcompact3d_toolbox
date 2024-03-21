@@ -13,6 +13,45 @@ The changes for the upcoming release can be found in [changelog.d](https://githu
 
 <!-- towncrier release notes start -->
 
+## [1.2.0rc0](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.2.0rc0) - 2024-03-21
+================================================================================================
+
+### Added
+
+- Added [loguru](https://loguru.readthedocs.io/en/stable/) to enhance logging in the project
+- Added support for Python 3.10, 3.11, and 3.12
+- Configured [sonarcloud](https://sonarcloud.io/project/overview?id=fschuch_xcompact3d_toolbox) to power code quality analysis and coverage tracking on the project
+
+### Changed
+
+- Boolean arguments in all functions and methods changed to keyword only
+- Changed all arguments on `xcompact3d_toolbox.sandbox.Geometry` to keyword only
+- Changed the project versioning schema to [Intended Effort Versioning](https://jacobtomlinson.dev/effver/)
+- Function `xcompact3d_toolbox.gene_epsi_3D` was renamed to `xcompact3d_toolbox.gene_epsi_3d`
+- Modified the way of working on the project by applying the [Wizard-Template](https://github.com/fschuch/wizard-template):
+
+  - [Hatch](https://hatch.pypa.io) now manages Python installations, virtual environments, dependencies, maintenance scripts, and builds
+  - [mypy](https://mypy.readthedocs.io/en/stable/) for static type checking
+  - [ruff](https://github.com/astral-sh/ruff) as the linter and code formatter
+  - [codespell](https://github.com/codespell-project/codespell) to check spelling
+  - [pytest](https://docs.pytest.org/en/7.4.x/) as the test engine
+  - [towncrier](https://towncrier.readthedocs.io/en/stable/index.html) handles the changelog file
+  - [Git hooks](https://pre-commit.com/) to guarantee consistency and leverage the aforementioned tools
+  - GitHub workflows and dependabot were reviewed to address the previous points
+
+### Fixed
+
+- Corrected typos, typing annotating, and formatting issues in the codebase and documentation
+- Fixed a bug on `xcompact3d_toolbox.gui._divisor_generator` affecting the coupling between `p_row`, `p_col`, and `ncores` on `ParametersGui._observe_2decomp` method
+- Fixed bug on `xcompact3d_toolbox.sandbox.Geometry.from_stl` on some platforms that resolve `np.longdouble` to `np.float128`, which is not compatible with Numba
+- Fixed compatibility issue on `xcompact3d_toolbox.io.Dataset.load_snapshot` when testing if field `is_scalar` on Python 3.8
+- Fixed issue on `xcompact3d_toolbox.sandbox.Geometry.square` that was resulting in a TypeError because `set` object is not subscriptable
+
+### Documentation
+
+- Replaced documentation framework by [Jupyter Books](https://jupyterbook.org/en/stable/intro.html) to enhance interactive tutorials
+
+
 ## [1.1.1](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.1.1) - 2023-08-10
 
 ### Fixed
