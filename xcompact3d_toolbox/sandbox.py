@@ -291,7 +291,7 @@ class Geometry:
     :obj:`xcompact3d_toolbox.genepsi.gene_epsi_3d`.
     """
 
-    def __init__(self, data_array):
+    def __init__(self, data_array: xr.DataArray):
         self._data_array = data_array
 
     def from_stl(
