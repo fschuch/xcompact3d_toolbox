@@ -19,6 +19,7 @@ For more details, see:
 from __future__ import annotations
 
 import os.path
+from typing import TYPE_CHECKING
 
 import numba
 import numpy as np
@@ -26,6 +27,9 @@ import stl
 import xarray as xr
 
 from xcompact3d_toolbox.param import param
+
+if TYPE_CHECKING:
+    from xcompact3d_toolbox.parameters import Parameters
 
 
 class DimensionNotFoundError(KeyError):
@@ -36,7 +40,7 @@ class DimensionNotFoundError(KeyError):
         super().__init__(f'Invalid key for "kwargs", "{dim}" is not a valid dimension')
 
 
-def init_epsi(prm, *, dask=False):
+def init_epsi(prm: Parameters, *, dask: bool = False) -> dict[str, xr.DataArray]:
     """Initializes the :math:`\\epsilon` arrays that define the solid geometry
     for the Immersed Boundary Method.
 
@@ -75,7 +79,7 @@ def init_epsi(prm, *, dask=False):
 
     """
 
-    epsi = {}
+    epsi: dict[str, xr.DataArray] = {}
 
     if prm.iibm == 0:
         return epsi
@@ -127,7 +131,7 @@ def init_epsi(prm, *, dask=False):
     return epsi
 
 
-def init_dataset(prm):
+def init_dataset(prm: Parameters) -> xr.Dataset:
     """This function initializes a :obj:`xarray.Dataset` including all variables
     that should be provided to XCompact3d and the sandbox flow configuration,
     according to the computational and physical parameters.
@@ -300,7 +304,7 @@ class Geometry:
         scale: float | None = None,
         user_tol: float = 2.0 * np.pi,
         remp: bool = True,
-    ):
+    ) -> xr.DataArray:
         r"""Load a STL file and compute if the nodes of the computational
         mesh are inside or outside the object. In this way, the
         customized geometry can be used at the flow solver.
@@ -461,7 +465,9 @@ class Geometry:
             remp,
         )
 
-    def cylinder(self, *, radius=0.5, axis="z", height=None, remp=True, **kwargs):
+    def cylinder(
+        self, *, radius: float = 0.5, axis: str = "z", height: float | None = None, remp: bool = True, **kwargs
+    ) -> xr.DataArray:
         r"""Draw a cylinder.
 
         Parameters
@@ -514,12 +520,12 @@ class Geometry:
             height *= 0.5
             # Notice that r*10 is just to guarantee that the values are larger than r
             # and consequently outside the cylinder
-            dis = dis.where(self._data_array[axis] <= kwargs.get(axis, 0.0) + height, radius * 10)
-            dis = dis.where(self._data_array[axis] >= kwargs.get(axis, 0.0) - height, radius * 10)
+            dis = dis.where(self._data_array[axis] <= kwargs.get(axis, 0.0) + height, radius * 10)  # type: ignore
+            dis = dis.where(self._data_array[axis] >= kwargs.get(axis, 0.0) - height, radius * 10)  # type: ignore
 
         return self._data_array.where(dis > radius, remp)
 
-    def box(self, *, remp=True, **kwargs):
+    def box(self, *, remp: bool = True, **kwargs) -> xr.DataArray:
         """Draw a box.
 
         Parameters
@@ -562,7 +568,7 @@ class Geometry:
 
         return self._data_array.where(tmp, remp)
 
-    def square(self, *, length=1.0, thickness=0.1, remp=True, **kwargs):
+    def square(self, *, length: float = 1.0, thickness: float = 0.1, remp: bool = True, **kwargs) -> xr.DataArray:
         """Draw a squared frame.
 
         Parameters
@@ -600,7 +606,7 @@ class Geometry:
             if key not in self._data_array.dims:
                 raise DimensionNotFoundError(key)
 
-        center = {kwargs.get(key, 0.0) for key in self._data_array.dims}
+        center = {key: kwargs.get(key, 0.0) for key in self._data_array.dims}
 
         boundaries1 = {
             "x": (center["x"] - 0.5 * thickness, center["x"] + 0.5 * thickness),
@@ -619,7 +625,7 @@ class Geometry:
         #
         return self._data_array.where(tmp, remp)
 
-    def sphere(self, *, radius=0.5, remp=True, **kwargs):
+    def sphere(self, *, radius: float = 0.5, remp: bool = True, **kwargs) -> xr.DataArray:
         """Draw a sphere.
 
         Parameters
@@ -662,7 +668,9 @@ class Geometry:
 
         return self._data_array.where(dis > radius, remp)
 
-    def ahmed_body(self, *, scale=1.0, angle=45.0, wheels=False, remp=True, **kwargs):
+    def ahmed_body(
+        self, *, scale: float = 1.0, angle: float = 45.0, wheels: bool = False, remp: bool = True, **kwargs
+    ) -> xr.DataArray:
         """Draw an Ahmed body.
 
         Parameters
@@ -845,7 +853,7 @@ class Geometry:
 
         return self._data_array.where(np.logical_not(tmp), remp)
 
-    def mirror(self, dim="x"):
+    def mirror(self, dim: str = "x") -> xr.DataArray:
         """Mirror the :math:`\\epsilon` array with respect to the central plane
         in the direction ``dim``.
 

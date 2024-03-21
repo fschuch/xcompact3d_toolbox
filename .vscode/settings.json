@@ -15,11 +15,11 @@
     "python.testing.pytestEnabled": true,
     "files.exclude": {
         "**/.coverage*": true,
-        "**/.hatch": true,
         "**/.hypothesis": true,
         "**/.mypy_cache": true,
         "**/.pytest_cache": true,
         "**/.ruff_cache": true,
+        "**/.venv": true,
         "**/build": true
     },
     "cSpell.enabled": true,

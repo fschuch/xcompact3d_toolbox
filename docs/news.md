@@ -27,7 +27,7 @@ The changes for the upcoming release can be found in [changelog.d](https://githu
 
 ### Added
 
-- Add `sandbox.Geometry.from_stl`. It reads a `stl` file and is able to compute what mesh points are inside or outside the geometry, so we can specify the geometry for a very customized immersed boundary method. By [@fschuch](https://github.com/fschuch) and [@nbeb](https://github.com/nbeb).
+- Add `sandbox.Geometry.from_stl`. It reads an `stl` file and is able to compute what mesh points are inside or outside the geometry, so we can specify the geometry for a very customized immersed boundary method. By [@fschuch](https://github.com/fschuch) and [@nbeb](https://github.com/nbeb).
 - Add `xcompact3d_toolbox.tutorial`, making it easier to get datasets for documentation and tutorials, by [@fschuch](https://github.com/fschuch).
 - Add `xcompact3d_toolbox.Parameters.from_string`, a useful method to get the parameters from the datasets at the tutorials, by [@fschuch](https://github.com/fschuch).
 - Add tutorial *Computing and Plotting*, by [@fschuch](https://github.com/fschuch).

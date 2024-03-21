@@ -267,7 +267,7 @@ class Dataset(traitlets.HasTraits):
       see how to plot `Gridded Data`_.
 
     .. _`xarray's documentation`: http://docs.xarray.dev/en/stable
-    .. _`Why xarray?`: http://docs.xarray.dev/en/stablewhy-xarray.html
+    .. _`Why xarray?`: http://docs.xarray.dev/en/stable/why-xarray.html
     .. _hvPlot : https://hvplot.holoviz.org/
     .. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
     """

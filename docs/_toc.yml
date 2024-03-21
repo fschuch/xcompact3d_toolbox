@@ -18,5 +18,4 @@ parts:
   - caption: References
     chapters:
       - file: news.md
-      - file: how-to-contribute.md
       - file: Docstrings.rst
