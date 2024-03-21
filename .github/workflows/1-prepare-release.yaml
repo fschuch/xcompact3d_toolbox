@@ -29,7 +29,7 @@ jobs:
       - name: Update Changelog
         run: hatch run changelog:build --yes --version "$VERSION"
 
-      - uses: peter-evans/create-pull-request@v4
+      - uses: peter-evans/create-pull-request@v6
         name: Create Pull Request
         id: cpr
         with:
