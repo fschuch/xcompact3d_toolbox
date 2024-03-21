@@ -1,9 +1,11 @@
 # Xcompact3d Toolbox
 
-![Build Status](https://github.com/fschuch/xcompact3d_toolbox/workflows/Python%20package/badge.svg)
-[![Documentation Status](https://readthedocs.org/projects/xcompact3d-toolbox/badge/?version=latest)](https://xcompact3d-toolbox.readthedocs.io/en/latest/?badge=latest)
-[![PyPI version](https://badge.fury.io/py/xcompact3d-toolbox.svg)](https://badge.fury.io/py/xcompact3d-toolbox)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+|         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| QA      | [![CI](https://github.com/fschuch/xcompact3d_toolbox/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/fschuch/xcompact3d_toolbox/actions/workflows/ci.yaml) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/fschuch/xcompact3d_toolbox/main.svg)](https://results.pre-commit.ci/latest/github/fschuch/xcompact3d_toolbox/main)[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=fschuch_xcompact3d_toolbox&metric=coverage)](https://sonarcloud.io/summary/new_code?id=fschuch_xcompact3d_toolbox)[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=fschuch_xcompact3d_toolbox&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=fschuch_xcompact3d_toolbox)        |
+| Docs    | [![Docs](https://github.com/fschuch/xcompact3d_toolbox/actions/workflows/docs.yaml/badge.svg?branch=main)](https://github.com/fschuch/xcompact3d_toolbox/actions/workflows/docs.yaml)[![Documentation Status](https://readthedocs.org/projects/xcompact3d_toolbox/badge/?version=latest)](https://xcompact3d-toolbox.readthedocs.io/en/latest/?badge=latest)                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Package | [![PyPI - Version](https://img.shields.io/pypi/v/xcompact3d-toolbox.svg?logo=pypi&label=PyPI)](https://pypi.org/project/xcompact3d-toolbox/) [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/xcompact3d-toolbox.svg?logo=python&label=Python)](https://pypi.org/project/xcompact3d-toolbox/)                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Meta    | [![Wizard Template](https://img.shields.io/badge/Wizard-Template-%23447CAA)](https://github.com/fschuch/wizard-template) [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/) [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch) [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff) [![PyPI - License](https://img.shields.io/pypi/l/xcompact3d-toolbox?color=blue)](https://github.com/fschuch/xcompact3d_toolbox/blob/master/LICENSE) [![EffVer Versioning](https://img.shields.io/badge/version_scheme-EffVer-0097a7)](https://jacobtomlinson.dev/effver) |
 
 It is a Python package designed to handle the pre and postprocessing of
 the high-order Navier-Stokes solver [XCompact3d](https://github.com/xcompact3d/Incompact3d). It aims to help users and
@@ -14,7 +16,7 @@ The physical and computational parameters are built on top of [traitlets](https:
 a framework that lets Python classes have attributes with type checking, dynamically calculated default values, and ‘on change’ callbacks.
 In addition to [ipywidgets](https://ipywidgets.readthedocs.io/en/latest/) for an user friendly interface.
 
-Data structure is provided by [xarray](http://xarray.pydata.org/en/stable/) (see [Why xarray?](http://xarray.pydata.org/en/stable/why-xarray.html)), that introduces labels in the form of dimensions, coordinates and attributes on top of raw [NumPy](https://numpy.org/)-like arrays, which allows for a more intuitive, more concise, and less error-prone developer experience. It integrates tightly with [dask](https://dask.org/) for parallel computing and [hvplot](https://hvplot.holoviz.org/user_guide/Gridded_Data.html) for interactive data visualization.
+Data structure is provided by [xarray](https://docs.xarray.dev/en/stable) (see [Why xarray?](https://docs.xarray.dev/en/stable/getting-started-guide/why-xarray.html)), that introduces labels in the form of dimensions, coordinates and attributes on top of raw [NumPy](https://numpy.org/)-like arrays, which allows for a more intuitive, more concise, and less error-prone developer experience. It integrates tightly with [dask](https://dask.org/) for parallel computing and [hvplot](https://hvplot.holoviz.org/user_guide/Gridded_Data.html) for interactive data visualization.
 
 Finally, Xcompact3d-toolbox is fully integrated with the new *Sandbox Flow Configuration*.
 The idea is to easily provide everything that XCompact3d needs from a [Jupyter Notebook](https://jupyter.org/), like initial conditions, solid geometry, boundary conditions, and the parameters ([see examples](https://xcompact3d-toolbox.readthedocs.io/en/latest/tutorial.html#sandbox-examples)).
@@ -23,11 +25,11 @@ For developers, it works as a rapid prototyping tool, to test concepts and then 
 
 ## Useful links
 
-* [Documentation](https://xcompact3d-toolbox.readthedocs.io/);
-* [Changelog](https://github.com/fschuch/xcompact3d_toolbox/blob/master/CHANGELOG.md);
-* [Suggestions for new features and bug report](https://github.com/fschuch/xcompact3d_toolbox/issues);
-* [See what is coming next (Project page)](https://github.com/fschuch/xcompact3d_toolbox/projects/1);
-* [Xcompact3d's repository](https://github.com/xcompact3d/Incompact3d).
+- [Documentation](https://xcompact3d-toolbox.readthedocs.io/);
+- [Changelog](https://github.com/fschuch/xcompact3d_toolbox/blob/master/CHANGELOG.md);
+- [Suggestions for new features and bug report](https://github.com/fschuch/xcompact3d_toolbox/issues);
+- [See what is coming next (Project page)](https://github.com/fschuch/xcompact3d_toolbox/projects/1);
+- [Xcompact3d's repository](https://github.com/xcompact3d/Incompact3d).
 
 ## Installation
 
@@ -41,11 +43,6 @@ There are other dependency sets for extra functionality:
 
 ```bash
 pip install xcompact3d-toolbox[visu] # interactive visualization with hvplot and others
-pip install xcompact3d-toolbox[doc]  # dependencies to build the documentation
-pip install xcompact3d-toolbox[dev]  # tools for development
-pip install xcompact3d-toolbox[test] # tools for testing
-pip install xcompact3d-toolbox[all]  # all the above
-
 ```
 
 To install from source, clone de repository:
@@ -61,10 +58,10 @@ cd xcompact3d_toolbox
 pip install -e .
 ```
 
-You can install all dependencies as well:
+You can install additional dependencies as well:
 
 ```bash
-pip install -e .[all]
+pip install -e .[visu]
 ```
 
 Now, any change you make at the source code will be available at your local installation, with no need to reinstall the package every time.
@@ -78,95 +75,105 @@ Click on any link above to launch [Binder](https://mybinder.org/) and interact w
 
 ## Examples
 
-* Importing the package:
+- Importing the package:
 
-   ```python
-   import xcompact3d_toolbox as x3d
-   ```
+  ```python
+  import xcompact3d_toolbox as x3d
+  ```
 
-* Loading the parameters file (both `.i3d` and `.prm` are supported, see [#7](https://github.com/fschuch/xcompact3d_toolbox/issues/7)) from the disc:
+- Loading the parameters file (both `.i3d` and `.prm` are supported, see [#7](https://github.com/fschuch/xcompact3d_toolbox/issues/7)) from the disc:
 
-   ```python
-   prm = x3d.Parameters(loadfile="input.i3d")
-   prm = x3d.Parameters(loadfile="incompact3d.prm")
-   ```
+  ```python
+  prm = x3d.Parameters(loadfile="input.i3d")
+  prm = x3d.Parameters(loadfile="incompact3d.prm")
+  ```
 
-* Specifying how the binary fields from your simulations are named, for instance:
+- Specifying how the binary fields from your simulations are named, for instance:
 
-   * If the simulated fields are named like `ux-000.bin`:
+- If the simulated fields are named like `ux-000.bin`:
 
-      ```python
-      prm.dataset.filename_properties.set(
-         separator = "-",
-         file_extension = ".bin",
-         number_of_digits = 3
-      )
-      ```
+  ```python
+  prm.dataset.filename_properties.set(
+     separator = "-",
+     file_extension = ".bin",
+     number_of_digits = 3
+  )
+  ```
 
-   * If the simulated fields are named like `ux0000`:
+- If the simulated fields are named like `ux0000`:
 
-      ```python
-      prm.dataset.filename_properties.set(
-         separator = "",
-         file_extension = "",
-         number_of_digits = 4
-      )
-      ```
+  ```python
+  prm.dataset.filename_properties.set(
+     separator = "",
+     file_extension = "",
+     number_of_digits = 4
+  )
+  ```
 
-* There are many ways to load the arrays produced by your numerical simulation, so you can choose what best suits your post-processing application.
-  All arrays are wrapped into [xarray](http://xarray.pydata.org/en/stable/) objects, with many useful methods for indexing, comparisons, reshaping and reorganizing, computations and plotting.
+- There are many ways to load the arrays produced by your numerical simulation, so you can choose what best suits your post-processing application.
+  All arrays are wrapped into [xarray](http://docs.xarray.dev/en/stable) objects, with many useful methods for indexing, comparisons, reshaping and reorganizing, computations and plotting.
   See the examples:
 
-   * Load one array from the disc:
+- Load one array from the disc:
 
-      ```python
-      ux = prm.dataset.load_array("ux-0000.bin")
-      ```
+  ```python
+  ux = prm.dataset.load_array("ux-0000.bin")
+  ```
 
-   * Load the entire time series for a given variable:
+- Load the entire time series for a given variable:
 
-      ```python
-      ux = prm.dataset["ux"]
-      ```
+  ```python
+  ux = prm.dataset["ux"]
+  ```
 
-   * Load all variables from a given snapshot:
+- Load all variables from a given snapshot:
 
-      ```python
-      snapshot = prm.dataset[10]
-      ```
+  ```python
+  snapshot = prm.dataset[10]
+  ```
 
-   * Loop through all snapshots, loading them one by one:
+- Loop through all snapshots, loading them one by one:
 
-      ```python
-      for ds in prm.dataset:
-         # compute something
-         vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-         # write the results to the disc
-         prm.dataset.write(data = vort, file_prefix = "w3")
-      ```
+  ```python
+  for ds in prm.dataset:
+     # compute something
+     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+     # write the results to the disc
+     prm.dataset.write(data = vort, file_prefix = "w3")
+  ```
 
-   * Or simply load all snapshots at once (if you have enough memory):
+- Or simply load all snapshots at once (if you have enough memory):
 
-      ```python
-      ds = prm.dataset[:]
-      ```
+  ```python
+  ds = prm.dataset[:]
+  ```
 
-   * It is possible to produce a new xdmf file, so all data can be visualized on any external tool:
+- It is possible to produce a new xdmf file, so all data can be visualized on any external tool:
 
-      ```python
-      prm.dataset.write_xdmf()
-      ```
+- Loop through all snapshots, loading them one by one:
 
+- User interface for the parameters with IPywidgets:
 
-* User interface for the parameters with IPywidgets:
+  ```python
+  ds = prm.dataset[:]
+  ```
 
-   ```python
-   prm = x3d.ParametersGui()
-   prm
-   ```
+- It is possible to produce a new xdmf file, so all data can be visualized on any external tool:
 
-   ![An animation showing the graphical user interface in action](https://www.fschuch.com/en/slides/2021-x3d-dev-meeting/Output.gif)
+  ```python
+  prm.dataset.write_xdmf()
+  ```
+
+- User interface for the parameters with IPywidgets:
+
+  ```python
+  prm = x3d.ParametersGui()
+  prm
+  ```
+
+  ![An animation showing the graphical user interface in action](https://www.fschuch.com/en/slides/2021-x3d-dev-meeting/Output.gif)
 
 ## Copyright and License
 
+© 2020 [Felipe N. Schuch](https://github.com/fschuch).
 All content is under [GPL-3.0 License](https://github.com/fschuch/xcompact3d_toolbox/blob/master/LICENSE).

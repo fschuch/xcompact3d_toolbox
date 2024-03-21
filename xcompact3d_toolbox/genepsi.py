@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """This module generates all the files necessary for our
 customized Immersed Boundary Method, based on Lagrange
 reconstructions. It is an adaptation to Python from the
@@ -8,7 +7,7 @@ original Fortran code and methods from:
   jet control with microjets using an alternating direction forcing
   strategy, Int. J. of Computational Fluid Dynamics, 28, 393--410.
 
-:obj:`gene_epsi_3D` is powered by `Numba`_, it translates Python functions to
+:obj:`gene_epsi_3d` is powered by `Numba`_, it translates Python functions to
 optimized machine code at runtime. Numba-compiled numerical algorithms in Python
 can approach the speeds of C or FORTRAN.
 
@@ -22,10 +21,11 @@ import os.path
 import numba
 import numpy as np
 import xarray as xr
+from loguru import logger
 
 
-def gene_epsi_3D(epsi_in_dict, prm):
-    """This function generates all the auxiliar files necessary for our
+def gene_epsi_3d(epsi_in_dict, prm):
+    """This function generates all the Auxiliary files necessary for our
     customize IBM, based on Lagrange reconstructions. The arrays can be
     initialized with :obj:`xcompact3d_toolbox.sandbox.init_epsi()`, then,
     some standard geometries are provided by the accessor
@@ -59,7 +59,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
     >>> epsi = x3d.sandbox.init_epsi(prm)
     >>> for key in epsi.keys():
     ...     epsi[key] = epsi[key].geo.cylinder(x=4, y=5)
-    >>> dataset = x3d.gene_epsi_3D(epsi, prm)
+    >>> dataset = x3d.gene_epsi_3d(epsi, prm)
 
     Remember to set the number of objects after that if ``prm.iibm >= 2``:
 
@@ -68,7 +68,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
 
     """
 
-    def obj_count(dataArray, dim):
+    def obj_count(data_array, dim):
         """Counts the number of objects in a given direction"""
 
         @numba.jit
@@ -81,14 +81,14 @@ def gene_epsi_3D(epsi_in_dict, prm):
 
         return xr.apply_ufunc(
             count,
-            dataArray,
+            data_array,
             input_core_dims=[[dim]],
             vectorize=True,
             dask="parallelized",
             output_dtypes=[np.int64],
         )
 
-    def get_boundaries(dataArray, dim, max_obj, length):
+    def get_boundaries(data_array, dim, max_obj, length):
         """Gets the boundaries in a given direction"""
 
         @numba.jit
@@ -112,11 +112,11 @@ def gene_epsi_3D(epsi_in_dict, prm):
 
         return xr.apply_ufunc(
             pos,
-            dataArray,
-            dataArray[dim],
+            data_array,
+            data_array[dim],
             input_core_dims=[[dim], [dim]],
             output_core_dims=[["obj"], ["obj"]],
-            dask_gufunc_kwargs=dict(output_sizes=dict(obj=max_obj)),
+            dask_gufunc_kwargs={"output_sizes": {"obj": max_obj}},
             vectorize=True,
             dask="parallelized",
             output_dtypes=[np.float64, np.float64],
@@ -148,28 +148,18 @@ def gene_epsi_3D(epsi_in_dict, prm):
                             idebraf = iiraf + 1
                         if refepsi[iiraf] and not refepsi[iiraf + 1]:
                             ifinraf = iiraf + 1
-                    if (
-                        idebraf != 0
-                        and ifinraf != 0
-                        and idebraf < ifinraf
-                        and iflu == 1
-                    ):
+                    if idebraf != 0 and ifinraf != 0 and idebraf < ifinraf and iflu == 1:
                         iobj += 1
                         for ii in range(iobj, nobjmax - 1):
                             xi[ii] = xi[ii + 1]
                             xf[ii] = xf[ii + 1]
                         iobj -= 1
-                    if (
-                        idebraf != 0
-                        and ifinraf != 0
-                        and idebraf > ifinraf
-                        and isol == 1
-                    ):
+                    if idebraf != 0 and ifinraf != 0 and idebraf > ifinraf and isol == 1:
                         iobj += 1
                         for ii in range(iobj, nobjmax - 1):
                             xi[ii] = xi[ii + 1]
                         iobj -= 1
-                        for i in range(iobj, nobjmax - 1):
+                        for ii in range(iobj, nobjmax - 1):
                             xf[ii] = xf[ii + 1]
 
             return xi, xf
@@ -182,7 +172,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
             nobjxraf,
             epsi,
             refepsi,
-            kwargs=dict(nraf=nraf, nobjmax=nobjmax),
+            kwargs={"nraf": nraf, "nobjmax": nobjmax},
             input_core_dims=[["obj"], ["obj"], [], [], [dim], [dim + "_raf"]],
             output_core_dims=[["obj"], ["obj"]],
             vectorize=True,
@@ -236,7 +226,7 @@ def gene_epsi_3D(epsi_in_dict, prm):
             epsi,
             input_core_dims=[[dim]],
             output_core_dims=[["obj_aux"], ["obj_aux"], ["c"]],
-            dask_gufunc_kwargs=dict(output_sizes=dict(obj_aux=max_obj + 1, c=1)),
+            dask_gufunc_kwargs={"output_sizes": {"obj_aux": max_obj + 1, "c": 1}},
             vectorize=True,
             dask="parallelized",
             output_dtypes=[np.int64, np.int64, np.int64],
@@ -257,51 +247,45 @@ def gene_epsi_3D(epsi_in_dict, prm):
 
     ds = epsi.to_dataset(name="epsi")
 
-    for dir, ep in zip(["x", "y", "z"], [xepsi, yepsi, zepsi]):
+    for direction, ep in zip(["x", "y", "z"], [xepsi, yepsi, zepsi]):
+        ds[f"nobj_{direction}"] = obj_count(epsi, direction)
+        ds[f"nobjmax_{direction}"] = ds[f"nobj_{direction}"].max()
+        ds[f"nobjraf_{direction}"] = obj_count(ep, direction)
+        ds[f"nobjmaxraf_{direction}"] = ds[f"nobjraf_{direction}"].max()
 
-        ds[f"nobj_{dir}"] = obj_count(epsi, dir)
-        ds[f"nobjmax_{dir}"] = ds[f"nobj_{dir}"].max()
-        ds[f"nobjraf_{dir}"] = obj_count(ep, dir)
-        ds[f"nobjmaxraf_{dir}"] = ds[f"nobjraf_{dir}"].max()
-
-        ds[f"ibug_{dir}"] = (
-            xr.zeros_like(ds[f"nobj_{dir}"])
-            .where(ds[f"nobj_{dir}"] == ds[f"nobjraf_{dir}"], 1)
-            .sum()
+        ds[f"ibug_{direction}"] = (
+            xr.zeros_like(ds[f"nobj_{direction}"]).where(ds[f"nobj_{direction}"] == ds[f"nobjraf_{direction}"], 1).sum()
         )
 
-        print(f"{dir}")
-        print(f'       nobjraf : {ds[f"nobjmax_{dir}"].values}')
-        print(f'    nobjmaxraf : {ds[f"nobjmaxraf_{dir}"].values}')
-        print(f'           bug : {ds[f"ibug_{dir}"].values}\n')
+        logger.debug(
+            f"{direction}\n"
+            f"       nobjraf : {ds[f'nobjmax_{direction}'].values}\n"
+            f"    nobjmaxraf : {ds[f'nobjmaxraf_{direction}'].values}\n"
+            f"           bug : {ds[f'ibug_{direction}'].values}\n"
+        )
 
     max_obj = np.max([ds.nobjmax_x.values, ds.nobjmax_y.values, ds.nobjmax_z.values])
     ds = ds.assign_coords(obj=range(max_obj), obj_aux=range(-1, max_obj))
 
-    for dir, ep, l in zip(
-        ["x", "y", "z"], [xepsi, yepsi, zepsi], [prm.xlx, prm.yly, prm.zlz]
-    ):
+    for direction, ep, length in zip(["x", "y", "z"], [xepsi, yepsi, zepsi], [prm.xlx, prm.yly, prm.zlz]):
+        ds[f"xi_{direction}"], ds[f"xf_{direction}"] = get_boundaries(ep, direction, max_obj, length)
 
-        ds[f"xi_{dir}"], ds[f"xf_{dir}"] = get_boundaries(ep, dir, max_obj, l)
-
-        if ds[f"ibug_{dir}"] != 0:
-            ds[f"xi_{dir}"], ds[f"xf_{dir}"] = fix_bug(
-                ds[f"xi_{dir}"],
-                ds[f"xf_{dir}"],
+        if ds[f"ibug_{direction}"] != 0:
+            ds[f"xi_{direction}"], ds[f"xf_{direction}"] = fix_bug(
+                ds[f"xi_{direction}"],
+                ds[f"xf_{direction}"],
                 nraf,
                 int(max_obj),
-                ds[f"nobj_{dir}"],
-                ds[f"nobjmaxraf_{dir}"],
+                ds[f"nobj_{direction}"],
+                ds[f"nobjmaxraf_{direction}"],
                 epsi,
-                ep.rename(**{dir: dir + "_raf"}),
-                dir,
+                ep.rename(**{direction: direction + "_raf"}),
+                direction,
             )
 
-        ds[f"nxipif_{dir}"], ds[f"nxfpif_{dir}"], ising = verif_epsi(epsi, dir)
+        ds[f"nxipif_{direction}"], ds[f"nxfpif_{direction}"], ising = verif_epsi(epsi, direction)
 
-        print(
-            f"number of points with potential problem in {dir} : {ising.sum().values}"
-        )
+        logger.debug(f"number of points with potential problem in {direction} : {ising.sum().values}")
 
     write_geomcomplex(prm, ds)
 
@@ -317,30 +301,25 @@ def write_geomcomplex(prm, ds) -> None:
     def write_nxipif(array1, array2, dim) -> None:
         _array1 = transpose_n_flatten(array1)
         _array2 = transpose_n_flatten(array2)
-        with open(
-            os.path.join(data_path, f"n{dim}ifpif.dat"), "w", newline="\n"
-        ) as file:
+        with open(os.path.join(data_path, f"n{dim}ifpif.dat"), "w", newline="\n") as file:
             for value1, value2 in zip(_array1, _array2):
                 file.write(f"{value1:12d}{value2:12d}\n")
 
     def write_xixf(array1, array2, dim) -> None:
         _array1 = transpose_n_flatten(array1)
         _array2 = transpose_n_flatten(array2)
-        with open(
-            os.path.join(data_path, f"{dim}i{dim}f.dat"), "w", newline="\n"
-        ) as file:
+        with open(os.path.join(data_path, f"{dim}i{dim}f.dat"), "w", newline="\n") as file:
             for value1, value2 in zip(_array1, _array2):
                 file.write(f"{value1:24.16E}{value2:24.16E}\n")
 
     def transpose_n_flatten(array):
-        if len(array.coords) == 3:
+        if len(array.coords) == 3:  # noqa: PLR2004
             return array.values.transpose(1, 0, 2).flatten()
         return array.values.T.flatten()
 
-    print("\nWriting...")
     data_path = os.path.join(prm.dataset.data_path, "geometry")
     prm.dataset.write(ds["epsi"])
-    for dir in ["x", "y", "z"]:
-        write_nobj(ds[f"nobj_{dir}"], dir)
-        write_nxipif(ds[f"nxipif_{dir}"], ds[f"nxfpif_{dir}"], dir)
-        write_xixf(ds[f"xi_{dir}"], ds[f"xf_{dir}"], dir)
+    for direction in ["x", "y", "z"]:
+        write_nobj(ds[f"nobj_{direction}"], direction)
+        write_nxipif(ds[f"nxipif_{direction}"], ds[f"nxfpif_{direction}"], direction)
+        write_xixf(ds[f"xi_{direction}"], ds[f"xf_{direction}"], direction)

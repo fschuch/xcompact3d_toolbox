@@ -1,0 +1,77 @@
+[env]
+requires = ["hatch-pip-compile"]
+
+[version]
+path = "xcompact3d_toolbox/_version.py"
+pattern = '__version__ = "(?P<version>[^"]+)"'
+
+[envs.default]
+description = "Base development environment"
+dependencies = [
+    "coverage[toml]",
+    "hypothesis>=4.53",
+    "pre-commit",
+    "pytest-cov",
+    "pytest",
+]
+
+[envs.default.scripts]
+pre-commit-install = "pre-commit install {args}"
+pre-commit-uninstall = "pre-commit uninstall {args}"
+check = "pre-commit run {args} --all-files"
+type = "check mypy {args}"
+lint = "check ruff {args}"
+format = "check ruff-format {args}"
+test = "pytest --cov --cov-report=term {args}"
+test-no-cov = "test --no-cov {args}"
+qa = ["check", "test", "echo '✅ QA passed'"]
+
+[envs.test]
+description = "Extended test environment"
+extra-dependencies = ["pytest-randomly", "pytest-rerunfailures", "pytest-xdist"]
+
+[envs.test.scripts]
+extended = "test -n auto --reruns 7 --reruns-delay 1 {args}"
+
+[[envs.test.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[envs.docs]
+description = "Documentation environment"
+features = ["visu"]
+install = true
+detached = false
+dependencies = [
+    "docutils",
+    "ipykernel",
+    "jupyter-book",
+    "nbsphinx",
+    "pooch",
+    "sphinx-autobuild",
+    "sphinx-rtd-theme",
+    "sphinx>=1.4",
+]
+type = "pip-compile"
+lock-filename = "docs/requirements.txt"
+
+[envs.docs.scripts]
+config = "jupyter-book config sphinx docs {args}"
+build = ["config", "jupyter-book build docs --path-output build {args}"]
+serve = ["config", "sphinx-autobuild docs build/_build/html --ignore='**/data/*' --open-browser {args}"]
+
+[envs.changelog]
+description = "Changelog handler"
+dependencies = ["towncrier"]
+
+[envs.changelog.scripts]
+build = "towncrier build {args}"
+draft = "build --draft {args}"
+create = "towncrier create {args}"
+check = "towncrier check {args}"
+
+[envs.hatch-static-analysis]
+config-path = "ruff_defaults.toml"
+
+[dirs.env]
+virtual = ".venv"
+pip-compile = ".venv"

@@ -1,0 +1,50 @@
+name: Create tag when PR is accepted
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/**
+    types: [closed]
+
+jobs:
+  create-tag:
+    if: (github.event.pull_request.merged && startsWith( github.head_ref, 'prepare-release/' ))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: bluwy/substitute-string-action@v1
+        name: Get Tag
+        id: get-tag
+        with:
+          _input-text: ${{ github.head_ref }}
+          prepare-release/: ""
+
+      - name: Show tag name
+        run: echo ${{ steps.get-tag.outputs.result }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Hatch
+        run: python -m pip install hatch
+
+      - name: Get hatch version
+        id: get-hatch-version
+        run: echo "::set-output name=version::$(hatch version)"
+
+      - name: Verify tag and hatch version
+        run: |
+          if [[ "${{ steps.get-hatch-version.outputs.version }}" != "${{ steps.get-tag.outputs.result }}" ]]; then
+            echo "Tag name does not match hatch version"
+            exit 1
+          fi
+
+      - uses: rickstaa/action-create-tag@v1
+        name: Create and Push Tag
+        with:
+          tag: v${{ steps.get-tag.outputs.result }}

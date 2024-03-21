@@ -1,0 +1,21 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: index
+parts:
+  - caption: Tutorials
+    chapters:
+      - file: tutorial/parameters.ipynb
+      - file: tutorial/io.ipynb
+      - file: tutorial/computing_and_plotting.ipynb
+  - caption: Sandbox Examples
+    chapters:
+      - file: examples/Axisymmetric_flow.ipynb
+      - file: examples/Cylinder.ipynb
+      - file: examples/Square.ipynb
+      - file: examples/Heat-exchanger.ipynb
+  - caption: References
+    chapters:
+      - file: news.md
+      - file: Docstrings.rst

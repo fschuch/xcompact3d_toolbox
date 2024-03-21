@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Usefull objects to read and write the binary fields produced by XCompact3d.
-"""
+"""Useful objects to read and write the binary fields produced by XCompact3d."""
 
 from __future__ import annotations
 
@@ -10,7 +7,7 @@ import io
 import os
 import os.path
 import warnings
-from typing import Type, Union
+from typing import Iterator
 
 import numpy as np
 import pandas as pd
@@ -18,8 +15,8 @@ import traitlets
 import xarray as xr
 from tqdm.auto import tqdm
 
-from .mesh import Mesh3D
-from .param import param
+from xcompact3d_toolbox.mesh import Istret, Mesh3D
+from xcompact3d_toolbox.param import param
 
 
 class FilenameProperties(traitlets.HasTraits):
@@ -42,7 +39,7 @@ class FilenameProperties(traitlets.HasTraits):
 
     Notes
     -----
-        :obj:`FilenameProperties` is in fact an atribute of
+        :obj:`FilenameProperties` is in fact an attribute of
         :obj:`xcompact3d_toolbox.io.Dataset`, so there is no
         need to initialize it manually for most of the common
         use cases.
@@ -80,7 +77,7 @@ class FilenameProperties(traitlets.HasTraits):
         for name in self.trait_names():
             if name.startswith("_"):
                 continue
-            string += f"    {name} = {repr(getattr(self, name))},\n"
+            string += f"    {name} = {getattr(self, name)!r},\n"
         string += ")"
         return string
 
@@ -106,23 +103,20 @@ class FilenameProperties(traitlets.HasTraits):
 
         >>> prm = xcompact3d_toolbox.Parameters()
         >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
+        ...     separator="-", file_extension=".bin", number_of_digits=3
         ... )
 
         If the simulated fields are named like ``ux0000``, the parameters are:
 
         >>> prm = xcompact3d_toolbox.Parameters()
         >>> prm.dataset.filename_properties.set(
-        ...     separator = "",
-        ...     file_extension = "",
-        ...     number_of_digits = 4
+        ...     separator="", file_extension="", number_of_digits=4
         ... )
         """
         for key, arg in kwargs.items():
             if key not in self.trait_names():
-                raise KeyError(f"{key} is not a valid argument for FilenameProperties")
+                msg = f"{key} is not a valid argument for FilenameProperties"
+                raise KeyError(msg)
             setattr(self, key, arg)
 
     def get_filename_for_binary(self, prefix: str, counter: int, data_path="") -> str:
@@ -148,9 +142,7 @@ class FilenameProperties(traitlets.HasTraits):
 
         >>> prm = xcompact3d_toolbox.Parameters()
         >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
+        ...     separator="-", file_extension=".bin", number_of_digits=3
         ... )
         >>> prm.dataset.filename_properties.get_filename_for_binary("ux", 10)
         'ux-010.bin'
@@ -158,9 +150,7 @@ class FilenameProperties(traitlets.HasTraits):
         'ux-???.bin'
 
         >>> prm.dataset.filename_properties.set(
-        ...     separator = "",
-        ...     file_extension = "",
-        ...     number_of_digits = 4
+        ...     separator="", file_extension="", number_of_digits=4
         ... )
         >>> prm.dataset.filename_properties.get_filename_for_binary("ux", 10)
         'ux0010'
@@ -192,17 +182,13 @@ class FilenameProperties(traitlets.HasTraits):
 
         >>> prm = xcompact3d_toolbox.Parameters()
         >>> prm.dataset.filename_properties.set(
-        ...     separator = "-",
-        ...     file_extension = ".bin",
-        ...     number_of_digits = 3
+        ...     separator="-", file_extension=".bin", number_of_digits=3
         ... )
-        >>> prm.dataset.filename_properties.get_info_from_filename('ux-010.bin')
+        >>> prm.dataset.filename_properties.get_info_from_filename("ux-010.bin")
         (10, 'ux')
 
         >>> prm.dataset.filename_properties.set(
-        ...     separator = "",
-        ...     file_extension = "",
-        ...     number_of_digits = 4
+        ...     separator="", file_extension="", number_of_digits=4
         ... )
         >>> prm.dataset.filename_properties.get_info_from_filename("ux0010")
         (10, 'ux')
@@ -236,8 +222,11 @@ class Dataset(traitlets.HasTraits):
     ----------
     data_path : str
         The path to the folder where the binary fields are located (default is ``"./data/"``).
-        .. note :: the default ``"./data/"`` is relative to the path to the parameters
-           file when initialized from :obj:`xcompact3d_toolbox.parameters.ParametersExtras`.
+
+    .. note::
+        The default ``"./data/"`` is relative to the path to the parameters
+        file when initialized from :obj:`xcompact3d_toolbox.parameters.ParametersExtras`.
+
     drop_coords : str
         If working with two-dimensional planes, specify which of the coordinates should be
         dropped, i.e., ``"x"``, ``"y"`` or ``"z"``, or leave it empty for 3D fields (default is ``""``).
@@ -265,23 +254,22 @@ class Dataset(traitlets.HasTraits):
 
     Notes
     -----
-        * :obj:`Dataset` is in fact an atribute of :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
-          so there is no need to initialize it manually for most of the common use cases.
+    * :obj:`Dataset` is in fact an attribute of :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
+      so there is no need to initialize it manually for most of the common use cases.
 
-        * All arrays are wrapped into Xarray objects (:obj:`xarray.DataArray`
-          or :obj:`xarray.Dataset`), take a look at `xarray's documentation`_,
-          specially, see `Why xarray?`_
-          Xarray has many useful methods for indexing, comparisons, reshaping
-          and reorganizing, computations and plotting.
+    * All arrays are wrapped into Xarray objects (:obj:`xarray.DataArray`
+      or :obj:`xarray.Dataset`), take a look at `xarray's documentation`_,
+      specially, see `Why xarray?`_
+      Xarray has many useful methods for indexing, comparisons, reshaping
+      and reorganizing, computations and plotting.
 
-        * Consider using hvPlot_ to explore your data interactively,
-          see how to plot `Gridded Data`_.
+    * Consider using hvPlot_ to explore your data interactively,
+      see how to plot `Gridded Data`_.
 
-        .. _`xarray's documentation`: http://xarray.pydata.org/en/stable/
-        .. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
-        .. _hvPlot : https://hvplot.holoviz.org/
-        .. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
-
+    .. _`xarray's documentation`: http://docs.xarray.dev/en/stable
+    .. _`Why xarray?`: http://docs.xarray.dev/en/stable/why-xarray.html
+    .. _hvPlot : https://hvplot.holoviz.org/
+    .. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
     """
 
     data_path = traitlets.Unicode(default_value="./data/")
@@ -294,9 +282,7 @@ class Dataset(traitlets.HasTraits):
     stack_velocity = traitlets.Bool(default_value=False)
 
     _mesh = traitlets.Instance(klass=Mesh3D)
-    _prm = traitlets.Instance(
-        klass="xcompact3d_toolbox.parameters.Parameters", allow_none=True
-    )
+    _prm = traitlets.Instance(klass="xcompact3d_toolbox.parameters.Parameters", allow_none=True)
 
     def __init__(self, **kwargs):
         """Initializes the Dataset class.
@@ -328,7 +314,7 @@ class Dataset(traitlets.HasTraits):
 
         self.set(**kwargs)
 
-    def __call__(self, *args) -> Type[xr.Dataset]:
+    def __call__(self, *args) -> Iterator[xr.Dataset]:
         """Yields selected snapshots, so the application can iterate over them,
         loading one by one, with the same arguments of a classic Python :obj:`range`.
 
@@ -351,9 +337,7 @@ class Dataset(traitlets.HasTraits):
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
         >>> prm.dataset.set(
         ...     filename_properties=dict(
-        ...         separator="-",
-        ...         file_extension=".bin",
-        ...         number_of_digits=3
+        ...         separator="-", file_extension=".bin", number_of_digits=3
         ...     ),
         ...     stack_scalar=True,
         ...     stack_velocity=True,
@@ -365,14 +349,12 @@ class Dataset(traitlets.HasTraits):
 
           >>> for ds in prm.dataset(0, 101, 5):
           ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-          ...     prm.dataset.write(data = vort, file_prefix = "w3")
+          ...     prm.dataset.write(data=vort, file_prefix="w3")
         """
         for t in range(*args):
             yield self.load_snapshot(t)
 
-    def __getitem__(
-        self, arg: Union[int, slice, str]
-    ) -> Union[Type[xr.DataArray], Type[xr.Dataset]]:
+    def __getitem__(self, arg: int | slice | str) -> xr.DataArray | xr.Dataset:
         """Get specified items from the disc.
 
         .. note:: Make sure to have enough memory to load many files at the same time.
@@ -398,7 +380,7 @@ class Dataset(traitlets.HasTraits):
         Raises
         ------
         TypeError
-            Raises type error if arg is not an interger, string or slice
+            Raises type error if arg is not an integer, string or slice
 
         Examples
         --------
@@ -408,9 +390,7 @@ class Dataset(traitlets.HasTraits):
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
         >>> prm.dataset.set(
         ...     filename_properties=dict(
-        ...         separator="-",
-        ...         file_extension=".bin",
-        ...         number_of_digits=3
+        ...         separator="-", file_extension=".bin", number_of_digits=3
         ...     ),
         ...     drop_coords="z",
         ...     stack_scalar=True,
@@ -445,14 +425,13 @@ class Dataset(traitlets.HasTraits):
         """
         if isinstance(arg, int):
             return self.load_snapshot(arg)
-        elif isinstance(arg, slice):
+        if isinstance(arg, slice):
             start, stop, step = arg.indices(len(self))
-            return xr.concat(
-                (self.load_snapshot(t) for t in range(start, stop, step)), "t"
-            )
-        elif isinstance(arg, str):
+            return xr.concat((self.load_snapshot(t) for t in range(start, stop, step)), "t")
+        if isinstance(arg, str):
             return self.load_time_series(arg)
-        raise TypeError("Dataset indices should be integers, string or slices")
+        msg = "Dataset indices should be integers, string or slices"
+        raise TypeError(msg)
 
     def __len__(self) -> int:
         """Make the dataset work with the Python function :obj:`len`.
@@ -465,11 +444,7 @@ class Dataset(traitlets.HasTraits):
         # Test environment
         if self._prm is None:
             return 11
-        return (
-            getattr(self._prm, self.snapshot_counting)
-            // getattr(self._prm, self.snapshot_step)
-            + 1
-        )
+        return getattr(self._prm, self.snapshot_counting) // getattr(self._prm, self.snapshot_step) + 1
 
     def __iter__(self):
         """Yields all the snapshots, so the application can iterate over them.
@@ -488,9 +463,7 @@ class Dataset(traitlets.HasTraits):
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
         >>> prm.dataset.set(
         ...     filename_properties=dict(
-        ...         separator="-",
-        ...         file_extension=".bin",
-        ...         number_of_digits=3
+        ...         separator="-", file_extension=".bin", number_of_digits=3
         ...     ),
         ...     stack_scalar=True,
         ...     stack_velocity=True,
@@ -500,7 +473,7 @@ class Dataset(traitlets.HasTraits):
 
         >>> for ds in prm.dataset:
         ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-        ...     prm.dataset.write(data = vort, file_prefix = "w3")
+        ...     prm.dataset.write(data=vort, file_prefix="w3")
         """
         for t in range(len(self)):
             yield self.load_snapshot(t)
@@ -510,7 +483,7 @@ class Dataset(traitlets.HasTraits):
         for name in self.trait_names():
             if name.startswith("_"):
                 continue
-            string += f"    {name} = {repr(getattr(self, name))},\n"
+            string += f"    {name} = {getattr(self, name)!r},\n"
         string += ")"
         return string
 
@@ -544,9 +517,7 @@ class Dataset(traitlets.HasTraits):
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
         >>> prm.dataset.set(
         ...     filename_properties=dict(
-        ...         separator="-",
-        ...         file_extension=".bin",
-        ...         number_of_digits=3
+        ...         separator="-", file_extension=".bin", number_of_digits=3
         ...     ),
         ...     stack_scalar=True,
         ...     stack_velocity=True,
@@ -558,12 +529,11 @@ class Dataset(traitlets.HasTraits):
 
         for key, arg in kwargs.items():
             if key not in self.trait_names():
-                raise KeyError(f"{key} is not a valid argument for Dataset")
+                msg = f"{key} is not a valid argument for Dataset"
+                raise KeyError(msg)
             setattr(self, key, arg)
 
-    def load_array(
-        self, filename: str, add_time: bool = True, attrs: dict = None
-    ) -> Type[xr.DataArray]:
+    def load_array(self, filename: str, attrs: dict | None = None, *, add_time: bool = True) -> type[xr.DataArray]:
         """This method reads a binary field from XCompact3d with :obj:`numpy.fromfile`
         and wraps it into a :obj:`xarray.DataArray` with the appropriate dimensions,
         coordinates and attributes.
@@ -590,9 +560,7 @@ class Dataset(traitlets.HasTraits):
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
         >>> prm.dataset.set(
         ...     filename_properties=dict(
-        ...         separator="-",
-        ...         file_extension=".bin",
-        ...         number_of_digits=3
+        ...         separator="-", file_extension=".bin", number_of_digits=3
         ...     ),
         ...     stack_scalar=True,
         ...     stack_velocity=True,
@@ -631,11 +599,12 @@ class Dataset(traitlets.HasTraits):
     def load_snapshot(
         self,
         numerical_identifier: int,
-        list_of_variables: list = None,
+        list_of_variables: list | None = None,
+        stack_scalar: bool | None = None,
+        stack_velocity: bool | None = None,
+        *,
         add_time: bool = True,
-        stack_scalar: bool = None,
-        stack_velocity: bool = None,
-    ) -> Type[xr.Dataset]:
+    ) -> type[xr.Dataset]:
         """Load the variables for a given snapshot.
 
         Parameters
@@ -649,11 +618,11 @@ class Dataset(traitlets.HasTraits):
         add_time : bool, optional
             Add time as a coordinate, by default True.
         stack_scalar : bool, optional
-            When true, the scalar fields will be stacked in a new coordinate ``n``, otherwise returns one array per scalar fraction.
-            If none, it uses :obj:`Dataset.stack_scalar`, by default None.
+            When true, the scalar fields will be stacked in a new coordinate ``n``, otherwise returns one array per
+            scalar fraction. If none, it uses :obj:`Dataset.stack_scalar`, by default None.
         stack_velocity : bool, optional
-            When true, the velocity will be stacked in a new coordinate ``i``, otherwise returns one array per velocity component.
-            If none, it uses :obj:`Dataset.stack_velocity`, by default None.
+            When true, the velocity will be stacked in a new coordinate ``i``, otherwise returns one array per velocity
+            component. If none, it uses :obj:`Dataset.stack_velocity`, by default None.
 
         Returns
         -------
@@ -674,9 +643,7 @@ class Dataset(traitlets.HasTraits):
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
         >>> prm.dataset.set(
         ...     filename_properties=dict(
-        ...         separator="-",
-        ...         file_extension=".bin",
-        ...         number_of_digits=3
+        ...         separator="-", file_extension=".bin", number_of_digits=3
         ...     ),
         ...     stack_scalar=True,
         ...     stack_velocity=True,
@@ -698,20 +665,14 @@ class Dataset(traitlets.HasTraits):
         elif self.set_of_variables:
             set_of_variables = self.set_of_variables.copy()
         else:
-            target_filename = self.filename_properties.get_filename_for_binary(
-                "*", numerical_identifier
-            )
+            target_filename = self.filename_properties.get_filename_for_binary("*", numerical_identifier)
 
             list_of_variables = glob.glob(os.path.join(self.data_path, target_filename))
-            list_of_variables = map(
-                self.filename_properties.get_name_from_filename, list_of_variables
-            )
-            set_of_variables = set(list_of_variables)
+            set_of_variables = {self.filename_properties.get_name_from_filename(i) for i in list_of_variables}
 
         if not set_of_variables:
-            raise IOError(
-                f"No file found corresponding to {self.data_path}/{target_filename}"
-            )
+            msg = f"No file found corresponding to {self.data_path}/{target_filename}"
+            raise OSError(msg)
 
         if stack_scalar is None:
             stack_scalar = self.stack_scalar
@@ -727,11 +688,12 @@ class Dataset(traitlets.HasTraits):
             )
 
         def is_scalar(name):
-            if len(name) != (3 + self.filename_properties.scalar_num_of_digits):
+            prefix = "phi"
+            if len(name) != (len(prefix) + self.filename_properties.scalar_num_of_digits):
                 return False
-            if not name.startswith("phi"):
+            if not name.startswith(prefix):
                 return False
-            if not name.removeprefix("phi").isdigit():
+            if not name[len(prefix) :].isdigit():
                 return False
             return True
 
@@ -740,11 +702,9 @@ class Dataset(traitlets.HasTraits):
 
         if stack_scalar:
             scalar_variables = sorted(
-                list(
-                    filter(
-                        is_scalar,
-                        set_of_variables,
-                    )
+                filter(
+                    is_scalar,
+                    set_of_variables,
                 )
             )
 
@@ -757,7 +717,7 @@ class Dataset(traitlets.HasTraits):
                 set_of_variables -= set(scalar_variables)
 
         if stack_velocity:
-            velocity_variables = sorted(list(filter(is_velocity, set_of_variables)))
+            velocity_variables = sorted(filter(is_velocity, set_of_variables))
             if velocity_variables:
                 dataset["u"] = (
                     stack_variables(velocity_variables, stack_velocity=False)
@@ -766,16 +726,14 @@ class Dataset(traitlets.HasTraits):
                 )
                 set_of_variables -= set(velocity_variables)
 
-        for var in sorted(list(set_of_variables)):
-            filename = self.filename_properties.get_filename_for_binary(
-                var, numerical_identifier
-            )
+        for var in sorted(set_of_variables):
+            filename = self.filename_properties.get_filename_for_binary(var, numerical_identifier)
             filename = os.path.join(self.data_path, filename)
             dataset[var] = self.load_array(filename=filename, add_time=add_time)
 
         return dataset
 
-    def load_time_series(self, array_prefix: str) -> Type[xr.DataArray]:
+    def load_time_series(self, array_prefix: str) -> type[xr.DataArray]:
         """Load the entire time series for a given variable.
 
         .. note:: Make sure to have enough memory to load all files at the same time.
@@ -804,9 +762,7 @@ class Dataset(traitlets.HasTraits):
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
         >>> prm.dataset.set(
         ...     filename_properties=dict(
-        ...         separator="-",
-        ...         file_extension=".bin",
-        ...         number_of_digits=3
+        ...         separator="-", file_extension=".bin", number_of_digits=3
         ...     ),
         ...     stack_scalar=True,
         ...     stack_velocity=True,
@@ -831,24 +787,20 @@ class Dataset(traitlets.HasTraits):
         ...     dataset[var] = prm.dataset[var]
 
         """
-        target_filename = self.filename_properties.get_filename_for_binary(
-            array_prefix, "*"
-        )
+        target_filename = self.filename_properties.get_filename_for_binary(array_prefix, "*")
         filename_pattern = os.path.join(self.data_path, target_filename)
         filename_list = sorted(glob.glob(filename_pattern))
 
         if not filename_list:
-            raise IOError(f"No file was found corresponding to {filename_pattern}.")
+            msg = f"No file was found corresponding to {filename_pattern}."
+            raise OSError(msg)
 
         return xr.concat(
-            (
-                self.load_array(file, add_time=True)
-                for file in tqdm(filename_list, desc=filename_pattern)
-            ),
+            (self.load_array(file, add_time=True) for file in tqdm(filename_list, desc=filename_pattern)),
             dim="t",
         )
 
-    def load_wind_turbine_data(self, file_pattern: str = None) -> Type[xr.Dataset]:
+    def load_wind_turbine_data(self, file_pattern: str | None = None) -> type[xr.Dataset]:
         """Load the data produced by wind turbine simulations.
 
         .. note:: This feature is experimental
@@ -894,19 +846,18 @@ class Dataset(traitlets.HasTraits):
         """
 
         def get_dataset(filename):
-
             time = os.path.basename(filename).split("_")[0]
 
             time = float(time) * self._prm.iturboutput * self._prm.dt
 
-            ds = xr.Dataset(coords=dict(t=[time]))
-            ds.t.attrs = dict(name="t", long_name="Time", units="s")
+            ds = xr.Dataset(coords={"t": [time]})
+            ds.t.attrs = {"name": "t", "long_name": "Time", "units": "s"}
 
             for name, values in pd.read_csv(filename).to_dict().items():
                 ds[name.strip()] = xr.DataArray(
                     data=np.float64(values[1]),
                     coords=ds.t.coords,
-                    attrs=dict(units=values[0].strip()[1:-1]),
+                    attrs={"units": values[0].strip()[1:-1]},
                 )
 
             return ds
@@ -918,7 +869,7 @@ class Dataset(traitlets.HasTraits):
 
         return xr.concat((get_dataset(file) for file in filenames), dim="t").sortby("t")
 
-    def write(self, data: Union[xr.DataArray, xr.Dataset], file_prefix: str = None):
+    def write(self, data: xr.DataArray | xr.Dataset, file_prefix: str | None = None):
         """Write an array or dataset to raw binary files on the disc, in the
         same order that Xcompact3d would do, so they can be easily read with
         2DECOMP.
@@ -957,39 +908,39 @@ class Dataset(traitlets.HasTraits):
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
         >>> prm.dataset.set(
         ...     filename_properties=dict(
-        ...         separator="-",
-        ...         file_extension=".bin",
-        ...         number_of_digits=3
+        ...         separator="-", file_extension=".bin", number_of_digits=3
         ...     ),
         ...     stack_scalar=True,
         ...     stack_velocity=True,
         ... )
 
-        * From a dataset, write only the variables with the atribute ``file_name``,
-        notice that ``ux`` and ``uy`` will not be overwritten because them do not
-        have the atribute ``file_name``:
+        * From a dataset, write only the variables with the attribute ``file_name``,
+            notice that ``ux`` and ``uy`` will not be overwritten because them do not
+            have the attribute ``file_name``:
 
-          >>> for ds in prm.dataset:
-          ...     ds["vort"] = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.  first_derivative("y")
-          ...     ds["vort"].attrs["file_name"] = "vorticity"
-          ...     prm.dataset.write(ds)
+            >>> for ds in prm.dataset:
+            ...     ds["vort"] = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative(
+            ...         "y"
+            ...     )
+            ...     ds["vort"].attrs["file_name"] = "vorticity"
+            ...     prm.dataset.write(ds)
 
         * Write an array:
 
-          >>> for ds in prm.dataset:
-          ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-          ...     vort.attrs["file_name"] = "vorticity"
-          ...     prm.dataset.write(vort)
+            >>> for ds in prm.dataset:
+            ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+            ...     vort.attrs["file_name"] = "vorticity"
+            ...     prm.dataset.write(vort)
 
-          or
+            or
 
-          >>> for ds in prm.dataset:
-          ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-          ...     prm.dataset.write(data = vort, file_prefix = "vorticity")
+            >>> for ds in prm.dataset:
+            ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+            ...     prm.dataset.write(data=vort, file_prefix="vorticity")
 
-        .. note :: It is not recomended to load the arrays with
-           ``add_time = False`` when planning to write the results in a
-           time series (e.g., `vort-000.bin`, `vort-001.bin`, `vort-002.bin`, ...)
+        .. note :: It is not recommended to load the arrays with
+            ``add_time = False`` when planning to write the results in a
+            time series (e.g., `vort-000.bin`, `vort-001.bin`, `vort-002.bin`, ...)
 
 
         """
@@ -1000,49 +951,46 @@ class Dataset(traitlets.HasTraits):
             os.makedirs(self.data_path, exist_ok=True)
             self._write_array(data, file_prefix)
         else:
-            raise IOError(
-                f"Invalid type for data, try with: xarray.Dataset or xarray.DataArray"
-            )
+            msg = "Invalid type for data, try with: xarray.Dataset or xarray.DataArray"
+            raise OSError(msg)
 
     def _write_dataset(self, dataset) -> None:
-
         for array_name, array in dataset.items():
             if "file_name" in array.attrs:
                 self._write_array(array)
             else:
-                warnings.warn(f"Can't write array {array_name}, no filename provided")
+                warnings.warn(f"Can't write array {array_name}, no filename provided", stacklevel=1)
 
-    def _write_array(self, dataArray, filename: str = None) -> None:
-        if filename is None:  # Try to get from atributes
-            filename = dataArray.attrs.get("file_name", None)
+    def _write_array(self, data_array, filename: str | None = None) -> None:
+        if filename is None:  # Try to get from attributes
+            filename = data_array.attrs.get("file_name", None)
         if filename is None:
-            raise IOError(f"Can't write field without a filename")
+            msg = "Can't write field without a filename"
+            raise OSError(msg)
         # If n is a dimension (for scalar), call write recursively to save
         # phi1, phi2, phi3, for instance.
-        if "n" in dataArray.dims:
-            for n, n_val in enumerate(dataArray.n.data):
+        if "n" in data_array.dims:
+            for n, n_val in enumerate(data_array.n.data):
                 self._write_array(
-                    dataArray.isel(n=n, drop=True),
+                    data_array.isel(n=n, drop=True),
                     filename=f"{filename}{str(n_val).zfill(self.filename_properties.scalar_num_of_digits)}",
                 )
         # If i is a dimension, call write recursively to save
         # ux, uy and uz, for instance
-        elif "i" in dataArray.dims:
-            for i, i_val in enumerate(dataArray.i.data):
-                self._write_array(
-                    dataArray.isel(i=i, drop=True), filename=f"{filename}{i_val}"
-                )
+        elif "i" in data_array.dims:
+            for i, i_val in enumerate(data_array.i.data):
+                self._write_array(data_array.isel(i=i, drop=True), filename=f"{filename}{i_val}")
         # If t is a dimension (for time), call write recursively to save
         # ux-0000.bin, ux-0001.bin, ux-0002.bin, for instance.
-        elif "t" in dataArray.dims:
+        elif "t" in data_array.dims:
             dt = self._time_step
-            if dataArray.t.size == 1:
-                loop_itr = enumerate(dataArray.t.data)
+            if data_array.t.size == 1:
+                loop_itr = enumerate(data_array.t.data)
             else:
-                loop_itr = enumerate(tqdm(dataArray.t.data, desc=filename))
+                loop_itr = enumerate(tqdm(data_array.t.data, desc=filename))
             for k, time in loop_itr:
                 self._write_array(
-                    dataArray.isel(t=k, drop=True),
+                    data_array.isel(t=k, drop=True),
                     self.filename_properties.get_filename_for_binary(
                         prefix=filename,
                         counter=int(time / dt),
@@ -1050,18 +998,14 @@ class Dataset(traitlets.HasTraits):
                 )
         # and finally writes to the disc
         else:
-            fileformat = self.filename_properties.file_extension
+            fileformat: str = self.filename_properties.file_extension
             if fileformat and not filename.endswith(fileformat):
                 filename += fileformat
-            align = [
-                dataArray.get_axis_num(i) for i in sorted(dataArray.dims, reverse=True)
-            ]
+            align = [data_array.get_axis_num(i) for i in sorted(data_array.dims, reverse=True)]
             filename_and_path = os.path.join(self.data_path, filename)
-            dataArray.values.astype(param["mytype"]).transpose(align).tofile(
-                filename_and_path
-            )
+            data_array.values.astype(param["mytype"]).transpose(align).tofile(filename_and_path)
 
-    def write_xdmf(self, xdmf_name: str = "snapshots.xdmf") -> None:
+    def write_xdmf(self, xdmf_name: str = "snapshots.xdmf", *, float_precision: int | None = None) -> None:
         """Write the xdmf file, so the results from the simulation and its postprocessing
         can be opened in an external visualization tool, like Paraview.
 
@@ -1073,6 +1017,9 @@ class Dataset(traitlets.HasTraits):
         ----------
         xdmf_name : str, optional
             Filename for the xdmf file, by default "snapshots.xdmf"
+        float_precision : int, optional
+            Number of digits for the float precision on the output file, by default None.
+            If None, it uses 8 for single precision and 16 for double precision arrays.
 
         Raises
         ------
@@ -1087,9 +1034,7 @@ class Dataset(traitlets.HasTraits):
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
         >>> prm.dataset.set(
         ...     filename_properties=dict(
-        ...         separator="-",
-        ...         file_extension=".bin",
-        ...         number_of_digits=3
+        ...         separator="-", file_extension=".bin", number_of_digits=3
         ...     ),
         ...     stack_scalar=True,
         ...     stack_velocity=True,
@@ -1101,8 +1046,8 @@ class Dataset(traitlets.HasTraits):
         >>> prm.dataset.write_xdmf()
         """
         if self.set_of_variables:
-            time_numbers = range(len(self))
-            var_names = sorted(list(self.set_of_variables))
+            time_numbers = list(range(len(self)))
+            var_names = sorted(self.set_of_variables)
         else:
             filename_pattern = self.filename_properties.get_filename_for_binary(
                 prefix="*", counter="*", data_path=self.data_path
@@ -1110,17 +1055,13 @@ class Dataset(traitlets.HasTraits):
             filename_list = glob.glob(filename_pattern)
 
             if not filename_list:
-                raise IOError(f"No file was found corresponding to {filename_pattern}.")
+                msg = f"No file was found corresponding to {filename_pattern}."
+                raise OSError(msg)
 
-            properties = zip(
-                *map(
-                    self.filename_properties.get_info_from_filename,
-                    filename_list,
-                )
-            )
-            time_numbers, var_names = properties
-            time_numbers = sorted(list(set(time_numbers)))
-            var_names = sorted(list(set(var_names)))
+            properties = [self.filename_properties.get_info_from_filename(f) for f in filename_list]
+
+            time_numbers = sorted({r[0] for r in properties})
+            var_names = sorted({r[1] for r in properties})
 
         nx = self._mesh.x.grid_size
         ny = self._mesh.y.grid_size
@@ -1140,20 +1081,20 @@ class Dataset(traitlets.HasTraits):
             nz, dz = 1, 0.0
 
         prec = 8 if param["mytype"] == np.float64 else 4
+        if float_precision is None:
+            float_precision = 2 * prec
+
+        float_format = f".{float_precision}e"
 
         def get_filename(var_name, num):
-            return self.filename_properties.get_filename_for_binary(
-                var_name, num, self.data_path
-            )
+            return self.filename_properties.get_filename_for_binary(var_name, num, self.data_path)
 
         with open(xdmf_name, "w") as f:
             f.write('<?xml version="1.0" ?>\n')
             f.write(' <!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>\n')
-            f.write(
-                ' <Xdmf xmlns:xi="http://www.w3.org/2001/XInclude" Version="2.0">\n'
-            )
+            f.write(' <Xdmf xmlns:xi="http://www.w3.org/2001/XInclude" Version="2.0">\n')
             f.write(" <Domain>\n")
-            if self._mesh.y.istret == 0:
+            if self._mesh.y.istret == Istret.NO_REFINEMENT:
                 f.write('     <Topology name="topo" TopologyType="3DCoRectMesh"\n')
                 f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
                 f.write("     </Topology>\n")
@@ -1164,7 +1105,8 @@ class Dataset(traitlets.HasTraits):
                 f.write("         </DataItem>\n")
                 f.write("         <!-- DxDyDz -->\n")
                 f.write('         <DataItem Format="XML" Dimensions="3">\n')
-                f.write(f"           {dz}  {dy}  {dx}\n")
+                array = " ".join(format(i, float_format) for i in (dz, dy, dx))
+                f.write(f"           {array}\n")
                 f.write("         </DataItem>\n")
                 f.write("     </Geometry>\n")
             else:
@@ -1172,56 +1114,37 @@ class Dataset(traitlets.HasTraits):
                 f.write(f'         Dimensions="{nz} {ny} {nx}">\n')
                 f.write("     </Topology>\n")
                 f.write('     <Geometry name="geo" Type="VXVYVZ">\n')
-                f.write(
-                    f'         <DataItem Dimensions="{nx}" NumberType="Float" Precision="{prec}" Format="XML">\n'
-                )
-                f.write(
-                    f'         {" ".join(map(str, self._mesh.x.vector)) if nx > 1 else 0.0}\n'
-                )
+                f.write(f'         <DataItem Dimensions="{nx}" NumberType="Float" Precision="{prec}" Format="XML">\n')
+                array = " ".join(format(i, float_format) for i in self._mesh.x.vector) if nx > 1 else "0.0"
+                f.write(f"         {array}\n")
                 f.write("          </DataItem>\n")
-                f.write(
-                    f'         <DataItem Dimensions="{ny}" NumberType="Float" Precision="{prec}" Format="XML">\n'
-                )
-                f.write(
-                    f'         {" ".join(map(str, self._mesh.y.vector)) if ny > 1 else 0.0}'
-                )
+                f.write(f'         <DataItem Dimensions="{ny}" NumberType="Float" Precision="{prec}" Format="XML">\n')
+                array = " ".join(format(j, float_format) for j in self._mesh.y.vector) if ny > 1 else "0.0"
+                f.write(f"         {array}\n")
                 f.write("          </DataItem>\n")
-                f.write(
-                    f'         <DataItem Dimensions="{nz}" NumberType="Float" Precision="{prec}" Format="XML">\n'
-                )
-                f.write(
-                    f'         {" ".join(map(str, self._mesh.z.vector)) if nz > 1 else 0.0}'
-                )
+                f.write(f'         <DataItem Dimensions="{nz}" NumberType="Float" Precision="{prec}" Format="XML">\n')
+                array = " ".join(format(k, float_format) for k in self._mesh.z.vector) if nz > 1 else "0.0"
+                f.write(f"         {array}\n")
                 f.write("         </DataItem>\n")
                 f.write("     </Geometry>\n")
             f.write("\n")
-            f.write(
-                '     <Grid Name="TimeSeries" GridType="Collection" CollectionType="Temporal">\n'
-            )
+            f.write('     <Grid Name="TimeSeries" GridType="Collection" CollectionType="Temporal">\n')
             f.write('         <Time TimeType="HyperSlab">\n')
-            f.write(
-                '             <DataItem Format="XML" NumberType="Float" Dimensions="3">\n'
-            )
+            f.write('             <DataItem Format="XML" NumberType="Float" Dimensions="3">\n')
             f.write("             <!--Start, Stride, Count-->\n")
-            f.write(f"             0.0 {dt}\n")
+            f.write(f"             0.0 {format(dt, float_format)}\n")
             f.write("             </DataItem>\n")
             f.write("         </Time>\n")
             for suffix in tqdm(time_numbers, desc=xdmf_name):
                 f.write("\n")
                 f.write("\n")
                 f.write(f'         <Grid Name="{suffix}" GridType="Uniform">\n')
-                f.write(
-                    '             <Topology Reference="/Xdmf/Domain/Topology[1]"/>\n'
-                )
-                f.write(
-                    '             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>\n'
-                )
+                f.write('             <Topology Reference="/Xdmf/Domain/Topology[1]"/>\n')
+                f.write('             <Geometry Reference="/Xdmf/Domain/Geometry[1]"/>\n')
                 for prefix in var_names:
                     f.write(f'             <Attribute Name="{prefix}" Center="Node">\n')
                     f.write('                <DataItem Format="Binary"\n')
-                    f.write(
-                        f'                 DataType="Float" Precision="{prec}" Endian="little" Seek="0" \n'
-                    )
+                    f.write(f'                 DataType="Float" Precision="{prec}" Endian="little" Seek="0"\n')
                     f.write(f'                 Dimensions="{nz} {ny} {nx}">\n')
                     f.write(f"                   {get_filename(prefix, suffix)}\n")
                     f.write("                </DataItem>\n")
@@ -1230,74 +1153,68 @@ class Dataset(traitlets.HasTraits):
             f.write("\n")
             f.write("     </Grid>\n")
             f.write(" </Domain>\n")
-            f.write("</Xdmf>")
+            f.write("</Xdmf>\n")
 
 
 def prm_to_dict(filename="incompact3d.prm"):
-
-    f = open(filename)
-
     dict_outer = {}
 
-    for line in f:
-        # Remove spaces
-        line = " ".join(line.split())
+    with open(filename) as f:
+        for raw_line in f:
+            # Remove spaces
+            line = " ".join(raw_line.split())
 
-        if line == "":  # Cycle if line is empty
-            continue
-        if line[0] == "#":  # Cycle if starts with a comment
-            continue
+            if line == "":  # Cycle if line is empty
+                continue
+            if line[0] == "#":  # Cycle if starts with a comment
+                continue
 
-        line = line.split("#")
-        # Get variable's name and value
-        param = line[1].strip()
-        value = line[0].strip()
+            line = line.split("#")
+            # Get variable's name and value
+            parameter = line[1].strip()
+            value = line[0].strip()
 
-        try:
-            # Converting from string according to datatype
-            if value[0] == "'" and value[-1] == "'":  # String
-                value = value[1:-1]
-            elif value.lower() == ".false.":  # Bool
-                value = False
-            elif value.lower() == ".true.":  # Bool
-                value = True
-            elif "." in value:  # Float
-                value = float(value)
-            else:  # Int
-                value = int(value)
-        except:
-            warnings.warn(f"Can't convert {param} : {value}")
-            continue
+            try:
+                # Converting from string according to datatype
+                if value[0] == "'" and value[-1] == "'":  # String
+                    value = value[1:-1]
+                elif value.lower() == ".false.":  # Bool
+                    value = False
+                elif value.lower() == ".true.":  # Bool
+                    value = True
+                elif "." in value:  # Float
+                    value = float(value)
+                else:  # Int
+                    value = int(value)
+            except TypeError:
+                warnings.warn(f"Can't convert {parameter} : {value}", stacklevel=1)
+                continue
 
-        if "(" in param and ")" == param[-1]:  # Param is a list
-            param = param.split("(")[0]
-            if param not in dict_outer:
-                dict_outer[param] = []
-            dict_outer[param].append(value)
-        else:  # Not a list
-            dict_outer[param] = value
-
-    f.close()
+            if "(" in parameter and parameter[-1] == ")":  # Param is a list
+                parameter = parameter.split("(")[0]
+                if parameter not in dict_outer:
+                    dict_outer[parameter] = []
+                dict_outer[parameter].append(value)
+            else:  # Not a list
+                dict_outer[parameter] = value
 
     return dict_outer
 
 
 def i3d_to_dict(filename="input.i3d", string=None):
-
     if string is None:
-        with open(filename, "r") as f:
+        with open(filename) as f:
             string = f.read()
 
     return i3d_string_to_dict(string)
 
 
 def i3d_string_to_dict(string):
-
     dict_outer = {}
 
-    for line in io.StringIO(string):
+    for raw_line in io.StringIO(string):
         # Remove comments
-        line = line.partition("!")[0].replace(" ", "")
+        line = raw_line.partition("!")[0].replace(" ", "")
         # Remove spaces
         line = " ".join(line.split())
 
@@ -1316,7 +1233,7 @@ def i3d_string_to_dict(string):
             continue
 
         # Get variable's name and value
-        param = line.partition("=")[0]
+        parameter = line.partition("=")[0]
         value = line.partition("=")[-1]
 
         try:
@@ -1331,16 +1248,16 @@ def i3d_string_to_dict(string):
                 value = float(value)
             else:  # Int
                 value = int(value)
-        except:
-            warnings.warn(f"Can't convert {param} : {value}")
+        except TypeError:
+            warnings.warn(f"Can't convert {parameter} : {value}", stacklevel=1)
             continue
 
-        if "(" in param and ")" == param[-1]:  # Param is a list
-            param = param.split("(")[0]
-            if param not in dict_inner:
-                dict_inner[param] = []
-            dict_inner[param].append(value)
+        if "(" in parameter and parameter[-1] == ")":  # Param is a list
+            parameter = parameter.split("(")[0]
+            if parameter not in dict_inner:
+                dict_inner[parameter] = []
+            dict_inner[parameter].append(value)
         else:  # Not a list
-            dict_inner[param] = value
+            dict_inner[parameter] = value
 
     return dict_outer

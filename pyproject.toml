@@ -1,0 +1,107 @@
+[project]
+name = "xcompact3d_toolbox"
+description = "A set of tools for pre and postprocessing prepared for the high-order Navier-Stokes solver XCompact3d"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [{ name = "Felipe N. Schuch", email = "me@fschuch.com" }]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python",
+    "Topic :: Scientific/Engineering",
+]
+dynamic = ["version"]
+dependencies = [
+    "numpy>=1.22",
+    "scipy>=1.5",
+    "traitlets>=4.3",
+    "ipywidgets>=7.5",
+    "pandas>=1.1",
+    "xarray>=0.16",
+    "netcdf4>=1.6.3",
+    "dask[complete]>=2.22",
+    "numba>=0.50",
+    "tqdm>=4.62",
+    "numpy-stl>=2.16.3",
+    "loguru>=0.6",
+]
+
+[project.optional-dependencies]
+visu = [
+    "matplotlib>=3.2",
+    "bokeh>=2.3",
+    "datashader>=0.13",
+    "hvplot>=0.7",
+    "panel>=0.12",
+    "holoviews>=1.14",
+]
+
+[project.urls]
+Changelog = "https://github.com/fschuch/xcompact3d_toolbox/blob/main/docs/news.md"
+Documentation = "https://xcompact3d-toolbox.readthedocs.io/"
+Issues = "https://github.com/fschuch/xcompact3d_toolbox/issues"
+Repository = "https://github.com/fschuch/xcompact3d_toolbox"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+# addopts = [
+#     "--doctest-modules",
+#     "--doctest-glob='*.md'",
+#     "--doctest-continue-on-failure",
+#     "--doctest-report=ndiff",
+# ]
+
+[tool.coverage.run]
+branch = true
+relative_files = true
+source = ["xcompact3d_toolbox", "tests"]
+omit = ["xcompact3d_toolbox/_version.py"]
+
+[tool.coverage.report]
+show_missing = true
+precision = 2
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:", "def __repr__"]
+
+[tool.ruff]
+extend = "ruff_defaults.toml"
+extend-exclude = ["./docs/conf.py"]
+
+[tool.ruff.lint]
+extend-ignore = ["A003"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"*.ipynb" = [
+    "E402",    # module level import not at top of file
+    "E712",    # comparison to True should be 'if cond is True:' or 'if cond:'
+    "PLR2004", # Magic value used in comparison
+    "T201",    # `print` found
+]
+"__init__.py" = ["F401"] # imported but unused
+"xcompact3d_toolbox/parameters.py" = [
+    "N815", # variable in function should be lowercase, but they come from x3d
+]
+"xcompact3d_toolbox/sandbox.py" = [
+    "E712", # comparison to True should be 'if cond is True:' or 'if cond:'
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.mypy]
+pretty = true
+ignore_missing_imports = true
+exclude = ["docs/conf.py"]
+
+[tool.codespell]
+skip = "docs/conf.py"
+check-filenames = true
+
+[build-system]
+requires = ["hatchling>=1.21.0", "hatch-vcs>=0.3.0"]
+build-backend = "hatchling.build"

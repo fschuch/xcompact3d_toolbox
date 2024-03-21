@@ -4,11 +4,9 @@ import warnings
 
 import xarray as xr
 
-from .parameters import Parameters
+from xcompact3d_toolbox.parameters import Parameters
 
-xr.tutorial.external_urls[
-    "cylinder"
-] = "https://github.com/fschuch/xcompact3d_toolbox_data/raw/main/cylinder.nc"
+xr.tutorial.external_urls["cylinder"] = "https://github.com/fschuch/xcompact3d_toolbox_data/raw/main/cylinder.nc"
 
 
 def open_dataset(name: str, **kws) -> tuple[xr.Dataset, Parameters]:
@@ -33,7 +31,7 @@ def open_dataset(name: str, **kws) -> tuple[xr.Dataset, Parameters]:
     xarray.open_dataset
     """
     ds = xr.tutorial.open_dataset(name, **kws)
-    # have a prm atribute, write it to the disc, del prm atribute
+    # have a prm attribute, write it to the disc, del prm attribute
 
     prm = Parameters()
 

@@ -1,9 +1,9 @@
 import scipy.sparse as sp
 
-from .param import param
+from xcompact3d_toolbox.param import param
 
 
-def SecondDerivative(n, d=None, ncl1=2, ncln=2, npaire=1, coord=None):
+def second_derivative(n, d=None, ncl1=2, ncln=2, npaire=1):
     """
     f_xx = (-1*f[i-2]+16*f[i-1]-30*f[i+0]+16*f[i+1]-1*f[i+2])/(12*h**2)
     """
@@ -37,7 +37,7 @@ def SecondDerivative(n, d=None, ncl1=2, ncln=2, npaire=1, coord=None):
             rhs[0, 2] *= 2.0
             # f_xx = (-1*f[1]+16*f[0]-30*f[1]+16*f[2]-1*f[3])/(12*h**2)
             rhs[1, 1] += rhs[1, 3]
-    elif ncl1 == 2:
+    elif ncl1 == 2:  # noqa: PLR2004
         # f_xx = (35*f[0]-104*f[1]+114*f[2]-56*f[3]+11*f[4])/(12*h**2)
         rhs[0, 0] = 35.0
         rhs[0, 1] = -104.0
@@ -73,7 +73,7 @@ def SecondDerivative(n, d=None, ncl1=2, ncln=2, npaire=1, coord=None):
             rhs[-1, -3] *= 2.0
             # f_xx = (-1*f[-4]+16*f[-3]-30*f[-2]+16*f[-1]-1*f[-2])/(12*h**2)
             rhs[-2, -2] += rhs[-2, -4]
-    elif ncln == 2:
+    elif ncln == 2:  # noqa: PLR2004
         # f_xx = (11*f[-5]-56*f[-4]+114*f[-3]-104*f[-2]+35*f[-1])/(12*h**2)
         rhs[-1, -5] = 11.0
         rhs[-1, -4] = -56.0
@@ -90,7 +90,7 @@ def SecondDerivative(n, d=None, ncl1=2, ncln=2, npaire=1, coord=None):
     return (rhs / (12.0 * d * d)).tocoo()
 
 
-def FirstDerivative(n, d, ncl1=2, ncln=2, npaire=1):
+def first_derivative(n, d, ncl1=2, ncln=2, npaire=1):
     """
     f_x = (1*f[i-2]-8*f[i-1]+0*f[i+0]+8*f[i+1]-1*f[i+2])/(12*h**1)
     """
@@ -122,7 +122,7 @@ def FirstDerivative(n, d, ncl1=2, ncln=2, npaire=1):
             rhs[0, 2] = 0.0
             # f_x = (1*f[1]-8*f[0]+0*f[1]+8*f[2]-1*f[3])/(12*h**1)
             rhs[1, 1] -= rhs[1, 3]
-    elif ncl1 == 2:
+    elif ncl1 == 2:  # noqa: PLR2004
         # f_x = (-25*f[0]+48*f[1]-36*f[2]+16*f[3]-3*f[4])/(12*h**1)
         rhs[0, 0] = -25.0
         rhs[0, 1] = 48.0
@@ -156,7 +156,7 @@ def FirstDerivative(n, d, ncl1=2, ncln=2, npaire=1):
             rhs[-1, -3] = 0.0
             # f_x = (1*f[-4]-8*f[-3]+0*f[-2]+8*f[-1]-1*f[-2])/(12*h**1)
             rhs[-2, -2] -= rhs[-2, -4]
-    elif ncln == 2:
+    elif ncln == 2:  # noqa: PLR2004
         # f_x = (3*f[-5]-16*f[-4]+36*f[-3]-48*f[-2]+25*f[-1])/(12*h**1)
         rhs[-1, -5] = 3.0
         rhs[-1, -4] = -16.0

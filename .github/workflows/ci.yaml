@@ -1,0 +1,119 @@
+name: CI
+
+on:
+  push:
+    tags: ["v[0-9]+\\.[0-9]+\\.[0-9]+.*"]
+    branches:
+      - main
+      - release/**
+  pull_request:
+    paths:
+      - .github/workflows/ci.yaml
+      - hatch.toml
+      - pyproject.toml
+      - sonar-project.properties
+      - tests/**
+      - xcompact3d_toolbox/**
+  schedule:
+    - cron: "0 0 * * 1" # midnight every Monday
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+      - name: Install Hatch
+        run: python -m pip install hatch
+      - name: Install and Show dependencies
+        run: hatch run +py=${{ matrix.python-version }} test:pip freeze
+      - name: Run tests
+        run: |
+          hatch run +py=${{ matrix.python-version }} test:extended --cov-report=xml:coverage.${{ matrix.os }}.${{ matrix.python-version }}.xml
+      - name: Upload coverage data
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.os }}-${{ matrix.python-version }}
+          path: coverage.*.xml
+
+  sonarcloud:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          merge-multiple: true
+      - name: Set project version
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "sonar.projectVersion=${{ github.ref }}" >> sonar-project.properties
+          fi
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  build:
+    needs: sonarcloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Install Hatch
+        run: python -m pip install hatch
+      - name: Build package
+        run: hatch build
+      - uses: actions/upload-artifact@v4
+        with:
+          path: dist/*.tar.gz
+          name: built-sdist
+      - uses: actions/upload-artifact@v4
+        with:
+          path: dist/*.whl
+          name: built-bdist
+
+  release:
+    needs: build
+    # upload to PyPI on every tag
+    if: github.event_name == 'push' && github.ref_type == 'tag' && github.repository == 'fschuch/xcompact3d_toolbox'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/xcompact3d-toolbox
+    permissions:
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: built-*
+          path: dist
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - uses: ncipollo/release-action@v1
+        with:
+          draft: true
+          skipIfReleaseExists: true
+          generateReleaseNotes: true

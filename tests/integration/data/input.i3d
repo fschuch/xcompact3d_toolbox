@@ -59,7 +59,7 @@ iibm=2                ! Flag for immersed boundary method (0: No IBM, 1: Old IBM
 ! Spatial derivatives
 ifirstder = 4         ! (1->2nd central, 2->4th central, 3->4th compact, 4-> 6th compact)
 isecondder = 4        ! (1->2nd central, 2->4th central, 3->4th compact, 4-> 6th compact, 5->hyperviscous 6th)
-ipinter = 3           ! interpolation scheme (1: classic, 2: optimized, 3: optimized agressive)
+ipinter = 3           ! interpolation scheme (1: classic, 2: optimized, 3: optimized aggressive)
 
 ! Time scheme
 itimescheme = 2       ! Time integration scheme (1->Euler,2->AB2, 3->AB3, 4->AB4,5->RK3,6->RK4)
@@ -133,8 +133,8 @@ SmagWallDamp = 1      ! Smagorinsky damping function for ABL if 1
  ra=0.5         ! when simulating a cylinder, radius
  nraf=10         ! level of refinement for (iibm=2 0r iibm=4) to find the surface of the immersed object
  nobjmax=1      ! number of immersed objects (DO NOT USE ZERO OBJECTS)
- npif=2         ! Number of Points for the Reconstruction (npif=1-3) (Recomended: 2)
- izap=1         ! How many points to skip for reconstruction (Range: 0-3) (Reccomended: 1)
+ npif=2         ! Number of Points for the Reconstruction (npif=1-3) (recommended: 2)
+ izap=1         ! How many points to skip for reconstruction (Range: 0-3) (Recommended: 1)
  ianal=0        ! Boundary position approximation? (0: Refinement Approximation, 1: Analytical)
 
 iforces=1

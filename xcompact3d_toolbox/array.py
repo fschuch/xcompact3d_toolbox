@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The data structure is provided by `xarray`_, that introduces labels in the
 form of dimensions, coordinates and attributes on top of raw `NumPy`_-like
 arrays, which allows for a more intuitive, more concise, and less error-prone
@@ -13,11 +12,11 @@ Consider using hvPlot_ to explore your data interactively,
 see how to plot `Gridded Data`_.
 
 Xcompact3d-toolbox adds extra functions on top of :obj:`xarray.DataArray`
-and :obj:`xarray.Dataset`, all the details are described bellow.
+and :obj:`xarray.Dataset`, all the details are described below.
 
 .. _dask: https://dask.org/
 .. _numpy: https://numpy.org/
-.. _xarray: http://xarray.pydata.org/en/stable/
+.. _xarray: http://docs.xarray.dev/en/stable
 .. _hvPlot : https://hvplot.holoviz.org/
 .. _`Gridded Data` : https://hvplot.holoviz.org/user_guide/Gridded_Data.html
 
@@ -26,9 +25,9 @@ and :obj:`xarray.Dataset`, all the details are described bellow.
 import xarray as xr
 from scipy.integrate import cumtrapz, simps
 
-from .derive import FirstDerivative, SecondDerivative
-from .mesh import _stretching
-from .param import param
+from xcompact3d_toolbox.derive import first_derivative, second_derivative
+from xcompact3d_toolbox.mesh import Istret, _stretching
+from xcompact3d_toolbox.param import param
 
 
 @xr.register_dataset_accessor("x3d")
@@ -36,7 +35,6 @@ class X3dDataset:
     """An accessor with extra utilities for :obj:`xarray.Dataset`."""
 
     def __init__(self, data_set):
-
         self._data_set = data_set
 
     def cumtrapz(self, dim):
@@ -58,7 +56,7 @@ class X3dDataset:
         Examples
         -------
 
-        >>> ds.x3d.cumtrapz('t')
+        >>> ds.x3d.cumtrapz("t")
 
         """
 
@@ -74,7 +72,7 @@ class X3dDataset:
 
     def simps(self, *args):
         """Integrate all arrays in this dataset in direction(s) ``args``
-        using the composite Simpson’s rule.
+        using the composite Simpson's rule.
         It is a wrapper for :obj:`scipy.integrate.simps`.
 
         Parameters
@@ -95,9 +93,9 @@ class X3dDataset:
         Examples
         -------
 
-        >>> ds.x3d.simps('x')
-        >>> ds.x3d.simps('t')
-        >>> ds.x3d.simps('x', 'y', 'z')
+        >>> ds.x3d.simps("x")
+        >>> ds.x3d.simps("t")
+        >>> ds.x3d.simps("x", "y", "z")
 
         """
 
@@ -112,18 +110,15 @@ class X3dDataset:
             )
 
         for var in args:
-            if not var in self._data_set.dims:
-                raise ValueError(
-                    f'Invalid value for "args", it should be a valid dimension'
-                )
+            if var not in self._data_set.dims:
+                msg = 'Invalid value for "args", it should be a valid dimension'
+                raise ValueError(msg)
 
+        result = 0
         for i, var in enumerate(args):
-            if i == 0:
-                I = integrate(self._data_set, var)
-            else:
-                I = integrate(I, var)
+            result = integrate(self._data_set, var) if i == 0 else integrate(result, var)
 
-        return I
+        return result
 
     def pencil_decomp(self, *args):
         """Coerce all arrays in this dataset into dask arrays.
@@ -152,20 +147,17 @@ class X3dDataset:
         Examples
         -------
 
-        >>> ds.x3d.pencil_decomp('x') # Pencil decomposition
-        >>> ds.x3d.pencil_decomp('t')
-        >>> ds.x3d.pencil_decomp('y', 'z') # Slab decomposition
+        >>> ds.x3d.pencil_decomp("x")  # Pencil decomposition
+        >>> ds.x3d.pencil_decomp("t")
+        >>> ds.x3d.pencil_decomp("y", "z")  # Slab decomposition
 
         """
 
         if not set(args).issubset(set(self._data_set.dims)):
-            raise ValueError(
-                f'Invalid value for "args", it should be a valid dimension'
-            )
+            msg = 'Invalid value for "args", it should be a valid dimension'
+            raise ValueError(msg)
 
-        return self._data_set.chunk(
-            chunks={dim: "auto" if dim in args else -1 for dim in self._data_set.dims}
-        )
+        return self._data_set.chunk(chunks={dim: "auto" if dim in args else -1 for dim in self._data_set.dims})
 
 
 @xr.register_dataarray_accessor("x3d")
@@ -197,15 +189,15 @@ class X3dDataArray:
         Examples
         -------
 
-        >>> da.x3d.cumtrapz('t')
+        >>> da.x3d.cumtrapz("t")
 
         """
-        ds = self._data_array._to_temp_dataset().x3d.cumtrapz(dim)
-        return self._data_array._from_temp_dataset(ds)
+        ds = self._data_array._to_temp_dataset().x3d.cumtrapz(dim)  # noqa: SLF001
+        return self._data_array._from_temp_dataset(ds)  # noqa: SLF001
 
     def simps(self, *args):
         """Integrate :obj:`xarray.DataArray` in direction(s) ``args`` using the
-        composite Simpson’s rule.
+        composite Simpson's rule.
         It is a wrapper for :obj:`scipy.integrate.simps`.
 
         Parameters
@@ -226,13 +218,13 @@ class X3dDataArray:
         Examples
         -------
 
-        >>> da.x3d.simps('x')
-        >>> da.x3d.simps('t')
-        >>> da.x3d.simps('x', 'y', 'z')
+        >>> da.x3d.simps("x")
+        >>> da.x3d.simps("t")
+        >>> da.x3d.simps("x", "y", "z")
 
         """
-        ds = self._data_array._to_temp_dataset().x3d.simps(*args)
-        return self._data_array._from_temp_dataset(ds)
+        ds = self._data_array._to_temp_dataset().x3d.simps(*args)  # noqa: SLF001
+        return self._data_array._from_temp_dataset(ds)  # noqa: SLF001
 
     def pencil_decomp(self, *args):
         """Coerce the data array into dask array.
@@ -261,20 +253,20 @@ class X3dDataArray:
         Examples
         -------
 
-        >>> da.x3d.pencil_decomp('x') # Pencil decomposition
-        >>> da.x3d.pencil_decomp('t')
-        >>> da.x3d.pencil_decomp('y', 'z') # Slab decomposition
+        >>> da.x3d.pencil_decomp("x")  # Pencil decomposition
+        >>> da.x3d.pencil_decomp("t")
+        >>> da.x3d.pencil_decomp("y", "z")  # Slab decomposition
 
         """
-        ds = self._data_array._to_temp_dataset().x3d.pencil_decomp(*args)
-        return self._data_array._from_temp_dataset(ds)
+        ds = self._data_array._to_temp_dataset().x3d.pencil_decomp(*args)  # noqa: SLF001
+        return self._data_array._from_temp_dataset(ds)  # noqa: SLF001
 
     def first_derivative(self, dim):
         """Compute first derivative with the 4th order accurate centered scheme.
 
         It is fully functional with all boundary conditions available on
         XCompact3d and stretched mesh in the vertical direction (y).
-        The **atribute** ``BC`` is used to store Boundary Condition information
+        The **attribute** ``BC`` is used to store Boundary Condition information
         in a dictionary (see examples), default is ``ncl1 = ncln = 2`` and
         ``npaire = 1``.
 
@@ -309,13 +301,13 @@ class X3dDataArray:
         ...         'ncln': 0,
         ...         'npaire': 1
         ... }
-        >>> da.x3d.first_derivative('x')
+        >>> da.x3d.first_derivative("x")
 
         or just:
 
         >>> prm = xcompact3d_toolbox.Parameters()
-        >>> da.attrs['BC'] = prm.get_boundary_condition('ux')
-        >>> da.x3d.first_derivative('x')
+        >>> da.attrs["BC"] = prm.get_boundary_condition("ux")
+        >>> da.x3d.first_derivative("x")
 
         """
 
@@ -324,23 +316,22 @@ class X3dDataArray:
                 ncl1 = self._data_array.attrs["BC"][dim]["ncl1"]
                 ncln = self._data_array.attrs["BC"][dim]["ncln"]
                 npaire = self._data_array.attrs["BC"][dim]["npaire"]
-            except:
+            except KeyError:
                 ncl1, ncln, npaire = 2, 2, 1
 
             n = self._data_array[dim].size
             m = n if ncl1 == 0 and ncln == 0 else n - 1
             d = (self._data_array[dim][-1] - self._data_array[dim][0]).values / m
-            self._Dx[dim] = FirstDerivative(n, d, ncl1, ncln, npaire)
+            self._Dx[dim] = first_derivative(n, d, ncl1, ncln, npaire)
 
         try:
             istret = self._data_array.attrs["BC"][dim]["istret"]
             beta = self._data_array.attrs["BC"][dim]["beta"]
-        except:
-            istret = 0
+        except KeyError:
+            istret = Istret.NO_REFINEMENT
             beta = 1.0
 
-        if istret == 0:
-
+        if istret == Istret.NO_REFINEMENT:
             return xr.apply_ufunc(
                 lambda f: self._Dx[dim].dot(f),
                 self._data_array,
@@ -351,30 +342,28 @@ class X3dDataArray:
                 output_dtypes=[param["mytype"]],
             )
 
-        else:
+        yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
 
-            yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
+        _, ppy, _, _ = _stretching(istret, beta, yly, m, n)
 
-            yp, ppy, pp2y, pp4y = _stretching(istret, beta, yly, m, n)
+        da_ppy = xr.DataArray(ppy, coords=[self._data_array[dim]], name="ppy")
 
-            da_ppy = xr.DataArray(ppy, coords=[self._data_array[dim]], name="ppy")
-
-            return da_ppy * xr.apply_ufunc(
-                lambda f: self._Dx[dim].dot(f),
-                self._data_array,
-                input_core_dims=[[dim]],
-                output_core_dims=[[dim]],
-                dask="parallelized",
-                vectorize=True,
-                output_dtypes=[param["mytype"]],
-            )
+        return da_ppy * xr.apply_ufunc(
+            lambda f: self._Dx[dim].dot(f),
+            self._data_array,
+            input_core_dims=[[dim]],
+            output_core_dims=[[dim]],
+            dask="parallelized",
+            vectorize=True,
+            output_dtypes=[param["mytype"]],
+        )
 
     def second_derivative(self, dim):
         """Compute second derivative with the 4th order accurate centered scheme.
 
         It is fully functional with all boundary conditions available on
         Xcompact3d and stretched mesh in y direction.
-        The **atribute** ``BC`` is used to store Boundary Condition information
+        The **attribute** ``BC`` is used to store Boundary Condition information
         in a dictionary (see examples), default is ``ncl1 = ncln = 2`` and
         ``npaire = 1``.
 
@@ -409,36 +398,35 @@ class X3dDataArray:
         ...         'ncln': 0,
         ...         'npaire': 1
         ... }
-        >>> da.x3d.second_derivative('x')
+        >>> da.x3d.second_derivative("x")
 
         or just:
 
         >>> prm = xcompact3d_toolbox.Parameters()
-        >>> da.attrs['BC'] = prm.get_boundary_condition('ux')
-        >>> da.x3d.second_derivative('x')
+        >>> da.attrs["BC"] = prm.get_boundary_condition("ux")
+        >>> da.x3d.second_derivative("x")
         """
         if dim not in self._Dxx:
             try:
                 ncl1 = self._data_array.attrs["BC"][dim]["ncl1"]
                 ncln = self._data_array.attrs["BC"][dim]["ncln"]
                 npaire = self._data_array.attrs["BC"][dim]["npaire"]
-            except:
+            except KeyError:
                 ncl1, ncln, npaire = 2, 2, 1
 
             n = self._data_array[dim].size
             m = n if ncl1 == 0 and ncln == 0 else n - 1
             d = (self._data_array[dim][-1] - self._data_array[dim][0]).values / m
-            self._Dxx[dim] = SecondDerivative(n, d, ncl1, ncln, npaire)
+            self._Dxx[dim] = second_derivative(n, d, ncl1, ncln, npaire)
 
         try:
             istret = self._data_array.attrs["BC"][dim]["istret"]
             beta = self._data_array.attrs["BC"][dim]["beta"]
-        except:
-            istret = 0
+        except KeyError:
+            istret = Istret.NO_REFINEMENT
             beta = 1.0
 
-        if istret == 0:
-
+        if istret == Istret.NO_REFINEMENT:
             return xr.apply_ufunc(
                 lambda f: self._Dxx[dim].dot(f),
                 self._data_array,
@@ -449,25 +437,19 @@ class X3dDataArray:
                 output_dtypes=[param["mytype"]],
             )
 
-        else:
+        yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
 
-            yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
+        _, _, pp2y, pp4y = _stretching(istret, beta, yly, m, n)
 
-            yp, ppy, pp2y, pp4y = _stretching(istret, beta, yly, m, n)
+        da_pp2y = xr.DataArray(pp2y, coords=[self._data_array[dim]], name="pp2y")
+        da_pp4y = xr.DataArray(pp4y, coords=[self._data_array[dim]], name="pp4y")
 
-            da_pp2y = xr.DataArray(pp2y, coords=[self._data_array[dim]], name="pp2y")
-            da_pp4y = xr.DataArray(pp4y, coords=[self._data_array[dim]], name="pp4y")
-
-            return (
-                da_pp2y
-                * xr.apply_ufunc(
-                    lambda f: self._Dxx[dim].dot(f),
-                    self._data_array,
-                    input_core_dims=[[dim]],
-                    output_core_dims=[[dim]],
-                    dask="parallelized",
-                    vectorize=True,
-                    output_dtypes=[param["mytype"]],
-                )
-                - da_pp4y * self._data_array.x3d.first_derivative(dim)
-            )
+        return da_pp2y * xr.apply_ufunc(
+            lambda f: self._Dxx[dim].dot(f),
+            self._data_array,
+            input_core_dims=[[dim]],
+            output_core_dims=[[dim]],
+            dask="parallelized",
+            vectorize=True,
+            output_dtypes=[param["mytype"]],
+        ) - da_pp4y * self._data_array.x3d.first_derivative(dim)

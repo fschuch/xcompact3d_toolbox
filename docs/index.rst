@@ -1,10 +1,4 @@
-.. Xcompact3d_toolbox documentation master file, created by
-   sphinx-quickstart on Mon Aug 17 09:28:19 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to Xcompact3d-toolbox's documentation!
-==============================================
+**Welcome to Xcompact3d-toolbox's documentation!**
 
 It is a Python package designed to handle the pre and postprocessing of
 the high-order Navier-Stokes solver Xcompact3d_. It aims to help users and
@@ -13,7 +7,7 @@ automated processes.
 
 The physical and computational parameters are built on top of traitlets_,
 a framework that lets Python classes have attributes with type checking, dynamically
-calculated default values, and ‘on change’ callbacks.
+calculated default values, and "on change" callbacks.
 In addition to ipywidgets_ for an user friendly interface.
 
 Data structure is provided by xarray_ (see `Why xarray?`_), that introduces labels
@@ -30,13 +24,15 @@ any new flow configuration without worrying about Fortran and 2decomp_. For
 developers, it works as a rapid prototyping tool, to test concepts and then
 compare results to validate any future Fortran implementations.
 
-Useful links
-------------
+**Useful links**
 
 * `View on GitHub`_;
 * `Changelog`_;
 * `Suggestions for new features and bug report`_;
 * `See what is coming next (Project page)`_.
+
+Getting Started
+===============
 
 Installation
 ------------
@@ -82,53 +78,53 @@ Examples
 
 * Specifying how the binary fields from your simulations are named, for instance:
 
-   * If the simulated fields are named like ``ux-000.bin``::
+  * If the simulated fields are named like ``ux-000.bin``::
 
-      prm.dataset.filename_properties.set(
-         separator = "-",
-         file_extension = ".bin",
-         number_of_digits = 3
-      )
+     prm.dataset.filename_properties.set(
+        separator = "-",
+        file_extension = ".bin",
+        number_of_digits = 3
+     )
 
-   * If the simulated fields are named like ``ux0000``::
+  * If the simulated fields are named like ``ux0000``::
 
-      prm.dataset.filename_properties.set(
-         separator = "",
-         file_extension = "",
-         number_of_digits = 4
-      )
+     prm.dataset.filename_properties.set(
+        separator = "",
+        file_extension = "",
+        number_of_digits = 4
+     )
 
 * There are many ways to load the arrays produced by your numerical simulation, so you can choose what best suits your post-processing application.
   All arrays are wrapped into xarray_ objects, with many useful methods for indexing, comparisons, reshaping and reorganizing, computations and plotting.
   See the examples:
 
-   * Load one array from the disc::
+  * Load one array from the disc::
 
-      ux = prm.dataset.load_array("ux-0000.bin")
+     ux = prm.dataset.load_array("ux-0000.bin")
 
-   * Load the entire time series for a given variable::
+  * Load the entire time series for a given variable::
 
-      ux = prm.dataset["ux"]
+     ux = prm.dataset["ux"]
 
-   * Load all variables from a given snapshot::
+  * Load all variables from a given snapshot::
 
-      snapshot = prm.dataset[10]
+     snapshot = prm.dataset[10]
 
-   * Loop through all snapshots, loading them one by one::
+  * Loop through all snapshots, loading them one by one::
 
-      for ds in prm.dataset:
-         # compute something
-         vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-         # write the results to the disc
-         prm.dataset.write(data = vort, file_prefix = "w3")
+     for ds in prm.dataset:
+        # compute something
+        vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+        # write the results to the disc
+        prm.dataset.write(data = vort, file_prefix = "w3")
 
-   * Or simply load all snapshots at once (if you have enough memory)::
+  * Or simply load all snapshots at once (if you have enough memory)::
 
-      ds = prm.dataset[:]
+     ds = prm.dataset[:]
 
-   * It is possible to produce a new xdmf file, so all data can be visualized on any external tool::
+* It is possible to produce a new xdmf file, so all data can be visualized on any external tool::
 
-      prm.dataset.write_xdmf()
+     prm.dataset.write_xdmf()
 
 
 * User interface for the parameters with IPywidgets::
@@ -150,23 +146,6 @@ Examples
 .. _`Jupyter Notebook`: https://jupyter.org/
 .. _Numpy: https://numpy.org/
 .. _traitlets: https://traitlets.readthedocs.io/en/stable/index.html
-.. _xarray: http://xarray.pydata.org/en/stable/
+.. _xarray: https://docs.xarray.dev/en/stable/
 .. _Xcompact3d: https://github.com/xcompact3d/Incompact3d
-.. _`Why xarray?`: http://xarray.pydata.org/en/stable/why-xarray.html
-
-Table of Content
-==================
-
-.. toctree::
-   :maxdepth: 4
-   :glob:
-
-   Docstrings
-   tutorial
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. _`Why xarray?`: https://docs.xarray.dev/en/stable/getting-started-guide/why-xarray.html
