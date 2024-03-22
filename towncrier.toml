@@ -3,8 +3,9 @@ package = "xcompact3d_toolbox"
 directory = "changelog.d"
 filename = "docs/news.md"
 start_string = "<!-- towncrier release notes start -->\n"
-title_format = "## [{version}](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v{version}) - {project_date}"
+title_format = "## [{version}](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v{version}) - {project_date}<!-- markdown-link-check-disable-line -->"
 issue_format = "[#{issue}](https://github.com/fschuch/xcompact3d_toolbox/issues/{issue})"
+underlines = ["", "", ""]
 
 [[tool.towncrier.type]]
 directory = "security"
