@@ -1,0 +1,258 @@
+Traceback (most recent call last):
+  File "/home/runner/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/home/runner/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/nbclient/client.py", line 1314, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.2/x64/lib/python3.12/asyncio/base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/home/runner/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/home/runner/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+dataset, prm = x3d.tutorial.open_dataset("cylinder", cache=True, cache_dir="./example/")
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mTimeoutError[0m                              Traceback (most recent call last)
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/urllib3/connectionpool.py:537[0m, in [0;36mHTTPConnectionPool._make_request[0;34m(self, conn, method, url, body, headers, retries, timeout, chunked, response_conn, preload_content, decode_content, enforce_content_length)[0m
+[1;32m    536[0m [38;5;28;01mtry[39;00m:
+[0;32m--> 537[0m     response [38;5;241m=[39m [43mconn[49m[38;5;241;43m.[39;49m[43mgetresponse[49m[43m([49m[43m)[49m
+[1;32m    538[0m [38;5;28;01mexcept[39;00m (BaseSSLError, [38;5;167;01mOSError[39;00m) [38;5;28;01mas[39;00m e:
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/urllib3/connection.py:466[0m, in [0;36mHTTPConnection.getresponse[0;34m(self)[0m
+[1;32m    465[0m [38;5;66;03m# Get the response from http.client.HTTPConnection[39;00m
+[0;32m--> 466[0m httplib_response [38;5;241m=[39m [38;5;28;43msuper[39;49m[43m([49m[43m)[49m[38;5;241;43m.[39;49m[43mgetresponse[49m[43m([49m[43m)[49m
+[1;32m    468[0m [38;5;28;01mtry[39;00m:
+
+File [0;32m/opt/hostedtoolcache/Python/3.12.2/x64/lib/python3.12/http/client.py:1423[0m, in [0;36mHTTPConnection.getresponse[0;34m(self)[0m
+[1;32m   1422[0m [38;5;28;01mtry[39;00m:
+[0;32m-> 1423[0m     [43mresponse[49m[38;5;241;43m.[39;49m[43mbegin[49m[43m([49m[43m)[49m
+[1;32m   1424[0m [38;5;28;01mexcept[39;00m [38;5;167;01mConnectionError[39;00m:
+
+File [0;32m/opt/hostedtoolcache/Python/3.12.2/x64/lib/python3.12/http/client.py:331[0m, in [0;36mHTTPResponse.begin[0;34m(self)[0m
+[1;32m    330[0m [38;5;28;01mwhile[39;00m [38;5;28;01mTrue[39;00m:
+[0;32m--> 331[0m     version, status, reason [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_read_status[49m[43m([49m[43m)[49m
+[1;32m    332[0m     [38;5;28;01mif[39;00m status [38;5;241m!=[39m CONTINUE:
+
+File [0;32m/opt/hostedtoolcache/Python/3.12.2/x64/lib/python3.12/http/client.py:292[0m, in [0;36mHTTPResponse._read_status[0;34m(self)[0m
+[1;32m    291[0m [38;5;28;01mdef[39;00m [38;5;21m_read_status[39m([38;5;28mself[39m):
+[0;32m--> 292[0m     line [38;5;241m=[39m [38;5;28mstr[39m([38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mfp[49m[38;5;241;43m.[39;49m[43mreadline[49m[43m([49m[43m_MAXLINE[49m[43m [49m[38;5;241;43m+[39;49m[43m [49m[38;5;241;43m1[39;49m[43m)[49m, [38;5;124m"[39m[38;5;124miso-8859-1[39m[38;5;124m"[39m)
+[1;32m    293[0m     [38;5;28;01mif[39;00m [38;5;28mlen[39m(line) [38;5;241m>[39m _MAXLINE:
+
+File [0;32m/opt/hostedtoolcache/Python/3.12.2/x64/lib/python3.12/socket.py:707[0m, in [0;36mSocketIO.readinto[0;34m(self, b)[0m
+[1;32m    706[0m [38;5;28;01mtry[39;00m:
+[0;32m--> 707[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_sock[49m[38;5;241;43m.[39;49m[43mrecv_into[49m[43m([49m[43mb[49m[43m)[49m
+[1;32m    708[0m [38;5;28;01mexcept[39;00m timeout:
+
+File [0;32m/opt/hostedtoolcache/Python/3.12.2/x64/lib/python3.12/ssl.py:1252[0m, in [0;36mSSLSocket.recv_into[0;34m(self, buffer, nbytes, flags)[0m
+[1;32m   1249[0m         [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
+[1;32m   1250[0m           [38;5;124m"[39m[38;5;124mnon-zero flags not allowed in calls to recv_into() on [39m[38;5;132;01m%s[39;00m[38;5;124m"[39m [38;5;241m%[39m
+[1;32m   1251[0m           [38;5;28mself[39m[38;5;241m.[39m[38;5;18m__class__[39m)
+[0;32m-> 1252[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mread[49m[43m([49m[43mnbytes[49m[43m,[49m[43m [49m[43mbuffer[49m[43m)[49m
+[1;32m   1253[0m [38;5;28;01melse[39;00m:
+
+File [0;32m/opt/hostedtoolcache/Python/3.12.2/x64/lib/python3.12/ssl.py:1104[0m, in [0;36mSSLSocket.read[0;34m(self, len, buffer)[0m
+[1;32m   1103[0m [38;5;28;01mif[39;00m buffer [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m:
+[0;32m-> 1104[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_sslobj[49m[38;5;241;43m.[39;49m[43mread[49m[43m([49m[38;5;28;43mlen[39;49m[43m,[49m[43m [49m[43mbuffer[49m[43m)[49m
+[1;32m   1105[0m [38;5;28;01melse[39;00m:
+
+[0;31mTimeoutError[0m: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+[0;31mReadTimeoutError[0m                          Traceback (most recent call last)
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/requests/adapters.py:486[0m, in [0;36mHTTPAdapter.send[0;34m(self, request, stream, timeout, verify, cert, proxies)[0m
+[1;32m    485[0m [38;5;28;01mtry[39;00m:
+[0;32m--> 486[0m     resp [38;5;241m=[39m [43mconn[49m[38;5;241;43m.[39;49m[43murlopen[49m[43m([49m
+[1;32m    487[0m [43m        [49m[43mmethod[49m[38;5;241;43m=[39;49m[43mrequest[49m[38;5;241;43m.[39;49m[43mmethod[49m[43m,[49m
+[1;32m    488[0m [43m        [49m[43murl[49m[38;5;241;43m=[39;49m[43murl[49m[43m,[49m
+[1;32m    489[0m [43m        [49m[43mbody[49m[38;5;241;43m=[39;49m[43mrequest[49m[38;5;241;43m.[39;49m[43mbody[49m[43m,[49m
+[1;32m    490[0m [43m        [49m[43mheaders[49m[38;5;241;43m=[39;49m[43mrequest[49m[38;5;241;43m.[39;49m[43mheaders[49m[43m,[49m
+[1;32m    491[0m [43m        [49m[43mredirect[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m,[49m
+[1;32m    492[0m [43m        [49m[43massert_same_host[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m,[49m
+[1;32m    493[0m [43m        [49m[43mpreload_content[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m,[49m
+[1;32m    494[0m [43m        [49m[43mdecode_content[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m,[49m
+[1;32m    495[0m [43m        [49m[43mretries[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mmax_retries[49m[43m,[49m
+[1;32m    496[0m [43m        [49m[43mtimeout[49m[38;5;241;43m=[39;49m[43mtimeout[49m[43m,[49m
+[1;32m    497[0m [43m        [49m[43mchunked[49m[38;5;241;43m=[39;49m[43mchunked[49m[43m,[49m
+[1;32m    498[0m [43m    [49m[43m)[49m
+[1;32m    500[0m [38;5;28;01mexcept[39;00m (ProtocolError, [38;5;167;01mOSError[39;00m) [38;5;28;01mas[39;00m err:
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/urllib3/connectionpool.py:847[0m, in [0;36mHTTPConnectionPool.urlopen[0;34m(self, method, url, body, headers, retries, redirect, assert_same_host, timeout, pool_timeout, release_conn, chunked, body_pos, preload_content, decode_content, **response_kw)[0m
+[1;32m    845[0m     new_e [38;5;241m=[39m ProtocolError([38;5;124m"[39m[38;5;124mConnection aborted.[39m[38;5;124m"[39m, new_e)
+[0;32m--> 847[0m retries [38;5;241m=[39m [43mretries[49m[38;5;241;43m.[39;49m[43mincrement[49m[43m([49m
+[1;32m    848[0m [43m    [49m[43mmethod[49m[43m,[49m[43m [49m[43murl[49m[43m,[49m[43m [49m[43merror[49m[38;5;241;43m=[39;49m[43mnew_e[49m[43m,[49m[43m [49m[43m_pool[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[43m,[49m[43m [49m[43m_stacktrace[49m[38;5;241;43m=[39;49m[43msys[49m[38;5;241;43m.[39;49m[43mexc_info[49m[43m([49m[43m)[49m[43m[[49m[38;5;241;43m2[39;49m[43m][49m
+[1;32m    849[0m [43m[49m[43m)[49m
+[1;32m    850[0m retries[38;5;241m.[39msleep()
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/urllib3/util/retry.py:470[0m, in [0;36mRetry.increment[0;34m(self, method, url, response, error, _pool, _stacktrace)[0m
+[1;32m    469[0m [38;5;28;01mif[39;00m read [38;5;129;01mis[39;00m [38;5;28;01mFalse[39;00m [38;5;129;01mor[39;00m method [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m [38;5;129;01mor[39;00m [38;5;129;01mnot[39;00m [38;5;28mself[39m[38;5;241m.[39m_is_method_retryable(method):
+[0;32m--> 470[0m     [38;5;28;01mraise[39;00m [43mreraise[49m[43m([49m[38;5;28;43mtype[39;49m[43m([49m[43merror[49m[43m)[49m[43m,[49m[43m [49m[43merror[49m[43m,[49m[43m [49m[43m_stacktrace[49m[43m)[49m
+[1;32m    471[0m [38;5;28;01melif[39;00m read [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m:
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/urllib3/util/util.py:39[0m, in [0;36mreraise[0;34m(tp, value, tb)[0m
+[1;32m     38[0m         [38;5;28;01mraise[39;00m value[38;5;241m.[39mwith_traceback(tb)
+[0;32m---> 39[0m     [38;5;28;01mraise[39;00m value
+[1;32m     40[0m [38;5;28;01mfinally[39;00m:
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/urllib3/connectionpool.py:793[0m, in [0;36mHTTPConnectionPool.urlopen[0;34m(self, method, url, body, headers, retries, redirect, assert_same_host, timeout, pool_timeout, release_conn, chunked, body_pos, preload_content, decode_content, **response_kw)[0m
+[1;32m    792[0m [38;5;66;03m# Make the request on the HTTPConnection object[39;00m
+[0;32m--> 793[0m response [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_make_request[49m[43m([49m
+[1;32m    794[0m [43m    [49m[43mconn[49m[43m,[49m
+[1;32m    795[0m [43m    [49m[43mmethod[49m[43m,[49m
+[1;32m    796[0m [43m    [49m[43murl[49m[43m,[49m
+[1;32m    797[0m [43m    [49m[43mtimeout[49m[38;5;241;43m=[39;49m[43mtimeout_obj[49m[43m,[49m
+[1;32m    798[0m [43m    [49m[43mbody[49m[38;5;241;43m=[39;49m[43mbody[49m[43m,[49m
+[1;32m    799[0m [43m    [49m[43mheaders[49m[38;5;241;43m=[39;49m[43mheaders[49m[43m,[49m
+[1;32m    800[0m [43m    [49m[43mchunked[49m[38;5;241;43m=[39;49m[43mchunked[49m[43m,[49m
+[1;32m    801[0m [43m    [49m[43mretries[49m[38;5;241;43m=[39;49m[43mretries[49m[43m,[49m
+[1;32m    802[0m [43m    [49m[43mresponse_conn[49m[38;5;241;43m=[39;49m[43mresponse_conn[49m[43m,[49m
+[1;32m    803[0m [43m    [49m[43mpreload_content[49m[38;5;241;43m=[39;49m[43mpreload_content[49m[43m,[49m
+[1;32m    804[0m [43m    [49m[43mdecode_content[49m[38;5;241;43m=[39;49m[43mdecode_content[49m[43m,[49m
+[1;32m    805[0m [43m    [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mresponse_kw[49m[43m,[49m
+[1;32m    806[0m [43m[49m[43m)[49m
+[1;32m    808[0m [38;5;66;03m# Everything went great![39;00m
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/urllib3/connectionpool.py:539[0m, in [0;36mHTTPConnectionPool._make_request[0;34m(self, conn, method, url, body, headers, retries, timeout, chunked, response_conn, preload_content, decode_content, enforce_content_length)[0m
+[1;32m    538[0m [38;5;28;01mexcept[39;00m (BaseSSLError, [38;5;167;01mOSError[39;00m) [38;5;28;01mas[39;00m e:
+[0;32m--> 539[0m     [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_raise_timeout[49m[43m([49m[43merr[49m[38;5;241;43m=[39;49m[43me[49m[43m,[49m[43m [49m[43murl[49m[38;5;241;43m=[39;49m[43murl[49m[43m,[49m[43m [49m[43mtimeout_value[49m[38;5;241;43m=[39;49m[43mread_timeout[49m[43m)[49m
+[1;32m    540[0m     [38;5;28;01mraise[39;00m
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/urllib3/connectionpool.py:370[0m, in [0;36mHTTPConnectionPool._raise_timeout[0;34m(self, err, url, timeout_value)[0m
+[1;32m    369[0m [38;5;28;01mif[39;00m [38;5;28misinstance[39m(err, SocketTimeout):
+[0;32m--> 370[0m     [38;5;28;01mraise[39;00m ReadTimeoutError(
+[1;32m    371[0m         [38;5;28mself[39m, url, [38;5;124mf[39m[38;5;124m"[39m[38;5;124mRead timed out. (read timeout=[39m[38;5;132;01m{[39;00mtimeout_value[38;5;132;01m}[39;00m[38;5;124m)[39m[38;5;124m"[39m
+[1;32m    372[0m     ) [38;5;28;01mfrom[39;00m [38;5;21;01merr[39;00m
+[1;32m    374[0m [38;5;66;03m# See the above comment about EAGAIN in Python 3.[39;00m
+
+[0;31mReadTimeoutError[0m: HTTPSConnectionPool(host='raw.githubusercontent.com', port=443): Read timed out. (read timeout=5)
+
+During handling of the above exception, another exception occurred:
+
+[0;31mReadTimeout[0m                               Traceback (most recent call last)
+Cell [0;32mIn[2], line 1[0m
+[0;32m----> 1[0m dataset, prm [38;5;241m=[39m [43mx3d[49m[38;5;241;43m.[39;49m[43mtutorial[49m[38;5;241;43m.[39;49m[43mopen_dataset[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mcylinder[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[43mcache[49m[38;5;241;43m=[39;49m[38;5;28;43;01mTrue[39;49;00m[43m,[49m[43m [49m[43mcache_dir[49m[38;5;241;43m=[39;49m[38;5;124;43m"[39;49m[38;5;124;43m./example/[39;49m[38;5;124;43m"[39;49m[43m)[49m
+
+File [0;32m~/work/xcompact3d_toolbox/xcompact3d_toolbox/xcompact3d_toolbox/tutorial.py:33[0m, in [0;36mopen_dataset[0;34m(name, **kws)[0m
+[1;32m     12[0m [38;5;28;01mdef[39;00m [38;5;21mopen_dataset[39m(name: [38;5;28mstr[39m, [38;5;241m*[39m[38;5;241m*[39mkws) [38;5;241m-[39m[38;5;241m>[39m [38;5;28mtuple[39m[xr[38;5;241m.[39mDataset, Parameters]:
+[1;32m     13[0m [38;5;250m    [39m[38;5;124;03m"""[39;00m
+[1;32m     14[0m [38;5;124;03m    Open a dataset from the online repository (requires internet).[39;00m
+[1;32m     15[0m 
+[0;32m   (...)[0m
+[1;32m     31[0m [38;5;124;03m    xarray.open_dataset[39;00m
+[1;32m     32[0m [38;5;124;03m    """[39;00m
+[0;32m---> 33[0m     ds [38;5;241m=[39m [43mxr[49m[38;5;241;43m.[39;49m[43mtutorial[49m[38;5;241;43m.[39;49m[43mopen_dataset[49m[43m([49m[43mname[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkws[49m[43m)[49m
+[1;32m     34[0m     [38;5;66;03m# have a prm attribute, write it to the disc, del prm attribute[39;00m
+[1;32m     36[0m     prm [38;5;241m=[39m Parameters()
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/xarray/tutorial.py:161[0m, in [0;36mopen_dataset[0;34m(name, cache, cache_dir, engine, **kws)[0m
+[1;32m    158[0m     url [38;5;241m=[39m [38;5;124mf[39m[38;5;124m"[39m[38;5;132;01m{[39;00mbase_url[38;5;132;01m}[39;00m[38;5;124m/raw/[39m[38;5;132;01m{[39;00mversion[38;5;132;01m}[39;00m[38;5;124m/[39m[38;5;132;01m{[39;00mpath[38;5;241m.[39mname[38;5;132;01m}[39;00m[38;5;124m"[39m
+[1;32m    160[0m [38;5;66;03m# retrieve the file[39;00m
+[0;32m--> 161[0m filepath [38;5;241m=[39m [43mpooch[49m[38;5;241;43m.[39;49m[43mretrieve[49m[43m([49m[43murl[49m[38;5;241;43m=[39;49m[43murl[49m[43m,[49m[43m [49m[43mknown_hash[49m[38;5;241;43m=[39;49m[38;5;28;43;01mNone[39;49;00m[43m,[49m[43m [49m[43mpath[49m[38;5;241;43m=[39;49m[43mcache_dir[49m[43m)[49m
+[1;32m    162[0m ds [38;5;241m=[39m _open_dataset(filepath, engine[38;5;241m=[39mengine, [38;5;241m*[39m[38;5;241m*[39mkws)
+[1;32m    163[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m cache:
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/pooch/core.py:239[0m, in [0;36mretrieve[0;34m(url, known_hash, fname, path, processor, downloader, progressbar)[0m
+[1;32m    236[0m [38;5;28;01mif[39;00m downloader [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m:
+[1;32m    237[0m     downloader [38;5;241m=[39m choose_downloader(url, progressbar[38;5;241m=[39mprogressbar)
+[0;32m--> 239[0m [43mstream_download[49m[43m([49m[43murl[49m[43m,[49m[43m [49m[43mfull_path[49m[43m,[49m[43m [49m[43mknown_hash[49m[43m,[49m[43m [49m[43mdownloader[49m[43m,[49m[43m [49m[43mpooch[49m[38;5;241;43m=[39;49m[38;5;28;43;01mNone[39;49;00m[43m)[49m
+[1;32m    241[0m [38;5;28;01mif[39;00m known_hash [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m:
+[1;32m    242[0m     get_logger()[38;5;241m.[39minfo(
+[1;32m    243[0m         [38;5;124m"[39m[38;5;124mSHA256 hash of downloaded file: [39m[38;5;132;01m%s[39;00m[38;5;130;01m\n[39;00m[38;5;124m"[39m
+[1;32m    244[0m         [38;5;124m"[39m[38;5;124mUse this value as the [39m[38;5;124m'[39m[38;5;124mknown_hash[39m[38;5;124m'[39m[38;5;124m argument of [39m[38;5;124m'[39m[38;5;124mpooch.retrieve[39m[38;5;124m'[39m[38;5;124m"[39m
+[0;32m   (...)[0m
+[1;32m    247[0m         file_hash([38;5;28mstr[39m(full_path)),
+[1;32m    248[0m     )
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/pooch/core.py:807[0m, in [0;36mstream_download[0;34m(url, fname, known_hash, downloader, pooch, retry_if_failed)[0m
+[1;32m    803[0m [38;5;28;01mtry[39;00m:
+[1;32m    804[0m     [38;5;66;03m# Stream the file to a temporary so that we can safely check its[39;00m
+[1;32m    805[0m     [38;5;66;03m# hash before overwriting the original.[39;00m
+[1;32m    806[0m     [38;5;28;01mwith[39;00m temporary_file(path[38;5;241m=[39m[38;5;28mstr[39m(fname[38;5;241m.[39mparent)) [38;5;28;01mas[39;00m tmp:
+[0;32m--> 807[0m         [43mdownloader[49m[43m([49m[43murl[49m[43m,[49m[43m [49m[43mtmp[49m[43m,[49m[43m [49m[43mpooch[49m[43m)[49m
+[1;32m    808[0m         hash_matches(tmp, known_hash, strict[38;5;241m=[39m[38;5;28;01mTrue[39;00m, source[38;5;241m=[39m[38;5;28mstr[39m(fname[38;5;241m.[39mname))
+[1;32m    809[0m         shutil[38;5;241m.[39mmove(tmp, [38;5;28mstr[39m(fname))
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/pooch/downloaders.py:214[0m, in [0;36mHTTPDownloader.__call__[0;34m(self, url, output_file, pooch, check_only)[0m
+[1;32m    212[0m     [38;5;66;03m# pylint: enable=consider-using-with[39;00m
+[1;32m    213[0m [38;5;28;01mtry[39;00m:
+[0;32m--> 214[0m     response [38;5;241m=[39m [43mrequests[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[43murl[49m[43m,[49m[43m [49m[43mtimeout[49m[38;5;241;43m=[39;49m[43mtimeout[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+[1;32m    215[0m     response[38;5;241m.[39mraise_for_status()
+[1;32m    216[0m     content [38;5;241m=[39m response[38;5;241m.[39miter_content(chunk_size[38;5;241m=[39m[38;5;28mself[39m[38;5;241m.[39mchunk_size)
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/requests/api.py:73[0m, in [0;36mget[0;34m(url, params, **kwargs)[0m
+[1;32m     62[0m [38;5;28;01mdef[39;00m [38;5;21mget[39m(url, params[38;5;241m=[39m[38;5;28;01mNone[39;00m, [38;5;241m*[39m[38;5;241m*[39mkwargs):
+[1;32m     63[0m [38;5;250m    [39m[38;5;124mr[39m[38;5;124;03m"""Sends a GET request.[39;00m
+[1;32m     64[0m 
+[1;32m     65[0m [38;5;124;03m    :param url: URL for the new :class:`Request` object.[39;00m
+[0;32m   (...)[0m
+[1;32m     70[0m [38;5;124;03m    :rtype: requests.Response[39;00m
+[1;32m     71[0m [38;5;124;03m    """[39;00m
+[0;32m---> 73[0m     [38;5;28;01mreturn[39;00m [43mrequest[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mget[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[43murl[49m[43m,[49m[43m [49m[43mparams[49m[38;5;241;43m=[39;49m[43mparams[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/requests/api.py:59[0m, in [0;36mrequest[0;34m(method, url, **kwargs)[0m
+[1;32m     55[0m [38;5;66;03m# By using the 'with' statement we are sure the session is closed, thus we[39;00m
+[1;32m     56[0m [38;5;66;03m# avoid leaving sockets open which can trigger a ResourceWarning in some[39;00m
+[1;32m     57[0m [38;5;66;03m# cases, and look like a memory leak in others.[39;00m
+[1;32m     58[0m [38;5;28;01mwith[39;00m sessions[38;5;241m.[39mSession() [38;5;28;01mas[39;00m session:
+[0;32m---> 59[0m     [38;5;28;01mreturn[39;00m [43msession[49m[38;5;241;43m.[39;49m[43mrequest[49m[43m([49m[43mmethod[49m[38;5;241;43m=[39;49m[43mmethod[49m[43m,[49m[43m [49m[43murl[49m[38;5;241;43m=[39;49m[43murl[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/requests/sessions.py:589[0m, in [0;36mSession.request[0;34m(self, method, url, params, data, headers, cookies, files, auth, timeout, allow_redirects, proxies, hooks, stream, verify, cert, json)[0m
+[1;32m    584[0m send_kwargs [38;5;241m=[39m {
+[1;32m    585[0m     [38;5;124m"[39m[38;5;124mtimeout[39m[38;5;124m"[39m: timeout,
+[1;32m    586[0m     [38;5;124m"[39m[38;5;124mallow_redirects[39m[38;5;124m"[39m: allow_redirects,
+[1;32m    587[0m }
+[1;32m    588[0m send_kwargs[38;5;241m.[39mupdate(settings)
+[0;32m--> 589[0m resp [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43msend[49m[43m([49m[43mprep[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43msend_kwargs[49m[43m)[49m
+[1;32m    591[0m [38;5;28;01mreturn[39;00m resp
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/requests/sessions.py:725[0m, in [0;36mSession.send[0;34m(self, request, **kwargs)[0m
+[1;32m    722[0m [38;5;28;01mif[39;00m allow_redirects:
+[1;32m    723[0m     [38;5;66;03m# Redirect resolving generator.[39;00m
+[1;32m    724[0m     gen [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mresolve_redirects(r, request, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+[0;32m--> 725[0m     history [38;5;241m=[39m [43m[[49m[43mresp[49m[43m [49m[38;5;28;43;01mfor[39;49;00m[43m [49m[43mresp[49m[43m [49m[38;5;129;43;01min[39;49;00m[43m [49m[43mgen[49m[43m][49m
+[1;32m    726[0m [38;5;28;01melse[39;00m:
+[1;32m    727[0m     history [38;5;241m=[39m []
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/requests/sessions.py:266[0m, in [0;36mSessionRedirectMixin.resolve_redirects[0;34m(self, resp, req, stream, timeout, verify, cert, proxies, yield_requests, **adapter_kwargs)[0m
+[1;32m    263[0m     [38;5;28;01myield[39;00m req
+[1;32m    264[0m [38;5;28;01melse[39;00m:
+[0;32m--> 266[0m     resp [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43msend[49m[43m([49m
+[1;32m    267[0m [43m        [49m[43mreq[49m[43m,[49m
+[1;32m    268[0m [43m        [49m[43mstream[49m[38;5;241;43m=[39;49m[43mstream[49m[43m,[49m
+[1;32m    269[0m [43m        [49m[43mtimeout[49m[38;5;241;43m=[39;49m[43mtimeout[49m[43m,[49m
+[1;32m    270[0m [43m        [49m[43mverify[49m[38;5;241;43m=[39;49m[43mverify[49m[43m,[49m
+[1;32m    271[0m [43m        [49m[43mcert[49m[38;5;241;43m=[39;49m[43mcert[49m[43m,[49m
+[1;32m    272[0m [43m        [49m[43mproxies[49m[38;5;241;43m=[39;49m[43mproxies[49m[43m,[49m
+[1;32m    273[0m [43m        [49m[43mallow_redirects[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m,[49m
+[1;32m    274[0m [43m        [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43madapter_kwargs[49m[43m,[49m
+[1;32m    275[0m [43m    [49m[43m)[49m
+[1;32m    277[0m     extract_cookies_to_jar([38;5;28mself[39m[38;5;241m.[39mcookies, prepared_request, resp[38;5;241m.[39mraw)
+[1;32m    279[0m     [38;5;66;03m# extract redirect url, if any, for the next loop[39;00m
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/requests/sessions.py:703[0m, in [0;36mSession.send[0;34m(self, request, **kwargs)[0m
+[1;32m    700[0m start [38;5;241m=[39m preferred_clock()
+[1;32m    702[0m [38;5;66;03m# Send the request[39;00m
+[0;32m--> 703[0m r [38;5;241m=[39m [43madapter[49m[38;5;241;43m.[39;49m[43msend[49m[43m([49m[43mrequest[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+[1;32m    705[0m [38;5;66;03m# Total elapsed time of the request (approximately)[39;00m
+[1;32m    706[0m elapsed [38;5;241m=[39m preferred_clock() [38;5;241m-[39m start
+
+File [0;32m~/.local/share/hatch/env/pip-compile/xcompact3d-toolbox/xgmTZzXW/docs/lib/python3.12/site-packages/requests/adapters.py:532[0m, in [0;36mHTTPAdapter.send[0;34m(self, request, stream, timeout, verify, cert, proxies)[0m
+[1;32m    530[0m     [38;5;28;01mraise[39;00m SSLError(e, request[38;5;241m=[39mrequest)
+[1;32m    531[0m [38;5;28;01melif[39;00m [38;5;28misinstance[39m(e, ReadTimeoutError):
+[0;32m--> 532[0m     [38;5;28;01mraise[39;00m ReadTimeout(e, request[38;5;241m=[39mrequest)
+[1;32m    533[0m [38;5;28;01melif[39;00m [38;5;28misinstance[39m(e, _InvalidHeader):
+[1;32m    534[0m     [38;5;28;01mraise[39;00m InvalidHeader(e, request[38;5;241m=[39mrequest)
+
+[0;31mReadTimeout[0m: HTTPSConnectionPool(host='raw.githubusercontent.com', port=443): Read timed out. (read timeout=5)
+
