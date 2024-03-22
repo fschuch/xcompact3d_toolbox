@@ -1,0 +1,1406 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Turbidity Current in Axisymmetric Configuration &#8212; Xcompact3d-toolbox</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/Axisymmetric_flow';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Flow Around a Complex Body" href="Cylinder.html" />
+    <link rel="prev" title="Computing and Plotting" href="../tutorial/computing_and_plotting.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Xcompact3d-toolbox - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="Xcompact3d-toolbox - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/io.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/computing_and_plotting.html">Computing and Plotting</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Sandbox Examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Turbidity Current in Axisymmetric Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Cylinder.html">Flow Around a Complex Body</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Square.html">Flow Around a Square and Flow Visualization with Passive Scalar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Heat-exchanger.html">Periodic Heat Exchanger</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../news.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Docstrings.html">API reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/fschuch/xcompact3d_toolbox/main?urlpath=lab/tree/docs/examples/Axisymmetric_flow.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/fschuch/xcompact3d_toolbox/blob/main/docs/examples/Axisymmetric_flow.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/fschuch/xcompact3d_toolbox" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fschuch/xcompact3d_toolbox/edit/main/docs/examples/Axisymmetric_flow.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fschuch/xcompact3d_toolbox/issues/new?title=Issue%20on%20page%20%2Fexamples/Axisymmetric_flow.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/examples/Axisymmetric_flow.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Turbidity Current in Axisymmetric Configuration</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#initial-condition">Initial Condition</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-to-disc">Writing to disc</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-simulation">Running the Simulation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="turbidity-current-in-axisymmetric-configuration">
+<h1>Turbidity Current in Axisymmetric Configuration<a class="headerlink" href="#turbidity-current-in-axisymmetric-configuration" title="Link to this heading">#</a></h1>
+<p><img alt="image info" src="../_images/Axisymmetric_flow.jpg" /></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>  <span class="c1"># noqa: F401</span>
+
+<span class="kn">import</span> <span class="nn">xcompact3d_toolbox</span> <span class="k">as</span> <span class="nn">x3d</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Numerical precision</p></li>
+</ul>
+<p>Use <code class="docutils literal notranslate"><span class="pre">np.float64</span></code> if Xcompact3d was compiled with the flag <code class="docutils literal notranslate"><span class="pre">-DDOUBLE_PREC</span></code>, use <code class="docutils literal notranslate"><span class="pre">np.float32</span></code> otherwise.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x3d</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;mytype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Xcompact3d’s parameters</p></li>
+</ul>
+<p>For more information about them, checkout the <a class="reference external" href="https://xcompact3d-toolbox.readthedocs.io/en/latest/Docstrings.html#xcompact3d_toolbox.parameters.Parameters">API reference</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prm</span> <span class="o">=</span> <span class="n">x3d</span><span class="o">.</span><span class="n">Parameters</span><span class="p">(</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;input.i3d&quot;</span><span class="p">,</span>
+    <span class="c1"># BasicParam</span>
+    <span class="n">itype</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">nx</span><span class="o">=</span><span class="mi">501</span><span class="p">,</span>
+    <span class="n">ny</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span>
+    <span class="n">nz</span><span class="o">=</span><span class="mi">501</span><span class="p">,</span>
+    <span class="n">xlx</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+    <span class="n">yly</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">zlz</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+    <span class="n">nclx1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">nclxn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">ncly1</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">nclyn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">nclz1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">nclzn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">re</span><span class="o">=</span><span class="mf">3500.0</span><span class="p">,</span>
+    <span class="n">init_noise</span><span class="o">=</span><span class="mf">0.0125</span><span class="p">,</span>
+    <span class="n">dt</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">,</span>
+    <span class="n">ifirst</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">ilast</span><span class="o">=</span><span class="mi">80000</span><span class="p">,</span>
+    <span class="n">numscalar</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="c1"># ScalarParam</span>
+    <span class="n">nclxS1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">nclxSn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">nclyS1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">nclySn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">nclzS1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">nclzSn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">sc</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>
+    <span class="n">ri</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">],</span>
+    <span class="n">uset</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">],</span>
+    <span class="n">cp</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Everything needed is in one Dataset (see <a class="reference external" href="https://xcompact3d-toolbox.readthedocs.io/en/latest/Docstrings.html#xcompact3d_toolbox.sandbox.init_dataset">API reference</a>):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">x3d</span><span class="o">.</span><span class="n">init_dataset</span><span class="p">(</span><span class="n">prm</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s see it, data and attributes are attached, try to interact with the icons:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body[data-theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-index-name div,
+.xr-index-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2,
+.xr-no-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt; Size: 293MB
+Dimensions:  (x: 501, y: 73, z: 501, n: 1)
+Coordinates:
+  * x        (x) float32 2kB 0.0 0.04 0.08 0.12 0.16 ... 19.88 19.92 19.96 20.0
+  * y        (y) float32 292B 0.0 0.02778 0.05556 0.08333 ... 1.944 1.972 2.0
+  * z        (z) float32 2kB 0.0 0.04 0.08 0.12 0.16 ... 19.88 19.92 19.96 20.0
+  * n        (n) int64 8B 1
+Data variables:
+    ux       (x, y, z) float32 73MB 0.0 0.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 0.0 0.0
+    uy       (x, y, z) float32 73MB 0.0 0.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 0.0 0.0
+    uz       (x, y, z) float32 73MB 0.0 0.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 0.0 0.0
+    phi      (n, x, y, z) float32 73MB 0.0 0.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 0.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-e569435b-40d9-41d2-a511-f3dd6d5ac4c6' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-e569435b-40d9-41d2-a511-f3dd6d5ac4c6' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>x</span>: 501</li><li><span class='xr-has-index'>y</span>: 73</li><li><span class='xr-has-index'>z</span>: 501</li><li><span class='xr-has-index'>n</span>: 1</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-cdd70a39-3873-468a-b5fa-3a2bfeae2cd9' class='xr-section-summary-in' type='checkbox'  checked><label for='section-cdd70a39-3873-468a-b5fa-3a2bfeae2cd9' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>x</span></div><div class='xr-var-dims'>(x)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>0.0 0.04 0.08 ... 19.92 19.96 20.0</div><input id='attrs-51b53170-a644-4b9f-b743-5bd23d601168' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-51b53170-a644-4b9f-b743-5bd23d601168' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7efe64d9-f222-4a34-a476-c8550a07dfda' class='xr-var-data-in' type='checkbox'><label for='data-7efe64d9-f222-4a34-a476-c8550a07dfda' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>name :</span></dt><dd>Streamwise coordinate</dd><dt><span>long_name :</span></dt><dd>$x_1$</dd></dl></div><div class='xr-var-data'><pre>array([ 0.  ,  0.04,  0.08, ..., 19.92, 19.96, 20.  ], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>y</span></div><div class='xr-var-dims'>(y)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>0.0 0.02778 0.05556 ... 1.972 2.0</div><input id='attrs-61d918b3-a794-4c1e-a4e0-f464d5d9622b' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-61d918b3-a794-4c1e-a4e0-f464d5d9622b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-63bd80cd-c282-45e5-956d-807018661e8c' class='xr-var-data-in' type='checkbox'><label for='data-63bd80cd-c282-45e5-956d-807018661e8c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>name :</span></dt><dd>Vertical coordinate</dd><dt><span>long_name :</span></dt><dd>$x_2$</dd></dl></div><div class='xr-var-data'><pre>array([0.      , 0.027778, 0.055556, 0.083333, 0.111111, 0.138889, 0.166667,
+       0.194444, 0.222222, 0.25    , 0.277778, 0.305556, 0.333333, 0.361111,
+       0.388889, 0.416667, 0.444444, 0.472222, 0.5     , 0.527778, 0.555556,
+       0.583333, 0.611111, 0.638889, 0.666667, 0.694444, 0.722222, 0.75    ,
+       0.777778, 0.805556, 0.833333, 0.861111, 0.888889, 0.916667, 0.944444,
+       0.972222, 1.      , 1.027778, 1.055556, 1.083333, 1.111111, 1.138889,
+       1.166667, 1.194444, 1.222222, 1.25    , 1.277778, 1.305556, 1.333333,
+       1.361111, 1.388889, 1.416667, 1.444444, 1.472222, 1.5     , 1.527778,
+       1.555556, 1.583333, 1.611111, 1.638889, 1.666667, 1.694444, 1.722222,
+       1.75    , 1.777778, 1.805556, 1.833333, 1.861111, 1.888889, 1.916667,
+       1.944444, 1.972222, 2.      ], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>z</span></div><div class='xr-var-dims'>(z)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>0.0 0.04 0.08 ... 19.92 19.96 20.0</div><input id='attrs-940e5a18-6b71-4c6e-a270-8eafcbd9eb1c' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-940e5a18-6b71-4c6e-a270-8eafcbd9eb1c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-da2dc628-1189-4980-8bcc-bb993449b09e' class='xr-var-data-in' type='checkbox'><label for='data-da2dc628-1189-4980-8bcc-bb993449b09e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>name :</span></dt><dd>Spanwise coordinate</dd><dt><span>long_name :</span></dt><dd>$x_3$</dd></dl></div><div class='xr-var-data'><pre>array([ 0.  ,  0.04,  0.08, ..., 19.92, 19.96, 20.  ], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>n</span></div><div class='xr-var-dims'>(n)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-ea663de0-33ad-41c7-b8e7-de59317128b0' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-ea663de0-33ad-41c7-b8e7-de59317128b0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6654a0d1-544a-4236-a570-e70d6260d378' class='xr-var-data-in' type='checkbox'><label for='data-6654a0d1-544a-4236-a570-e70d6260d378' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>name :</span></dt><dd>Scalar fraction</dd><dt><span>long_name :</span></dt><dd>$\ell$</dd></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-cb1011b7-0877-4a54-922c-f03bd7c27953' class='xr-section-summary-in' type='checkbox'  checked><label for='section-cb1011b7-0877-4a54-922c-f03bd7c27953' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>ux</span></div><div class='xr-var-dims'>(x, y, z)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>0.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 0.0</div><input id='attrs-d94084cd-fe82-4a4e-9409-ab5c4feaf013' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-d94084cd-fe82-4a4e-9409-ab5c4feaf013' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-1ebcca4f-e942-4211-afea-2431df9e19d6' class='xr-var-data-in' type='checkbox'><label for='data-1ebcca4f-e942-4211-afea-2431df9e19d6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>file_name :</span></dt><dd>ux</dd><dt><span>name :</span></dt><dd>Initial Condition for Streamwise Velocity</dd><dt><span>long_name :</span></dt><dd>$u_1 (x_1,x_2,x_3,t=0)$</dd><dt><span>BC :</span></dt><dd>{&#x27;x&#x27;: {&#x27;ncl1&#x27;: 1, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 0}, &#x27;y&#x27;: {&#x27;ncl1&#x27;: 2, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 1, &#x27;istret&#x27;: &lt;Istret.NO_REFINEMENT: 0&gt;, &#x27;beta&#x27;: 1.0}, &#x27;z&#x27;: {&#x27;ncl1&#x27;: 1, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 1}}</dd></dl></div><div class='xr-var-data'><pre>array([[[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+...
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]]], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>uy</span></div><div class='xr-var-dims'>(x, y, z)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>0.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 0.0</div><input id='attrs-a68a3b0e-7d5c-425e-bc70-54702d77945d' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-a68a3b0e-7d5c-425e-bc70-54702d77945d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e8a6120e-3360-4ccd-a5b8-bdf886bb9909' class='xr-var-data-in' type='checkbox'><label for='data-e8a6120e-3360-4ccd-a5b8-bdf886bb9909' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>file_name :</span></dt><dd>uy</dd><dt><span>name :</span></dt><dd>Initial Condition for Vertical Velocity</dd><dt><span>long_name :</span></dt><dd>$u_2 (x_1,x_2,x_3,t=0)$</dd><dt><span>BC :</span></dt><dd>{&#x27;x&#x27;: {&#x27;ncl1&#x27;: 1, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 1}, &#x27;y&#x27;: {&#x27;ncl1&#x27;: 2, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 0, &#x27;istret&#x27;: &lt;Istret.NO_REFINEMENT: 0&gt;, &#x27;beta&#x27;: 1.0}, &#x27;z&#x27;: {&#x27;ncl1&#x27;: 1, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 1}}</dd></dl></div><div class='xr-var-data'><pre>array([[[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+...
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]]], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>uz</span></div><div class='xr-var-dims'>(x, y, z)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>0.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 0.0</div><input id='attrs-10e2fe5e-7c11-409d-a3de-1a2408be84c6' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-10e2fe5e-7c11-409d-a3de-1a2408be84c6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c8e6c35e-5848-480f-b7ef-09340438915c' class='xr-var-data-in' type='checkbox'><label for='data-c8e6c35e-5848-480f-b7ef-09340438915c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>file_name :</span></dt><dd>uz</dd><dt><span>name :</span></dt><dd>Initial Condition for Spanwise Velocity</dd><dt><span>long_name :</span></dt><dd>$u_3 (x_1,x_2,x_3,t=0)$</dd><dt><span>BC :</span></dt><dd>{&#x27;x&#x27;: {&#x27;ncl1&#x27;: 1, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 1}, &#x27;y&#x27;: {&#x27;ncl1&#x27;: 2, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 1, &#x27;istret&#x27;: &lt;Istret.NO_REFINEMENT: 0&gt;, &#x27;beta&#x27;: 1.0}, &#x27;z&#x27;: {&#x27;ncl1&#x27;: 1, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 0}}</dd></dl></div><div class='xr-var-data'><pre>array([[[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+...
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]],
+
+       [[0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]]], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>phi</span></div><div class='xr-var-dims'>(n, x, y, z)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>0.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 0.0</div><input id='attrs-dcb46284-5365-4427-b299-576bc6b8eabd' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-dcb46284-5365-4427-b299-576bc6b8eabd' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c91c796f-dc86-4b79-ae04-0b09322c33f1' class='xr-var-data-in' type='checkbox'><label for='data-c91c796f-dc86-4b79-ae04-0b09322c33f1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>file_name :</span></dt><dd>phi</dd><dt><span>name :</span></dt><dd>Initial Condition for Scalar field(s)</dd><dt><span>long_name :</span></dt><dd>$\varphi (x_1,x_2,x_3,n,t=0)$</dd><dt><span>BC :</span></dt><dd>{&#x27;x&#x27;: {&#x27;ncl1&#x27;: 1, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 1}, &#x27;y&#x27;: {&#x27;ncl1&#x27;: 1, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 1, &#x27;istret&#x27;: &lt;Istret.NO_REFINEMENT: 0&gt;, &#x27;beta&#x27;: 1.0}, &#x27;z&#x27;: {&#x27;ncl1&#x27;: 1, &#x27;ncln&#x27;: 1, &#x27;npaire&#x27;: 1}}</dd></dl></div><div class='xr-var-data'><pre>array([[[[0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         ...,
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.]],
+
+        [[0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         ...,
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.]],
+
+        [[0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         ...,
+...
+         ...,
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.]],
+
+        [[0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         ...,
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.]],
+
+        [[0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         ...,
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.],
+         [0., 0., 0., ..., 0., 0., 0.]]]], dtype=float32)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-2a712185-10ec-4ba8-bfbb-275366bc0057' class='xr-section-summary-in' type='checkbox'  ><label for='section-2a712185-10ec-4ba8-bfbb-275366bc0057' class='xr-section-summary' >Indexes: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>x</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-ac23f905-ce98-4105-a320-6d62dc22d368' class='xr-index-data-in' type='checkbox'/><label for='index-ac23f905-ce98-4105-a320-6d62dc22d368' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([                0.0, 0.03999999910593033, 0.07999999821186066,
+       0.11999999731779099,  0.1599999964237213, 0.20000000298023224,
+       0.23999999463558197,  0.2800000011920929,  0.3199999928474426,
+       0.36000001430511475,
+       ...
+        19.639999389648438,   19.68000030517578,  19.719999313354492,
+        19.760000228881836,  19.799999237060547,   19.84000015258789,
+          19.8799991607666,  19.920000076293945,  19.959999084472656,
+                      20.0],
+      dtype=&#x27;float32&#x27;, name=&#x27;x&#x27;, length=501))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>y</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-d97f0600-7cbc-4a0e-9e06-381f47450bce' class='xr-index-data-in' type='checkbox'/><label for='index-d97f0600-7cbc-4a0e-9e06-381f47450bce' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([                0.0, 0.02777777798473835,  0.0555555559694767,
+        0.0833333358168602,  0.1111111119389534,  0.1388888955116272,
+        0.1666666716337204,  0.1944444477558136,  0.2222222238779068,
+                      0.25,  0.2777777910232544,  0.3055555522441864,
+        0.3333333432674408,  0.3611111044883728,  0.3888888955116272,
+        0.4166666567325592,  0.4444444477558136,  0.4722222089767456,
+                       0.5,  0.5277777910232544,  0.5555555820465088,
+        0.5833333134651184,  0.6111111044883728,  0.6388888955116272,
+        0.6666666865348816,  0.6944444179534912,  0.7222222089767456,
+                      0.75,  0.7777777910232544,  0.8055555820465088,
+        0.8333333134651184,  0.8611111044883728,  0.8888888955116272,
+        0.9166666865348816,  0.9444444179534912,  0.9722222089767456,
+                       1.0,  1.0277777910232544,  1.0555555820465088,
+        1.0833333730697632,  1.1111111640930176,  1.1388888359069824,
+        1.1666666269302368,  1.1944444179534912,  1.2222222089767456,
+                      1.25,  1.2777777910232544,  1.3055555820465088,
+        1.3333333730697632,  1.3611111640930176,  1.3888888359069824,
+        1.4166666269302368,  1.4444444179534912,  1.4722222089767456,
+                       1.5,  1.5277777910232544,  1.5555555820465088,
+        1.5833333730697632,  1.6111111640930176,  1.6388888359069824,
+        1.6666666269302368,  1.6944444179534912,  1.7222222089767456,
+                      1.75,  1.7777777910232544,  1.8055555820465088,
+        1.8333333730697632,  1.8611111640930176,  1.8888888359069824,
+        1.9166666269302368,  1.9444444179534912,  1.9722222089767456,
+                       2.0],
+      dtype=&#x27;float32&#x27;, name=&#x27;y&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>z</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-52d8635d-4174-4dde-a79b-af0007f0a302' class='xr-index-data-in' type='checkbox'/><label for='index-52d8635d-4174-4dde-a79b-af0007f0a302' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([                0.0, 0.03999999910593033, 0.07999999821186066,
+       0.11999999731779099,  0.1599999964237213, 0.20000000298023224,
+       0.23999999463558197,  0.2800000011920929,  0.3199999928474426,
+       0.36000001430511475,
+       ...
+        19.639999389648438,   19.68000030517578,  19.719999313354492,
+        19.760000228881836,  19.799999237060547,   19.84000015258789,
+          19.8799991607666,  19.920000076293945,  19.959999084472656,
+                      20.0],
+      dtype=&#x27;float32&#x27;, name=&#x27;z&#x27;, length=501))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>n</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-5b7f7ae2-aab7-4f4a-b895-f83bea6e12eb' class='xr-index-data-in' type='checkbox'/><label for='index-5b7f7ae2-aab7-4f4a-b895-f83bea6e12eb' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1], dtype=&#x27;int64&#x27;, name=&#x27;n&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-662ff569-e64a-4d62-8d72-87c734aa1aca' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-662ff569-e64a-4d62-8d72-87c734aa1aca' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
+</div>
+<section id="initial-condition">
+<h3>Initial Condition<a class="headerlink" href="#initial-condition" title="Link to this heading">#</a></h3>
+<p>A random noise will be applied to the initial velocity field, we start creating a modulation function <code class="docutils literal notranslate"><span class="pre">mod</span></code>, to apply it just near the fresh/turbidity interface:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Position of the initial interface in the polar coordinate</span>
+<span class="n">r0</span> <span class="o">=</span> <span class="mf">4.0</span>
+
+<span class="c1"># Random noise with fixed seed,</span>
+<span class="c1"># important for reproducibility, development and debugging</span>
+<span class="k">if</span> <span class="n">prm</span><span class="o">.</span><span class="n">iin</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">67</span><span class="p">)</span>
+
+<span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">ds</span><span class="o">.</span><span class="n">z</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span>
+
+<span class="n">mod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">25.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">radius</span> <span class="o">-</span> <span class="n">r0</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span>
+
+<span class="c1"># This attribute will be shown at the colorbar</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Noise modulation&quot;</span>
+
+<span class="n">mod</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh at 0x7f8c0bbc9760&gt;
+</pre></div>
+</div>
+<img alt="../_images/119589132385733d0cba386af703f2a450b287efd2d77dac7f26987bbe263e47.png" src="../_images/119589132385733d0cba386af703f2a450b287efd2d77dac7f26987bbe263e47.png" />
+</div>
+</div>
+<p>Now we reset velocity fields <code class="docutils literal notranslate"><span class="pre">ds[key]</span> <span class="pre">*=</span> <span class="pre">0.0</span></code>, just to guarantee consistency in the case of multiple executions of this cell. Notice that <code class="docutils literal notranslate"><span class="pre">ds[key]</span> <span class="pre">=</span> <span class="pre">0.0</span></code> may overwrite all the metadata contained in the array, so it should be avoided.</p>
+<p>We then add a random number array with the right shape and multiply by the noise amplitude at the initial condition <code class="docutils literal notranslate"><span class="pre">init_noise</span></code> and multiply again by our modulation function <code class="docutils literal notranslate"><span class="pre">mod</span></code>, defined previously.</p>
+<p>Plotting a <code class="docutils literal notranslate"><span class="pre">xarray.DataArray</span></code> is as simple as <code class="docutils literal notranslate"><span class="pre">da.plot()</span></code> (see its <a class="reference external" href="http://docs.xarray.dev/en/stable/plotting.html">user guide</a>), I’m adding extra options just to exemplify how easily we can slice the vertical coordinate and produce multiple plots:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="s2">&quot;ux uy uz&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+    <span class="c1">#</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+    <span class="c1">#</span>
+    <span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">0.0</span>
+    <span class="c1">#</span>
+    <span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">prm</span><span class="o">.</span><span class="n">init_noise</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*=</span> <span class="n">mod</span>
+    <span class="c1">#</span>
+    <span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial Condition for Streamwise Velocity
+</pre></div>
+</div>
+<img alt="../_images/8768313e4e59a0a31e620eb12bb6346cc870de00bec9447529005fc5877f38fb.png" src="../_images/8768313e4e59a0a31e620eb12bb6346cc870de00bec9447529005fc5877f38fb.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial Condition for Vertical Velocity
+</pre></div>
+</div>
+<img alt="../_images/732dec9f61487e09d5dc93495134b892756598f0bcbe88aa2601637c98e714ed.png" src="../_images/732dec9f61487e09d5dc93495134b892756598f0bcbe88aa2601637c98e714ed.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial Condition for Spanwise Velocity
+</pre></div>
+</div>
+<img alt="../_images/ff966e358a3acb50051e25c7b971a8549bf01a3f1127cda188e011e2579ce054.png" src="../_images/ff966e358a3acb50051e25c7b971a8549bf01a3f1127cda188e011e2579ce054.png" />
+</div>
+</div>
+<p>A smooth transition at the interface fresh/turbidity fluid is used for the initial concentration(s) field(s), it is defined in the polar coordinates as:</p>
+<div class="math notranslate nohighlight">
+\[
+\varphi_n = c_{0,n} \dfrac{1}{2} \left( 1 - \tanh \left( (r - r_0) \sqrt{Sc_n Re} \right) \right).
+\]</div>
+<p>The code block includes the same procedures, we reset the scalar field <code class="docutils literal notranslate"><span class="pre">ds['phi']</span> <span class="pre">*=</span> <span class="pre">0.0</span></code>, just to guarantee consistency, we compute the equation above, we add it to the array and make a plot:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Concentration</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+
+<span class="n">ds</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">0.0</span>
+
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prm</span><span class="o">.</span><span class="n">numscalar</span><span class="p">):</span>
+    <span class="c1">#</span>
+    <span class="n">fun</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">prm</span><span class="o">.</span><span class="n">cp</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="n">radius</span> <span class="o">-</span> <span class="n">r0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">prm</span><span class="o">.</span><span class="n">sc</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="n">prm</span><span class="o">.</span><span class="n">re</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">))</span>
+    <span class="c1">#</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">][{</span><span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="n">n</span><span class="p">}]</span> <span class="o">+=</span> <span class="n">fun</span>
+    <span class="c1">#</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">phi</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">prm</span><span class="o">.</span><span class="n">yly</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial Condition for Scalar field(s)
+</pre></div>
+</div>
+<img alt="../_images/b595340d92db209dcc06fb9bbc5a413e5c6d9cdd84c65146ace0c166fe3631b6.png" src="../_images/b595340d92db209dcc06fb9bbc5a413e5c6d9cdd84c65146ace0c166fe3631b6.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="writing-to-disc">
+<h2>Writing to disc<a class="headerlink" href="#writing-to-disc" title="Link to this heading">#</a></h2>
+<p>is as simple as:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prm</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prm</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="running-the-simulation">
+<h2>Running the Simulation<a class="headerlink" href="#running-the-simulation" title="Link to this heading">#</a></h2>
+<p>It was just to show the capabilities of <code class="docutils literal notranslate"><span class="pre">xcompact3d_toolbox.sandbox</span></code>, keep in mind the aspects of numerical stability of our Navier-Stokes solver. <strong>It is up to the user to find the right set of numerical and physical parameters</strong>.</p>
+<p>Make sure that the compiling flags and options at <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> are what you expect. Then, compile the main code at the root folder with <code class="docutils literal notranslate"><span class="pre">make</span></code>.</p>
+<p>And finally, we are good to go:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mpirun<span class="w"> </span>-n<span class="w"> </span><span class="o">[</span>number<span class="w"> </span>of<span class="w"> </span>cores<span class="o">]</span><span class="w"> </span>./xcompact3d<span class="w"> </span><span class="p">|</span>tee<span class="w"> </span>log.out
+</pre></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./examples"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../tutorial/computing_and_plotting.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Computing and Plotting</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Cylinder.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Flow Around a Complex Body</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#initial-condition">Initial Condition</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-to-disc">Writing to disc</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-simulation">Running the Simulation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Felipe N. Schuch
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2021.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

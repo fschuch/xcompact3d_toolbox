@@ -1,0 +1,1050 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; Xcompact3d-toolbox</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=36754332"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Xcompact3d-toolbox - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Xcompact3d-toolbox - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="tutorial/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/io.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/computing_and_plotting.html">Computing and Plotting</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Sandbox Examples</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="examples/Axisymmetric_flow.html">Turbidity Current in Axisymmetric Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Cylinder.html">Flow Around a Complex Body</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Square.html">Flow Around a Square and Flow Visualization with Passive Scalar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Heat-exchanger.html">Periodic Heat Exchanger</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="news.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Docstrings.html">API reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/fschuch/xcompact3d_toolbox" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fschuch/xcompact3d_toolbox/issues/new?title=Issue%20on%20page%20%2Fgenindex.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ | <a href="#X"><strong>X</strong></a>
+ | <a href="#Y"><strong>Y</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
+ 
+</div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Coordinate.__array__">__array__() (xcompact3d_toolbox.mesh.Coordinate method)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.StretchedCoordinate.__array__">(xcompact3d_toolbox.mesh.StretchedCoordinate method)</a>
+</li>
+      </ul></li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.gui.ParametersGui.__call__">__call__() (xcompact3d_toolbox.gui.ParametersGui method)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.__call__">(xcompact3d_toolbox.io.Dataset method)</a>
+</li>
+      </ul></li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Istret.__format__">__format__() (xcompact3d_toolbox.mesh.Istret method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.__getitem__">__getitem__() (xcompact3d_toolbox.io.Dataset method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.gui.ParametersGui.__init__">__init__() (xcompact3d_toolbox.gui.ParametersGui method)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.__init__">(xcompact3d_toolbox.io.Dataset method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.io.FilenameProperties.__init__">(xcompact3d_toolbox.io.FilenameProperties method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Coordinate.__init__">(xcompact3d_toolbox.mesh.Coordinate method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Mesh3D.__init__">(xcompact3d_toolbox.mesh.Mesh3D method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.Parameters.__init__">(xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersALMParam.__init__">(xcompact3d_toolbox.parameters.ParametersALMParam method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.__init__">(xcompact3d_toolbox.parameters.ParametersBasicParam method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersExtras.__init__">(xcompact3d_toolbox.parameters.ParametersExtras method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersIbmStuff.__init__">(xcompact3d_toolbox.parameters.ParametersIbmStuff method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersInOutParam.__init__">(xcompact3d_toolbox.parameters.ParametersInOutParam method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersLESModel.__init__">(xcompact3d_toolbox.parameters.ParametersLESModel method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersNumOptions.__init__">(xcompact3d_toolbox.parameters.ParametersNumOptions method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.__init__">(xcompact3d_toolbox.parameters.ParametersScalarParam method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.__iter__">__iter__() (xcompact3d_toolbox.io.Dataset method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.__len__">__len__() (xcompact3d_toolbox.io.Dataset method)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Coordinate.__len__">(xcompact3d_toolbox.mesh.Coordinate method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Mesh3D.__len__">(xcompact3d_toolbox.mesh.Mesh3D method)</a>
+</li>
+      </ul></li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Istret.__new__">__new__() (xcompact3d_toolbox.mesh.Istret method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.__repr__">__repr__() (xcompact3d_toolbox.io.Dataset method)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.io.FilenameProperties.__repr__">(xcompact3d_toolbox.io.FilenameProperties method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Coordinate.__repr__">(xcompact3d_toolbox.mesh.Coordinate method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Mesh3D.__repr__">(xcompact3d_toolbox.mesh.Mesh3D method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.StretchedCoordinate.__repr__">(xcompact3d_toolbox.mesh.StretchedCoordinate method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.Parameters.__repr__">(xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+      </ul></li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.Parameters.__str__">__str__() (xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.sandbox.Geometry.ahmed_body">ahmed_body() (xcompact3d_toolbox.sandbox.Geometry method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.StretchedCoordinate.beta">beta (xcompact3d_toolbox.mesh.StretchedCoordinate attribute)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.beta">(xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.sandbox.Geometry.box">box() (xcompact3d_toolbox.sandbox.Geometry method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersNumOptions.cnu">cnu (xcompact3d_toolbox.parameters.ParametersNumOptions attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Coordinate">Coordinate (class in xcompact3d_toolbox.mesh)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Mesh3D.copy">copy() (xcompact3d_toolbox.mesh.Mesh3D method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.cp">cp (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.array.X3dDataArray.cumtrapz">cumtrapz() (xcompact3d_toolbox.array.X3dDataArray method)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.array.X3dDataset.cumtrapz">(xcompact3d_toolbox.array.X3dDataset method)</a>
+</li>
+      </ul></li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.sandbox.Geometry.cylinder">cylinder() (xcompact3d_toolbox.sandbox.Geometry method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset">Dataset (class in xcompact3d_toolbox.io)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersExtras.dataset">dataset (xcompact3d_toolbox.parameters.ParametersExtras attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.sandbox.DimensionNotFoundError">DimensionNotFoundError</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Mesh3D.drop">drop() (xcompact3d_toolbox.mesh.Mesh3D method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.dt">dt (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersExtras.dx">dx (xcompact3d_toolbox.parameters.ParametersExtras attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersExtras.dy">dy (xcompact3d_toolbox.parameters.ParametersExtras attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersExtras.dz">dz (xcompact3d_toolbox.parameters.ParametersExtras attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersExtras.filename">filename (xcompact3d_toolbox.parameters.ParametersExtras attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.FilenameProperties">FilenameProperties (class in xcompact3d_toolbox.io)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.array.X3dDataArray.first_derivative">first_derivative() (xcompact3d_toolbox.array.X3dDataArray method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.Parameters.from_file">from_file() (xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.sandbox.Geometry.from_stl">from_stl() (xcompact3d_toolbox.sandbox.Geometry method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.Parameters.from_string">from_string() (xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.genepsi.gene_epsi_3d">gene_epsi_3d() (in module xcompact3d_toolbox.genepsi)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.sandbox.Geometry">Geometry (class in xcompact3d_toolbox.sandbox)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Mesh3D.get">get() (xcompact3d_toolbox.mesh.Mesh3D method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.Parameters.get_boundary_condition">get_boundary_condition() (xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.FilenameProperties.get_filename_for_binary">get_filename_for_binary() (xcompact3d_toolbox.io.FilenameProperties method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.FilenameProperties.get_info_from_filename">get_info_from_filename() (xcompact3d_toolbox.io.FilenameProperties method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.Parameters.get_mesh">get_mesh() (xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.FilenameProperties.get_name_from_filename">get_name_from_filename() (xcompact3d_toolbox.io.FilenameProperties method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.FilenameProperties.get_num_from_filename">get_num_from_filename() (xcompact3d_toolbox.io.FilenameProperties method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.gravx">gravx (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.gravy">gravy (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.gravz">gravz (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersInOutParam.icheckpoint">icheckpoint (xcompact3d_toolbox.parameters.ParametersInOutParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.ifirst">ifirst (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersNumOptions.ifirstder">ifirstder (xcompact3d_toolbox.parameters.ParametersNumOptions attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.iibm">iibm (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersNumOptions.iimplicit">iimplicit (xcompact3d_toolbox.parameters.ParametersNumOptions attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.iin">iin (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.ilast">ilast (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.ilesmod">ilesmod (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.inflow_noise">inflow_noise (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.sandbox.init_dataset">init_dataset() (in module xcompact3d_toolbox.sandbox)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.sandbox.init_epsi">init_epsi() (in module xcompact3d_toolbox.sandbox)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.init_noise">init_noise (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersInOutParam.ioutput">ioutput (xcompact3d_toolbox.parameters.ParametersInOutParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.ipost">ipost (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersInOutParam.iprocessing">iprocessing (xcompact3d_toolbox.parameters.ParametersInOutParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersInOutParam.irestart">irestart (xcompact3d_toolbox.parameters.ParametersInOutParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersNumOptions.isecondder">isecondder (xcompact3d_toolbox.parameters.ParametersNumOptions attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Istret">Istret (class in xcompact3d_toolbox.mesh)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.StretchedCoordinate.istret">istret (xcompact3d_toolbox.mesh.StretchedCoordinate attribute)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.istret">(xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersNumOptions.itimescheme">itimescheme (xcompact3d_toolbox.parameters.ParametersNumOptions attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.itype">itype (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.ivisu">ivisu (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersLESModel.iwall">iwall (xcompact3d_toolbox.parameters.ParametersLESModel attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersIbmStuff.izap">izap (xcompact3d_toolbox.parameters.ParametersIbmStuff attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersLESModel.jles">jles (xcompact3d_toolbox.parameters.ParametersLESModel attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.gui.ParametersGui.link_widgets">link_widgets() (xcompact3d_toolbox.gui.ParametersGui method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.Parameters.load">load() (xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.load_array">load_array() (xcompact3d_toolbox.io.Dataset method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.load_snapshot">load_snapshot() (xcompact3d_toolbox.io.Dataset method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.load_time_series">load_time_series() (xcompact3d_toolbox.io.Dataset method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.load_wind_turbine_data">load_wind_turbine_data() (xcompact3d_toolbox.io.Dataset method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersLESModel.maxdsmagcst">maxdsmagcst (xcompact3d_toolbox.parameters.ParametersLESModel attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersExtras.mesh">mesh (xcompact3d_toolbox.parameters.ParametersExtras attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Mesh3D">Mesh3D (class in xcompact3d_toolbox.mesh)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.sandbox.Geometry.mirror">mirror() (xcompact3d_toolbox.sandbox.Geometry method)</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.array">xcompact3d_toolbox.array</a>
+</li>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.genepsi">xcompact3d_toolbox.genepsi</a>
+</li>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.gui">xcompact3d_toolbox.gui</a>
+</li>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.io">xcompact3d_toolbox.io</a>
+</li>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.mesh">xcompact3d_toolbox.mesh</a>
+</li>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.parameters">xcompact3d_toolbox.parameters</a>
+</li>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.sandbox">xcompact3d_toolbox.sandbox</a>
+</li>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.tutorial">xcompact3d_toolbox.tutorial</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.nclx1">nclx1 (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.nclxn">nclxn (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.nclxS1">nclxS1 (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.nclxSn">nclxSn (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.ncly1">ncly1 (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.nclyn">nclyn (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.nclyS1">nclyS1 (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.nclySn">nclySn (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.nclz1">nclz1 (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.nclzn">nclzn (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.nclzS1">nclzS1 (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.nclzSn">nclzSn (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersExtras.ncores">ncores (xcompact3d_toolbox.parameters.ParametersExtras attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersIbmStuff.nobjmax">nobjmax (xcompact3d_toolbox.parameters.ParametersIbmStuff attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersIbmStuff.npif">npif (xcompact3d_toolbox.parameters.ParametersIbmStuff attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersIbmStuff.nraf">nraf (xcompact3d_toolbox.parameters.ParametersIbmStuff attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersLESModel.nSmag">nSmag (xcompact3d_toolbox.parameters.ParametersLESModel attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersNumOptions.nu0nu">nu0nu (xcompact3d_toolbox.parameters.ParametersNumOptions attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.numscalar">numscalar (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersInOutParam.nvisu">nvisu (xcompact3d_toolbox.parameters.ParametersInOutParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.nx">nx (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.ny">ny (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.nz">nz (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.tutorial.open_dataset">open_dataset() (in module xcompact3d_toolbox.tutorial)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.p_col">p_col (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.p_row">p_row (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.Parameters">Parameters (class in xcompact3d_toolbox.parameters)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersALMParam">ParametersALMParam (class in xcompact3d_toolbox.parameters)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam">ParametersBasicParam (class in xcompact3d_toolbox.parameters)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersExtras">ParametersExtras (class in xcompact3d_toolbox.parameters)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.gui.ParametersGui">ParametersGui (class in xcompact3d_toolbox.gui)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersIbmStuff">ParametersIbmStuff (class in xcompact3d_toolbox.parameters)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersInOutParam">ParametersInOutParam (class in xcompact3d_toolbox.parameters)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersLESModel">ParametersLESModel (class in xcompact3d_toolbox.parameters)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersNumOptions">ParametersNumOptions (class in xcompact3d_toolbox.parameters)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam">ParametersScalarParam (class in xcompact3d_toolbox.parameters)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.array.X3dDataArray.pencil_decomp">pencil_decomp() (xcompact3d_toolbox.array.X3dDataArray method)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.array.X3dDataset.pencil_decomp">(xcompact3d_toolbox.array.X3dDataset method)</a>
+</li>
+      </ul></li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Coordinate.possible_grid_size">possible_grid_size (xcompact3d_toolbox.mesh.Coordinate property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.re">re (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.ri">ri (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.sc">sc (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.scalar_lbound">scalar_lbound (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.scalar_ubound">scalar_ubound (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.array.X3dDataArray.second_derivative">second_derivative() (xcompact3d_toolbox.array.X3dDataArray method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.set">set() (xcompact3d_toolbox.io.Dataset method)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.io.FilenameProperties.set">(xcompact3d_toolbox.io.FilenameProperties method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Coordinate.set">(xcompact3d_toolbox.mesh.Coordinate method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Mesh3D.set">(xcompact3d_toolbox.mesh.Mesh3D method)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.Parameters.set">(xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.array.X3dDataArray.simps">simps() (xcompact3d_toolbox.array.X3dDataArray method)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.array.X3dDataset.simps">(xcompact3d_toolbox.array.X3dDataset method)</a>
+</li>
+      </ul></li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Coordinate.size">size (xcompact3d_toolbox.mesh.Coordinate property)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Mesh3D.size">(xcompact3d_toolbox.mesh.Mesh3D property)</a>
+</li>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersExtras.size">(xcompact3d_toolbox.parameters.ParametersExtras attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersLESModel.smagcst">smagcst (xcompact3d_toolbox.parameters.ParametersLESModel attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersLESModel.smagwalldamp">smagwalldamp (xcompact3d_toolbox.parameters.ParametersLESModel attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.sandbox.Geometry.sphere">sphere() (xcompact3d_toolbox.sandbox.Geometry method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.sandbox.Geometry.square">square() (xcompact3d_toolbox.sandbox.Geometry method)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.StretchedCoordinate">StretchedCoordinate (class in xcompact3d_toolbox.mesh)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersScalarParam.uset">uset (xcompact3d_toolbox.parameters.ParametersScalarParam attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.mesh.Coordinate.vector">vector (xcompact3d_toolbox.mesh.Coordinate property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersLESModel.walecst">walecst (xcompact3d_toolbox.parameters.ParametersLESModel attribute)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.write">write() (xcompact3d_toolbox.io.Dataset method)</a>
+
+      <ul>
+        <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.Parameters.write">(xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.io.Dataset.write_xdmf">write_xdmf() (xcompact3d_toolbox.io.Dataset method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.array.X3dDataArray">X3dDataArray (class in xcompact3d_toolbox.array)</a>
+</li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.array.X3dDataset">X3dDataset (class in xcompact3d_toolbox.array)</a>
+</li>
+      <li>
+    xcompact3d_toolbox.array
+
+      <ul>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.array">module</a>
+</li>
+      </ul></li>
+      <li>
+    xcompact3d_toolbox.genepsi
+
+      <ul>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.genepsi">module</a>
+</li>
+      </ul></li>
+      <li>
+    xcompact3d_toolbox.gui
+
+      <ul>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.gui">module</a>
+</li>
+      </ul></li>
+      <li>
+    xcompact3d_toolbox.io
+
+      <ul>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.io">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    xcompact3d_toolbox.mesh
+
+      <ul>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.mesh">module</a>
+</li>
+      </ul></li>
+      <li>
+    xcompact3d_toolbox.parameters
+
+      <ul>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.parameters">module</a>
+</li>
+      </ul></li>
+      <li>
+    xcompact3d_toolbox.sandbox
+
+      <ul>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.sandbox">module</a>
+</li>
+      </ul></li>
+      <li>
+    xcompact3d_toolbox.tutorial
+
+      <ul>
+        <li><a href="Docstrings.html#module-xcompact3d_toolbox.tutorial">module</a>
+</li>
+      </ul></li>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.xlx">xlx (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Y">Y</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.yly">yly (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Docstrings.html#xcompact3d_toolbox.parameters.ParametersBasicParam.zlz">zlz (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Felipe N. Schuch
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2021.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
