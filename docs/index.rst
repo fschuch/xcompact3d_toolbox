@@ -27,7 +27,6 @@ compare results to validate any future Fortran implementations.
 **Useful links**
 
 * `View on GitHub`_;
-* `Changelog`_;
 * `Suggestions for new features and bug report`_;
 * `See what is coming next (Project page)`_.
 
@@ -44,10 +43,6 @@ It is possible to install using pip::
 There are other dependency sets for extra functionality::
 
    pip install xcompact3d-toolbox[visu] # interactive visualization with hvplot and others
-   pip install xcompact3d-toolbox[doc]  # dependencies to build the documentation
-   pip install xcompact3d-toolbox[dev]  # tools for development
-   pip install xcompact3d-toolbox[test] # tools for testing
-   pip install xcompact3d-toolbox[all]  # all the above
 
 To install from source, clone de repository::
 
@@ -135,7 +130,6 @@ Examples
 .. image:: https://www.fschuch.com/en/slides/2021-x3d-dev-meeting/Output.gif
 
 .. _`View on GitHub`: https://github.com/fschuch/xcompact3d_toolbox
-.. _`Changelog`: https://github.com/fschuch/xcompact3d_toolbox/blob/master/CHANGELOG.md
 .. _`Suggestions for new features and bug report`: https://github.com/fschuch/xcompact3d_toolbox/issues
 .. _`See what is coming next (Project page)`: https://github.com/fschuch/xcompact3d_toolbox/projects/1
 
