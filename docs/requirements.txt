@@ -213,7 +213,7 @@ loguru==0.7.2
     # via hatch.envs.docs
 lz4==4.3.3
     # via dask
-markdown==3.5.2
+markdown==3.6
     # via panel
 markdown-it-py==3.0.0
     # via
