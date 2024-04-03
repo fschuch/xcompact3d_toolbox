@@ -338,7 +338,7 @@ partd==1.4.1
     # via dask
 pexpect==4.9.0
     # via ipython
-pillow==10.2.0
+pillow==10.3.0
     # via
     #   bokeh
     #   datashader
