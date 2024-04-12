@@ -136,7 +136,7 @@ holoviews==1.18.3
     #   hvplot
 hvplot==0.9.2
     # via hatch.envs.docs
-idna==3.6
+idna==3.7
     # via requests
 imagesize==1.4.1
     # via sphinx
