@@ -54,7 +54,7 @@ bleach==6.1.0
     # via
     #   nbconvert
     #   panel
-bokeh==3.3.4
+bokeh==3.4.1
     # via
     #   hatch.envs.docs
     #   dask
