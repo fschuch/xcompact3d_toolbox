@@ -524,7 +524,7 @@ tornado==6.4
     #   ipykernel
     #   jupyter-client
     #   livereload
-tqdm==4.66.2
+tqdm==4.66.3
     # via
     #   hatch.envs.docs
     #   panel
