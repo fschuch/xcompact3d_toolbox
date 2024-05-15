@@ -25,9 +25,13 @@ concurrency:
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        exclude:
+          - os: macos-latest
+            python-version: "3.8"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -63,8 +67,10 @@ jobs:
           merge-multiple: true
       - name: Set project version
         run: |
+          REF=${{ github.ref }}
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            echo "sonar.projectVersion=${{ github.ref }}" >> sonar-project.properties
+            TAG_NAME=${REF#refs/tags/}
+            echo "sonar.projectVersion=$TAG_NAME" >> sonar-project.properties
           fi
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
@@ -116,9 +122,3 @@ jobs:
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-
-      - uses: ncipollo/release-action@v1
-        with:
-          draft: true
-          skipIfReleaseExists: true
-          generateReleaseNotes: true
