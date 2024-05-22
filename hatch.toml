@@ -61,6 +61,7 @@ serve = ["config", "sphinx-autobuild docs build/_build/html --ignore='**/data/*'
 
 [envs.changelog]
 description = "Changelog handler"
+detached = true
 dependencies = ["towncrier"]
 
 [envs.changelog.scripts]
