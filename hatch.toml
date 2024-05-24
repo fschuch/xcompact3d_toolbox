@@ -40,8 +40,8 @@ python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 [envs.docs]
 description = "Documentation environment"
 features = ["visu"]
+template = "docs"
 install = true
-detached = true
 dependencies = [
     "docutils",
     "ipykernel",
@@ -62,7 +62,8 @@ serve = ["config", "sphinx-autobuild docs build/_build/html --ignore='**/data/*'
 
 [envs.changelog]
 description = "Changelog handler"
-detached = true
+template = "changelog"
+install = true
 dependencies = ["towncrier"]
 
 [envs.changelog.scripts]
