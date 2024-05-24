@@ -61,7 +61,7 @@ minversion = "8.0"
 branch = true
 relative_files = true
 source = ["xcompact3d_toolbox", "tests"]
-omit = ["xcompact3d_toolbox/_version.py"]
+omit = ["xcompact3d_toolbox/_version.py", "**/__init__.py"]
 
 [tool.coverage.report]
 show_missing = true

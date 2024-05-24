@@ -22,7 +22,7 @@ check = "pre-commit run {args} --all-files"
 type = "check mypy {args}"
 lint = "check ruff {args}"
 format = "check ruff-format {args}"
-test = "pytest --cov --cov-report=term {args}"
+test = "pytest --cov --cov-report=term --cov=xcompact3d_toolbox --cov=tests {args}"
 test-no-cov = "test --no-cov {args}"
 qa = ["check", "test", "echo '✅ QA passed'"]
 
@@ -61,6 +61,7 @@ serve = ["config", "sphinx-autobuild docs build/_build/html --ignore='**/data/*'
 
 [envs.changelog]
 description = "Changelog handler"
+detached = true
 dependencies = ["towncrier"]
 
 [envs.changelog.scripts]
@@ -71,7 +72,3 @@ check = "towncrier check {args}"
 
 [envs.hatch-static-analysis]
 config-path = "ruff_defaults.toml"
-
-[dirs.env]
-virtual = ".venv"
-pip-compile = ".venv"
