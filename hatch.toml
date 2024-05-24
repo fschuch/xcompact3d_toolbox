@@ -7,6 +7,7 @@ pattern = '__version__ = "(?P<version>[^"]+)"'
 
 [envs.default]
 description = "Base development environment"
+installer = "uv"
 dependencies = [
     "coverage[toml]",
     "hypothesis>=4.53",
@@ -40,7 +41,7 @@ python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 description = "Documentation environment"
 features = ["visu"]
 install = true
-detached = false
+detached = true
 dependencies = [
     "docutils",
     "ipykernel",
