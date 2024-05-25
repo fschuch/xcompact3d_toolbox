@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=87e54e7c" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -42,7 +42,7 @@
   <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script src="_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
@@ -52,7 +52,7 @@
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="_static/design-tabs.js?v=36754332"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
@@ -398,83 +398,87 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc1-2024-05-24">1.2.0rc1 - 2024-05-24<!-- markdown-link-check-disable-line --></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc0-2024-03-21">1.2.0rc0 - 2024-03-21<!-- markdown-link-check-disable-line --></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#added">Added</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changed">Changed</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Documentation</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">1.1.1 - 2023-08-10</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">1.1.1 - 2023-08-10</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Fixed</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modified">Modified</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">1.1.0 - 2021-10-07</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Modified</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">1.1.0 - 2021-10-07</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Modified</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">1.0.1 - 2021-09-23</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Modified</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">1.0.1 - 2021-09-23</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Modified</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">1.0.0 - 2021-09-14</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Modified</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">1.0.0 - 2021-09-14</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Modified</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">0.1.11 - 2021-02-12</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">0.1.11 - 2021-02-12</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">0.1.10 - 2021-02-11</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">0.1.10 - 2021-02-11</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">0.1.9 - 2020-10-09</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id24">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">0.1.9 - 2020-10-09</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id24">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">0.1.8 - 2020-09-29</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">0.1.8 - 2020-09-29</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">0.1.7 - 2020-08-28</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id28">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id28">0.1.7 - 2020-08-28</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id29">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id29">0.1.6 - 2020-08-28</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id30">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id30">0.1.6 - 2020-08-28</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id31">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id31">0.1.5 - 2020-08-28</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id32">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id33">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id32">0.1.5 - 2020-08-28</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id33">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id34">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id34">0.1.4 - 2020-08-20</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id35">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id36">Changed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id35">0.1.4 - 2020-08-20</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id36">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id37">Changed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id37">0.1.3 - 2020-08-17</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id38">0.1.2 - 2020-08-17</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id39">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id40">Changed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id38">0.1.3 - 2020-08-17</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id39">0.1.2 - 2020-08-17</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id40">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id41">Changed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id41">0.1.1 - 2020-08-14</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id42">0.0.0 - 2020-08-14</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id43">Added</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id42">0.1.1 - 2020-08-14</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id43">0.0.0 - 2020-08-14</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id44">Added</a></li>
 </ul>
 </li>
 </ul>
@@ -495,6 +499,15 @@ document.write(`
 The changes for the upcoming release can be found in <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/tree/main/changelog.d/">changelog.d</a>.</p>
 <!-- WARNING: This file is auto-generated. Do not manually update this file. -->
 <!-- towncrier release notes start -->
+<section id="rc1-2024-05-24">
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.2.0rc1">1.2.0rc1</a> - 2024-05-24<!-- markdown-link-check-disable-line --><a class="headerlink" href="#rc1-2024-05-24" title="Link to this heading">#</a></h2>
+<section id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Migrated documentation hosting from readthedocs to GitHub Pages</p></li>
+</ul>
+</section>
+</section>
 <section id="rc0-2024-03-21">
 <h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.2.0rc0">1.2.0rc0</a> - 2024-03-21<!-- markdown-link-check-disable-line --><a class="headerlink" href="#rc0-2024-03-21" title="Link to this heading">#</a></h2>
 <section id="added">
@@ -536,17 +549,17 @@ The changes for the upcoming release can be found in <a class="reference externa
 <li><p>Fixed issue on <code class="docutils literal notranslate"><span class="pre">xcompact3d_toolbox.sandbox.Geometry.square</span></code> that was resulting in a TypeError because <code class="docutils literal notranslate"><span class="pre">set</span></code> object is not subscriptable</p></li>
 </ul>
 </section>
-<section id="documentation">
-<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h3>
+<section id="id1">
+<h3>Documentation<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Replaced documentation framework by <a class="reference external" href="https://jupyterbook.org/en/stable/intro.html">Jupyter Books</a> to enhance interactive tutorials</p></li>
 </ul>
 </section>
 </section>
-<section id="id1">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.1.1">1.1.1</a> - 2023-08-10<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <section id="id2">
-<h3>Fixed<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.1.1">1.1.1</a> - 2023-08-10<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<section id="id3">
+<h3>Fixed<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Specified the version for netcdf4, to avoid issues with the latest version (<a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/issues/13">#13</a>), by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
@@ -558,10 +571,10 @@ The changes for the upcoming release can be found in <a class="reference externa
 </ul>
 </section>
 </section>
-<section id="id3">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.1.0">1.1.0</a> - 2021-10-07<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
 <section id="id4">
-<h3>Added<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.1.0">1.1.0</a> - 2021-10-07<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<section id="id5">
+<h3>Added<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add <code class="docutils literal notranslate"><span class="pre">sandbox.Geometry.from_stl</span></code>. It reads an <code class="docutils literal notranslate"><span class="pre">stl</span></code> file and can compute which mesh points are inside or outside the geometry, so we can specify the geometry for a very customized immersed boundary method. By <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a> and <a class="reference external" href="https://github.com/nbeb">&#64;nbeb</a>.</p></li>
 <li><p>Add <code class="docutils literal notranslate"><span class="pre">xcompact3d_toolbox.tutorial</span></code>, making it easier to get datasets for documentation and tutorials, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
@@ -570,8 +583,8 @@ The changes for the upcoming release can be found in <a class="reference externa
 <li><p>Add tutorial <em>Reading and writing files</em>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>Modified<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<section id="id6">
+<h3>Modified<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Automatically obtain <code class="docutils literal notranslate"><span class="pre">io.Dataset.data_path</span></code> from <code class="docutils literal notranslate"><span class="pre">parameters.Parameter.filename</span></code> during initialization (e.g., if <code class="docutils literal notranslate"><span class="pre">filename</span> <span class="pre">=</span> <span class="pre">&quot;./example/input.i3d&quot;</span></code> then <code class="docutils literal notranslate"><span class="pre">data_path</span> <span class="pre">=</span> <span class="pre">&quot;./example/data/&quot;</span></code>). Of course, <code class="docutils literal notranslate"><span class="pre">data_path</span></code> can be changed to any value after that. By <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">io.Dataset.load_wind_turbine_data</span></code> now have a default location for <code class="docutils literal notranslate"><span class="pre">file_pattern</span></code>. Attributes were included for the coordinate time. By <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
@@ -579,43 +592,43 @@ The changes for the upcoming release can be found in <a class="reference externa
 <li><p>The default return from <code class="docutils literal notranslate"><span class="pre">xcompact3d_toolbox.param.boundary_condition</span></code> now takes into consideration whether the domain is periodic or not, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id6">
-<h3>Fixed<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<section id="id7">
+<h3>Fixed<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">fix_bug</span></code> at <code class="docutils literal notranslate"><span class="pre">xcompact3d-toolbox.gene_epsi_3D</span></code> was not working properly (<a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/issues/3">#3</a>), by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">xcompact3d.io.Dataset.load_array</span></code> was not working for files that do not change in time, like <code class="docutils literal notranslate"><span class="pre">./data/geometry/epsilon.bin</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
 </section>
-<section id="id7">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.0.1">1.0.1</a> - 2021-09-23<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
 <section id="id8">
-<h3>Modified<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.0.1">1.0.1</a> - 2021-09-23<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<section id="id9">
+<h3>Modified<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Rename the default branch to <code class="docutils literal notranslate"><span class="pre">main</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id9">
-<h3>Added<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<section id="id10">
+<h3>Added<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add <code class="docutils literal notranslate"><span class="pre">load_wind_turbine_data</span></code> that reads the files from the disc and wraps the data into a <code class="docutils literal notranslate"><span class="pre">xarray.Dataset</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id10">
-<h3>Fixed<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<section id="id11">
+<h3>Fixed<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">Black</span></code> version was not working properly at <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
 </section>
-<section id="id11">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.0.0">1.0.0</a> - 2021-09-14<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<section id="id12">
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.0.0">1.0.0</a> - 2021-09-14<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
 <p>Xcompact3d-toolbox has evolved considerably in the last year.
 The pre-release version has been employed in CFD research projects, and the feedback from the users helped to improve its interfaces and functionalities.
 The integration between this Python package and the numerical solver <a class="reference external" href="https://github.com/xcompact3d/Incompact3d">XCompact3d</a> were experimental, and many of the functionalities were only available in a forked repository for a test of concept (<a class="reference external" href="https://github.com/fschuch/Xcompact3d">fschuch/Xcompact3d</a>). These features are now part of the main repository <a class="reference external" href="https://github.com/xcompact3d/Incompact3d">XCompact3d</a> (see <a class="reference external" href="https://github.com/xcompact3d/Incompact3d/pull/51">PR #51</a>).
 With this, Xcompact3d-toolbox is ready for its first stable release.</p>
-<section id="id12">
-<h3>Added<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
+<section id="id13">
+<h3>Added<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Support for stretched mesh at the xdmf writer and automated tests for it, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p>A class to handle the binary filenames and its tests. Now all methods support different filenames, like the classic <code class="docutils literal notranslate"><span class="pre">ux000</span></code>, or the new <code class="docutils literal notranslate"><span class="pre">ux-0000.bin</span></code>, besides some combinations between them. By <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
@@ -627,16 +640,16 @@ With this, Xcompact3d-toolbox is ready for its first stable release.</p>
 <li><p>Add type hints to many functions and class methods, for a better development experience using modern IDEs, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id13">
-<h3>Modified<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
+<section id="id14">
+<h3>Modified<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Writing methods for the binary files were moved from the xarray accessors to the Dataset class, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p>The new sandbox flow configuration is now set with <code class="docutils literal notranslate"><span class="pre">itype</span> <span class="pre">=</span> <span class="pre">12</span></code>, following its addition the XCompact3d’s main repository (see <a class="reference external" href="https://github.com/xcompact3d/Incompact3d/pull/51">#51</a>), by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p>The documentation was improved, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id14">
-<h3>Fixed<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
+<section id="id15">
+<h3>Fixed<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Not installing all dependencies with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p>Suppressed warning from <code class="docutils literal notranslate"><span class="pre">tqdm</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
@@ -644,34 +657,34 @@ With this, Xcompact3d-toolbox is ready for its first stable release.</p>
 </ul>
 </section>
 </section>
-<section id="id15">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.11">0.1.11</a> - 2021-02-12<a class="headerlink" href="#id15" title="Link to this heading">#</a></h2>
 <section id="id16">
-<h3>Fixed<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.11">0.1.11</a> - 2021-02-12<a class="headerlink" href="#id16" title="Link to this heading">#</a></h2>
+<section id="id17">
+<h3>Fixed<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fix #8, a little incompatibility problem with xcompact3d was fixed, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
 </section>
-<section id="id17">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.10">0.1.10</a> - 2021-02-11<a class="headerlink" href="#id17" title="Link to this heading">#</a></h2>
 <section id="id18">
-<h3>Added<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.10">0.1.10</a> - 2021-02-11<a class="headerlink" href="#id18" title="Link to this heading">#</a></h2>
+<section id="id19">
+<h3>Added<a class="headerlink" href="#id19" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add support for the previous parameters format <code class="docutils literal notranslate"><span class="pre">.prm</span></code> (#7), by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p>Class <code class="docutils literal notranslate"><span class="pre">ParametersGui</span></code>, a subclass from <code class="docutils literal notranslate"><span class="pre">Parameters</span></code>, but with widgets, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p>Argument <code class="docutils literal notranslate"><span class="pre">loadfile</span></code> added to class <code class="docutils literal notranslate"><span class="pre">Parameters</span></code>, so it is possible to initialize and load form the disc with just one line of code <code class="docutils literal notranslate"><span class="pre">prm</span> <span class="pre">=</span> <span class="pre">x3d.Parameters(loadfile='example.i3d')</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id19">
-<h3>Changed<a class="headerlink" href="#id19" title="Link to this heading">#</a></h3>
+<section id="id20">
+<h3>Changed<a class="headerlink" href="#id20" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Changed from method <code class="docutils literal notranslate"><span class="pre">__call__</span></code> to <code class="docutils literal notranslate"><span class="pre">__repr__</span></code> at <code class="docutils literal notranslate"><span class="pre">parameters.py</span></code> as the procedure to show the parameters on screen, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p>Functions to read binary fields where moved from <code class="docutils literal notranslate"><span class="pre">io.py</span></code> to methods at <code class="docutils literal notranslate"><span class="pre">parameters.py</span></code>, so the syntax is simplified from <code class="docutils literal notranslate"><span class="pre">x3d.read_field('filename',</span> <span class="pre">prm)</span></code> to just <code class="docutils literal notranslate"><span class="pre">prm.read_field('filename')</span></code>. by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id20">
-<h3>Fixed<a class="headerlink" href="#id20" title="Link to this heading">#</a></h3>
+<section id="id21">
+<h3>Fixed<a class="headerlink" href="#id21" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Scale factor for Ahmed Body at sandbox, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p>Fix #2, widgets are now working in a new class <code class="docutils literal notranslate"><span class="pre">ParametersGui</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
@@ -680,76 +693,76 @@ With this, Xcompact3d-toolbox is ready for its first stable release.</p>
 </ul>
 </section>
 </section>
-<section id="id21">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.9">0.1.9</a> - 2020-10-09<a class="headerlink" href="#id21" title="Link to this heading">#</a></h2>
 <section id="id22">
-<h3>Added<a class="headerlink" href="#id22" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.9">0.1.9</a> - 2020-10-09<a class="headerlink" href="#id22" title="Link to this heading">#</a></h2>
+<section id="id23">
+<h3>Added<a class="headerlink" href="#id23" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">get_boundary_condition</span></code> at class <code class="docutils literal notranslate"><span class="pre">Parameters</span></code>. It returns the appropriate boundary parameters that are
 expected by the derivative functions. by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p>First and second derivatives for stretched mesh in y, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id23">
-<h3>Changed<a class="headerlink" href="#id23" title="Link to this heading">#</a></h3>
+<section id="id24">
+<h3>Changed<a class="headerlink" href="#id24" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Syntax for <code class="docutils literal notranslate"><span class="pre">&lt;da,ds&gt;.x3d.simps</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;da,ds&gt;.x3d.pencil_decomp</span></code>. It is now possible to use them over multiple dimensions with just one call (for instance <code class="docutils literal notranslate"><span class="pre">ds.x3d.simps('x',</span> <span class="pre">'y',</span> <span class="pre">'z')</span></code>), by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id24">
-<h3>Fixed<a class="headerlink" href="#id24" title="Link to this heading">#</a></h3>
+<section id="id25">
+<h3>Fixed<a class="headerlink" href="#id25" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>First derivative was incorrect when <code class="docutils literal notranslate"><span class="pre">ncl1=1</span></code> and <code class="docutils literal notranslate"><span class="pre">ncln=2</span></code>. by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
 </section>
-<section id="id25">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.8">0.1.8</a> - 2020-09-29<a class="headerlink" href="#id25" title="Link to this heading">#</a></h2>
 <section id="id26">
-<h3>Fixed<a class="headerlink" href="#id26" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.8">0.1.8</a> - 2020-09-29<a class="headerlink" href="#id26" title="Link to this heading">#</a></h2>
+<section id="id27">
+<h3>Fixed<a class="headerlink" href="#id27" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">param.mytype</span></code> was not updating properly <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/issues/4">#4</a>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
 </section>
-<section id="id27">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.7">0.1.7</a> - 2020-08-28<a class="headerlink" href="#id27" title="Link to this heading">#</a></h2>
 <section id="id28">
-<h3>Fixed<a class="headerlink" href="#id28" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.7">0.1.7</a> - 2020-08-28<a class="headerlink" href="#id28" title="Link to this heading">#</a></h2>
+<section id="id29">
+<h3>Fixed<a class="headerlink" href="#id29" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>BC parameters at <code class="docutils literal notranslate"><span class="pre">xcompact3d_toolbox.param</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
 </section>
-<section id="id29">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.6">0.1.6</a> - 2020-08-28<a class="headerlink" href="#id29" title="Link to this heading">#</a></h2>
 <section id="id30">
-<h3>Fixed<a class="headerlink" href="#id30" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.6">0.1.6</a> - 2020-08-28<a class="headerlink" href="#id30" title="Link to this heading">#</a></h2>
+<section id="id31">
+<h3>Fixed<a class="headerlink" href="#id31" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">.github/workflows/python-package.yml</span></code> action does not trigger if the release was first drafted, then published, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
 </section>
-<section id="id31">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.5">0.1.5</a> - 2020-08-28<a class="headerlink" href="#id31" title="Link to this heading">#</a></h2>
 <section id="id32">
-<h3>Added<a class="headerlink" href="#id32" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.5">0.1.5</a> - 2020-08-28<a class="headerlink" href="#id32" title="Link to this heading">#</a></h2>
+<section id="id33">
+<h3>Added<a class="headerlink" href="#id33" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Support for stretched mesh in y, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id33">
-<h3>Fixed<a class="headerlink" href="#id33" title="Link to this heading">#</a></h3>
+<section id="id34">
+<h3>Fixed<a class="headerlink" href="#id34" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">get_mesh</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">write_xdmf</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
 </section>
-<section id="id34">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.4">0.1.4</a> - 2020-08-20<a class="headerlink" href="#id34" title="Link to this heading">#</a></h2>
 <section id="id35">
-<h3>Added<a class="headerlink" href="#id35" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.4">0.1.4</a> - 2020-08-20<a class="headerlink" href="#id35" title="Link to this heading">#</a></h2>
+<section id="id36">
+<h3>Added<a class="headerlink" href="#id36" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/warner/python-versioneer">python-versioneer</a> removes the tedious and error-prone “update the embedded version string” step from our release process, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p>Docstrings for most classes, methods and functions, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
@@ -767,41 +780,41 @@ expected by the derivative functions. by <a class="reference external" href="htt
 <li><p>Integration with <a class="reference external" href="https://xcompact3d-toolbox.readthedocs.io">Read the Docs</a>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id36">
-<h3>Changed<a class="headerlink" href="#id36" title="Link to this heading">#</a></h3>
+<section id="id37">
+<h3>Changed<a class="headerlink" href="#id37" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Code style changed to <a class="reference external" href="https://github.com/psf/black">black</a>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">param</span> <span class="pre">=</span> <span class="pre">{'mytype':</span> <span class="pre">np.float64}</span></code> changed to just <code class="docutils literal notranslate"><span class="pre">mytype</span> <span class="pre">=</span> <span class="pre">float64</span></code> in <code class="docutils literal notranslate"><span class="pre">xcompact3d_toolbox.param.py</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
 </section>
-<section id="id37">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.3">0.1.3</a> - 2020-08-17<a class="headerlink" href="#id37" title="Link to this heading">#</a></h2>
+<section id="id38">
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.3">0.1.3</a> - 2020-08-17<a class="headerlink" href="#id38" title="Link to this heading">#</a></h2>
 <p>No changes, just trying to get familiar with workflows and the release to Pypi.</p>
 </section>
-<section id="id38">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.2">0.1.2</a> - 2020-08-17<a class="headerlink" href="#id38" title="Link to this heading">#</a></h2>
 <section id="id39">
-<h3>Added<a class="headerlink" href="#id39" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.2">0.1.2</a> - 2020-08-17<a class="headerlink" href="#id39" title="Link to this heading">#</a></h2>
+<section id="id40">
+<h3>Added<a class="headerlink" href="#id40" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Unittest for observations and validations at <code class="docutils literal notranslate"><span class="pre">xcompact3d_toolbox.parameters</span></code>, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
-<section id="id40">
-<h3>Changed<a class="headerlink" href="#id40" title="Link to this heading">#</a></h3>
+<section id="id41">
+<h3>Changed<a class="headerlink" href="#id41" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Temporarily disabling the link between parameters and their widgets (see <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/issues/2">#2</a>), by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 </ul>
 </section>
 </section>
-<section id="id41">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.1">0.1.1</a> - 2020-08-14<a class="headerlink" href="#id41" title="Link to this heading">#</a></h2>
+<section id="id42">
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.1">0.1.1</a> - 2020-08-14<a class="headerlink" href="#id42" title="Link to this heading">#</a></h2>
 <p>No changes, just trying to get familiar with workflows and the release to Pypi.</p>
 </section>
-<section id="id42">
-<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.0.0">0.0.0</a> - 2020-08-14<a class="headerlink" href="#id42" title="Link to this heading">#</a></h2>
 <section id="id43">
-<h3>Added<a class="headerlink" href="#id43" title="Link to this heading">#</a></h3>
+<h2><a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.0.0">0.0.0</a> - 2020-08-14<a class="headerlink" href="#id43" title="Link to this heading">#</a></h2>
+<section id="id44">
+<h3>Added<a class="headerlink" href="#id44" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="http://CHANGELOG.md">CHANGELOG.md</a> by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">class</span> <span class="pre">Parameters</span></code>  built on top of <a class="reference external" href="https://traitlets.readthedocs.io/en/stable/index.html">traitlets</a>, for type checking, dynamically calculated default values, and ‘on change’ callbacks, by <a class="reference external" href="https://github.com/fschuch">&#64;fschuch</a>.</p></li>
@@ -879,83 +892,87 @@ expected by the derivative functions. by <a class="reference external" href="htt
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc1-2024-05-24">1.2.0rc1 - 2024-05-24<!-- markdown-link-check-disable-line --></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc0-2024-03-21">1.2.0rc0 - 2024-03-21<!-- markdown-link-check-disable-line --></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#added">Added</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changed">Changed</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Documentation</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">1.1.1 - 2023-08-10</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">1.1.1 - 2023-08-10</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Fixed</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modified">Modified</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">1.1.0 - 2021-10-07</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Modified</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">1.1.0 - 2021-10-07</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Modified</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">1.0.1 - 2021-09-23</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Modified</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">1.0.1 - 2021-09-23</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Modified</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">1.0.0 - 2021-09-14</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Modified</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">1.0.0 - 2021-09-14</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Modified</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">0.1.11 - 2021-02-12</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">0.1.11 - 2021-02-12</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">0.1.10 - 2021-02-11</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">0.1.10 - 2021-02-11</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">0.1.9 - 2020-10-09</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id24">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">0.1.9 - 2020-10-09</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id24">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">0.1.8 - 2020-09-29</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">0.1.8 - 2020-09-29</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">0.1.7 - 2020-08-28</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id28">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id28">0.1.7 - 2020-08-28</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id29">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id29">0.1.6 - 2020-08-28</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id30">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id30">0.1.6 - 2020-08-28</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id31">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id31">0.1.5 - 2020-08-28</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id32">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id33">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id32">0.1.5 - 2020-08-28</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id33">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id34">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id34">0.1.4 - 2020-08-20</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id35">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id36">Changed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id35">0.1.4 - 2020-08-20</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id36">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id37">Changed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id37">0.1.3 - 2020-08-17</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id38">0.1.2 - 2020-08-17</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id39">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id40">Changed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id38">0.1.3 - 2020-08-17</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id39">0.1.2 - 2020-08-17</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id40">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id41">Changed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id41">0.1.1 - 2020-08-14</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id42">0.0.0 - 2020-08-14</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id43">Added</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id42">0.1.1 - 2020-08-14</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id43">0.0.0 - 2020-08-14</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id44">Added</a></li>
 </ul>
 </li>
 </ul>
