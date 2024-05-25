@@ -9,6 +9,12 @@ The changes for the upcoming release can be found in [changelog.d](https://githu
 
 <!-- towncrier release notes start -->
 
+## [1.2.0rc1](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.2.0rc1) - 2024-05-24<!-- markdown-link-check-disable-line -->
+
+### Documentation
+
+- Migrated documentation hosting from readthedocs to GitHub Pages
+
 ## [1.2.0rc0](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.2.0rc0) - 2024-03-21<!-- markdown-link-check-disable-line -->
 
 ### Added
