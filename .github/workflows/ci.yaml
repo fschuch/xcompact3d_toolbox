@@ -65,13 +65,17 @@ jobs:
         with:
           pattern: coverage-*
           merge-multiple: true
-      - name: Set project version
+      - uses: actions/setup-python@v5
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Set Version
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
-          REF=${{ github.ref }}
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            TAG_NAME=${REF#refs/tags/}
-            echo "sonar.projectVersion=$TAG_NAME" >> sonar-project.properties
-          fi
+          python -m pip install hatch
+          VERSION=$(hatch version)
+          echo "sonar.projectVersion=$VERSION" >> sonar-project.properties
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
