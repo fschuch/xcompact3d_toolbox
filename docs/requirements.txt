@@ -258,7 +258,7 @@ multipledispatch==1.0.0
     # via datashader
 myst-nb==1.1.0
     # via jupyter-book
-myst-parser==2.0.0
+myst-parser==3.0.1
     # via
     #   jupyter-book
     #   myst-nb
