@@ -14,6 +14,11 @@ def filename_properties():
     return x3d.io.FilenameProperties()
 
 
+@pytest.fixture(scope="session")
+def random_generator():
+    return np.random.Generator(np.random.PCG64(1234))
+
+
 @pytest.mark.parametrize("prefix", ["ux", "uy", "uz", "pp", "phi1"])
 @pytest.mark.parametrize("counter", [0, 10, 100])
 @pytest.mark.parametrize("separator", ["", "-"])
@@ -37,10 +42,10 @@ def dataset():
     return x3d.io.Dataset(stack_velocity=True, stack_scalar=True)
 
 
-def test_write_read_field(dataset):
+def test_write_read_field(dataset, random_generator):
     coords = dataset._mesh.get()  # noqa: SLF001
     shape = [len(x) for x in coords.values()]
-    numpy_array = np.random.random(size=shape).astype(x3d.param["mytype"])
+    numpy_array = random_generator.random(size=shape).astype(x3d.param["mytype"])
     filename = dataset.filename_properties.get_filename_for_binary("ux", 0)
     array_out = xr.DataArray(numpy_array, coords=coords, dims=coords.keys())
     dataset.write(array_out, filename)
@@ -49,10 +54,10 @@ def test_write_read_field(dataset):
 
 
 @pytest.fixture
-def snapshot(dataset):
+def snapshot(dataset, random_generator):
     def numpy_array(**kwargs):
         shape = [len(i) for i in kwargs.values()]
-        return np.random.random(shape).astype(x3d.param["mytype"])
+        return random_generator.random(shape).astype(x3d.param["mytype"])
 
     def xr_array(file_name, **kwargs):
         return xr.DataArray(
