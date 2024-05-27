@@ -606,7 +606,7 @@ xyzservices==2024.4.0
     #   panel
 zict==3.0.0
     # via distributed
-zipp==3.18.2
+zipp==3.19.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
