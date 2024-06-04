@@ -21,6 +21,12 @@ def test_data_pencil_decomp(array, dataset, dims):
 
 
 @pytest.mark.parametrize("dims", ["x", "y", "t"])
+def test_data_cumtrapz(array, dataset, dims):
+    array.x3d.cumtrapz(*dims)
+    dataset.x3d.cumtrapz(*dims)
+
+
+@pytest.mark.parametrize("dims", ["x", "y", "t"])
 def test_data_cumulative_trapezoid(array, dataset, dims):
     array.x3d.cumulative_trapezoid(*dims)
     dataset.x3d.cumulative_trapezoid(*dims)
@@ -28,6 +34,12 @@ def test_data_cumulative_trapezoid(array, dataset, dims):
 
 @pytest.mark.parametrize("dims", ["x", "y", "t"])
 def test_data_simps(array, dataset, dims):
+    array.x3d.simps(*dims)
+    dataset.x3d.simps(*dims)
+
+
+@pytest.mark.parametrize("dims", ["x", "y", "t"])
+def test_data_simpson(array, dataset, dims):
     array.x3d.simpson(*dims)
     dataset.x3d.simpson(*dims)
 

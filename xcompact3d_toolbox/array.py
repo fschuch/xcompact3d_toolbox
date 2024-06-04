@@ -29,8 +29,8 @@ try:
     from scipy.integrate import cumulative_trapezoid, simpson
 except ImportError:
     # to be removed in Scipy 1.14.0
-    from scipy.integrate import cumtrapz as cumulative_trapezoid
-    from scipy.integrate import simps as simpson
+    from scipy.integrate import cumtrapz as cumulative_trapezoid  # no cov
+    from scipy.integrate import simps as simpson  # no cov
 
 from xcompact3d_toolbox.derive import first_derivative, second_derivative
 from xcompact3d_toolbox.mesh import Istret, _stretching
