@@ -18,6 +18,7 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
+    "Deprecated>=1.2",
     "numpy>=1.22",
     "scipy>=1.5",
     "traitlets>=4.3",

@@ -31,6 +31,7 @@ repos:
     hooks:
       - id: mypy
         exclude: docs/conf.py
+        args: [--install-types, --non-interactive]
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
     hooks:

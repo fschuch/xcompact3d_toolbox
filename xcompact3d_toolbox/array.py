@@ -23,7 +23,14 @@ and :obj:`xarray.Dataset`, all the details are described below.
 """
 
 import xarray as xr
-from scipy.integrate import cumtrapz, simps
+from deprecated.sphinx import deprecated, versionadded
+
+try:
+    from scipy.integrate import cumulative_trapezoid, simpson
+except ImportError:
+    # to be removed in Scipy 1.14.0
+    from scipy.integrate import cumtrapz as cumulative_trapezoid
+    from scipy.integrate import simps as simpson
 
 from xcompact3d_toolbox.derive import first_derivative, second_derivative
 from xcompact3d_toolbox.mesh import Istret, _stretching
@@ -37,10 +44,22 @@ class X3dDataset:
     def __init__(self, data_set):
         self._data_set = data_set
 
+    @deprecated(
+        version="1.2.0",
+        reason="""
+        Scipy deprecated :obj:`scipy.integrate.cumtrapz` in favor of :obj:`scipy.integrate.cumulative_trapezoid`.
+        Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
+        """,
+    )
     def cumtrapz(self, dim):
+        """See :obj:`cumulative_trapezoid`."""
+        return self.cumulative_trapezoid(dim)
+
+    @versionadded(version="1.2.0")
+    def cumulative_trapezoid(self, dim):
         """Cumulatively integrate all arrays in this dataset
         in direction ``dim`` using the composite trapezoidal rule.
-        It is a wrapper for :obj:`scipy.integrate.cumtrapz`.
+        It is a wrapper for :obj:`scipy.integrate.cumulative_trapezoid`.
         Initial value is defined to zero.
 
         Parameters
@@ -56,12 +75,12 @@ class X3dDataset:
         Examples
         -------
 
-        >>> ds.x3d.cumtrapz("t")
+        >>> ds.x3d.cumulative_trapezoid("t")
 
         """
 
         return xr.apply_ufunc(
-            cumtrapz,
+            cumulative_trapezoid,
             self._data_set,
             input_core_dims=[[dim]],
             output_core_dims=[[dim]],
@@ -70,10 +89,22 @@ class X3dDataset:
             kwargs={"x": self._data_set[dim], "axis": -1, "initial": 0.0},
         )
 
+    @deprecated(
+        version="1.2.0",
+        reason="""
+        Scipy deprecated :obj:`scipy.integrate.simps` in favor of :obj:`scipy.integrate.simpson`.
+        Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
+        """,
+    )
     def simps(self, *args):
+        """See :obj:`simpson`."""
+        return self.simpson(*args)
+
+    @versionadded(version="1.2.0")
+    def simpson(self, *args):
         """Integrate all arrays in this dataset in direction(s) ``args``
         using the composite Simpson's rule.
-        It is a wrapper for :obj:`scipy.integrate.simps`.
+        It is a wrapper for :obj:`scipy.integrate.simpson`.
 
         Parameters
         ----------
@@ -93,15 +124,15 @@ class X3dDataset:
         Examples
         -------
 
-        >>> ds.x3d.simps("x")
-        >>> ds.x3d.simps("t")
-        >>> ds.x3d.simps("x", "y", "z")
+        >>> ds.x3d.simpson("x")
+        >>> ds.x3d.simpson("t")
+        >>> ds.x3d.simpson("x", "y", "z")
 
         """
 
         def integrate(dataset, dim):
             return xr.apply_ufunc(
-                simps,
+                simpson,
                 dataset,
                 input_core_dims=[[dim]],
                 dask="parallelized",
@@ -170,10 +201,22 @@ class X3dDataArray:
         self._Dx = {}
         self._Dxx = {}
 
+    @deprecated(
+        version="1.2.0",
+        reason="""
+        Scipy deprecated :obj:`scipy.integrate.cumtrapz` in favor of :obj:`scipy.integrate.cumulative_trapezoid`.
+        Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
+        """,
+    )
     def cumtrapz(self, dim):
+        """See :obj:`cumulative_trapezoid`."""
+        return self.cumulative_trapezoid(dim)
+
+    @versionadded(version="1.2.0")
+    def cumulative_trapezoid(self, dim):
         """Cumulatively integrate :obj:`xarray.DataArray` in direction ``dim``
         using the composite trapezoidal rule.
-        It is a wrapper for :obj:`scipy.integrate.cumtrapz`.
+        It is a wrapper for :obj:`scipy.integrate.cumulative_trapezoid`.
         Initial value is defined to zero.
 
         Parameters
@@ -189,16 +232,28 @@ class X3dDataArray:
         Examples
         -------
 
-        >>> da.x3d.cumtrapz("t")
+        >>> da.x3d.cumulative_trapezoid("t")
 
         """
-        ds = self._data_array._to_temp_dataset().x3d.cumtrapz(dim)  # noqa: SLF001
+        ds = self._data_array._to_temp_dataset().x3d.cumulative_trapezoid(dim)  # noqa: SLF001
         return self._data_array._from_temp_dataset(ds)  # noqa: SLF001
 
+    @deprecated(
+        version="1.2.0",
+        reason="""
+        Scipy deprecated :obj:`scipy.integrate.simps` in favor of :obj:`scipy.integrate.simpson`.
+        Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
+        """,
+    )
     def simps(self, *args):
+        """See :obj:`simpson`."""
+        return self.simpson(*args)
+
+    @versionadded(version="1.2.0")
+    def simpson(self, *args):
         """Integrate :obj:`xarray.DataArray` in direction(s) ``args`` using the
         composite Simpson's rule.
-        It is a wrapper for :obj:`scipy.integrate.simps`.
+        It is a wrapper for :obj:`scipy.integrate.simpson`.
 
         Parameters
         ----------
@@ -218,12 +273,12 @@ class X3dDataArray:
         Examples
         -------
 
-        >>> da.x3d.simps("x")
-        >>> da.x3d.simps("t")
-        >>> da.x3d.simps("x", "y", "z")
+        >>> da.x3d.simpson("x")
+        >>> da.x3d.simpson("t")
+        >>> da.x3d.simpson("x", "y", "z")
 
         """
-        ds = self._data_array._to_temp_dataset().x3d.simps(*args)  # noqa: SLF001
+        ds = self._data_array._to_temp_dataset().x3d.simpson(*args)  # noqa: SLF001
         return self._data_array._from_temp_dataset(ds)  # noqa: SLF001
 
     def pencil_decomp(self, *args):
