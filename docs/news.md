@@ -11,7 +11,6 @@ The changes for the upcoming release can be found in [changelog.d](https://githu
 
 ## [1.2.0rc2](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.2.0rc2) - 2024-06-05<!-- markdown-link-check-disable-line -->
 
-
 ### Deprecated
 
 - The integration methods `cumtrapz` and `simps` on `xcompact3d_toolbox.array` have been deprecated in favor of
@@ -20,8 +19,7 @@ The changes for the upcoming release can be found in [changelog.d](https://githu
 
 ### Misc
 
-- 
-
+-
 
 ## [1.2.0rc1](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.2.0rc1) - 2024-05-24<!-- markdown-link-check-disable-line -->
 
