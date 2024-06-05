@@ -6,7 +6,6 @@ on:
       - v[0-9].[0-9].[0-9]*
     branches:
       - main
-      - release/**
   pull_request:
     paths:
       - .github/workflows/docs.yaml

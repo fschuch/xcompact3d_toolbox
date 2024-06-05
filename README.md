@@ -26,7 +26,7 @@ For developers, it works as a rapid prototyping tool, to test concepts and then 
 ## Useful links
 
 - [Documentation](https://docs.fschuch.com/xcompact3d_toolbox/);
-- [Changelog](https://docs.fschuch.com/xcompact3d_toolbox/news.html);
+- [Changelog](https://github.com/fschuch/xcompact3d_toolbox/releases);
 - [Suggestions for new features and bug report](https://github.com/fschuch/xcompact3d_toolbox/issues);
 - [See what is coming next (Project page)](https://github.com/fschuch/xcompact3d_toolbox/projects/1);
 - [Xcompact3d's repository](https://github.com/xcompact3d/Incompact3d).

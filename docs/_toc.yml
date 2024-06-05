@@ -17,5 +17,4 @@ parts:
       - file: examples/Heat-exchanger.ipynb
   - caption: References
     chapters:
-      - file: news.md
       - file: Docstrings.rst
