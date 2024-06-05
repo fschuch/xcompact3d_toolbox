@@ -35,18 +35,20 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
+
       - name: Install Hatch
         run: python -m pip install hatch
-      - name: Install and Show dependencies
-        run: hatch run +py=${{ matrix.python-version }} test:pip freeze
+
       - name: Run tests
         run: |
           hatch run +py=${{ matrix.python-version }} test:extended --cov-report=xml:coverage.${{ matrix.os }}.${{ matrix.python-version }}.xml
+
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
         with:
@@ -60,22 +62,26 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
       - name: Download coverage data
         uses: actions/download-artifact@v4
         with:
           pattern: coverage-*
           merge-multiple: true
+
       - uses: actions/setup-python@v5
         if: startsWith(github.ref, 'refs/tags/')
         with:
           python-version: "3.12"
           cache: "pip"
+
       - name: Set Version
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           python -m pip install hatch
           VERSION=$(hatch version)
           echo "sonar.projectVersion=$VERSION" >> sonar-project.properties
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

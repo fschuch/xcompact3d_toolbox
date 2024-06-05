@@ -24,26 +24,6 @@ jobs:
       - name: Show tag name
         run: echo ${{ steps.get-tag.outputs.result }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-
-      - name: Install Hatch
-        run: python -m pip install hatch
-
-      - name: Get hatch version
-        id: get-hatch-version
-        run: echo "::set-output name=version::$(hatch version)"
-
-      - name: Verify tag and hatch version
-        run: |
-          if [[ "${{ steps.get-hatch-version.outputs.version }}" != "${{ steps.get-tag.outputs.result }}" ]]; then
-            echo "Tag name does not match hatch version"
-            exit 1
-          fi
-
       - uses: rickstaa/action-create-tag@v1
         name: Create and Push Tag
         with:

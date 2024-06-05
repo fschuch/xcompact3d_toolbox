@@ -2,8 +2,10 @@
 requires = ["hatch-pip-compile"]
 
 [version]
-path = "xcompact3d_toolbox/_version.py"
-pattern = '__version__ = "(?P<version>[^"]+)"'
+source = "vcs"
+
+[build.hooks.vcs]
+version-file = "xcompact3d_toolbox/_version.py"
 
 [envs.default]
 description = "Base development environment"
