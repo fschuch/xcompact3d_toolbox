@@ -599,16 +599,20 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-xcompact3d_toolbox.array">Computation and Plotting</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray"><code class="docutils literal notranslate"><span class="pre">X3dDataArray</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.cumtrapz"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.cumtrapz()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.cumulative_trapezoid"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.cumulative_trapezoid()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.first_derivative"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.first_derivative()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.pencil_decomp"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.pencil_decomp()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.second_derivative"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.second_derivative()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.simps"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.simps()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.simpson"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.simpson()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset"><code class="docutils literal notranslate"><span class="pre">X3dDataset</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset.cumtrapz"><code class="docutils literal notranslate"><span class="pre">X3dDataset.cumtrapz()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset.cumulative_trapezoid"><code class="docutils literal notranslate"><span class="pre">X3dDataset.cumulative_trapezoid()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset.pencil_decomp"><code class="docutils literal notranslate"><span class="pre">X3dDataset.pencil_decomp()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset.simps"><code class="docutils literal notranslate"><span class="pre">X3dDataset.simps()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset.simpson"><code class="docutils literal notranslate"><span class="pre">X3dDataset.simpson()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -3481,9 +3485,21 @@ and <a class="reference external" href="https://docs.xarray.dev/en/stable/genera
 <dl class="py method">
 <dt class="sig sig-object py" id="xcompact3d_toolbox.array.X3dDataArray.cumtrapz">
 <span class="sig-name descname"><span class="pre">cumtrapz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xcompact3d_toolbox.array.X3dDataArray.cumtrapz" title="Link to this definition">#</a></dt>
+<dd><p>See <a class="reference internal" href="#xcompact3d_toolbox.array.X3dDataArray.cumulative_trapezoid" title="xcompact3d_toolbox.array.X3dDataArray.cumulative_trapezoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cumulative_trapezoid</span></code></a>.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.2.0: </span>Scipy deprecated <code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.cumtrapz</span></code> in favor of
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.cumulative_trapezoid.html#scipy.integrate.cumulative_trapezoid" title="(in SciPy v1.13.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.cumulative_trapezoid</span></code></a>.
+Since it is running under the hood, it makes sense to rename the
+method on xcompact3d-toolbox as well.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xcompact3d_toolbox.array.X3dDataArray.cumulative_trapezoid">
+<span class="sig-name descname"><span class="pre">cumulative_trapezoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xcompact3d_toolbox.array.X3dDataArray.cumulative_trapezoid" title="Link to this definition">#</a></dt>
 <dd><p>Cumulatively integrate <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2024.5.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a> in direction <code class="docutils literal notranslate"><span class="pre">dim</span></code>
 using the composite trapezoidal rule.
-It is a wrapper for <code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.cumtrapz</span></code>.
+It is a wrapper for <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.cumulative_trapezoid.html#scipy.integrate.cumulative_trapezoid" title="(in SciPy v1.13.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.cumulative_trapezoid</span></code></a>.
 Initial value is defined to zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -3497,8 +3513,11 @@ Initial value is defined to zero.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">da</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">cumtrapz</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">da</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">cumulative_trapezoid</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 1.2.0.</span></p>
 </div>
 </dd></dl>
 
@@ -3635,9 +3654,21 @@ in a dictionary (see examples), default is <code class="docutils literal notrans
 <dl class="py method">
 <dt class="sig sig-object py" id="xcompact3d_toolbox.array.X3dDataArray.simps">
 <span class="sig-name descname"><span class="pre">simps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xcompact3d_toolbox.array.X3dDataArray.simps" title="Link to this definition">#</a></dt>
+<dd><p>See <a class="reference internal" href="#xcompact3d_toolbox.array.X3dDataArray.simpson" title="xcompact3d_toolbox.array.X3dDataArray.simpson"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simpson</span></code></a>.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.2.0: </span>Scipy deprecated <code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.simps</span></code> in favor of
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.simpson.html#scipy.integrate.simpson" title="(in SciPy v1.13.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.simpson</span></code></a>.
+Since it is running under the hood, it makes sense to rename the
+method on xcompact3d-toolbox as well.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xcompact3d_toolbox.array.X3dDataArray.simpson">
+<span class="sig-name descname"><span class="pre">simpson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xcompact3d_toolbox.array.X3dDataArray.simpson" title="Link to this definition">#</a></dt>
 <dd><p>Integrate <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2024.5.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a> in direction(s) <code class="docutils literal notranslate"><span class="pre">args</span></code> using the
 composite Simpson’s rule.
-It is a wrapper for <code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.simps</span></code>.</p>
+It is a wrapper for <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.simpson.html#scipy.integrate.simpson" title="(in SciPy v1.13.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.simpson</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>arg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> or </em><em>sequence</em><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Dimension(s) to compute integration.</p>
@@ -3653,10 +3684,13 @@ It is a wrapper for <code class="xref py py-obj docutils literal notranslate"><s
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">da</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">da</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">da</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">da</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">da</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">da</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 1.2.0.</span></p>
 </div>
 </dd></dl>
 
@@ -3669,9 +3703,21 @@ It is a wrapper for <code class="xref py py-obj docutils literal notranslate"><s
 <dl class="py method">
 <dt class="sig sig-object py" id="xcompact3d_toolbox.array.X3dDataset.cumtrapz">
 <span class="sig-name descname"><span class="pre">cumtrapz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xcompact3d_toolbox.array.X3dDataset.cumtrapz" title="Link to this definition">#</a></dt>
+<dd><p>See <a class="reference internal" href="#xcompact3d_toolbox.array.X3dDataset.cumulative_trapezoid" title="xcompact3d_toolbox.array.X3dDataset.cumulative_trapezoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cumulative_trapezoid</span></code></a>.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.2.0: </span>Scipy deprecated <code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.cumtrapz</span></code> in favor of
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.cumulative_trapezoid.html#scipy.integrate.cumulative_trapezoid" title="(in SciPy v1.13.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.cumulative_trapezoid</span></code></a>.
+Since it is running under the hood, it makes sense to rename the
+method on xcompact3d-toolbox as well.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xcompact3d_toolbox.array.X3dDataset.cumulative_trapezoid">
+<span class="sig-name descname"><span class="pre">cumulative_trapezoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xcompact3d_toolbox.array.X3dDataset.cumulative_trapezoid" title="Link to this definition">#</a></dt>
 <dd><p>Cumulatively integrate all arrays in this dataset
 in direction <code class="docutils literal notranslate"><span class="pre">dim</span></code> using the composite trapezoidal rule.
-It is a wrapper for <code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.cumtrapz</span></code>.
+It is a wrapper for <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.cumulative_trapezoid.html#scipy.integrate.cumulative_trapezoid" title="(in SciPy v1.13.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.cumulative_trapezoid</span></code></a>.
 Initial value is defined to zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -3685,8 +3731,11 @@ Initial value is defined to zero.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">cumtrapz</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">cumulative_trapezoid</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 1.2.0.</span></p>
 </div>
 </dd></dl>
 
@@ -3723,9 +3772,21 @@ pencil decomposition for parallel evaluation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="xcompact3d_toolbox.array.X3dDataset.simps">
 <span class="sig-name descname"><span class="pre">simps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xcompact3d_toolbox.array.X3dDataset.simps" title="Link to this definition">#</a></dt>
+<dd><p>See <a class="reference internal" href="#xcompact3d_toolbox.array.X3dDataset.simpson" title="xcompact3d_toolbox.array.X3dDataset.simpson"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simpson</span></code></a>.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.2.0: </span>Scipy deprecated <code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.simps</span></code> in favor of
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.simpson.html#scipy.integrate.simpson" title="(in SciPy v1.13.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.simpson</span></code></a>.
+Since it is running under the hood, it makes sense to rename the
+method on xcompact3d-toolbox as well.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xcompact3d_toolbox.array.X3dDataset.simpson">
+<span class="sig-name descname"><span class="pre">simpson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xcompact3d_toolbox.array.X3dDataset.simpson" title="Link to this definition">#</a></dt>
 <dd><p>Integrate all arrays in this dataset in direction(s) <code class="docutils literal notranslate"><span class="pre">args</span></code>
 using the composite Simpson’s rule.
-It is a wrapper for <code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.simps</span></code>.</p>
+It is a wrapper for <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.simpson.html#scipy.integrate.simpson" title="(in SciPy v1.13.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.integrate.simpson</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>arg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> or </em><em>sequence</em><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Dimension(s) to compute integration.</p>
@@ -3741,10 +3802,13 @@ It is a wrapper for <code class="xref py py-obj docutils literal notranslate"><s
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">x3d</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 1.2.0.</span></p>
 </div>
 </dd></dl>
 
@@ -4502,16 +4566,20 @@ e.g. ‘cylinder’.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-xcompact3d_toolbox.array">Computation and Plotting</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray"><code class="docutils literal notranslate"><span class="pre">X3dDataArray</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.cumtrapz"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.cumtrapz()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.cumulative_trapezoid"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.cumulative_trapezoid()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.first_derivative"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.first_derivative()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.pencil_decomp"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.pencil_decomp()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.second_derivative"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.second_derivative()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.simps"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.simps()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataArray.simpson"><code class="docutils literal notranslate"><span class="pre">X3dDataArray.simpson()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset"><code class="docutils literal notranslate"><span class="pre">X3dDataset</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset.cumtrapz"><code class="docutils literal notranslate"><span class="pre">X3dDataset.cumtrapz()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset.cumulative_trapezoid"><code class="docutils literal notranslate"><span class="pre">X3dDataset.cumulative_trapezoid()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset.pencil_decomp"><code class="docutils literal notranslate"><span class="pre">X3dDataset.pencil_decomp()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset.simps"><code class="docutils literal notranslate"><span class="pre">X3dDataset.simps()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#xcompact3d_toolbox.array.X3dDataset.simpson"><code class="docutils literal notranslate"><span class="pre">X3dDataset.simpson()</span></code></a></li>
 </ul>
 </li>
 </ul>

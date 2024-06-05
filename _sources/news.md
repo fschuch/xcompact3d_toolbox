@@ -9,6 +9,18 @@ The changes for the upcoming release can be found in [changelog.d](https://githu
 
 <!-- towncrier release notes start -->
 
+## [1.2.0rc2](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.2.0rc2) - 2024-06-05<!-- markdown-link-check-disable-line -->
+
+### Deprecated
+
+- The integration methods `cumtrapz` and `simps` on `xcompact3d_toolbox.array` have been deprecated in favor of
+  `cumulative_trapezoid` and `simpson` respectively, following the same changes applied downstream on
+  [SciPy 1.12.0](https://docs.scipy.org/doc/scipy/release/1.12.0-notes.html#deprecated-features)
+
+### Misc
+
+-
+
 ## [1.2.0rc1](https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.2.0rc1) - 2024-05-24<!-- markdown-link-check-disable-line -->
 
 ### Documentation
