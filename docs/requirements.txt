@@ -34,7 +34,7 @@ accessible-pygments==0.0.5
     # via pydata-sphinx-theme
 alabaster==0.7.16
     # via sphinx
-anyio==4.3.0
+anyio==4.4.0
     # via
     #   starlette
     #   watchfiles
