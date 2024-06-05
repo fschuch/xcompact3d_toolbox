@@ -122,7 +122,7 @@ deprecated==1.2.14
     # via hatch.envs.docs
 distributed==2024.5.1
     # via dask
-docutils==0.20.1
+docutils==0.21.2
     # via
     #   hatch.envs.docs
     #   myst-parser
