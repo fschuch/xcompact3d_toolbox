@@ -534,7 +534,7 @@ toolz==0.12.1
     #   datashader
     #   distributed
     #   partd
-tornado==6.4
+tornado==6.4.1
     # via
     #   bokeh
     #   distributed
