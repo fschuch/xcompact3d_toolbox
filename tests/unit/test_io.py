@@ -1,5 +1,4 @@
 import filecmp
-from tempfile import NamedTemporaryFile
 from textwrap import dedent
 
 import numpy as np
@@ -112,13 +111,14 @@ def test_dataset_iter(dataset, snapshot):
 
 
 @pytest.mark.parametrize("istret", [0, 1])
-def test_dataset_write_xdmf(dataset, snapshot, istret):  # noqa: ARG001
+def test_dataset_write_xdmf(dataset, snapshot, istret, tmp_path):  # noqa: ARG001
     dataset._mesh.y.istret = istret  # noqa: SLF001
 
     filename = f"snapshots_istret_{istret}.xdmf"
-    with NamedTemporaryFile() as f:
-        dataset.write_xdmf(f.name, float_precision=6)
-        assert filecmp.cmp(f.name, f"./tests/unit/data/{filename}")
+    actual_file = tmp_path / filename
+
+    dataset.write_xdmf(actual_file.as_posix(), float_precision=6)
+    assert filecmp.cmp(actual_file.as_posix(), f"./tests/unit/data/{filename}")
 
 
 def test_prm_to_dict(tmp_path):
