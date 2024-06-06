@@ -50,6 +50,7 @@ class X3dDataset:
         Scipy deprecated :obj:`scipy.integrate.cumtrapz` in favor of :obj:`scipy.integrate.cumulative_trapezoid`.
         Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
         """,
+        category=FutureWarning,
     )
     def cumtrapz(self, dim):
         """See :obj:`cumulative_trapezoid`."""
@@ -95,6 +96,7 @@ class X3dDataset:
         Scipy deprecated :obj:`scipy.integrate.simps` in favor of :obj:`scipy.integrate.simpson`.
         Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
         """,
+        category=FutureWarning,
     )
     def simps(self, *args):
         """See :obj:`simpson`."""
@@ -207,6 +209,7 @@ class X3dDataArray:
         Scipy deprecated :obj:`scipy.integrate.cumtrapz` in favor of :obj:`scipy.integrate.cumulative_trapezoid`.
         Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
         """,
+        category=FutureWarning,
     )
     def cumtrapz(self, dim):
         """See :obj:`cumulative_trapezoid`."""
@@ -244,6 +247,7 @@ class X3dDataArray:
         Scipy deprecated :obj:`scipy.integrate.simps` in favor of :obj:`scipy.integrate.simpson`.
         Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
         """,
+        category=FutureWarning,
     )
     def simps(self, *args):
         """See :obj:`simpson`."""
