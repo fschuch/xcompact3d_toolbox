@@ -46,10 +46,11 @@ class X3dDataset:
 
     @deprecated(
         version="1.2.0",
-        reason="""
-        Scipy deprecated :obj:`scipy.integrate.cumtrapz` in favor of :obj:`scipy.integrate.cumulative_trapezoid`.
-        Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
-        """,
+        reason=(
+            "`SciPy 1.12.0 <https://docs.scipy.org/doc/scipy/release/1.12.0-notes.html#deprecated-features>`_ "
+            "deprecated :obj:`scipy.integrate.cumtrapz` in favor of :obj:`scipy.integrate.cumulative_trapezoid`. "
+            "Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well."
+        ),
         category=FutureWarning,
     )
     def cumtrapz(self, dim):
@@ -92,10 +93,11 @@ class X3dDataset:
 
     @deprecated(
         version="1.2.0",
-        reason="""
-        Scipy deprecated :obj:`scipy.integrate.simps` in favor of :obj:`scipy.integrate.simpson`.
-        Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
-        """,
+        reason=(
+            "`SciPy 1.12.0 <https://docs.scipy.org/doc/scipy/release/1.12.0-notes.html#deprecated-features>`_ "
+            "deprecated :obj:`scipy.integrate.simps` in favor of :obj:`scipy.integrate.simpson`. "
+            "Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well."
+        ),
         category=FutureWarning,
     )
     def simps(self, *args):
@@ -205,10 +207,11 @@ class X3dDataArray:
 
     @deprecated(
         version="1.2.0",
-        reason="""
-        Scipy deprecated :obj:`scipy.integrate.cumtrapz` in favor of :obj:`scipy.integrate.cumulative_trapezoid`.
-        Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
-        """,
+        reason=(
+            "`SciPy 1.12.0 <https://docs.scipy.org/doc/scipy/release/1.12.0-notes.html#deprecated-features>`_ "
+            "deprecated :obj:`scipy.integrate.cumtrapz` in favor of :obj:`scipy.integrate.cumulative_trapezoid`. "
+            "Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well."
+        ),
         category=FutureWarning,
     )
     def cumtrapz(self, dim):
@@ -243,10 +246,11 @@ class X3dDataArray:
 
     @deprecated(
         version="1.2.0",
-        reason="""
-        Scipy deprecated :obj:`scipy.integrate.simps` in favor of :obj:`scipy.integrate.simpson`.
-        Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well.
-        """,
+        reason=(
+            "`SciPy 1.12.0 <https://docs.scipy.org/doc/scipy/release/1.12.0-notes.html#deprecated-features>`_ "
+            "deprecated :obj:`scipy.integrate.simps` in favor of :obj:`scipy.integrate.simpson`. "
+            "Since it is running under the hood, it makes sense to rename the method on xcompact3d-toolbox as well."
+        ),
         category=FutureWarning,
     )
     def simps(self, *args):
