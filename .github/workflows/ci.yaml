@@ -78,15 +78,22 @@ jobs:
         if: github.ref_type == 'tag'
         run: |
           python -m pip install hatch
-          VERSION=$(hatch version)
-          echo "sonar.projectVersion=$VERSION" >> sonar-project.properties
-          cat sonar-project.properties
+          echo "VERSION=$(hatch version)" >> $GITHUB_ENV
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=fschuch
+            -Dsonar.projectKey=fschuch_xcompact3d_toolbox
+            -Dsonar.python.version=3.8, 3.9, 3.10, 3.11, 3.12
+            -Dsonar.sources=xcompact3d_toolbox
+            -Dsonar.tests=tests
+            -Dsonar.python.coverage.reportPaths=coverage.*.xml
+            ${{ github.ref_type == 'tag' && '-Dsonar.projectVersion=' + env.VERSION || '' }}
 
   build:
     needs: sonarcloud
