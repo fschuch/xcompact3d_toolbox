@@ -31,4 +31,7 @@ changelog:
         - "*"
   exclude:
     authors:
-      - pre-commit-ci[bot]
+      - coderabbitai
+      - dependabot
+      - github-actions
+      - pre-commit-ci
