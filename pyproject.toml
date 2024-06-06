@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling>=1.21.0", "hatch-vcs>=0.3.0"]
+build-backend = "hatchling.build"
+
 [project]
 name = "xcompact3d_toolbox"
 description = "A set of tools for pre and postprocessing prepared for the high-order Navier-Stokes solver XCompact3d"
@@ -44,10 +48,10 @@ visu = [
 ]
 
 [project.urls]
+Repository = "https://github.com/fschuch/xcompact3d_toolbox"
 Changelog = "https://github.com/fschuch/xcompact3d_toolbox/releases"
 Documentation = "https://docs.fschuch.com/xcompact3d_toolbox"
 Issues = "https://github.com/fschuch/xcompact3d_toolbox/issues"
-Repository = "https://github.com/fschuch/xcompact3d_toolbox"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
@@ -103,6 +107,70 @@ exclude = ["docs/conf.py"]
 skip = "docs/conf.py"
 check-filenames = true
 
-[build-system]
-requires = ["hatchling>=1.21.0", "hatch-vcs>=0.3.0"]
-build-backend = "hatchling.build"
+[tool.hatch.env]
+requires = ["hatch-pip-compile"]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "xcompact3d_toolbox/_version.py"
+
+[tool.hatch.envs.default]
+description = "Base development environment"
+installer = "uv"
+dependencies = [
+    "coverage[toml]",
+    "hypothesis>=4.53",
+    "pre-commit",
+    "pytest-cov",
+    "pytest",
+]
+
+[tool.hatch.envs.default.scripts]
+pre-commit-install = "pre-commit install {args}"
+pre-commit-uninstall = "pre-commit uninstall {args}"
+check = "pre-commit run {args} --all-files"
+type = "check mypy {args}"
+lint = "check ruff {args}"
+format = "check ruff-format {args}"
+test = "pytest --cov --cov-report=term --cov=xcompact3d_toolbox --cov=tests {args}"
+test-no-cov = "test --no-cov {args}"
+qa = ["check", "test", "echo '✅ QA passed'"]
+
+[tool.hatch.envs.test]
+description = "Extended test environment"
+extra-dependencies = ["pytest-randomly", "pytest-rerunfailures", "pytest-xdist"]
+
+[tool.hatch.envs.test.scripts]
+extended = "test -n auto --reruns 7 --reruns-delay 1 {args}"
+
+[[tool.hatch.envs.test.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.docs]
+description = "Documentation environment"
+features = ["visu"]
+template = "docs"
+install = true
+installer = "uv"
+dependencies = [
+    "docutils",
+    "ipykernel",
+    "jupyter-book",
+    "nbsphinx",
+    "pooch",
+    "sphinx-autobuild",
+    "sphinx-rtd-theme",
+    "sphinx>=1.4",
+]
+type = "pip-compile"
+lock-filename = "docs/requirements.txt"
+
+[tool.hatch.envs.docs.scripts]
+config = "jupyter-book config sphinx docs {args}"
+build = ["config", "jupyter-book build docs --path-output build {args}"]
+serve = ["config", "sphinx-autobuild docs build/_build/html --ignore='**/data/*' --open-browser {args}"]
+
+[tool.hatch.envs.hatch-static-analysis]
+config-path = "ruff_defaults.toml"
