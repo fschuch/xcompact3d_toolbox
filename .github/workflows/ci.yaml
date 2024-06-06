@@ -93,7 +93,7 @@ jobs:
             -Dsonar.sources=xcompact3d_toolbox
             -Dsonar.tests=tests
             -Dsonar.python.coverage.reportPaths=coverage.*.xml
-            ${{ github.ref_type == 'tag' && '-Dsonar.projectVersion=' + env.VERSION || '' }}
+            ${{ github.ref_type == 'tag' && format('-Dsonar.projectVersion={0}', env.VERSION) || '' }}
 
   build:
     needs: sonarcloud
