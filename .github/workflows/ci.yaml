@@ -57,6 +57,7 @@ jobs:
   sonarcloud:
     needs: test
     runs-on: ubuntu-latest
+    if: github.repository == 'fschuch/xcompact3d_toolbox' # prevent running on forks
     steps:
       - uses: actions/checkout@v4
         with:
@@ -89,7 +90,7 @@ jobs:
           args: >
             -Dsonar.organization=fschuch
             -Dsonar.projectKey=fschuch_xcompact3d_toolbox
-            -Dsonar.python.version=3.8, 3.9, 3.10, 3.11, 3.12
+            -Dsonar.python.version="3.8, 3.9, 3.10, 3.11, 3.12"
             -Dsonar.sources=xcompact3d_toolbox
             -Dsonar.tests=tests
             -Dsonar.python.coverage.reportPaths=coverage.*.xml
@@ -120,7 +121,7 @@ jobs:
   release:
     needs: build
     # upload to PyPI on every tag
-    if: github.event_name == 'push' && github.ref_type == 'tag' && github.repository == 'fschuch/xcompact3d_toolbox'
+    if: github.event_name == 'push' && github.ref_type == 'tag'
     runs-on: ubuntu-latest
     environment:
       name: pypi
