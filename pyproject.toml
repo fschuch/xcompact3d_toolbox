@@ -54,7 +54,6 @@ Documentation = "https://docs.fschuch.com/xcompact3d_toolbox"
 Issues = "https://github.com/fschuch/xcompact3d_toolbox/issues"
 
 [tool.pytest.ini_options]
-minversion = "8.0"
 filterwarnings = [
     # Internal deprecation warnings
     "ignore:.*Call to deprecated method cumtrapz.*:FutureWarning",
@@ -112,9 +111,6 @@ exclude = ["docs/conf.py"]
 skip = "docs/conf.py"
 check-filenames = true
 
-[tool.hatch.env]
-requires = ["hatch-pip-compile"]
-
 [tool.hatch.version]
 source = "vcs"
 
@@ -125,11 +121,11 @@ version-file = "xcompact3d_toolbox/_version.py"
 description = "Base development environment"
 installer = "uv"
 dependencies = [
-    "coverage[toml]",
-    "hypothesis>=4.53",
-    "pre-commit",
-    "pytest-cov",
-    "pytest",
+    "coverage[toml]>=7.5.3",
+    "hypothesis>=6.103.1",
+    "pre-commit>=3.5.0",
+    "pytest-cov>=5.0.0",
+    "pytest>=8.2.2",
 ]
 
 [tool.hatch.envs.default.scripts]
@@ -159,18 +155,16 @@ features = ["visu"]
 template = "docs"
 install = true
 installer = "uv"
+python = "3.12"
 dependencies = [
-    "docutils",
-    "ipykernel",
-    "jupyter-book",
-    "nbsphinx",
-    "pooch",
-    "sphinx-autobuild",
-    "sphinx-rtd-theme",
-    "sphinx>=1.4",
+    "docutils==0.20.1",
+    "ipykernel==6.29.4",
+    "jupyter-book==1.0.0",
+    "nbsphinx==0.9.4",
+    "pooch==1.8.1",
+    "sphinx-autobuild==2024.4.16",
+    "sphinx==7.3.7",
 ]
-type = "pip-compile"
-lock-filename = "docs/requirements.txt"
 
 [tool.hatch.envs.docs.scripts]
 config = "jupyter-book config sphinx docs {args}"
