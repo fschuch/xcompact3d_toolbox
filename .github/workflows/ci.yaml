@@ -91,7 +91,7 @@ jobs:
           args: >
             -Dsonar.organization=fschuch
             -Dsonar.projectKey=fschuch_xcompact3d_toolbox
-            -Dsonar.python.version="3.8, 3.9, 3.10, 3.11, 3.12"
+            -Dsonar.python.version=3.8,3.9,3.10,3.11,3.12
             -Dsonar.sources=xcompact3d_toolbox
             -Dsonar.tests=tests
             -Dsonar.python.coverage.reportPaths=coverage.*.xml
