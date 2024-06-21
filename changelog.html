@@ -1,0 +1,808 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>What’s New &#8212; Xcompact3d-toolbox</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'changelog';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="API reference" href="Docstrings.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Xcompact3d-toolbox - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Xcompact3d-toolbox - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="tutorial/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/io.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/computing_and_plotting.html">Computing and Plotting</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Sandbox Examples</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="examples/Axisymmetric_flow.html">Turbidity Current in Axisymmetric Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Cylinder.html">Flow Around a Complex Body</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Square.html">Flow Around a Square and Flow Visualization with Passive Scalar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Heat-exchanger.html">Periodic Heat Exchanger</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Docstrings.html">API reference</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">What’s New</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/fschuch/xcompact3d_toolbox" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fschuch/xcompact3d_toolbox/edit/main/docs/changelog.md" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fschuch/xcompact3d_toolbox/issues/new?title=Issue%20on%20page%20%2Fchangelog.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/changelog.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>What’s New</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v1-2-0">v1.2.0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v1-1-1">v1.1.1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v1-1-0">v1.1.0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v1-0-1">v1.0.1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v1-0-0">v1.0.0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-11">v0.1.11</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-10">v0.1.10</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-9">v0.1.9</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-8">v0.1.8</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-7">v0.1.7</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-6">v0.1.6</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-5">v0.1.5</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-4">v0.1.4</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-3">v0.1.3</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="what-s-new">
+<h1>What’s New<a class="headerlink" href="#what-s-new" title="Link to this heading">#</a></h1>
+<p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>, and this project adheres to <a class="reference external" href="https://jacobtomlinson.dev/effver/">Intended Effort Versioning</a> (EffVer for short).
+Release notes are automatically recovered from GitHub by <a class="reference external" href="https://github.com/ewjoachim/sphinx-github-changelog">sphinx-github-changelog</a>.</p>
+<section id="release-v1-2-0">
+<h2>v1.2.0<a class="headerlink" href="#release-v1-2-0" title="Link to this heading">#</a></h2>
+<p><em>Released on 2024-06-21 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.2.0">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v1.2.0/">PyPI</a></em></p>
+
+<h2>What's Changed</h2>
+<h3>Deprecated</h3>
+<ul>
+<li>The integration methods <code>cumtrapz</code> and <code>simps</code> on <code>xcompact3d_toolbox.array</code> have been deprecated in favor of <code>cumulative_trapezoid</code> and <code>simpson</code> respectively, following the same changes applied upstream on <a href="https://docs.scipy.org/doc/scipy/release/1.12.0-notes.html#deprecated-features" rel="nofollow">SciPy 1.12.0</a></li>
+</ul>
+<h3>Added</h3>
+<ul>
+<li>Added <a href="https://loguru.readthedocs.io/en/stable/" rel="nofollow">loguru</a> to enhance logging in the project</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Dropped support for Python 3.7 and added support for Python 3.10, 3.11, and 3.12</li>
+<li>Boolean arguments in all functions and methods changed to keyword-only</li>
+<li>Changed all arguments on <code>xcompact3d_toolbox.sandbox.Geometry</code> to keyword-only</li>
+<li>Changed the project versioning schema to <a href="https://jacobtomlinson.dev/effver/" rel="nofollow">Intended Effort Versioning</a></li>
+<li>Function <code>xcompact3d_toolbox.gene_epsi_3D</code> was renamed to <code>xcompact3d_toolbox.gene_epsi_3d</code></li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>Corrected typos, typing annotating, and formatting issues in the codebase and documentation</li>
+<li>Fixed a bug on <code>xcompact3d_toolbox.gui._divisor_generator</code> affecting the coupling between <code>p_row</code>, <code>p_col</code>, and <code>ncores</code> on <code>ParametersGui._observe_2decomp</code> method</li>
+<li>Fixed bug on <code>xcompact3d_toolbox.sandbox.Geometry.from_stl</code> on some platforms that resolve <code>np.longdouble</code> to <code>np.float128</code>, which is not compatible with Numba</li>
+<li>Fixed compatibility issue on <code>xcompact3d_toolbox.io.Dataset.load_snapshot</code> when testing if field <code>is_scalar</code> on Python 3.8</li>
+<li>Fixed issue on <code>xcompact3d_toolbox.sandbox.Geometry.square</code> that was resulting in a TypeError because <code>set</code> object is not subscriptable</li>
+</ul>
+<h3>Documentation</h3>
+<ul>
+<li>Replaced documentation framework by <a href="https://jupyterbook.org/en/stable/intro.html" rel="nofollow">Jupyter Books</a> to enhance interactive tutorials</li>
+<li>Migrated documentation hosting from readthedocs to GitHub Pages by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/fschuch/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/fschuch">@fschuch</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="2316319535" data-permission-text="Title is private" data-url="https://github.com/fschuch/xcompact3d_toolbox/issues/41" data-hovercard-type="pull_request" data-hovercard-url="/fschuch/xcompact3d_toolbox/pull/41/hovercard" href="https://github.com/fschuch/xcompact3d_toolbox/pull/41">#41</a></li>
+<li>Added a changelog page auto generated from GitHub release notes by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/fschuch/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/fschuch">@fschuch</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="2367230380" data-permission-text="Title is private" data-url="https://github.com/fschuch/xcompact3d_toolbox/issues/60" data-hovercard-type="pull_request" data-hovercard-url="/fschuch/xcompact3d_toolbox/pull/60/hovercard" href="https://github.com/fschuch/xcompact3d_toolbox/pull/60">#60</a></li>
+</ul>
+<h3>Internals</h3>
+<ul>
+<li>Configured <a href="https://sonarcloud.io/project/overview?id=fschuch_xcompact3d_toolbox" rel="nofollow">sonarcloud</a> to power code quality analysis and coverage tracking on the project</li>
+<li>Modified the way of working on the project by applying the <a href="https://github.com/fschuch/wizard-template">Wizard-Template</a> by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/fschuch/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/fschuch">@fschuch</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="2165516645" data-permission-text="Title is private" data-url="https://github.com/fschuch/xcompact3d_toolbox/issues/14" data-hovercard-type="pull_request" data-hovercard-url="/fschuch/xcompact3d_toolbox/pull/14/hovercard" href="https://github.com/fschuch/xcompact3d_toolbox/pull/14">#14</a>:
+<ul>
+<li><a href="https://hatch.pypa.io" rel="nofollow">Hatch</a> now manages Python installations, virtual environments, dependencies, maintenance scripts, and builds</li>
+<li><a href="https://mypy.readthedocs.io/en/stable/" rel="nofollow">mypy</a> for static type checking</li>
+<li><a href="https://github.com/astral-sh/ruff">ruff</a> as the linter and code formatter</li>
+<li><a href="https://github.com/codespell-project/codespell">codespell</a> to check spelling</li>
+<li><a href="https://docs.pytest.org/en/7.4.x/" rel="nofollow">pytest</a> as the test engine</li>
+<li><a href="https://pre-commit.com/" rel="nofollow">Git hooks</a> to guarantee consistency and leverage the aforementioned tools</li>
+<li>GitHub workflows and dependabot were reviewed to address the previous points</li>
+</ul>
+</li>
+</ul>
+<p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/fschuch/xcompact3d_toolbox/compare/v1.1.1...v1.2.0"><tt>v1.1.1...v1.2.0</tt></a></p></section>
+<section id="release-v1-1-1">
+<h2>v1.1.1<a class="headerlink" href="#release-v1-1-1" title="Link to this heading">#</a></h2>
+<p><em>Released on 2023-08-10 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.1.1">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v1.1.1/">PyPI</a></em></p>
+<h3>Fixed</h3>
+<ul>
+<li>Specified the version for netcdf4, to avoid a issues with the latest version (<a href="https://github.com/fschuch/xcompact3d_toolbox/issues/13" data-hovercard-type="issue" data-hovercard-url="/fschuch/xcompact3d_toolbox/issues/13/hovercard">#13</a>), by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Modified</h3>
+<ul>
+<li>Support for parallel computing with dask was extended at <code>genepsi.gene_epsi_3D</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v1-1-0">
+<h2>v1.1.0<a class="headerlink" href="#release-v1-1-0" title="Link to this heading">#</a></h2>
+<p><em>Released on 2021-10-07 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.1.0">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v1.1.0/">PyPI</a></em></p>
+<h3>Added</h3>
+<ul>
+<li>Add <code>sandbox.Geometry.from_stl</code>. It reads an <code>stl</code> file and is able to compute what mesh points are inside or outside the geometry, so we can specify the geometry for a very customized immersed boundary method. By <a href="https://github.com/fschuch">@fschuch</a> and <a href="https://github.com/nbeb">@nbeb</a>.</li>
+<li>Add <code>xcompact3d_toolbox.tutorial</code>, making it easier to get datasets for documentation and tutorials, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Add <code>xcompact3d_toolbox.Parameters.from_string</code>, an useful method to get the parameters from the datasets at the tutorials, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Add tutorial <strong>Computing and Plotting</strong>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Add tutorial <strong>Reading and writing files</strong>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Modified</h3>
+<ul>
+<li><code>io.Dataset.data_path</code> is now obtained automatically from <code>parameters.Parameter.filename</code> at initialization (i.g., if <code>filename = "./example/input.i3d"</code> then <code>data_path = "./example/data/"</code>). Of course, <code>data_path</code> can be changed to any value after that. By <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li><code>io.Dataset.load_wind_turbine_data</code> now have a default location for <code>file_pattern</code>. Atributes were included for the coordinate time. By <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li><code>io.Dataset.set</code> now accepts keyword arguments to send to <code>io.FilenameProperties.set</code>, for a more concise sintaxe. By <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>The default return from <code>xcompact3d.param.boundary_condition</code> now takes in consideration if the domain is periodic or not, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li><code>fix_bug</code> at <a href="/fschuch/xcompact3d_toolbox/blob/v1.1.0/xcompact3d-toolbox/genepsi.py">gene_epsi_3D</a> was not working properly (<a href="https://github.com/fschuch/xcompact3d_toolbox/issues/3" data-hovercard-type="issue" data-hovercard-url="/fschuch/xcompact3d_toolbox/issues/3/hovercard">#3</a>), by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li><code>xcompact3d.io.Dataset.load_array</code> was not working for files that do not change in time, like <code>./data/geometry/epsilon.bin</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v1-0-1">
+<h2>v1.0.1<a class="headerlink" href="#release-v1-0-1" title="Link to this heading">#</a></h2>
+<p><em>Released on 2021-09-23 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.0.1">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v1.0.1/">PyPI</a></em></p>
+<h3>Modified</h3>
+<ul>
+<li>Rename the default branch to <code>main</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Added</h3>
+<ul>
+<li>Add <code>load_wind_turbine_data</code> that reads the files from the disc and wraps the data into a <code>xarray.Dataset</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li><code>Black</code> version was not working properly at <code>setup.py</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v1-0-0">
+<h2>v1.0.0<a class="headerlink" href="#release-v1-0-0" title="Link to this heading">#</a></h2>
+<p><em>Released on 2021-09-14 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v1.0.0">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v1.0.0/">PyPI</a></em></p>
+<p>Xcompact3d-toolbox has evolved considerably in the last year. The pre-release version has been employed in CFD research projects, and the feedback from the users helped to improve its interfaces and functionalities. The integration between this Python package and the numerical solver <a href="https://github.com/xcompact3d/Incompact3d">XCompact3d</a> was experimental, and many of the functionalities were only available in a forked repository for a test of concept (<a href="https://github.com/fschuch/Xcompact3d">fschuch/Xcompact3d</a>). These features are now part of the main repository <a href="https://github.com/xcompact3d/Incompact3d">XCompact3d</a> (see <a href="https://github.com/xcompact3d/Incompact3d/pull/51" data-hovercard-type="pull_request" data-hovercard-url="/xcompact3d/Incompact3d/pull/51/hovercard">PR #51</a>). With this, Xcompact3d-toolbox is ready for its first stable release.</p>
+<h3>Added</h3>
+<ul>
+<li>Support for stretched mesh at the xdmf writer and automatized tests for it, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>A class to handle the binary filenames and their tests. Now all methods support different filenames, like the classic <code>ux000</code>, or the new <code>ux-0000.bin</code>, besides some combinations between them. By <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Classes to handle the coordinates and their tests, so they can be moved out of the parameters class, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>New class for the 3D coordinate system, with useful methods and its testes, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Add <code>class Dataset</code> to read the binary files from XCompact3d on-demand, it is possible to loop through the snapshots, select any of them or read the entire time-series for a given variable. It returns them in a proper <code>xarray.Dataset</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Sets of dependencies for extra functionalities, like docs, tests, and visu, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>More parameters are now covered in the Parameters class, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Add type hints to many functions and class methods, for a better development experience using modern IDEs, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Modified</h3>
+<ul>
+<li>Writing methods for the binary files were moved from the xarray accessors to the Dataset class, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>The new sandbox flow configuration is now set with <code>itype = 12</code>, following its addition the XCompact3d's main repository (see <a href="https://github.com/xcompact3d/Incompact3d/pull/51" data-hovercard-type="pull_request" data-hovercard-url="/xcompact3d/Incompact3d/pull/51/hovercard">#51</a>), by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>The documentation was improved, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>Not installing all dependencies with <code>pip install</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Suppressed warning from <code>tqdm</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>The output format from <code>gene_epsi_3D</code> has changed, fixing some compatibility issues with XCompact3d as well (see <a href="https://github.com/xcompact3d/Incompact3d/pull/51" data-hovercard-type="pull_request" data-hovercard-url="/xcompact3d/Incompact3d/pull/51/hovercard">#51</a>), by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v0-1-11">
+<h2>v0.1.11<a class="headerlink" href="#release-v0-1-11" title="Link to this heading">#</a></h2>
+<p><em>Released on 2021-02-12 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.11">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v0.1.11/">PyPI</a></em></p>
+<h3>Fixed</h3>
+<ul>
+<li>Fix <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="807352931" data-permission-text="Title is private" data-url="https://github.com/fschuch/xcompact3d_toolbox/issues/8" data-hovercard-type="issue" data-hovercard-url="/fschuch/xcompact3d_toolbox/issues/8/hovercard" href="https://github.com/fschuch/xcompact3d_toolbox/issues/8">#8</a>, a little incompatibility problem with xcompact3d was fixed, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v0-1-10">
+<h2>v0.1.10<a class="headerlink" href="#release-v0-1-10" title="Link to this heading">#</a></h2>
+<p><em>Released on 2021-02-11 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.10">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v0.1.10/">PyPI</a></em></p>
+<h3>Added</h3>
+<ul>
+<li>Add support for the previous parameters format <code>.prm</code> (<a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="804984864" data-permission-text="Title is private" data-url="https://github.com/fschuch/xcompact3d_toolbox/issues/7" data-hovercard-type="issue" data-hovercard-url="/fschuch/xcompact3d_toolbox/issues/7/hovercard" href="https://github.com/fschuch/xcompact3d_toolbox/issues/7">#7</a>), by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Class <code>ParametersGui</code>, a subclass from <code>Parameters</code>, but with widgets, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Argument <code>loadfile</code> added to class <code>Parameters</code>, so it is possible to initialize and load form the disc with just one line of code <code>prm = x3d.Parameters(loadfile='example.i3d')</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Changed from method <code>__call__</code> to <code>__repr__</code> at <code>parameters.py</code> as the procedure to show the parameters on screen, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Functions to read binary fields were moved from <code>io.py</code> to methods at <code>parameters.py</code>, so the syntax is simplified from <code>x3d.read_field('filename', prm)</code> to just <code>prm.read_field('filename')</code>. by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>Scale factor for Ahmed Body at the sandbox, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Fix <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="680389286" data-permission-text="Title is private" data-url="https://github.com/fschuch/xcompact3d_toolbox/issues/2" data-hovercard-type="issue" data-hovercard-url="/fschuch/xcompact3d_toolbox/issues/2/hovercard" href="https://github.com/fschuch/xcompact3d_toolbox/issues/2">#2</a>, widgets are now working in a new class <code>ParametersGui</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Fix <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="730890918" data-permission-text="Title is private" data-url="https://github.com/fschuch/xcompact3d_toolbox/issues/5" data-hovercard-type="issue" data-hovercard-url="/fschuch/xcompact3d_toolbox/issues/5/hovercard" href="https://github.com/fschuch/xcompact3d_toolbox/issues/5">#5</a>, Bug at Ahmed body when using double-precision, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Fix <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="800721105" data-permission-text="Title is private" data-url="https://github.com/fschuch/xcompact3d_toolbox/issues/6" data-hovercard-type="issue" data-hovercard-url="/fschuch/xcompact3d_toolbox/issues/6/hovercard" href="https://github.com/fschuch/xcompact3d_toolbox/issues/6">#6</a>, The files describing the geometry are incompatible when running on Linux, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v0-1-9">
+<h2>v0.1.9<a class="headerlink" href="#release-v0-1-9" title="Link to this heading">#</a></h2>
+<p><em>Released on 2020-10-09 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.9">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v0.1.9/">PyPI</a></em></p>
+<h3>Added</h3>
+<ul>
+<li><code>get_boundary_condition</code> at class <code>Parameters</code>. It returns the appropriate boundary parameters that are<br>
+expected by the derivative functions. by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>First and second derivatives for stretched mesh in y, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Syntax for <code>&lt;da,ds&gt;.x3d.simps</code> and <code>&lt;da,ds&gt;.x3d.pencil_decomp</code>. It is now possible to use them over multiple dimensions with just one call (for instance <code>ds.x3d.simps('x', 'y', 'z')</code>), by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>First derivative was incorrect when <code>ncl1=1</code> and <code>ncln=2</code>. by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v0-1-8">
+<h2>v0.1.8<a class="headerlink" href="#release-v0-1-8" title="Link to this heading">#</a></h2>
+<p><em>Released on 2020-09-29 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.8">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v0.1.8/">PyPI</a></em></p>
+<h3>Fixed</h3>
+<ul>
+<li><code>param.mytype</code> was not updating properly <a href="https://github.com/fschuch/xcompact3d_toolbox/issues/4" data-hovercard-type="issue" data-hovercard-url="/fschuch/xcompact3d_toolbox/issues/4/hovercard">#4</a>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v0-1-7">
+<h2>v0.1.7<a class="headerlink" href="#release-v0-1-7" title="Link to this heading">#</a></h2>
+<p><em>Released on 2020-08-28 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.7">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v0.1.7/">PyPI</a></em></p>
+<h3>Fixed</h3>
+<ul>
+<li>BC parameters at (<a href="/fschuch/xcompact3d_toolbox/blob/v0.1.7/xcompact3d_toolbox%5Cparam.py">param.py</a>), by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v0-1-6">
+<h2>v0.1.6<a class="headerlink" href="#release-v0-1-6" title="Link to this heading">#</a></h2>
+<p><em>Released on 2020-08-28 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.6">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v0.1.6/">PyPI</a></em></p>
+<h3>Fixed</h3>
+<ul>
+<li><a href="/fschuch/xcompact3d_toolbox/blob/v0.1.6/.github/workflows/python-package.yml">python-publish</a> action does not trigger if the release was first drafted, then published, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v0-1-5">
+<h2>v0.1.5<a class="headerlink" href="#release-v0-1-5" title="Link to this heading">#</a></h2>
+<p><em>Released on 2020-08-28 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.5">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v0.1.5/">PyPI</a></em></p>
+<h3>Added</h3>
+<ul>
+<li>Support for stretched mesh in y, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li><code>get_mesh</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li><code>write_xdmf</code>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v0-1-4">
+<h2>v0.1.4<a class="headerlink" href="#release-v0-1-4" title="Link to this heading">#</a></h2>
+<p><em>Released on 2020-08-20 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.4">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v0.1.4/">PyPI</a></em></p>
+<h3>Fixed</h3>
+<ul>
+<li>Fixed bug producing potential <code>KeyError</code> on the cylinder geometry</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li><code>param = {'mytype': np.float64}</code> changed to just <code>mytype = float64</code> (<a href="/fschuch/xcompact3d_toolbox/blob/v0.1.4/xcompact3d_toolbox%5Cparam.py">param.py</a>), by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Code style changed to <a href="https://github.com/psf/black">black</a>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Documentation</h3>
+<ul>
+<li>Created the <code>docs</code> folder powered by <a href="https://github.com/sphinx-doc/sphinx">sphinx</a>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Examples for Sandbox flow configuration (by <a href="https://github.com/fschuch">@fschuch</a>):
+<ul>
+<li><a href="/fschuch/xcompact3d_toolbox/blob/v0.1.4/docs%5Cexamples%5CAxisymmetric_flow.ipynb">Turbidity Current in Axisymmetric Configuration</a>;</li>
+<li><a href="/fschuch/xcompact3d_toolbox/blob/v0.1.4/docs%5Cexamples%5CCylinder.ipynb">Flow Around a Complex Body</a>.</li>
+</ul>
+</li>
+<li>Tutorials (by <a href="https://github.com/fschuch">@fschuch</a>):
+<ul>
+<li><a href="/fschuch/xcompact3d_toolbox/blob/v0.1.4/docs%5Ctutorial%5Cparameters.ipynb">Parameters</a>.</li>
+</ul>
+</li>
+<li>Added a page for autogenerated API references, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Extended the docstring for most classes, methods, and functions, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Integration with <a href="https://xcompact3d-toolbox.readthedocs.io/en/latest/" rel="nofollow">Read the Docs</a>, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul>
+<h3>Internals</h3>
+<ul>
+<li><a href="https://github.com/warner/python-versioneer">python-versioneer</a> removed the tedious and error-prone "update the embedded version string" step from our release process, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+</ul></section>
+<section id="release-v0-1-3">
+<h2>v0.1.3<a class="headerlink" href="#release-v0-1-3" title="Link to this heading">#</a></h2>
+<p><em>Released on 2020-08-17 - <a class="reference external" href="https://github.com/fschuch/xcompact3d_toolbox/releases/tag/v0.1.3">GitHub</a> - <a class="reference external" href="https://pypi.org/project/xcompact3d-toolbox/v0.1.3/">PyPI</a></em></p>
+<p>The kickoff for the project, the first release to PyPi.</p>
+<h3>Added</h3>
+<ul>
+<li>CHANGELOG.md by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li><code>class Parameters</code>  built on top of <a href="https://traitlets.readthedocs.io/en/stable/index.html" rel="nofollow">traitlets</a>, for type checking, dynamically calculated default values, and "on change" callbacks, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li><a href="https://ipywidgets.readthedocs.io/en/latest/" rel="nofollow">ipywidgets</a> for all relevant parameters and two-ways linking with <a href="https://traitlets.readthedocs.io/en/stable/index.html" rel="nofollow">traitlets</a> variables, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Accessors for <a href="http://xarray.pydata.org/en/stable/" rel="nofollow">xarray</a>'s <code>Dataset</code> and <code>DataArray</code>, making possible high-order derivatives (with appropriated boundary conditions), I/O, parallel execution with pencil decomposition (powered by <a href="https://dask.org/" rel="nofollow">dask</a>) and integration with <code>scipy.integrate.simps</code> and <code>scipy.integrate.cumtrapz</code>. By <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Ported genepsi.f90 to genepsi.py (powered by <a href="http://numba.pydata.org/" rel="nofollow">Numba</a>), generating all the files necessary for our customized Immersed Boundary Method, by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Support to <em>Sandbox Flow Configuration</em> (see <a href="https://github.com/fschuch/Xcompact3d/">fschuch/Xcompact3d</a>), by <a href="https://github.com/fschuch">@fschuch</a>.</li>
+<li>Ahmed body as benchmark geometry, mirror and plotting tools, by <a href="https://github.com/momba98">@momba98</a>.</li>
+</ul></section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Docstrings.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">API reference</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v1-2-0">v1.2.0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v1-1-1">v1.1.1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v1-1-0">v1.1.0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v1-0-1">v1.0.1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v1-0-0">v1.0.0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-11">v0.1.11</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-10">v0.1.10</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-9">v0.1.9</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-8">v0.1.8</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-7">v0.1.7</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-6">v0.1.6</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-5">v0.1.5</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-4">v0.1.4</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-v0-1-3">v0.1.3</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Felipe N. Schuch
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2021.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
