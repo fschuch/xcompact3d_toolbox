@@ -570,6 +570,9 @@ class Dataset(traitlets.HasTraits):
 
         >>> ux = prm.dataset.load_array("ux-000.bin")
 
+        .. versionchanged:: 1.2.0
+            The argument ``add_time`` changed to keyword-only.
+
         """
 
         coords = self._mesh.drop(*self.drop_coords)
@@ -915,8 +918,8 @@ class Dataset(traitlets.HasTraits):
         ... )
 
         * From a dataset, write only the variables with the attribute ``file_name``,
-            notice that ``ux`` and ``uy`` will not be overwritten because them do not
-            have the attribute ``file_name``:
+          notice that ``ux`` and ``uy`` will not be overwritten because them do not
+          have the attribute ``file_name``:
 
             >>> for ds in prm.dataset:
             ...     ds["vort"] = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative(
@@ -927,16 +930,16 @@ class Dataset(traitlets.HasTraits):
 
         * Write an array:
 
-            >>> for ds in prm.dataset:
-            ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-            ...     vort.attrs["file_name"] = "vorticity"
-            ...     prm.dataset.write(vort)
+          >>> for ds in prm.dataset:
+          ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+          ...     vort.attrs["file_name"] = "vorticity"
+          ...     prm.dataset.write(vort)
 
-            or
+          or
 
-            >>> for ds in prm.dataset:
-            ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-            ...     prm.dataset.write(data=vort, file_prefix="vorticity")
+          >>> for ds in prm.dataset:
+          ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+          ...     prm.dataset.write(data=vort, file_prefix="vorticity")
 
         .. note :: It is not recommended to load the arrays with
             ``add_time = False`` when planning to write the results in a
@@ -1044,6 +1047,9 @@ class Dataset(traitlets.HasTraits):
         can be visualized on any external tool:
 
         >>> prm.dataset.write_xdmf()
+
+        .. versionchanged:: 1.2.0
+            Added argument ``float_precision``.
         """
         if self.set_of_variables:
             time_numbers = list(range(len(self)))

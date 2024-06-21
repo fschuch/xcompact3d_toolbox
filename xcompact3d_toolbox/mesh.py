@@ -11,28 +11,14 @@ from math import isclose
 
 import numpy as np
 import traitlets
+from deprecated.sphinx import versionadded
 
 from xcompact3d_toolbox.param import param
 
 
+@versionadded(version="1.2.0")
 class Istret(IntEnum):
-    """Mesh refinement type.
-
-    Parameters
-    ----------
-    value : int
-        Type of mesh refinement:
-
-            * 0 - No refinement;
-            * 1 - Refinement at the center;
-            * 2 - Both sides;
-            * 3 - Just near the bottom.
-
-    Returns
-    -------
-    :obj:`xcompact3d_toolbox.mesh.Istret`
-        Mesh refinement type
-    """
+    """Mesh refinement type."""
 
     NO_REFINEMENT = 0
     CENTER_REFINEMENT = 1
@@ -355,12 +341,8 @@ class StretchedCoordinate(Coordinate):
         Stretched coordinate
     """
 
-    istret = traitlets.UseEnum(
-        Istret,
-        default_value=0,
-        help="type of mesh refinement (0:no, 1:center, 2:both sides, 3:bottom)",
-    )
-    beta = traitlets.Float(default_value=1.0, min=0.0, help="Refinement parameter")
+    istret = traitlets.UseEnum(Istret, default_value=0)
+    beta = traitlets.Float(default_value=1.0, min=0.0)
 
     def __repr__(self):
         if self.istret == 0:

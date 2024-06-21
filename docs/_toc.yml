@@ -18,3 +18,4 @@ parts:
   - caption: References
     chapters:
       - file: Docstrings.rst
+      - file: changelog.md
