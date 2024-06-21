@@ -45,6 +45,7 @@ launch_buttons:
 sphinx:
   extra_extensions:
     - nbsphinx
+    - sphinx_github_changelog
     - sphinx.ext.autodoc
     - sphinx.ext.intersphinx
     - sphinx.ext.mathjax

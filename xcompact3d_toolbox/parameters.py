@@ -893,6 +893,9 @@ class Parameters(
         .. _#7:
             https://github.com/fschuch/xcompact3d_toolbox/issues/7
 
+        .. versionchanged:: 1.2.0
+            The argument ``raise_warning`` changed to keyword-only.
+
         """
 
         super().__init__()
@@ -1146,6 +1149,8 @@ class Parameters(
         ...     p_col=2,
         ... )
 
+        .. versionchanged:: 1.2.0
+            The argument ``raise_warning`` changed to keyword-only.
         """
         # They are high priority in order to avoid errors with validations and observations
         for bc in "nclx1 nclxn ncly1 nclyn nclz1 nclzn numscalar ilesmod".split():

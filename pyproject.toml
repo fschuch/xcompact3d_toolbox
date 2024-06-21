@@ -49,7 +49,7 @@ visu = [
 
 [project.urls]
 Repository = "https://github.com/fschuch/xcompact3d_toolbox"
-Changelog = "https://github.com/fschuch/xcompact3d_toolbox/releases"
+Changelog = "https://docs.fschuch.com/xcompact3d_toolbox/changelog.html"
 Documentation = "https://docs.fschuch.com/xcompact3d_toolbox"
 Issues = "https://github.com/fschuch/xcompact3d_toolbox/issues"
 
@@ -164,12 +164,14 @@ dependencies = [
     "pooch==1.8.1",
     "sphinx-autobuild==2024.4.16",
     "sphinx==7.3.7",
+    "sphinx-github-changelog==1.3.0",
 ]
 
 [tool.hatch.envs.docs.scripts]
 config = "jupyter-book config sphinx docs {args}"
 build = ["config", "jupyter-book build docs --path-output build {args}"]
 serve = ["config", "sphinx-autobuild docs build/_build/html --ignore='**/data/*' --watch xcompact3d_toolbox --open-browser {args}"]
+clear = "rm -rf build/_build"
 
 [tool.hatch.envs.hatch-static-analysis]
 config-path = "ruff_defaults.toml"

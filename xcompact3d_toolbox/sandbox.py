@@ -77,6 +77,8 @@ def init_epsi(prm: Parameters, *, dask: bool = False) -> dict[str, xr.DataArray]
     >>> prm = xcompact3d_toolbox.Parameters()
     >>> epsi = xcompact3d_toolbox.init_epsi(prm)
 
+    .. versionchanged:: 1.2.0
+        The argument ``dask`` changed to keyword-only.
     """
 
     epsi: dict[str, xr.DataArray] = {}
@@ -404,6 +406,8 @@ class Geometry:
         .. _`numpy-stl's documentation`: https://numpy-stl.readthedocs.io/en/latest/
         .. _`Numba`: http://numba.pydata.org/
 
+        .. versionchanged:: 1.2.0
+            All arguments changed to keyword-only.
         """
 
         def get_boundary(mesh_coord, coord):
@@ -503,6 +507,8 @@ class Geometry:
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.cylinder(x=4.0, y=5.0)
 
+        .. versionchanged:: 1.2.0
+            All arguments changed to keyword-only.
         """
 
         for key in kwargs:
@@ -554,6 +560,8 @@ class Geometry:
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.box(x=(2,5), y=(0,1))
 
+        .. versionchanged:: 1.2.0
+            All arguments changed to keyword-only.
         """
 
         for key in kwargs:
@@ -601,6 +609,8 @@ class Geometry:
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.square(x=5, y=2, z=1)
 
+        .. versionchanged:: 1.2.0
+            All arguments changed to keyword-only.
         """
         for key in kwargs:
             if key not in self._data_array.dims:
@@ -656,6 +666,8 @@ class Geometry:
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.sphere(x=1, y=1, z=1)
 
+        .. versionchanged:: 1.2.0
+            All arguments changed to keyword-only.
         """
         for key in kwargs:
             if key not in self._data_array.dims:
@@ -707,6 +719,8 @@ class Geometry:
         >>> for key in epsi.keys():
         >>>     epsi[key] = epsi[key].geo.ahmed_body(x=2)
 
+        .. versionchanged:: 1.2.0
+            All arguments changed to keyword-only.
         """
 
         import math
