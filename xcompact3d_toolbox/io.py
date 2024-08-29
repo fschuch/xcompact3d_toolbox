@@ -696,9 +696,7 @@ class Dataset(traitlets.HasTraits):
                 return False
             if not name.startswith(prefix):
                 return False
-            if not name[len(prefix) :].isdigit():
-                return False
-            return True
+            return name[len(prefix) :].isdigit()
 
         def is_velocity(name):
             return name in {"ux", "uy", "uz"}
