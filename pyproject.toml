@@ -27,7 +27,7 @@ dependencies = [
     "ipywidgets>=7.5",
     "loguru>=0.6",
     "netcdf4>=1.6.3",
-    "numba>=0.50",
+    "numba>=0.50.1",
     "numpy-stl>=2.16.3",
     "numpy>=1.22",
     "pandas>=1.1",
@@ -119,7 +119,6 @@ version-file = "xcompact3d_toolbox/_version.py"
 
 [tool.hatch.envs.default]
 description = "Base development environment"
-installer = "uv"
 dependencies = [
     "coverage[toml]>=7.5.3",
     "hypothesis>=6.103.1",
@@ -154,7 +153,6 @@ description = "Documentation environment"
 features = ["visu"]
 template = "docs"
 install = true
-installer = "uv"
 python = "3.12"
 dependencies = [
     "docutils==0.20.1",
