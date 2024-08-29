@@ -599,9 +599,7 @@ def _validate_grid_size(grid_size, is_periodic):
                 else:
                     break
 
-    if size != 1:
-        return False
-    return True
+    return size == 1
 
 
 def _get_possible_grid_values(start: int = 0, end: int = 9002, *, is_periodic: bool) -> list:
