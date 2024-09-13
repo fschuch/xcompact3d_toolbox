@@ -605,6 +605,11 @@ class ParametersIbmStuff(traitlets.HasTraits):
         the recommended is 2.
     """
 
+    iforces = traitlets.Int(default_value=0, min=0, max=1).tag(
+        group="ibmstuff", desc="Forces calculation (0: No, 1: Yes)"
+    )
+    """int: Enables forces calculation."""
+
     def __init__(self):
         super().__init__()
 
