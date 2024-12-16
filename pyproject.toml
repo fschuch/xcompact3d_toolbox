@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "xcompact3d_toolbox"
 description = "A set of tools for pre and postprocessing prepared for the high-order Navier-Stokes solver XCompact3d"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [{ name = "Felipe N. Schuch", email = "me@fschuch.com" }]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -15,7 +15,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering",
@@ -146,7 +145,7 @@ extra-dependencies = ["pytest-randomly", "pytest-rerunfailures", "pytest-xdist"]
 extended = "test -n auto --reruns 7 --reruns-delay 1 {args}"
 
 [[tool.hatch.envs.test.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+python = ["3.9", "3.10", "3.11", "3.12"]
 
 [tool.hatch.envs.docs]
 description = "Documentation environment"

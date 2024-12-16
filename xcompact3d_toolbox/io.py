@@ -7,7 +7,10 @@ import io
 import os
 import os.path
 import warnings
-from typing import Iterator
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 import numpy as np
 import pandas as pd

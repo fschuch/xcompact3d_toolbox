@@ -26,12 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        exclude:
-          - os: macos-latest
-            python-version: "3.8"
-          - os: windows-latest
-            python-version: "3.8"
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -91,7 +86,7 @@ jobs:
           args: >
             -Dsonar.organization=fschuch
             -Dsonar.projectKey=fschuch_xcompact3d_toolbox
-            -Dsonar.python.version=3.8,3.9,3.10,3.11,3.12
+            -Dsonar.python.version=3.9,3.10,3.11,3.12
             -Dsonar.sources=xcompact3d_toolbox
             -Dsonar.tests=tests
             -Dsonar.python.coverage.reportPaths=coverage.*.xml
