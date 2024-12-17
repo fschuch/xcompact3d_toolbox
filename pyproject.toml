@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling>=1.21.0", "hatch-vcs>=0.3.0"]
+requires = ["hatchling>=1.27.0", "hatch-vcs>=0.4.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -21,19 +21,19 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-    "dask[complete]>=2.22",
+    "dask[complete]>=2024.8",
     "Deprecated>=1.2",
-    "ipywidgets>=7.5",
-    "loguru>=0.6",
-    "netcdf4>=1.6.3",
-    "numba>=0.50.1",
-    "numpy-stl>=2.16.3",
-    "numpy>=1.22",
-    "pandas>=1.1",
-    "scipy>=1.5",
-    "tqdm>=4.62",
-    "traitlets>=4.3",
-    "xarray>=0.16",
+    "ipywidgets>=8.1",
+    "loguru>=0.7",
+    "netcdf4>=1.7",
+    "numba>=0.60",
+    "numpy-stl>=3.2",
+    "numpy>=2.0",
+    "pandas>=2.2",
+    "scipy>=1.13",
+    "tqdm>=4.67",
+    "traitlets>=5.14",
+    "xarray>=2024.7",
 ]
 
 [project.optional-dependencies]
