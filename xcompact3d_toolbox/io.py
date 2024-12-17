@@ -716,7 +716,7 @@ class Dataset(traitlets.HasTraits):
                 dataset["phi"] = (
                     stack_variables(scalar_variables, stack_scalar=False)
                     .to_array(dim="n")
-                    .assign_coords(n=[int(v[-self.filename_properties.scalar_num_of_digits]) for v in scalar_variables])
+                    .assign_coords(n=[int(v[-self.filename_properties.scalar_num_of_digits:]) for v in scalar_variables])
                 )
                 set_of_variables -= set(scalar_variables)
 
