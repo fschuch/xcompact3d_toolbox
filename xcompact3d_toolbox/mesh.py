@@ -184,7 +184,7 @@ class Coordinate(traitlets.HasTraits):
     @traitlets.validate("grid_size")
     def _validate_grid_size(self, proposal):
         if not _validate_grid_size(proposal.get("value"), self.is_periodic):
-            msg = f'{proposal.get("value")} is an invalid value for grid size'
+            msg = f"{proposal.get('value')} is an invalid value for grid size"
             raise traitlets.TraitError(msg)
         return proposal.get("value")
 

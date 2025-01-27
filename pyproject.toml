@@ -110,6 +110,7 @@ exclude = ["docs/conf.py"]
 [tool.codespell]
 skip = "docs/conf.py"
 check-filenames = true
+ignore-words-list = ["ABL"]
 
 [tool.hatch.version]
 source = "vcs"
