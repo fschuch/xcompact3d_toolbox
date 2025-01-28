@@ -29,6 +29,8 @@ import xarray as xr
 from xcompact3d_toolbox.param import param
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from xcompact3d_toolbox.parameters import Parameters
 
 
@@ -38,6 +40,19 @@ class DimensionNotFoundError(KeyError):
     def __init__(self, dim):
         self.dim = dim
         super().__init__(f'Invalid key for "kwargs", "{dim}" is not a valid dimension')
+
+
+def data_array_zeros(
+    coords: Mapping[str, np.ndarray], dtype: np.ScalarType = param["mytype"], **kwargs
+) -> xr.DataArray:
+    """
+    Create a DataArray filled with zeros.
+    """
+    return xr.DataArray(
+        data=np.zeros(tuple(map(len, coords.values())), dtype=dtype),
+        coords=coords,
+        **kwargs,
+    )
 
 
 def init_epsi(prm: Parameters, *, dask: bool = False) -> dict[str, xr.DataArray]:
@@ -108,12 +123,7 @@ def init_epsi(prm: Parameters, *, dask: bool = False) -> dict[str, xr.DataArray]
     # the fluid points and one at the solid points. The algorithm should work
     # for integer ao float as well
     for key, (x, y, z) in fields.items():
-        epsi[key] = xr.DataArray(
-            np.zeros((x.size, y.size, z.size), dtype=bool),
-            dims=["x", "y", "z"],
-            coords={"x": x, "y": y, "z": z},
-            name=key,
-        )
+        epsi[key] = data_array_zeros(coords={"x": x, "y": y, "z": z}, dtype=bool, name=key)
 
     # With 'file_name' attribute, we make sure that epsi will be written to disc,
     # while the refined versions are not needed
@@ -198,14 +208,12 @@ def init_dataset(prm: Parameters) -> xr.Dataset:
     # Boundary conditions
     if prm.nclx1 == 2:  # noqa: PLR2004
         for i, var in enumerate("bxx1 bxy1 bxz1 noise_mod_x1".split()):
-            ds[var] = xr.DataArray(
-                param["mytype"](0.0),
-                dims=["y", "z"],
-                coords=[ds.y, ds.z],
+            ds[var] = data_array_zeros(
+                coords={"y": ds.y, "z": ds.z},
                 attrs={
                     "file_name": var,
-                    "name": f"Inflow Plane for {description.get(i,'')} Velocity",
-                    "long_name": rf"$u_{i+1} (x_1=0,x_2,x_3)$",
+                    "name": f"Inflow Plane for {description.get(i, '')} Velocity",
+                    "long_name": rf"$u_{i + 1} (x_1=0,x_2,x_3)$",
                 },
             )
         ds.noise_mod_x1.attrs["name"] = "Modulation function for Random Numbers at Inflow Plane"
@@ -213,10 +221,8 @@ def init_dataset(prm: Parameters) -> xr.Dataset:
 
     if prm.numscalar != 0:
         if prm.nclxS1 == 2:  # noqa: PLR2004
-            ds["bxphi1"] = xr.DataArray(
-                param["mytype"](0.0),
-                dims=["n", "y", "z"],
-                coords=[ds.n, ds.y, ds.z],
+            ds["bxphi1"] = data_array_zeros(
+                coords={"n": ds.n, "y": ds.y, "z": ds.z},
                 attrs={
                     "file_name": "bxphi1",
                     "name": "Inflow Plane for Scalar field(s)",
@@ -224,10 +230,8 @@ def init_dataset(prm: Parameters) -> xr.Dataset:
                 },
             )
         if prm.nclyS1 == 2:  # noqa: PLR2004
-            ds["byphi1"] = xr.DataArray(
-                param["mytype"](0.0),
-                dims=["n", "x", "z"],
-                coords=[ds.n, ds.x, ds.z],
+            ds["byphi1"] = data_array_zeros(
+                coords={"n": ds.n, "x": ds.x, "z": ds.z},
                 attrs={
                     "file_name": "byphi1",
                     "name": "Bottom Boundary Condition for Scalar field(s)",
@@ -235,10 +239,8 @@ def init_dataset(prm: Parameters) -> xr.Dataset:
                 },
             )
         if prm.nclySn == 2:  # noqa: PLR2004
-            ds["byphin"] = xr.DataArray(
-                param["mytype"](0.0),
-                dims=["n", "x", "z"],
-                coords=[ds.n, ds.x, ds.z],
+            ds["byphin"] = data_array_zeros(
+                coords={"n": ds.n, "x": ds.x, "z": ds.z},
                 attrs={
                     "file_name": "byphin",
                     "name": "Top Boundary Condition for Scalar field(s)",
@@ -247,22 +249,18 @@ def init_dataset(prm: Parameters) -> xr.Dataset:
             )
     # Initial Condition
     for i, var in enumerate(["ux", "uy", "uz"]):
-        ds[var] = xr.DataArray(
-            param["mytype"](0.0),
-            dims=["x", "y", "z"],
-            coords=[ds.x, ds.y, ds.z],
+        ds[var] = data_array_zeros(
+            coords={"x": ds.x, "y": ds.y, "z": ds.z},
             attrs={
                 "file_name": var,
-                "name": f"Initial Condition for {description.get(i,'')} Velocity",
-                "long_name": rf"$u_{i+1!s} (x_1,x_2,x_3,t=0)$",
+                "name": f"Initial Condition for {description.get(i, '')} Velocity",
+                "long_name": rf"$u_{i + 1!s} (x_1,x_2,x_3,t=0)$",
                 "BC": prm.get_boundary_condition(var),
             },
         )
     if prm.numscalar != 0:
-        ds["phi"] = xr.DataArray(
-            param["mytype"](0.0),
-            dims=["n", "x", "y", "z"],
-            coords=[ds.n, ds.x, ds.y, ds.z],
+        ds["phi"] = data_array_zeros(
+            coords={"n": ds.n, "x": ds.x, "y": ds.y, "z": ds.z},
             attrs={
                 "file_name": "phi",
                 "name": "Initial Condition for Scalar field(s)",
@@ -272,16 +270,13 @@ def init_dataset(prm: Parameters) -> xr.Dataset:
         )
     # Flowrate control
     if prm.nclx1 == 0 and prm.nclxn == 0:
-        ds["vol_frc"] = xr.DataArray(
-            param["mytype"](0.0),
-            dims=["x", "y", "z"],
-            coords=[ds.x, ds.y, ds.z],
+        ds["vol_frc"] = data_array_zeros(
+            coords={"x": ds.x, "y": ds.y, "z": ds.z},
             attrs={
                 "file_name": "vol_frc",
                 "name": "Integral Operator for Flow Rate Control",
             },
         )
-
     return ds
 
 
