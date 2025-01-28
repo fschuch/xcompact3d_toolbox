@@ -15,6 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering",
@@ -118,6 +119,7 @@ version-file = "xcompact3d_toolbox/_version.py"
 
 [tool.hatch.envs.default]
 description = "Base development environment"
+installer = "uv"
 dependencies = [
     "coverage[toml]>=7.5.3",
     "hypothesis>=6.103.1",
@@ -145,14 +147,14 @@ extra-dependencies = ["pytest-randomly", "pytest-rerunfailures", "pytest-xdist"]
 extended = "test -n auto --reruns 7 --reruns-delay 1 {args}"
 
 [[tool.hatch.envs.test.matrix]]
-python = ["3.9", "3.10", "3.11", "3.12"]
+python = ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
 [tool.hatch.envs.docs]
 description = "Documentation environment"
 features = ["visu"]
 template = "docs"
 install = true
-python = "3.12"
+python = "3.13"
 dependencies = [
     "docutils==0.20.1",
     "ipykernel==6.29.4",
