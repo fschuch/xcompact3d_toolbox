@@ -85,3 +85,84 @@ def test_geometry_from_stl(cube):
     ds_stl = x3d.init_epsi(prm)["epsi"].geo.from_stl(stl_mesh=cube, user_tol=0.05)
     ds_box = x3d.init_epsi(prm)["epsi"].geo.box(x=(-1.0, 1.0), y=(-1.0, 1.0), z=(-1.0, 1.0))
     xr.testing.assert_equal(ds_stl, ds_box)
+
+
+@pytest.mark.parametrize("var_name", ["bxx1", "bxy1", "bxz1", "noise_mod_x1"])
+class TestInitDatasetInflowBoundaryCondition:
+    @pytest.fixture(scope="class")
+    def prm(self):
+        return x3d.Parameters(nclx1=2, nclxn=2)
+
+    @pytest.fixture(scope="class")
+    def dataset(self, prm):
+        return x3d.init_dataset(prm)
+
+    def test_dataset_contains_variable(self, var_name, dataset):
+        assert var_name in dataset.variables
+
+    def test_dataset_has_correct_dimensions(self, var_name, dataset):
+        assert dataset[var_name].dims == ("y", "z")
+
+    @pytest.mark.parametrize("nclx", [0, 1])
+    def test_init_dataset__no_inflow_boundary_condition(self, var_name, nclx):
+        prm = x3d.Parameters(nclx1=nclx, nclxn=nclx)
+        ds = x3d.init_dataset(prm)
+        assert var_name not in ds.variables
+
+
+class TestInitDatasetScalarBoundaryConditions:
+    @pytest.fixture
+    def prm(self):
+        return x3d.Parameters(nclx1=2, nclxn=2, numscalar=1)
+
+    def test_dataset_contains__bxphi1(self, prm):
+        prm.nclxS1 = 2
+        ds = x3d.init_dataset(prm)
+        assert "bxphi1" in ds.variables
+        assert ds["bxphi1"].dims == ("n", "y", "z")
+
+    def test_dataset_contains__byphi1(self, prm):
+        prm.nclyS1 = 2
+        ds = x3d.init_dataset(prm)
+        assert "byphi1" in ds.variables
+        assert ds["byphi1"].dims == ("n", "x", "z")
+
+    def test_dataset_contains__byphin(self, prm):
+        prm.nclySn = 2
+        ds = x3d.init_dataset(prm)
+        assert "byphin" in ds.variables
+        assert ds["byphin"].dims == ("n", "x", "z")
+
+
+class TestInitDatasetInitialConditions:
+    @pytest.fixture
+    def prm(self):
+        return x3d.Parameters(numscalar=1)
+
+    def test_dataset_contains__ux(self, prm):
+        ds = x3d.init_dataset(prm)
+        assert "ux" in ds.variables
+        assert ds["ux"].dims == ("x", "y", "z")
+
+    def test_dataset_contains__uy(self, prm):
+        ds = x3d.init_dataset(prm)
+        assert "uy" in ds.variables
+        assert ds["uy"].dims == ("x", "y", "z")
+
+    def test_dataset_contains__uz(self, prm):
+        ds = x3d.init_dataset(prm)
+        assert "uz" in ds.variables
+        assert ds["uz"].dims == ("x", "y", "z")
+
+    def test_dataset_contains__phi(self, prm):
+        ds = x3d.init_dataset(prm)
+        assert "phi" in ds.variables
+        assert ds["phi"].dims == ("n", "x", "y", "z")
+
+
+class TestInitDatasetFlowrateControl:
+    def test_dataset_contains__flowrate(self):
+        prm = x3d.Parameters(nclx1=0, nclxn=0)
+        ds = x3d.init_dataset(prm)
+        assert "vol_frc" in ds.variables
+        assert ds["vol_frc"].dims == ("x", "y", "z")
