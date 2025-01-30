@@ -102,8 +102,8 @@ class ParametersGui(Parameters):
                 ],
             ),
             "ilast": widgets.BoundedIntText(min=0, max=1e9),
-            "inflow_noise": widgets.FloatText(min=-1e9, max=1e9),
-            "init_noise": widgets.FloatText(min=-1e9, max=1e9),
+            "inflow_noise": widgets.BoundedFloatText(min=-1e9, max=1e9),
+            "init_noise": widgets.BoundedFloatText(min=-1e9, max=1e9),
             "istret": widgets.Dropdown(
                 options=[
                     ("No refinement", 0),
@@ -138,7 +138,7 @@ class ParametersGui(Parameters):
             "numscalar": widgets.IntSlider(min=0, max=9, continuous_update=False),
             "p_col": widgets.Dropdown(options=self._possible_p_col),
             "p_row": widgets.Dropdown(options=self._possible_p_row),
-            "re": widgets.FloatText(min=0.0, max=1e9),
+            "re": widgets.BoundedFloatText(min=0.0, max=1e9),
             #
             # # NumOptions
             #
@@ -211,7 +211,7 @@ class ParametersGui(Parameters):
         }
 
         for name in "gravx gravy gravz".split():
-            self._widgets[name] = widgets.FloatText(min=-1.0, max=1.0)
+            self._widgets[name] = widgets.BoundedFloatText(min=-1.0, max=1.0)
 
         for name in "nx ny nz".split():
             self._widgets[name] = widgets.Dropdown()
@@ -247,7 +247,7 @@ class ParametersGui(Parameters):
             # get description to include together with widgets
             description = self.trait_metadata(name, "desc")
             if description is not None:
-                self._widgets[name].description_tooltip = description
+                self._widgets[name].tooltip = description
 
         # Creating an arrange with all widgets
         dim = COORDS
