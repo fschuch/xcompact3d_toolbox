@@ -983,16 +983,16 @@ class Parameters(
                 # Check if param is a list or not
                 if isinstance(paramvalue, list):
                     for n, p in enumerate(paramvalue):
-                        string += f"{paramkey+'('+str(n+1)+')':>15} = {p:<15} {'! '+description}\n"
+                        string += f"{paramkey + '(' + str(n + 1) + ')':>15} = {p:<15} {'! ' + description}\n"
                 # Check if param is a string
                 elif isinstance(paramvalue, str):
                     new_paramvalue = "'" + paramvalue + "'"
-                    string += f"{paramkey:>15} = {new_paramvalue:<15} {'! '+description}\n"
+                    string += f"{paramkey:>15} = {new_paramvalue:<15} {'! ' + description}\n"
                 elif isinstance(paramvalue, bool):
                     new_paramvalue = ".true." if paramvalue else ".false."
-                    string += f"{paramkey:>15} = {new_paramvalue:<15} {'! '+description}\n"
+                    string += f"{paramkey:>15} = {new_paramvalue:<15} {'! ' + description}\n"
                 else:
-                    string += f"{paramkey:>15} = {paramvalue:<15} {'! '+description}\n"
+                    string += f"{paramkey:>15} = {paramvalue:<15} {'! ' + description}\n"
             string += "\n"
             string += "/End\n"
 
