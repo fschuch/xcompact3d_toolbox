@@ -4,7 +4,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 Release notes are automatically recovered from GitHub by [sphinx-github-changelog](https://github.com/ewjoachim/sphinx-github-changelog).
 
 ```{changelog}
-:changelog-url: https://docs.fschuch.com/xcompact3d_toolbox/changelog.html
+:changelog-url: https://docs.fschuch.com/xcompact3d_toolbox/references/what-is-new.html
 :github: https://github.com/fschuch/xcompact3d_toolbox/releases/
 :pypi: https://pypi.org/project/xcompact3d-toolbox/
 ```
