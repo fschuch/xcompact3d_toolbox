@@ -1,10 +1,10 @@
 # How to Contribute
 
-Thank you for your interest in contributing to the **Wizard Template** project! Contributions are welcome and greatly appreciated. This guide will help you get started.
+Thank you for your interest in contributing to the project! Contributions are welcome and greatly appreciated. This guide will help you get started.
 
 ## Reporting Issues
 
-If you encounter a bug or have a feature request, please open an issue on <https://github.com/fschuch/wizard-template/issues>. Provide as much detail as possible to help us address the issue.
+If you encounter a bug or have a feature request, please open an issue on <https://github.com/fschuch/xcompact3d_toolbox/issues>. Provide as much detail as possible to help us address the issue.
 
 ## Setting up the Project
 
@@ -29,8 +29,8 @@ hatch config set dirs.env.virtual .venv
 Fork the repository and clone it to your local machine:
 
 ```bash
-git clone https://github.com/<your-username>/wizard-template.git
-cd wizard-template
+git clone https://github.com/<your-username>/xcompact3d_toolbox.git
+cd xcompact3d_toolbox
 ```
 
 Run quality assurance checks to ensure you have green lights on your local copy:
@@ -61,13 +61,13 @@ Requests). You can do so by running `hatch run check <hook-id>`, for instance `h
 Some of them are available as scripts as a syntax sugar, like `hatch run lint`,
 `hatch run format`, or `hatch run type`. They check the whole codebase using ruff, ruff-format, and mypy, respectively.
 
-The file [project.toml](https://github.com/fschuch/wizard-template/blob/main/pyproject.toml) includes configuration for some of the tools, so they can be consumed by your IDE as well.
-The file [.pre-commit-config.yaml](https://github.com/fschuch/wizard-template/blob/main/.pre-commit-config.yaml) includes the configuration for the pre-commit hooks.
+The file [pyproject.toml](https://github.com/fschuch/xcompact3d_toolbox/blob/main/pyproject.toml) includes configuration for some of the tools, so they can be consumed by your IDE as well.
+The file [.pre-commit-config.yaml](https://github.com/fschuch/xcompact3d_toolbox/blob/main/.pre-commit-config.yaml) includes the configuration for the pre-commit hooks.
 
 The [pytest](https://docs.pytest.org/en/stable/index.html) test suite can be run from the default environment with `hatch run test`
 or `hatch run test-no-cov` (the latter without coverage check).
 
-Code examples on docstrings and documentation are tested by the `doctest` module (configured on the file [pyproject.toml](https://github.com/fschuch/wizard-template/blob/main/pyproject.toml)).
+Code examples on docstrings and documentation are tested by the `doctest` module (configured on the file [pyproject.toml](https://github.com/fschuch/xcompact3d_toolbox/blob/main/pyproject.toml)).
 It is integrated with pytest, so the previous test commands will also run the doctests.
 
 To run all the quality checks, you can use the command `hatch run qa`.
@@ -78,13 +78,13 @@ verify the package on different Python versions and under different conditions t
 - `pytest-randomly` that randomizes the test order;
 - `pytest-rerunfailures` that re-runs tests to eliminate intermittent failures;
 - `pytest-xdist` that parallelizes the test suite and reduce runtime, to help the previous points that increase the workload;
-- The file [pyproject.toml](https://github.com/fschuch/wizard-template/blob/main/pyproject.toml) includes configuration for them.
+- The file [pyproject.toml](https://github.com/fschuch/xcompact3d_toolbox/blob/main/pyproject.toml) includes configuration for them.
 
 ## Continuous Integration
 
-- The workflow [ci.yaml](https://github.com/fschuch/wizard-template/blob/main/.github/workflows/ci.yaml) performs the verifications on every push and pull request, and deploys the package if running from a valid tag.
-- The workflow [update-pre-commits.yaml](https://github.com/fschuch/wizard-template/blob/main/.github/workflows/update-pre-commits.yaml) is scheduled to run weekly to ensure the pre-commit hooks are up-to-date.
-- Dependabot is enabled to keep the dependencies up-to-date ([dependabot.yml](https://github.com/fschuch/wizard-template/blob/main/.github/dependabot.yml)).
+- The workflow [ci.yaml](https://github.com/fschuch/xcompact3d_toolbox/blob/main/.github/workflows/ci.yaml) performs the verifications on every push and pull request, and deploys the package if running from a valid tag.
+- The workflow [update-pre-commits.yaml](https://github.com/fschuch/xcompact3d_toolbox/blob/main/.github/workflows/update-pre-commits.yaml) is scheduled to run weekly to ensure the pre-commit hooks are up-to-date.
+- Dependabot is enabled to keep the dependencies up-to-date ([dependabot.yml](https://github.com/fschuch/xcompact3d_toolbox/blob/main/.github/dependabot.yml)).
 
 ## Development Workflow
 
@@ -159,7 +159,7 @@ To create a new release, follow these steps:
 
 - Ensure all pull requests for the release are labeled and merged.
 
-- Create a new release from GitHub: <https://github.com/fschuch/wizard-template/releases>
+- Create a new release from GitHub: <https://github.com/fschuch/xcompact3d_toolbox/releases>
 
   - Based on previous versions, choose the next version number according to the [EffVer](https://jacobtomlinson.dev/effver/) scheme. The tag matching pattern is set to `v*.*.*`, for instance, `v1.2.3`, , `v2.3.4a0`, , `v2.3.4b0`, `v2.3.4rc0`.
   - Choose to create a new tag on publish based on version from previous step.
@@ -192,7 +192,7 @@ to provide a promising approach for interactive tutorials.
 The documentation source is on the `docs` folder and can be
 served locally with `hatch run docs:serve`, it will be available on `http://127.0.0.1:8000`.
 The documentation is also built automatically on the deployment workflow
-[docs.yaml](https://github.com/fschuch/wizard-template/blob/main/.github/workflows/docs.yaml).
+[docs.yaml](https://github.com/fschuch/xcompact3d_toolbox/blob/main/.github/workflows/docs.yaml).
 
 Modules and functions docstrings are used to generate the documentation thanks to the [sphinx-autodoc](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html) and [sphinx-napoleon](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html) packages.
 
@@ -206,4 +206,4 @@ Useful references:
 
 ### VSCode Configuration
 
-The project includes a `.vscode` folder with a [extensions.json](https://github.com/fschuch/wizard-template/blob/main/.vscode/extensions.json) file that suggests the extensions to be installed on VSCode. It allows test, debug, auto-format, lint, and a few other functionalities to work directly on your IDE. It also includes a [settings.json](https://github.com/fschuch/wizard-template/blob/main/.vscode/settings.json) file that configures the Python extension to use the virtual environment created by Hatch. Remember to set hatch to use the virtual environment within the project folder `hatch config set dirs.env.virtual .venv`.
+The project includes a `.vscode` folder with a [extensions.json](https://github.com/fschuch/xcompact3d_toolbox/blob/main/.vscode/extensions.json) file that suggests the extensions to be installed on VSCode. It allows test, debug, auto-format, lint, and a few other functionalities to work directly on your IDE. It also includes a [settings.json](https://github.com/fschuch/xcompact3d_toolbox/blob/main/.vscode/settings.json) file that configures the Python extension to use the virtual environment created by Hatch. Remember to set hatch to use the virtual environment within the project folder `hatch config set dirs.env.virtual .venv`.
