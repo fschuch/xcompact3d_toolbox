@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import hypothesis
 import numpy as np
 import pytest
@@ -80,11 +82,46 @@ def test_point_is_inside_geometry(cube, x, y, z):
     assert x3d.sandbox._point_in_geometry(cube.vectors, x, y, z, 0.05) == inside_cube  # noqa: SLF001
 
 
-def test_geometry_from_stl(cube):
-    prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=2)
-    ds_stl = x3d.init_epsi(prm)["epsi"].geo.from_stl(stl_mesh=cube, user_tol=0.05)
-    ds_box = x3d.init_epsi(prm)["epsi"].geo.box(x=(-1.0, 1.0), y=(-1.0, 1.0), z=(-1.0, 1.0))
-    xr.testing.assert_equal(ds_stl, ds_box)
+class TestGeometryFromSTL:
+    def test_stl__from_stl_mesh(self, cube):
+        prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=2)
+        ds_stl = x3d.init_epsi(prm)["epsi"].geo.from_stl(stl_mesh=cube, user_tol=0.05)
+        ds_box = x3d.init_epsi(prm)["epsi"].geo.box(x=(-1.0, 1.0), y=(-1.0, 1.0), z=(-1.0, 1.0))
+        xr.testing.assert_equal(ds_stl, ds_box)
+
+    def test_stl__from_file(self, cube, tmp_path):
+        prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=2)
+        stl_file = tmp_path / "cube.stl"
+        cube.save(stl_file)
+        ds_stl = x3d.init_epsi(prm)["epsi"].geo.from_stl(
+            filename=stl_file,
+            user_tol=0.05,
+            origin={"x": -1.0, "y": -1.0, "z": -1.0},
+            scale=1.0,
+            rotate={"axis": "z", "theta": 0.0},
+        )
+        ds_box = x3d.init_epsi(prm)["epsi"].geo.box(x=(-1.0, 1.0), y=(-1.0, 1.0), z=(-1.0, 1.0))
+        xr.testing.assert_equal(ds_stl, ds_box)
+
+    def test_stl__no_mesh_provided(self):
+        prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=2)
+        with pytest.raises(ValueError, match="Please, specify filename or stl_mesh"):
+            x3d.init_epsi(prm)["epsi"].geo.from_stl()
+
+    def test_stl__is_not_invalid_mesh(self):
+        mesh = MagicMock(spec=stl.mesh.Mesh)
+        mesh.check.return_value = False
+        prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=2)
+        with pytest.raises(ValueError, match="stl_mesh is not valid"):
+            x3d.init_epsi(prm)["epsi"].geo.from_stl(stl_mesh=mesh)
+
+    def test_stl__is_not_closed(self):
+        mesh = MagicMock(spec=stl.mesh.Mesh)
+        mesh.check.return_value = True
+        mesh.is_closed.return_value = False
+        prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=2)
+        with pytest.raises(ValueError, match="stl_mesh is not closed"):
+            x3d.init_epsi(prm)["epsi"].geo.from_stl(stl_mesh=mesh)
 
 
 @pytest.mark.parametrize("var_name", ["bxx1", "bxy1", "bxz1", "noise_mod_x1"])

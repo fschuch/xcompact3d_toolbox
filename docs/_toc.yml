@@ -17,5 +17,6 @@ parts:
       - file: examples/Heat-exchanger.ipynb
   - caption: References
     chapters:
-      - file: Docstrings.rst
-      - file: changelog.md
+      - file: references/api-reference.rst
+      - file: references/how-to-contribute.md
+      - file: references/what-is-new.md
