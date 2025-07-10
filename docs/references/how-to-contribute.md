@@ -188,8 +188,7 @@ To create a new release, follow these steps:
 
 ## Documentation
 
-The project uses [Jupyter Books](https://jupyterbook.org/en/stable/intro.html)
-to provide a promising approach for interactive tutorials.
+The project uses Jupyter Books to provide a promising approach for interactive tutorials.
 The documentation source is on the `docs` folder and can be
 served locally with `hatch run docs:serve`, it will be available on `http://127.0.0.1:8000`.
 The documentation is also built automatically on the deployment workflow
@@ -199,7 +198,7 @@ Modules and functions docstrings are used to generate the documentation thanks t
 
 Useful references:
 
-- <https://jupyterbook.org/en/stable/intro.html>
+- <https://jupyterbook.org/en/stable/>
 - <https://sphinx-book-theme.readthedocs.io/en/stable/index.html>
 - <https://www.sphinx-doc.org/en/master/>
 
