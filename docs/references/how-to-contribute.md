@@ -83,7 +83,8 @@ verify the package on different Python versions and under different conditions t
 ## Continuous Integration
 
 - The workflow [ci.yaml](https://github.com/fschuch/xcompact3d_toolbox/blob/main/.github/workflows/ci.yaml) performs the verifications on every push and pull request, and deploys the package if running from a valid tag.
-- The workflow [update-pre-commits.yaml](https://github.com/fschuch/xcompact3d_toolbox/blob/main/.github/workflows/update-pre-commits.yaml) is scheduled to run weekly to ensure the pre-commit hooks are up-to-date.
+- [pre-commit.ci](https://pre-commit.ci/) is integrated on the repo to ensure the pre-commit hooks are checked and up-to-date.
+- [SonarCloud](https://sonarcloud.io/project/overview?id=fschuch_xcompact3d_toolbox) is used to analyze the code quality, code coverage, maintainability, and more.
 - Dependabot is enabled to keep the dependencies up-to-date ([dependabot.yml](https://github.com/fschuch/xcompact3d_toolbox/blob/main/.github/dependabot.yml)).
 
 ## Development Workflow
