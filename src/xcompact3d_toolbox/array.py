@@ -33,7 +33,7 @@ except ImportError:
     from scipy.integrate import simps as simpson  # no cov
 
 from xcompact3d_toolbox.derive import first_derivative, second_derivative
-from xcompact3d_toolbox.mesh import Istret, _stretching
+from xcompact3d_toolbox.mesh import Istret, Stretching
 from xcompact3d_toolbox.param import param
 
 
@@ -202,8 +202,8 @@ class X3dDataArray:
     def __init__(self, data_array):
         self._data_array = data_array
 
-        self._Dx = {}
-        self._Dxx = {}
+        self._dx = {}
+        self._dxx = {}
 
     @deprecated(
         version="1.2.0",
@@ -374,7 +374,7 @@ class X3dDataArray:
 
         """
 
-        if dim not in self._Dx:
+        if dim not in self._dx:
             try:
                 ncl1 = self._data_array.attrs["BC"][dim]["ncl1"]
                 ncln = self._data_array.attrs["BC"][dim]["ncln"]
@@ -385,7 +385,7 @@ class X3dDataArray:
             n = self._data_array[dim].size
             m = n if ncl1 == 0 and ncln == 0 else n - 1
             d = (self._data_array[dim][-1] - self._data_array[dim][0]).values / m
-            self._Dx[dim] = first_derivative(n, d, ncl1, ncln, npaire)
+            self._dx[dim] = first_derivative(n, d, ncl1, ncln, npaire)
 
         try:
             istret = self._data_array.attrs["BC"][dim]["istret"]
@@ -396,7 +396,7 @@ class X3dDataArray:
 
         if istret == Istret.NO_REFINEMENT:
             return xr.apply_ufunc(
-                lambda f: self._Dx[dim].dot(f),
+                lambda f: self._dx[dim].dot(f),
                 self._data_array,
                 input_core_dims=[[dim]],
                 output_core_dims=[[dim]],
@@ -406,13 +406,11 @@ class X3dDataArray:
             )
 
         yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
-
-        _, ppy, _, _ = _stretching(istret, beta, yly, m, n)
-
-        da_ppy = xr.DataArray(ppy, coords=[self._data_array[dim]], name="ppy")
+        stretching = Stretching(istret=istret, beta=beta, yly=float(yly), my=m, ny=n)
+        da_ppy = xr.DataArray(stretching.ppy, coords=[self._data_array[dim]], name="ppy")
 
         return da_ppy * xr.apply_ufunc(
-            lambda f: self._Dx[dim].dot(f),
+            lambda f: self._dx[dim].dot(f),
             self._data_array,
             input_core_dims=[[dim]],
             output_core_dims=[[dim]],
@@ -469,7 +467,7 @@ class X3dDataArray:
         >>> da.attrs["BC"] = prm.get_boundary_condition("ux")
         >>> da.x3d.second_derivative("x")
         """
-        if dim not in self._Dxx:
+        if dim not in self._dxx:
             try:
                 ncl1 = self._data_array.attrs["BC"][dim]["ncl1"]
                 ncln = self._data_array.attrs["BC"][dim]["ncln"]
@@ -480,7 +478,7 @@ class X3dDataArray:
             n = self._data_array[dim].size
             m = n if ncl1 == 0 and ncln == 0 else n - 1
             d = (self._data_array[dim][-1] - self._data_array[dim][0]).values / m
-            self._Dxx[dim] = second_derivative(n, d, ncl1, ncln, npaire)
+            self._dxx[dim] = second_derivative(n, d, ncl1, ncln, npaire)
 
         try:
             istret = self._data_array.attrs["BC"][dim]["istret"]
@@ -491,7 +489,7 @@ class X3dDataArray:
 
         if istret == Istret.NO_REFINEMENT:
             return xr.apply_ufunc(
-                lambda f: self._Dxx[dim].dot(f),
+                lambda f: self._dxx[dim].dot(f),
                 self._data_array,
                 input_core_dims=[[dim]],
                 output_core_dims=[[dim]],
@@ -501,14 +499,12 @@ class X3dDataArray:
             )
 
         yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
-
-        _, _, pp2y, pp4y = _stretching(istret, beta, yly, m, n)
-
-        da_pp2y = xr.DataArray(pp2y, coords=[self._data_array[dim]], name="pp2y")
-        da_pp4y = xr.DataArray(pp4y, coords=[self._data_array[dim]], name="pp4y")
+        stretching = Stretching(istret=istret, beta=beta, yly=float(yly), my=m, ny=n)
+        da_pp2y = xr.DataArray(stretching.pp2y, coords=[self._data_array[dim]], name="pp2y")
+        da_pp4y = xr.DataArray(stretching.pp4y, coords=[self._data_array[dim]], name="pp4y")
 
         return da_pp2y * xr.apply_ufunc(
-            lambda f: self._Dxx[dim].dot(f),
+            lambda f: self._dxx[dim].dot(f),
             self._data_array,
             input_core_dims=[[dim]],
             output_core_dims=[[dim]],
