@@ -33,7 +33,7 @@ except ImportError:
     from scipy.integrate import simps as simpson  # no cov
 
 from xcompact3d_toolbox.derive import first_derivative, second_derivative
-from xcompact3d_toolbox.mesh import Istret, _stretching
+from xcompact3d_toolbox.mesh import Istret, Stretching
 from xcompact3d_toolbox.param import param
 
 
@@ -406,10 +406,8 @@ class X3dDataArray:
             )
 
         yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
-
-        _, ppy, _, _ = _stretching(istret, beta, yly, m, n)
-
-        da_ppy = xr.DataArray(ppy, coords=[self._data_array[dim]], name="ppy")
+        stretching = Stretching(istret=istret, beta=beta, yly=float(yly), my=m, ny=n)
+        da_ppy = xr.DataArray(stretching.ppy, coords=[self._data_array[dim]], name="ppy")
 
         return da_ppy * xr.apply_ufunc(
             lambda f: self._Dx[dim].dot(f),
@@ -501,11 +499,9 @@ class X3dDataArray:
             )
 
         yly = (self._data_array[dim][-1] - self._data_array[dim][0]).values
-
-        _, _, pp2y, pp4y = _stretching(istret, beta, yly, m, n)
-
-        da_pp2y = xr.DataArray(pp2y, coords=[self._data_array[dim]], name="pp2y")
-        da_pp4y = xr.DataArray(pp4y, coords=[self._data_array[dim]], name="pp4y")
+        stretching = Stretching(istret=istret, beta=beta, yly=float(yly), my=m, ny=n)
+        da_pp2y = xr.DataArray(stretching.pp2y, coords=[self._data_array[dim]], name="pp2y")
+        da_pp4y = xr.DataArray(stretching.pp4y, coords=[self._data_array[dim]], name="pp4y")
 
         return da_pp2y * xr.apply_ufunc(
             lambda f: self._Dxx[dim].dot(f),

@@ -6,7 +6,7 @@ so they work together with all the other parameters. They are presented here for
 from __future__ import annotations
 
 from enum import IntEnum
-from functools import partial
+from functools import cached_property, partial
 from math import isclose
 
 import numpy as np
@@ -379,14 +379,9 @@ class StretchedCoordinate(Coordinate):
         """
         if self.istret == Istret.NO_REFINEMENT:
             return super().__array__()
-        return _stretching(
-            istret=self.istret,
-            beta=self.beta,
-            yly=self.length,
-            my=self._sub_grid_size,
-            ny=self.grid_size,
-            return_auxiliary_variables=False,
-        )
+        return Stretching(
+            istret=self.istret, beta=self.beta, yly=self.length, my=self._sub_grid_size, ny=self.grid_size
+        ).yp
 
     @traitlets.validate("istret")
     def _validate_istret(self, proposal):
@@ -423,8 +418,8 @@ class Mesh3D(traitlets.HasTraits):
     -----
         :obj:`mesh` is in fact an attribute of :obj:`xcompact3d_toolbox.parameters.ParametersExtras`,
         so there is no need to initialize it manually for most of the common use cases.
-        The features of each coordinate are copled by a two-way link with their corresponding
-        values at the Parameters class. For instance, the length of each of them is copled to
+        The features of each coordinate are coupled by a two-way link with their corresponding
+        values at the Parameters class. For instance, the length of each of them is coupled to
         :obj:`xlx`, :obj:`yly` and :obj:`zlz`, grid size to :obj:`nx`, :obj:`ny` and :obj:`nz`
         and so on.
 
@@ -615,145 +610,101 @@ _possible_size_periodic = _get_possible_grid_values(is_periodic=True)
 
 _possible_size_not_periodic = _get_possible_grid_values(is_periodic=False)
 
+close_enough = partial(isclose, abs_tol=1e-8, rel_tol=1e-8)
 
-def _stretching(istret, beta, yly, my, ny, *, return_auxiliary_variables=True):
-    close_enough = partial(isclose, abs_tol=1e-8, rel_tol=1e-8)
 
-    yp = np.zeros(ny, dtype=param["mytype"])
-    yeta = np.zeros_like(yp)
-    ypi = np.zeros_like(yp)
-    yetai = np.zeros_like(yp)
-    ppy = np.zeros_like(yp)
-    pp2y = np.zeros_like(yp)
-    pp4y = np.zeros_like(yp)
-    ppyi = np.zeros_like(yp)
-    pp2yi = np.zeros_like(yp)
-    pp4yi = np.zeros_like(yp)
-    #
-    yinf = -0.5 * yly
-    den = 2.0 * beta * yinf
-    xnum = -yinf - np.sqrt(np.pi * np.pi * beta * beta + yinf * yinf)
-    alpha = np.abs(xnum / den)
-    if not close_enough(alpha, 0.0):
-        if istret == Istret.CENTER_REFINEMENT:
-            yp[0] = 0.0
-        if istret == Istret.BOTH_SIDES_REFINEMENT:
-            yp[0] = 0.0
-        if istret == Istret.CENTER_REFINEMENT:
-            yeta[0] = 0.0
-        if istret == Istret.BOTH_SIDES_REFINEMENT:
-            yeta[0] = -0.5
-        if istret == Istret.BOTTOM_REFINEMENT:
-            yp[0] = 0.0
-        if istret == Istret.BOTTOM_REFINEMENT:
-            yeta[0] = -0.5
-        for j in range(1, ny):
-            if istret == Istret.CENTER_REFINEMENT:
-                yeta[j] = j / my
-            if istret == Istret.BOTH_SIDES_REFINEMENT:
-                yeta[j] = j / my - 0.5
-            if istret == Istret.BOTTOM_REFINEMENT:
-                yeta[j] = 0.5 * j / my - 0.5
-            den1 = np.sqrt(alpha * beta + 1.0)
-            xnum = den1 / np.sqrt(alpha / np.pi) / np.sqrt(beta) / np.sqrt(np.pi)
-            den = 2.0 * np.sqrt(alpha / np.pi) * np.sqrt(beta) * np.pi * np.sqrt(np.pi)
-            den3 = ((np.sin(np.pi * yeta[j])) * (np.sin(np.pi * yeta[j])) / beta / np.pi) + alpha / np.pi
-            den4 = 2.0 * alpha * beta - np.cos(2.0 * np.pi * yeta[j]) + 1.0
-            xnum1 = (np.arctan(xnum * np.tan(np.pi * yeta[j]))) * den4 / den1 / den3 / den
-            cst = np.sqrt(beta) * np.pi / (2.0 * np.sqrt(alpha) * np.sqrt(alpha * beta + 1.0))
-            if istret == Istret.CENTER_REFINEMENT:
-                if yeta[j] < 0.5:  # noqa: PLR2004
-                    yp[j] = xnum1 - cst - yinf
-                if close_enough(yeta[j], 0.5):
-                    yp[j] = -yinf
-                if yeta[j] > 0.5:  # noqa: PLR2004
-                    yp[j] = xnum1 + cst - yinf
-            elif istret == Istret.BOTH_SIDES_REFINEMENT:
-                if yeta[j] < 0.5:  # noqa: PLR2004
-                    yp[j] = xnum1 - cst + yly
-                if close_enough(yeta[j], 0.5):
-                    yp[j] = yly
-                if yeta[j] > 0.5:  # noqa: PLR2004
-                    yp[j] = xnum1 + cst + yly
-            elif istret == Istret.BOTTOM_REFINEMENT:
-                if yeta[j] < 0.5:  # noqa: PLR2004
-                    yp[j] = (xnum1 - cst + yly) * 2.0
-                if close_enough(yeta[j], 0.5):
-                    yp[j] = yly * 2.0
-                if yeta[j] > 0.5:  # noqa: PLR2004
-                    yp[j] = (xnum1 + cst + yly) * 2.0
-            else:
-                msg = "Unsupported: invalid value for istret"
-                raise NotImplementedError(msg)
-    if close_enough(alpha, 0.0):
-        yp[0] = -1.0e10
-        for j in range(1, ny):
-            yeta[j] = j / ny
-            yp[j] = -beta * np.cos(np.pi * yeta[j]) / np.sin(yeta[j] * np.pi)
+class Stretching(traitlets.HasTraits):
+    """A class to handle the stretching of the vertical coordinate."""
 
-    if not close_enough(alpha, 0.0):
-        for j in range(ny):
-            if istret == Istret.CENTER_REFINEMENT:
-                yetai[j] = (j + 0.5) * (1.0 / my)
-            if istret == Istret.BOTH_SIDES_REFINEMENT:
-                yetai[j] = (j + 0.5) * (1.0 / my) - 0.5
-            if istret == Istret.BOTTOM_REFINEMENT:
-                yetai[j] = (j + 0.5) * (0.5 / my) - 0.5
-            den1 = np.sqrt(alpha * beta + 1.0)
-            xnum = den1 / np.sqrt(alpha / np.pi) / np.sqrt(beta) / np.sqrt(np.pi)
-            den = 2.0 * np.sqrt(alpha / np.pi) * np.sqrt(beta) * np.pi * np.sqrt(np.pi)
-            den3 = ((np.sin(np.pi * yetai[j])) * (np.sin(np.pi * yetai[j])) / beta / np.pi) + alpha / np.pi
-            den4 = 2.0 * alpha * beta - np.cos(2.0 * np.pi * yetai[j]) + 1.0
-            xnum1 = (np.arctan(xnum * np.tan(np.pi * yetai[j]))) * den4 / den1 / den3 / den
-            cst = np.sqrt(beta) * np.pi / (2.0 * np.sqrt(alpha) * np.sqrt(alpha * beta + 1.0))
-            if istret == Istret.CENTER_REFINEMENT:
-                if yetai[j] < 0.5:  # noqa: PLR2004
-                    ypi[j] = xnum1 - cst - yinf
-                elif close_enough(yetai[j], 0.5):
-                    ypi[j] = 0.0 - yinf
-                elif yetai[j] > 0.5:  # noqa: PLR2004
-                    ypi[j] = xnum1 + cst - yinf
-            elif istret == Istret.BOTH_SIDES_REFINEMENT:
-                if yetai[j] < 0.5:  # noqa: PLR2004
-                    ypi[j] = xnum1 - cst + yly
-                elif close_enough(yetai[j], 0.5):
-                    ypi[j] = 0.0 + yly
-                elif yetai[j] > 0.5:  # noqa: PLR2004
-                    ypi[j] = xnum1 + cst + yly
-            elif istret == Istret.BOTTOM_REFINEMENT:
-                if yetai[j] < 0.5:  # noqa: PLR2004
-                    ypi[j] = (xnum1 - cst + yly) * 2.0
-                elif close_enough(yetai[j], 0.5):
-                    ypi[j] = (0.0 + yly) * 2.0
-                elif yetai[j] > 0.5:  # noqa: PLR2004
-                    ypi[j] = (xnum1 + cst + yly) * 2.0
+    istret = traitlets.UseEnum(Istret)
+    beta = traitlets.Float(min=0.0)
+    yly = traitlets.Float(min=0.0)
+    my = traitlets.Int(min=1)
+    ny = traitlets.Int(min=1)
 
-    if close_enough(alpha, 0.0):
-        ypi[0] = -1e10
-        for j in range(1, ny):
-            yetai[j] = j * (1.0 / ny)
-            ypi[j] = -beta * np.cos(np.pi * yetai[j]) / np.sin(yetai[j] * np.pi)
+    @cached_property
+    def yinf(self) -> float:
+        return -0.5 * self.yly
 
-    # Mapping!!, metric terms
-    if istret != Istret.BOTTOM_REFINEMENT:
-        for j in range(ny):
-            ppy[j] = yly * (alpha / np.pi + (1.0 / np.pi / beta) * np.sin(np.pi * yeta[j]) * np.sin(np.pi * yeta[j]))
-            pp2y[j] = ppy[j] * ppy[j]
-            pp4y[j] = -2.0 / beta * np.cos(np.pi * yeta[j]) * np.sin(np.pi * yeta[j])
-        for j in range(ny):
-            ppyi[j] = yly * (alpha / np.pi + (1.0 / np.pi / beta) * np.sin(np.pi * yetai[j]) * np.sin(np.pi * yetai[j]))
-            pp2yi[j] = ppyi[j] * ppyi[j]
-            pp4yi[j] = -2.0 / beta * np.cos(np.pi * yetai[j]) * np.sin(np.pi * yetai[j])
+    @cached_property
+    def den(self) -> float:
+        return 2.0 * self.beta * self.yinf
 
-    if istret == Istret.BOTTOM_REFINEMENT:
-        for j in range(ny):
-            ppy[j] = yly * (alpha / np.pi + (1.0 / np.pi / beta) * np.sin(np.pi * yeta[j]) * np.sin(np.pi * yeta[j]))
-            pp2y[j] = ppy[j] * ppy[j]
-            pp4y[j] = (-2.0 / beta * np.cos(np.pi * yeta[j]) * np.sin(np.pi * yeta[j])) / 2.0
-        for j in range(ny):
-            ppyi[j] = yly * (alpha / np.pi + (1.0 / np.pi / beta) * np.sin(np.pi * yetai[j]) * np.sin(np.pi * yetai[j]))
-            pp2yi[j] = ppyi[j] * ppyi[j]
-            pp4yi[j] = (-2.0 / beta * np.cos(np.pi * yetai[j]) * np.sin(np.pi * yetai[j])) / 2.0
-    if return_auxiliary_variables:
-        return yp, ppy, pp2y, pp4y
-    return yp
+    @cached_property
+    def xnum(self) -> float:
+        return -self.yinf - np.sqrt(np.pi * np.pi * self.beta * self.beta + self.yinf * self.yinf)
+
+    @cached_property
+    def alpha(self) -> float:
+        return np.abs(self.xnum / self.den)
+
+    @cached_property
+    def yeta(self) -> np.ndarray:
+        j = np.arange(self.ny, dtype=param["mytype"])
+        if close_enough(self.alpha, 0.0):
+            return j / self.ny
+        result = j / self.my
+        if self.istret == Istret.BOTH_SIDES_REFINEMENT:
+            result -= 0.5
+        elif self.istret == Istret.BOTTOM_REFINEMENT:
+            result = 0.5 * result - 0.5
+        return result
+
+    @cached_property
+    def yp(self) -> np.ndarray:
+        result = np.zeros(self.ny, dtype=param["mytype"])
+
+        if close_enough(self.alpha, 0.0):
+            result[0] = -1.0e10
+            result[1:] = -self.beta * np.cos(np.pi * self.yeta[1:]) / np.sin(self.yeta[1:] * np.pi)
+            return result
+
+        den1: float = np.sqrt(self.alpha * self.beta + 1.0)
+        xnum: float = den1 / np.sqrt(self.alpha / np.pi) / np.sqrt(self.beta) / np.sqrt(np.pi)
+        den: float = 2.0 * np.sqrt(self.alpha / np.pi) * np.sqrt(self.beta) * np.pi * np.sqrt(np.pi)
+        den3: np.ndarray = (
+            (np.sin(np.pi * self.yeta)) * (np.sin(np.pi * self.yeta)) / self.beta / np.pi
+        ) + self.alpha / np.pi
+        den4: np.ndarray = 2.0 * self.alpha * self.beta - np.cos(2.0 * np.pi * self.yeta) + 1.0
+        xnum1: np.ndarray = (np.arctan(xnum * np.tan(np.pi * self.yeta))) * den4 / den1 / den3 / den
+        cst: float = np.sqrt(self.beta) * np.pi / (2.0 * np.sqrt(self.alpha) * np.sqrt(self.alpha * self.beta + 1.0))
+
+        threshold = 0.5
+        mask_lower = self.yeta < threshold
+        mask_middle = self.yeta == threshold
+        mask_upper = self.yeta > threshold
+
+        if self.istret == Istret.CENTER_REFINEMENT:
+            result[mask_lower] = xnum1[mask_lower] - cst - self.yinf
+            result[mask_middle] = -self.yinf
+            result[mask_upper] = xnum1[mask_upper] + cst - self.yinf
+        elif self.istret == Istret.BOTH_SIDES_REFINEMENT:
+            result[mask_lower] = xnum1[mask_lower] - cst + self.yly
+            result[mask_middle] = self.yly
+            result[mask_upper] = xnum1[mask_upper] + cst + self.yly
+        elif self.istret == Istret.BOTTOM_REFINEMENT:
+            result[mask_lower] = (xnum1[mask_lower] - cst + self.yly) * 2.0
+            result[mask_middle] = self.yly * 2.0
+            result[mask_upper] = (xnum1[mask_upper] + cst + self.yly) * 2.0
+        else:
+            msg = "Unsupported: invalid value for istret"
+            raise NotImplementedError(msg)
+
+        return result
+
+    @cached_property
+    def ppy(self) -> np.ndarray:
+        return self.yly * (
+            self.alpha / np.pi + (1.0 / np.pi / self.beta) * np.sin(np.pi * self.yeta) * np.sin(np.pi * self.yeta)
+        )
+
+    @cached_property
+    def pp2y(self) -> np.ndarray:
+        return self.ppy**2.0
+
+    @cached_property
+    def pp4y(self) -> np.ndarray:
+        result = -2.0 / self.beta * np.cos(np.pi * self.yeta) * np.sin(np.pi * self.yeta)
+        if self.istret == Istret.BOTTOM_REFINEMENT:
+            result *= 0.5
+        return result
