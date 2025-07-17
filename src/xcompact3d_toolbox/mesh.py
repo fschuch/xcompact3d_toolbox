@@ -671,8 +671,8 @@ class Stretching(traitlets.HasTraits):
 
         threshold = 0.5
         mask_lower = self.yeta < threshold
-        mask_middle = self.yeta == threshold
         mask_upper = self.yeta > threshold
+        mask_middle = ~(mask_lower | mask_upper)
 
         if self.istret == Istret.CENTER_REFINEMENT:
             result[mask_lower] = xnum1[mask_lower] - cst - self.yinf
