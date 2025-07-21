@@ -60,7 +60,7 @@ tests-extra = [
 ]
 docs = [
     "docutils==0.21.2",
-    "ipykernel==6.29.5",
+    "ipykernel==6.30.0",
     "jupyter-book==1.0.4.post1",
     "nbsphinx==0.9.7",
     "pooch==1.8.2",
