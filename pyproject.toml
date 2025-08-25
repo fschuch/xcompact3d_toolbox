@@ -59,8 +59,8 @@ tests-extra = [
     "pytest-xdist==3.8.0",
 ]
 docs = [
-    "docutils==0.21.2",
-    "ipykernel==6.29.5",
+    "docutils==0.22",
+    "ipykernel==6.30.1",
     "jupyter-book==1.0.4.post1",
     "nbsphinx==0.9.7",
     "pooch==1.8.2",
