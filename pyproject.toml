@@ -54,14 +54,14 @@ tests = [
     "pytest>=8.2.2",
 ]
 tests-extra = [
-    "pytest-randomly==3.16.0",
-    "pytest-rerunfailures==15.1",
+    "pytest-randomly==4.0.1",
+    "pytest-rerunfailures==16.0.1",
     "pytest-xdist==3.8.0",
 ]
 docs = [
-    "docutils==0.21.2",
-    "ipykernel==6.29.5",
-    "jupyter-book==1.0.4.post1",
+    "docutils==0.22.3",
+    "ipykernel==6.31.0",
+    "jupyter-book==2.0.2",
     "nbsphinx==0.9.7",
     "pooch==1.8.2",
     "sphinx-autobuild==2024.10.3",
