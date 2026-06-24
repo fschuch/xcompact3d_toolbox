@@ -247,7 +247,7 @@ def gene_epsi_3d(epsi_in_dict, prm):
 
     ds = epsi.to_dataset(name="epsi")
 
-    for direction, ep in zip(["x", "y", "z"], [xepsi, yepsi, zepsi], strict=False):
+    for direction, ep in zip(["x", "y", "z"], [xepsi, yepsi, zepsi], strict=True):
         ds[f"nobj_{direction}"] = obj_count(epsi, direction)
         ds[f"nobjmax_{direction}"] = ds[f"nobj_{direction}"].max()
         ds[f"nobjraf_{direction}"] = obj_count(ep, direction)
@@ -267,7 +267,7 @@ def gene_epsi_3d(epsi_in_dict, prm):
     max_obj = np.max([ds.nobjmax_x.values, ds.nobjmax_y.values, ds.nobjmax_z.values])
     ds = ds.assign_coords(obj=range(max_obj), obj_aux=range(-1, max_obj))
 
-    for direction, ep, length in zip(["x", "y", "z"], [xepsi, yepsi, zepsi], [prm.xlx, prm.yly, prm.zlz], strict=False):
+    for direction, ep, length in zip(["x", "y", "z"], [xepsi, yepsi, zepsi], [prm.xlx, prm.yly, prm.zlz], strict=True):
         ds[f"xi_{direction}"], ds[f"xf_{direction}"] = get_boundaries(ep, direction, max_obj, length)
 
         if ds[f"ibug_{direction}"] != 0:
@@ -302,14 +302,14 @@ def write_geomcomplex(prm, ds) -> None:
         _array1 = transpose_n_flatten(array1)
         _array2 = transpose_n_flatten(array2)
         with open(os.path.join(data_path, f"n{dim}ifpif.dat"), "w", newline="\n") as file:
-            for value1, value2 in zip(_array1, _array2, strict=False):
+            for value1, value2 in zip(_array1, _array2, strict=True):
                 file.write(f"{value1:12d}{value2:12d}\n")
 
     def write_xixf(array1, array2, dim) -> None:
         _array1 = transpose_n_flatten(array1)
         _array2 = transpose_n_flatten(array2)
         with open(os.path.join(data_path, f"{dim}i{dim}f.dat"), "w", newline="\n") as file:
-            for value1, value2 in zip(_array1, _array2, strict=False):
+            for value1, value2 in zip(_array1, _array2, strict=True):
                 file.write(f"{value1:24.16E}{value2:24.16E}\n")
 
     def transpose_n_flatten(array):
