@@ -24,12 +24,6 @@ any new flow configuration without worrying about Fortran and 2decomp_. For
 developers, it works as a rapid prototyping tool, to test concepts and then
 compare results to validate any future Fortran implementations.
 
-**Useful links**
-
-* `View on GitHub`_;
-* `Suggestions for new features and bug report`_;
-* `See what is coming next (Project page)`_.
-
 Getting Started
 ===============
 
@@ -128,10 +122,6 @@ Examples
    prm
 
 .. image:: https://www.fschuch.com/en/slides/2021-x3d-dev-meeting/Output.gif
-
-.. _`View on GitHub`: https://github.com/fschuch/xcompact3d_toolbox
-.. _`Suggestions for new features and bug report`: https://github.com/fschuch/xcompact3d_toolbox/issues
-.. _`See what is coming next (Project page)`: https://github.com/fschuch/xcompact3d_toolbox/projects/1
 
 .. _2decomp: http://www.2decomp.org/
 .. _dask: https://dask.org/
