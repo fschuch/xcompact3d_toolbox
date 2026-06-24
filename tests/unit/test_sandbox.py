@@ -125,11 +125,13 @@ class TestGeometryFromSTL:
 @pytest.mark.parametrize("var_name", ["bxx1", "bxy1", "bxz1", "noise_mod_x1"])
 class TestInitDatasetInflowBoundaryCondition:
     @pytest.fixture(scope="class")
-    def prm(self):
+    @classmethod
+    def prm(cls):
         return x3d.Parameters(nclx1=2, nclxn=2)
 
     @pytest.fixture(scope="class")
-    def dataset(self, prm):
+    @classmethod
+    def dataset(cls, prm):
         return x3d.init_dataset(prm)
 
     def test_dataset_contains_variable(self, var_name, dataset):
