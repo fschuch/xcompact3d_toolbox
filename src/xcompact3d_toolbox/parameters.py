@@ -17,7 +17,7 @@ from loguru import logger
 
 from xcompact3d_toolbox.io import Dataset, i3d_to_dict, prm_to_dict
 from xcompact3d_toolbox.mesh import Istret, Mesh3D
-from xcompact3d_toolbox.param import COORDS, boundary_condition, param
+from xcompact3d_toolbox.param import COORDS, ENCODING, boundary_condition, param
 
 
 class ParametersBasicParam(traitlets.HasTraits):
@@ -1013,9 +1013,7 @@ class Parameters(
         "nclzSn",
     )
     def _observe_bc(self, change):
-        #
         dim = change["name"][3]  # It will be x, y or z
-        #
         if change["new"] == 0:
             for boundary_condition in f"ncl{dim}1 ncl{dim}n ncl{dim}S1 ncl{dim}Sn".split():
                 setattr(self, boundary_condition, 0)
@@ -1070,7 +1068,7 @@ class Parameters(
         # Restart Size from tools.f90
         count = 3 + self.numscalar  # ux, uy, uz, phi
         # Previous time-step if necessary
-        if self.itimescheme in [3, 7]:
+        if self.itimescheme in {3, 7}:
             count *= 3
         elif self.itimescheme == 2:  # noqa: PLR2004
             count *= 2
@@ -1188,14 +1186,11 @@ class Parameters(
         KeyError
             Exception is raised when an attributes is invalid.
         """
-
-        dictionary = {}
-
-        # unpacking the nested dictionary
-        for value_out in i3d_to_dict(string=string).values():
-            for key_in, value_in in value_out.items():
-                dictionary[key_in] = value_in
-
+        dictionary = {
+            key_in: value_in
+            for value_out in i3d_to_dict(string=string).values()
+            for key_in, value_in in value_out.items()
+        }
         self.set(raise_warning=raise_warning, **dictionary)
 
     def from_file(self, filename: str | None = None, *, raise_warning: bool = False) -> None:
@@ -1240,12 +1235,11 @@ class Parameters(
         if filename is None:
             filename = self.filename
         if self.filename.split(".")[-1] == "i3d":
-            dictionary = {}
-
-            # unpacking the nested dictionary
-            for value_out in i3d_to_dict(self.filename).values():
-                for key_in, value_in in value_out.items():
-                    dictionary[key_in] = value_in
+            dictionary = {
+                key_in: value_in
+                for value_out in i3d_to_dict(self.filename).values()
+                for key_in, value_in in value_out.items()
+            }
 
         elif self.filename.split(".")[-1] == "prm":
             dictionary = prm_to_dict(self.filename)
@@ -1292,8 +1286,8 @@ class Parameters(
         if filename is None:
             filename = self.filename
         if filename.split(".")[-1] == "i3d":
-            with open(filename, "w", encoding="utf-8") as file:
-                file.write(self.__str__())
+            with open(filename, mode="w", encoding=ENCODING) as file:
+                file.write(str(self))
         else:
             msg = "Format error, only .i3d is supported"
             raise OSError(msg)

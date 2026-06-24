@@ -23,6 +23,8 @@ import numpy as np
 import xarray as xr
 from loguru import logger
 
+from xcompact3d_toolbox.param import ENCODING
+
 
 def gene_epsi_3d(epsi_in_dict, prm):
     """This function generates all the Auxiliary files necessary for our
@@ -294,21 +296,21 @@ def gene_epsi_3d(epsi_in_dict, prm):
 
 def write_geomcomplex(prm, ds) -> None:
     def write_nobj(array, dim) -> None:
-        with open(os.path.join(data_path, f"nobj{dim}.dat"), "w", newline="\n") as file:
+        with open(os.path.join(data_path, f"nobj{dim}.dat"), "w", newline="\n", encoding=ENCODING) as file:
             for value in transpose_n_flatten(array):
                 file.write(f"{value:12d}\n")
 
     def write_nxipif(array1, array2, dim) -> None:
         _array1 = transpose_n_flatten(array1)
         _array2 = transpose_n_flatten(array2)
-        with open(os.path.join(data_path, f"n{dim}ifpif.dat"), "w", newline="\n") as file:
+        with open(os.path.join(data_path, f"n{dim}ifpif.dat"), "w", newline="\n", encoding=ENCODING) as file:
             for value1, value2 in zip(_array1, _array2, strict=True):
                 file.write(f"{value1:12d}{value2:12d}\n")
 
     def write_xixf(array1, array2, dim) -> None:
         _array1 = transpose_n_flatten(array1)
         _array2 = transpose_n_flatten(array2)
-        with open(os.path.join(data_path, f"{dim}i{dim}f.dat"), "w", newline="\n") as file:
+        with open(os.path.join(data_path, f"{dim}i{dim}f.dat"), "w", newline="\n", encoding=ENCODING) as file:
             for value1, value2 in zip(_array1, _array2, strict=True):
                 file.write(f"{value1:24.16E}{value2:24.16E}\n")
 

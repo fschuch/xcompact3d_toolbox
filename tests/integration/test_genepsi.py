@@ -19,7 +19,7 @@ def set_up(tmp_path_factory):
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="Work in progress to make it platform independent")
-@pytest.mark.parametrize("file_ref", pathlib.Path("tests", "integration", "data", "geometry").glob("*.dat"))
+@pytest.mark.parametrize("file_ref", list(pathlib.Path("tests", "integration", "data", "geometry").glob("*.dat")))
 def test_dat_files(file_ref, set_up):
     file = set_up / "geometry" / file_ref.name
 

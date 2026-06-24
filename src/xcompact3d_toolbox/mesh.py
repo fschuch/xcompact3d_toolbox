@@ -98,7 +98,7 @@ class Coordinate(traitlets.HasTraits):
         self._possible_grid_size = _possible_size_not_periodic
         self.set(**kwargs)
 
-    def __array__(self) -> np.ndarray:
+    def __array__(self) -> np.ndarray:  # noqa: PLW3201
         """This method makes the coordinate automatically work as a numpy
         like array in any function from numpy.
 
@@ -355,7 +355,7 @@ class StretchedCoordinate(Coordinate):
             f"is_periodic = {self.is_periodic}, istret = {self.istret}, beta = {self.beta})"
         )
 
-    def __array__(self):
+    def __array__(self) -> np.ndarray:  # noqa: PLW3201
         """This method makes the coordinate automatically work as a numpy
         like array in any function from numpy.
 
@@ -502,9 +502,9 @@ class Mesh3D(traitlets.HasTraits):
         ...     z=dict(length=1.0, grid_size=16, is_periodic=True),
         ... )
         """
-        for key in kwargs:
+        for key, value in kwargs.items():
             if key in self.trait_names():
-                getattr(self, key).set(**kwargs.get(key))
+                getattr(self, key).set(**value)
             else:
                 msg = f"{key} is not a valid coordinate for Mesh3D"
                 raise KeyError(msg)

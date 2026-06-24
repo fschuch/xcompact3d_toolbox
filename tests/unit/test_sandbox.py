@@ -30,22 +30,20 @@ def cube():
         ],
     )
     # Define the 12 triangles composing the cube
-    faces = np.array(
-        [
-            [0, 3, 1],
-            [1, 3, 2],
-            [0, 4, 7],
-            [0, 7, 3],
-            [4, 5, 6],
-            [4, 6, 7],
-            [5, 1, 2],
-            [5, 2, 6],
-            [2, 3, 6],
-            [3, 7, 6],
-            [0, 1, 5],
-            [0, 5, 4],
-        ]
-    )
+    faces = np.array([
+        [0, 3, 1],
+        [1, 3, 2],
+        [0, 4, 7],
+        [0, 7, 3],
+        [4, 5, 6],
+        [4, 6, 7],
+        [5, 1, 2],
+        [5, 2, 6],
+        [2, 3, 6],
+        [3, 7, 6],
+        [0, 1, 5],
+        [0, 5, 4],
+    ])
 
     # Create the mesh
     cube = stl.mesh.Mesh(np.zeros(faces.shape[0], dtype=stl.mesh.Mesh.dtype))
@@ -127,11 +125,13 @@ class TestGeometryFromSTL:
 @pytest.mark.parametrize("var_name", ["bxx1", "bxy1", "bxz1", "noise_mod_x1"])
 class TestInitDatasetInflowBoundaryCondition:
     @pytest.fixture(scope="class")
-    def prm(self):
+    @classmethod
+    def prm(cls):
         return x3d.Parameters(nclx1=2, nclxn=2)
 
     @pytest.fixture(scope="class")
-    def dataset(self, prm):
+    @classmethod
+    def dataset(cls, prm):
         return x3d.init_dataset(prm)
 
     def test_dataset_contains_variable(self, var_name, dataset):

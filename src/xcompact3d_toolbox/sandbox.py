@@ -18,7 +18,9 @@ For more details, see:
 
 from __future__ import annotations
 
+import math
 import os.path
+from os import makedirs
 from typing import TYPE_CHECKING
 
 import numba
@@ -100,8 +102,6 @@ def init_epsi(prm: Parameters, *, dask: bool = False) -> dict[str, xr.DataArray]
 
     if prm.iibm == 0:
         return epsi
-
-    from os import makedirs
 
     makedirs(os.path.join(prm.dataset.data_path, "geometry"), exist_ok=True)
 
@@ -190,9 +190,6 @@ def init_dataset(prm: Parameters) -> xr.Dataset:
     >>> prm.dataset.write(dataset)  # write the files to the disc
 
     """
-
-    from os import makedirs
-
     makedirs(prm.dataset.data_path, exist_ok=True)
 
     # Init dataset
@@ -426,13 +423,11 @@ class Geometry:
             if origin is None:
                 origin = {}
 
-            stl_mesh.translate(
-                [
-                    origin.get("x", 0.0) - stl_mesh.x.min(),
-                    origin.get("y", 0.0) - stl_mesh.y.min(),
-                    origin.get("z", 0.0) - stl_mesh.z.min(),
-                ]
-            )
+            stl_mesh.translate([
+                origin.get("x", 0.0) - stl_mesh.x.min(),
+                origin.get("y", 0.0) - stl_mesh.y.min(),
+                origin.get("z", 0.0) - stl_mesh.z.min(),
+            ])
 
         if stl_mesh is None:
             msg = "Please, specify filename or stl_mesh"
@@ -514,7 +509,7 @@ class Geometry:
         for d in self._data_array.dims:
             if d == axis:
                 continue
-            dis = dis + (self._data_array[d] - kwargs.get(d, 0.0)) ** 2.0
+            dis = dis + (self._data_array[d] - kwargs.get(d, 0.0)) ** 2.0  # noqa non-augmented-assignment
         dis = np.sqrt(dis)
 
         if height is not None:
@@ -619,7 +614,6 @@ class Geometry:
             "z": (center["z"] - 0.5 * length, center["z"] + 0.5 * length),
         }
         tmp = self._data_array.geo.box(**boundaries1, remp=True)
-        #
         length -= 2 * thickness
         boundaries2 = {
             "x": (center["x"] - 0.5 * thickness, center["x"] + 0.5 * thickness),
@@ -627,7 +621,6 @@ class Geometry:
             "z": (center["z"] - 0.5 * length, center["z"] + 0.5 * length),
         }
         tmp = tmp.geo.box(**boundaries2, remp=False)
-        #
         return self._data_array.where(tmp, remp)
 
     def sphere(self, *, radius: float = 0.5, remp: bool = True, **kwargs) -> xr.DataArray:
@@ -670,7 +663,7 @@ class Geometry:
 
         dis = 0.0
         for d in self._data_array.dims:
-            dis = dis + (self._data_array[d] - kwargs.get(d, 0.0)) ** 2.0
+            dis = dis + (self._data_array[d] - kwargs.get(d, 0.0)) ** 2.0  # noqa non-augmented-assignment
         dis = np.sqrt(dis)
 
         return self._data_array.where(dis > radius, remp)
@@ -717,10 +710,7 @@ class Geometry:
         .. versionchanged:: 1.2.0
             All arguments changed to keyword-only.
         """
-
-        import math
-
-        s = scale / 288.0  # adimensional and scale factor
+        s = scale / 288.0  # dimensionless and scale factor
 
         for key in kwargs:
             if key not in self._data_array.dims:

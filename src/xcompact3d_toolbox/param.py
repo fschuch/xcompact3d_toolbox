@@ -4,6 +4,7 @@ param = {"mytype": float64}
 
 
 COORDS = ["x", "y", "z"]
+ENCODING = "utf-8"
 
 
 def boundary_condition(prm, var=None):
