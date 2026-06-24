@@ -1013,9 +1013,7 @@ class Parameters(
         "nclzSn",
     )
     def _observe_bc(self, change):
-        #
         dim = change["name"][3]  # It will be x, y or z
-        #
         if change["new"] == 0:
             for boundary_condition in f"ncl{dim}1 ncl{dim}n ncl{dim}S1 ncl{dim}Sn".split():
                 setattr(self, boundary_condition, 0)
@@ -1188,14 +1186,11 @@ class Parameters(
         KeyError
             Exception is raised when an attributes is invalid.
         """
-
-        dictionary = {}
-
-        # unpacking the nested dictionary
-        for value_out in i3d_to_dict(string=string).values():
-            for key_in, value_in in value_out.items():
-                dictionary[key_in] = value_in
-
+        dictionary = {
+            key_in: value_in
+            for value_out in i3d_to_dict(string=string).values()
+            for key_in, value_in in value_out.items()
+        }
         self.set(raise_warning=raise_warning, **dictionary)
 
     def from_file(self, filename: str | None = None, *, raise_warning: bool = False) -> None:
@@ -1240,12 +1235,11 @@ class Parameters(
         if filename is None:
             filename = self.filename
         if self.filename.split(".")[-1] == "i3d":
-            dictionary = {}
-
-            # unpacking the nested dictionary
-            for value_out in i3d_to_dict(self.filename).values():
-                for key_in, value_in in value_out.items():
-                    dictionary[key_in] = value_in
+            dictionary = {
+                key_in: value_in
+                for value_out in i3d_to_dict(self.filename).values()
+                for key_in, value_in in value_out.items()
+            }
 
         elif self.filename.split(".")[-1] == "prm":
             dictionary = prm_to_dict(self.filename)
