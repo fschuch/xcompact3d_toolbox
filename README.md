@@ -187,4 +187,5 @@ Now, any change you make at the source code will be available at your local inst
 ## Copyright and License
 
 © 2020 [Felipe N. Schuch](https://github.com/fschuch).
-All content is under [GPL-3.0 License](https://github.com/fschuch/xcompact3d_toolbox/blob/master/LICENSE).
+All content is under [MIT License](https://github.com/fschuch/xcompact3d_toolbox/blob/master/LICENSE).
+This project was previously distributed under the GPL-3.0 License and has since been relicensed under the MIT License.
