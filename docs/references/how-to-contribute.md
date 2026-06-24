@@ -15,7 +15,7 @@ and deploys the project to [PyPI](https://pypi.org).
 See [Why Hatch?](https://hatch.pypa.io/latest/why/) for more details.
 Refer to [Install Hatch](https://hatch.pypa.io/latest/install/) for instructions on how to install it on your operating system.
 
-Ensure you have Python 3.9 or later installed (this can also be done by hatch, take a look at `hatch python --help`).
+Ensure you have Python 3.10 or later installed (this can also be done by hatch, take a look at `hatch python --help`).
 
 ````{tip}
 Optionally, configure Hatch to keep virtual environments within the project folder:
