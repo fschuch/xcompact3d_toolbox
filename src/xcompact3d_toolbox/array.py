@@ -374,6 +374,10 @@ class X3dDataArray:
 
         """
 
+        def first_derivative_func(f):
+            """Compute first derivative with the 4th order accurate centered scheme."""
+            return self._dx[dim].dot(f)
+
         if dim not in self._dx:
             try:
                 ncl1 = self._data_array.attrs["BC"][dim]["ncl1"]
@@ -396,7 +400,7 @@ class X3dDataArray:
 
         if istret == Istret.NO_REFINEMENT:
             return xr.apply_ufunc(
-                lambda f: self._dx[dim].dot(f),
+                first_derivative_func,
                 self._data_array,
                 input_core_dims=[[dim]],
                 output_core_dims=[[dim]],
@@ -410,7 +414,7 @@ class X3dDataArray:
         da_ppy = xr.DataArray(stretching.ppy, coords=[self._data_array[dim]], name="ppy")
 
         return da_ppy * xr.apply_ufunc(
-            lambda f: self._dx[dim].dot(f),
+            first_derivative_func,
             self._data_array,
             input_core_dims=[[dim]],
             output_core_dims=[[dim]],
@@ -467,6 +471,11 @@ class X3dDataArray:
         >>> da.attrs["BC"] = prm.get_boundary_condition("ux")
         >>> da.x3d.second_derivative("x")
         """
+
+        def second_derivative_func(f):
+            """Compute second derivative with the 4th order accurate centered scheme."""
+            return self._dxx[dim].dot(f)
+
         if dim not in self._dxx:
             try:
                 ncl1 = self._data_array.attrs["BC"][dim]["ncl1"]
@@ -489,7 +498,7 @@ class X3dDataArray:
 
         if istret == Istret.NO_REFINEMENT:
             return xr.apply_ufunc(
-                lambda f: self._dxx[dim].dot(f),
+                second_derivative_func,
                 self._data_array,
                 input_core_dims=[[dim]],
                 output_core_dims=[[dim]],
@@ -504,7 +513,7 @@ class X3dDataArray:
         da_pp4y = xr.DataArray(stretching.pp4y, coords=[self._data_array[dim]], name="pp4y")
 
         return da_pp2y * xr.apply_ufunc(
-            lambda f: self._dxx[dim].dot(f),
+            second_derivative_func,
             self._data_array,
             input_core_dims=[[dim]],
             output_core_dims=[[dim]],

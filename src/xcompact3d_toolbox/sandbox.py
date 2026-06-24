@@ -423,13 +423,11 @@ class Geometry:
             if origin is None:
                 origin = {}
 
-            stl_mesh.translate(
-                [
-                    origin.get("x", 0.0) - stl_mesh.x.min(),
-                    origin.get("y", 0.0) - stl_mesh.y.min(),
-                    origin.get("z", 0.0) - stl_mesh.z.min(),
-                ]
-            )
+            stl_mesh.translate([
+                origin.get("x", 0.0) - stl_mesh.x.min(),
+                origin.get("y", 0.0) - stl_mesh.y.min(),
+                origin.get("z", 0.0) - stl_mesh.z.min(),
+            ])
 
         if stl_mesh is None:
             msg = "Please, specify filename or stl_mesh"
@@ -511,7 +509,7 @@ class Geometry:
         for d in self._data_array.dims:
             if d == axis:
                 continue
-            dis = dis + (self._data_array[d] - kwargs.get(d, 0.0)) ** 2.0
+            dis = dis + (self._data_array[d] - kwargs.get(d, 0.0)) ** 2.0  # noqa non-augmented-assignment
         dis = np.sqrt(dis)
 
         if height is not None:
@@ -665,7 +663,7 @@ class Geometry:
 
         dis = 0.0
         for d in self._data_array.dims:
-            dis = dis + (self._data_array[d] - kwargs.get(d, 0.0)) ** 2.0
+            dis = dis + (self._data_array[d] - kwargs.get(d, 0.0)) ** 2.0  # noqa non-augmented-assignment
         dis = np.sqrt(dis)
 
         return self._data_array.where(dis > radius, remp)

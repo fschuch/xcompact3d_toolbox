@@ -19,7 +19,7 @@ import xarray as xr
 from tqdm.auto import tqdm
 
 from xcompact3d_toolbox.mesh import Istret, Mesh3D
-from xcompact3d_toolbox.param import param
+from xcompact3d_toolbox.param import ENCODING, param
 
 
 class FilenameProperties(traitlets.HasTraits):
@@ -1098,7 +1098,7 @@ class Dataset(traitlets.HasTraits):
         def get_filename(var_name, num):
             return self.filename_properties.get_filename_for_binary(var_name, num, self.data_path)
 
-        with open(xdmf_name, "w") as f:
+        with open(xdmf_name, "w", encoding=ENCODING) as f:
             f.write('<?xml version="1.0" ?>\n')
             f.write(' <!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>\n')
             f.write(' <Xdmf xmlns:xi="http://www.w3.org/2001/XInclude" Version="2.0">\n')
@@ -1168,12 +1168,12 @@ class Dataset(traitlets.HasTraits):
 def prm_to_dict(filename="incompact3d.prm"):
     dict_outer = {}
 
-    with open(filename) as f:
+    with open(filename, encoding=ENCODING) as f:
         for raw_line in f:
             # Remove spaces
             line = " ".join(raw_line.split())
 
-            if line == "":  # Cycle if line is empty
+            if not line:  # Cycle if line is empty
                 continue
             if line[0] == "#":  # Cycle if starts with a comment
                 continue
@@ -1212,7 +1212,7 @@ def prm_to_dict(filename="incompact3d.prm"):
 
 def i3d_to_dict(filename="input.i3d", string=None):
     if string is None:
-        with open(filename) as f:
+        with open(filename, encoding=ENCODING) as f:
             string = f.read()
 
     return i3d_string_to_dict(string)
@@ -1227,7 +1227,7 @@ def i3d_string_to_dict(string):
         # Remove spaces
         line = " ".join(line.split())
 
-        if line == "":  # Cycle if line is empty
+        if not line:  # Cycle if line is empty
             continue
 
         # Beginning of a new group

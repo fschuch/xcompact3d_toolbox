@@ -106,10 +106,12 @@ exclude_lines = [
 ]
 
 [tool.ruff]
+preview = true
 extend = "ruff_defaults.toml"
 extend-exclude = ["./docs/conf.py"]
 
 [tool.ruff.lint]
+preview = true
 extend-ignore = ["A003"]
 
 [tool.ruff.lint.extend-per-file-ignores]

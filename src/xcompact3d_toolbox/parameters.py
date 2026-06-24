@@ -17,7 +17,7 @@ from loguru import logger
 
 from xcompact3d_toolbox.io import Dataset, i3d_to_dict, prm_to_dict
 from xcompact3d_toolbox.mesh import Istret, Mesh3D
-from xcompact3d_toolbox.param import COORDS, boundary_condition, param
+from xcompact3d_toolbox.param import COORDS, ENCODING, boundary_condition, param
 
 
 class ParametersBasicParam(traitlets.HasTraits):
@@ -1068,7 +1068,7 @@ class Parameters(
         # Restart Size from tools.f90
         count = 3 + self.numscalar  # ux, uy, uz, phi
         # Previous time-step if necessary
-        if self.itimescheme in [3, 7]:
+        if self.itimescheme in {3, 7}:
             count *= 3
         elif self.itimescheme == 2:  # noqa: PLR2004
             count *= 2
@@ -1286,8 +1286,8 @@ class Parameters(
         if filename is None:
             filename = self.filename
         if filename.split(".")[-1] == "i3d":
-            with open(filename, "w", encoding="utf-8") as file:
-                file.write(self.__str__())
+            with open(filename, mode="w", encoding=ENCODING) as file:
+                file.write(str(self))
         else:
             msg = "Format error, only .i3d is supported"
             raise OSError(msg)

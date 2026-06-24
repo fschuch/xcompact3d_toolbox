@@ -252,54 +252,50 @@ class ParametersGui(Parameters):
         # Creating an arrange with all widgets
         dim = COORDS
 
-        self.ipyview = widgets.VBox(
-            [
-                widgets.HTML(value="<h1>Xcompact3d Parameters</h1>"),
-                widgets.HBox(
-                    [
-                        self._widgets["filename"],
-                        widgets.Button(description="Read", disabled=True, icon="file-upload"),
-                        widgets.Button(description="Write", disabled=True, icon="file-download"),
-                        widgets.Button(description="Run", disabled=True, icon="rocket"),
-                        widgets.Button(description="Sync", disabled=True, icon="sync"),
-                    ]
+        self.ipyview = widgets.VBox([
+            widgets.HTML(value="<h1>Xcompact3d Parameters</h1>"),
+            widgets.HBox([
+                self._widgets["filename"],
+                widgets.Button(description="Read", disabled=True, icon="file-upload"),
+                widgets.Button(description="Write", disabled=True, icon="file-download"),
+                widgets.Button(description="Run", disabled=True, icon="rocket"),
+                widgets.Button(description="Sync", disabled=True, icon="sync"),
+            ]),
+            widgets.HTML(value="<h2>BasicParam</h2>"),
+            widgets.HBox([self._widgets[d] for d in "itype re".split()]),
+            widgets.HBox([self._widgets[d] for d in "iin init_noise inflow_noise".split()]),
+            widgets.HTML(value="<h3>Domain Decomposition</h3>"),
+            widgets.HBox([self._widgets[d] for d in "ncores p_row p_col".split()]),
+            widgets.HTML(value="<h3>Temporal discretization</h3>"),
+            widgets.HBox([self._widgets[d] for d in "ifirst ilast dt".split()]),
+            widgets.HTML(value="<h3>InOutParam</h3>"),
+            widgets.HBox([self._widgets[d] for d in "irestart nvisu size".split()]),
+            widgets.HBox([self._widgets[d] for d in "icheckpoint ioutput iprocessing".split()]),
+            widgets.HTML(value="<h3>Spatial discretization</h3>"),
+            widgets.HBox([self._widgets[f"n{d}"] for d in dim]),
+            widgets.HBox([self._widgets[f"{d}l{d}"] for d in dim]),
+            widgets.HBox([self._widgets[f"d{d}"] for d in dim]),
+            widgets.HBox([self._widgets[f"ncl{d}1"] for d in dim]),
+            widgets.HBox([self._widgets[f"ncl{d}n"] for d in dim]),
+            widgets.HBox([self._widgets[d] for d in "istret beta".split()]),
+            widgets.HTML(value="<h2>NumOptions</h2>"),
+            widgets.HBox([self._widgets[d] for d in "ifirstder isecondder itimescheme".split()]),
+            widgets.HBox([self._widgets[d] for d in "ilesmod nu0nu cnu".split()]),
+            widgets.HTML(value="<h2>ScalarParam</h2>"),
+            widgets.HBox([self._widgets["numscalar"]]),
+            widgets.HBox([self._widgets[f"ncl{d}S1"] for d in dim]),
+            widgets.HBox([self._widgets[f"ncl{d}Sn"] for d in dim]),
+            widgets.HBox([self._widgets[f"grav{d}"] for d in dim]),
+            # widgets.HBox([self._widgets[d] for d in "iibmS".split()]),
+            widgets.HTML(
+                value=(
+                    "<strong>cp, us, sc, ri, scalar_lbound & scalar_ubound</strong> are lists "
+                    "with length numscalar, set them properly on the code."
                 ),
-                widgets.HTML(value="<h2>BasicParam</h2>"),
-                widgets.HBox([self._widgets[d] for d in "itype re".split()]),
-                widgets.HBox([self._widgets[d] for d in "iin init_noise inflow_noise".split()]),
-                widgets.HTML(value="<h3>Domain Decomposition</h3>"),
-                widgets.HBox([self._widgets[d] for d in "ncores p_row p_col".split()]),
-                widgets.HTML(value="<h3>Temporal discretization</h3>"),
-                widgets.HBox([self._widgets[d] for d in "ifirst ilast dt".split()]),
-                widgets.HTML(value="<h3>InOutParam</h3>"),
-                widgets.HBox([self._widgets[d] for d in "irestart nvisu size".split()]),
-                widgets.HBox([self._widgets[d] for d in "icheckpoint ioutput iprocessing".split()]),
-                widgets.HTML(value="<h3>Spatial discretization</h3>"),
-                widgets.HBox([self._widgets[f"n{d}"] for d in dim]),
-                widgets.HBox([self._widgets[f"{d}l{d}"] for d in dim]),
-                widgets.HBox([self._widgets[f"d{d}"] for d in dim]),
-                widgets.HBox([self._widgets[f"ncl{d}1"] for d in dim]),
-                widgets.HBox([self._widgets[f"ncl{d}n"] for d in dim]),
-                widgets.HBox([self._widgets[d] for d in "istret beta".split()]),
-                widgets.HTML(value="<h2>NumOptions</h2>"),
-                widgets.HBox([self._widgets[d] for d in "ifirstder isecondder itimescheme".split()]),
-                widgets.HBox([self._widgets[d] for d in "ilesmod nu0nu cnu".split()]),
-                widgets.HTML(value="<h2>ScalarParam</h2>"),
-                widgets.HBox([self._widgets["numscalar"]]),
-                widgets.HBox([self._widgets[f"ncl{d}S1"] for d in dim]),
-                widgets.HBox([self._widgets[f"ncl{d}Sn"] for d in dim]),
-                widgets.HBox([self._widgets[f"grav{d}"] for d in dim]),
-                # widgets.HBox([self._widgets[d] for d in "iibmS".split()]),
-                widgets.HTML(
-                    value=(
-                        "<strong>cp, us, sc, ri, scalar_lbound & scalar_ubound</strong> are lists "
-                        "with length numscalar, set them properly on the code."
-                    ),
-                ),
-                widgets.HTML(value="<h2>IBMStuff</h2>"),
-                widgets.HBox([self._widgets[d] for d in "iibm nraf nobjmax".split()]),
-            ]
-        )
+            ),
+            widgets.HTML(value="<h2>IBMStuff</h2>"),
+            widgets.HBox([self._widgets[d] for d in "iibm nraf nobjmax".split()]),
+        ])
 
         self.link_widgets()
 
@@ -324,7 +320,7 @@ class ParametersGui(Parameters):
 
         return widgets.VBox([self._widgets[name] for name in args])
 
-    def _ipython_display_(self):
+    def _ipython_display_(self):  # noqa: PLW3201
         display(self.ipyview)
 
     @traitlets.observe("p_row", "p_col", "ncores")
