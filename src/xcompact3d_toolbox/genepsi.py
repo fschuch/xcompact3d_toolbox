@@ -311,11 +311,13 @@ def write_geomcomplex(prm, ds, folder: str) -> None:
     os.makedirs(geometry, exist_ok=True)  # data_path may differ from the one init_epsi created
 
     def write_nobj(array, dim) -> None:
+        """Write the number of objects along ``dim`` to ``nobj<dim>.dat``."""
         with open(os.path.join(geometry, f"nobj{dim}.dat"), "w", newline="\n", encoding=ENCODING) as file:
             for value in transpose_n_flatten(array):
                 file.write(f"{value:12d}\n")
 
     def write_nxipif(array1, array2, dim) -> None:
+        """Write the first and last reconstruction indices along ``dim`` to ``n<dim>ifpif.dat``."""
         _array1 = transpose_n_flatten(array1)
         _array2 = transpose_n_flatten(array2)
         with open(os.path.join(geometry, f"n{dim}ifpif.dat"), "w", newline="\n", encoding=ENCODING) as file:
@@ -323,6 +325,7 @@ def write_geomcomplex(prm, ds, folder: str) -> None:
                 file.write(f"{value1:12d}{value2:12d}\n")
 
     def write_xixf(array1, array2, dim) -> None:
+        """Write the start and end positions of the objects along ``dim`` to ``<dim>i<dim>f.dat``."""
         _array1 = transpose_n_flatten(array1)
         _array2 = transpose_n_flatten(array2)
         with open(os.path.join(geometry, f"{dim}i{dim}f.dat"), "w", newline="\n", encoding=ENCODING) as file:
@@ -330,6 +333,7 @@ def write_geomcomplex(prm, ds, folder: str) -> None:
                 file.write(f"{value1:24.16E}{value2:24.16E}\n")
 
     def transpose_n_flatten(array):
+        """Flatten an array in the order the Fortran reader expects."""
         if len(array.coords) == 3:  # noqa: PLR2004
             return array.values.transpose(1, 0, 2).flatten()
         return array.values.T.flatten()

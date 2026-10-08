@@ -11,6 +11,7 @@ pytestmark = pytest.mark.filterwarnings("ignore:prm.dataset is deprecated:Future
 
 @pytest.fixture(scope="session")
 def set_up(tmp_path_factory):
+    """Run the immersed-boundary preprocessing of the reference case into a temporary folder."""
     prm = x3d.Parameters(loadfile="tests/integration/data/input.i3d", raise_warning=True)
     tmp_path = tmp_path_factory.mktemp("data")
     prm.dataset.set(data_path=tmp_path.as_posix())
@@ -24,6 +25,7 @@ def set_up(tmp_path_factory):
 @pytest.mark.skipif(sys.platform == "win32", reason="Work in progress to make it platform independent")
 @pytest.mark.parametrize("file_ref", list(pathlib.Path("tests", "integration", "data", "geometry").glob("*.dat")))
 def test_dat_files(file_ref, set_up):
+    """Dat files."""
     file = set_up / "geometry" / file_ref.name
 
     expected_content = file_ref.read_text()

@@ -94,6 +94,7 @@ def _primed(specs: Iterable[WriteSpecs]) -> Iterator[WriteSpecs]:
 
 
 def _filename_template(filename_properties: FilenameProperties) -> str:
+    """The ``str.format`` template equivalent to the given :obj:`FilenameProperties`."""
     fp = filename_properties
     return f"{{name}}{fp.separator}{{step:0{fp.number_of_digits}d}}{fp.file_extension}"
 
@@ -447,6 +448,7 @@ class Xcompact3dConvention(FolderConventions):
             # layout and is never filtered. Only static files can be planes: a snapshot with
             # a plane's size is truncated and must fail loudly when opened. The stat runs
             # first because it rejects nearly every file.
+            """Whether ``path`` is a write-only plane of the root layout (never opened)."""
             return (
                 path.stat().st_size in plane_bytes
                 and path.parent == root

@@ -669,6 +669,7 @@ class ParametersExtras(traitlets.HasTraits):
 
     @dataset.setter
     def dataset(self, value: Dataset) -> None:
+        """Assign the on-demand loader (deprecated, see the getter)."""
         warnings.warn(DATASET_DEPRECATION, FutureWarning, stacklevel=2)
         self._dataset = value
 

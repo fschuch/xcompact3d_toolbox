@@ -55,6 +55,7 @@ def cube():
 
 
 def test_init_epsi__no_ibm():
+    """Init epsi no ibm."""
     prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=0)
     expected_result = {}
     actual_result = x3d.init_epsi(prm)
@@ -62,6 +63,7 @@ def test_init_epsi__no_ibm():
 
 
 def test_init_epsi__ibm():
+    """Init epsi ibm."""
     prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=1)
 
     actual_result = x3d.init_epsi(prm)
@@ -76,18 +78,21 @@ def test_init_epsi__ibm():
 )
 @hypothesis.example(x=1.0, y=1.0, z=1.0)  # edge case
 def test_point_is_inside_geometry(cube, x, y, z):
+    """Point is inside geometry."""
     inside_cube = all(-1.0 <= dim <= 1.0 for dim in [x, y, z])
     assert x3d.sandbox._point_in_geometry(cube.vectors, x, y, z, 0.05) == inside_cube  # noqa: SLF001
 
 
 class TestGeometryFromSTL:
     def test_stl__from_stl_mesh(self, cube):
+        """Stl from stl mesh."""
         prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=2)
         ds_stl = x3d.init_epsi(prm)["epsi"].geo.from_stl(stl_mesh=cube, user_tol=0.05)
         ds_box = x3d.init_epsi(prm)["epsi"].geo.box(x=(-1.0, 1.0), y=(-1.0, 1.0), z=(-1.0, 1.0))
         xr.testing.assert_equal(ds_stl, ds_box)
 
     def test_stl__from_file(self, cube, tmp_path):
+        """Stl from file."""
         prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=2)
         stl_file = tmp_path / "cube.stl"
         cube.save(stl_file)
@@ -102,11 +107,13 @@ class TestGeometryFromSTL:
         xr.testing.assert_equal(ds_stl, ds_box)
 
     def test_stl__no_mesh_provided(self):
+        """Stl no mesh provided."""
         prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=2)
         with pytest.raises(ValueError, match="Please, specify filename or stl_mesh"):
             x3d.init_epsi(prm)["epsi"].geo.from_stl()
 
     def test_stl__is_not_invalid_mesh(self):
+        """Stl is not invalid mesh."""
         mesh = MagicMock(spec=stl.mesh.Mesh)
         mesh.check.return_value = False
         prm = x3d.Parameters(xlx=2.0, yly=2.0, zlz=2.0, iibm=2)
@@ -114,6 +121,7 @@ class TestGeometryFromSTL:
             x3d.init_epsi(prm)["epsi"].geo.from_stl(stl_mesh=mesh)
 
     def test_stl__is_not_closed(self):
+        """Stl is not closed."""
         mesh = MagicMock(spec=stl.mesh.Mesh)
         mesh.check.return_value = True
         mesh.is_closed.return_value = False
@@ -127,21 +135,26 @@ class TestInitDatasetInflowBoundaryCondition:
     @pytest.fixture(scope="class")
     @classmethod
     def prm(cls):
+        """The parameters object this test class exercises."""
         return x3d.Parameters(nclx1=2, nclxn=2)
 
     @pytest.fixture(scope="class")
     @classmethod
     def dataset(cls, prm):
+        """The dataset produced by init_dataset for the class parameters."""
         return x3d.init_dataset(prm)
 
     def test_dataset_contains_variable(self, var_name, dataset):
+        """Dataset contains variable."""
         assert var_name in dataset.variables
 
     def test_dataset_has_correct_dimensions(self, var_name, dataset):
+        """Dataset has correct dimensions."""
         assert dataset[var_name].dims == ("y", "z")
 
     @pytest.mark.parametrize("nclx", [0, 1])
     def test_init_dataset__no_inflow_boundary_condition(self, var_name, nclx):
+        """Init dataset no inflow boundary condition."""
         prm = x3d.Parameters(nclx1=nclx, nclxn=nclx)
         ds = x3d.init_dataset(prm)
         assert var_name not in ds.variables
@@ -150,21 +163,25 @@ class TestInitDatasetInflowBoundaryCondition:
 class TestInitDatasetScalarBoundaryConditions:
     @pytest.fixture
     def prm(self):
+        """The parameters object this test class exercises."""
         return x3d.Parameters(nclx1=2, nclxn=2, numscalar=1)
 
     def test_dataset_contains__bxphi1(self, prm):
+        """Dataset contains bxphi1."""
         prm.nclxS1 = 2
         ds = x3d.init_dataset(prm)
         assert "bxphi1" in ds.variables
         assert ds["bxphi1"].dims == ("n", "y", "z")
 
     def test_dataset_contains__byphi1(self, prm):
+        """Dataset contains byphi1."""
         prm.nclyS1 = 2
         ds = x3d.init_dataset(prm)
         assert "byphi1" in ds.variables
         assert ds["byphi1"].dims == ("n", "x", "z")
 
     def test_dataset_contains__byphin(self, prm):
+        """Dataset contains byphin."""
         prm.nclySn = 2
         ds = x3d.init_dataset(prm)
         assert "byphin" in ds.variables
@@ -174,24 +191,29 @@ class TestInitDatasetScalarBoundaryConditions:
 class TestInitDatasetInitialConditions:
     @pytest.fixture
     def prm(self):
+        """The parameters object this test class exercises."""
         return x3d.Parameters(numscalar=1)
 
     def test_dataset_contains__ux(self, prm):
+        """Dataset contains ux."""
         ds = x3d.init_dataset(prm)
         assert "ux" in ds.variables
         assert ds["ux"].dims == ("x", "y", "z")
 
     def test_dataset_contains__uy(self, prm):
+        """Dataset contains uy."""
         ds = x3d.init_dataset(prm)
         assert "uy" in ds.variables
         assert ds["uy"].dims == ("x", "y", "z")
 
     def test_dataset_contains__uz(self, prm):
+        """Dataset contains uz."""
         ds = x3d.init_dataset(prm)
         assert "uz" in ds.variables
         assert ds["uz"].dims == ("x", "y", "z")
 
     def test_dataset_contains__phi(self, prm):
+        """Dataset contains phi."""
         ds = x3d.init_dataset(prm)
         assert "phi" in ds.variables
         assert ds["phi"].dims == ("n", "x", "y", "z")
@@ -199,6 +221,7 @@ class TestInitDatasetInitialConditions:
 
 class TestInitDatasetFlowrateControl:
     def test_dataset_contains__flowrate(self):
+        """Dataset contains flowrate."""
         prm = x3d.Parameters(nclx1=0, nclxn=0)
         ds = x3d.init_dataset(prm)
         assert "vol_frc" in ds.variables
@@ -210,9 +233,11 @@ class TestDataPathArgument:
 
     @pytest.fixture
     def prm(self, tmp_path):
+        """The parameters object this test class exercises."""
         return x3d.Parameters(filename=(tmp_path / "input.i3d").as_posix(), nx=9, ny=9, nz=9, iibm=1, nclx1=2, nclxn=2)
 
     def test_init_dataset_creates_the_given_data_path(self, prm, tmp_path):
+        """Init dataset creates the given data path."""
         target = tmp_path / "elsewhere"
 
         x3d.init_dataset(prm, data_path=target)
@@ -221,6 +246,7 @@ class TestDataPathArgument:
         assert not (tmp_path / "data").exists()
 
     def test_init_epsi_and_gene_epsi_write_into_the_given_data_path(self, prm, tmp_path):
+        """Init epsi and gene epsi write into the given data path."""
         target = tmp_path / "elsewhere"
         epsi = x3d.init_epsi(prm, data_path=target)
         for key in epsi:
@@ -233,6 +259,7 @@ class TestDataPathArgument:
         assert float(lazy["epsilon"].sum()) > 0
 
     def test_gene_epsi_creates_geometry_under_its_own_data_path(self, prm, tmp_path):
+        """Gene epsi creates geometry under its own data path."""
         prm.set(iibm=2, nraf=2)
         epsi = x3d.init_epsi(prm)  # creates <default>/geometry, not the folder used below
         for key in epsi:
@@ -245,10 +272,12 @@ class TestDataPathArgument:
         assert (other / "geometry" / "nobjx.dat").exists()
 
     def test_defaults_to_the_data_folder_next_to_the_parameters_file(self, prm, tmp_path):
+        """Defaults to the data folder next to the parameters file."""
         epsi = x3d.init_epsi(prm)
         x3d.gene_epsi_3d(epsi, prm)
 
         assert (tmp_path / "data" / "geometry" / "epsilon.bin").exists()
 
     def test_epsi_file_name_uses_posix_separators(self, prm):
+        """Epsi file name uses POSIX separators."""
         assert x3d.init_epsi(prm)["epsi"].attrs["file_name"] == "geometry/epsilon"
