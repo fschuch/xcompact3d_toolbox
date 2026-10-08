@@ -193,7 +193,8 @@ class Xcompact3dConvention:
         The dataset root holds the snapshots (``ux-000.bin``) next to static
         fields (``epsilon.bin``). Velocity components are stacked on ``i``
         (``u`` from ``ux``, ``uy``, ``uz``) and scalar fractions on ``n``
-        (``phi`` from ``phi1``, ``phi2``, ...). The name an array is written
+        (``phi`` from ``phi1``, ``phi2``, ...); the stacks act on those two names
+        only, so a field such as ``vortx`` is left as it is on disk. The name an array is written
         under is its ``file_name`` attribute, falling back to its name, like
         :obj:`xcompact3d_toolbox.io.Dataset.write`.
 
@@ -269,7 +270,7 @@ class Xcompact3dConvention:
         )
         pattern = FilenamePattern(_filename_template(fp), exact_width=True)
         stacks = (
-            VariableStack("i", "{name}{i}", values=VELOCITY_COMPONENTS, attrs=COORD_ATTRS["i"]),
+            VariableStack("i", "{name}{i}", values=VELOCITY_COMPONENTS, names=("u",), attrs=COORD_ATTRS["i"]),
             VariableStack(
                 "n",
                 f"{{name}}{{n:0{fp.scalar_num_of_digits}d}}",
@@ -480,23 +481,19 @@ class Xcompact3dConvention:
         """
         return self.convention.stack(dataset)  # type: ignore[attr-defined]
 
-    def _disk_names(self, variables: Iterable[str], on_disk: set[str]) -> set[str]:
+    def _disk_names(self, variables: Iterable[str]) -> set[str]:
         """Map requested names to names found on disk.
 
-        A name present on disk is taken as is; a missing one is read as a stacked
-        name (``u``, ``phi``) and expanded into its components (``ux``, ``uy``, ``uz``).
+        A stacked name (``u``, ``phi``, as declared by the stacks) expands into its
+        components (``ux``, ``uy``, ``uz``); any other name is taken as is.
         """
         names: set[str] = set()
         for variable in variables:
-            if variable in on_disk:
+            stacked = [stack for stack in self.stacks if stack.names is not None and variable in stack.names]
+            if not stacked:
                 names.add(variable)
-                continue
-            names.update(
-                stack.template.format(name=variable, **{stack.dim: value})
-                for stack in self.stacks
-                if stack.names is None or variable in stack.names
-                for value in stack.values
-            )
+            for stack in stacked:
+                names.update(stack.template.format(name=variable, **{stack.dim: value}) for value in stack.values)
         return names
 
     def open(
@@ -551,9 +548,8 @@ class Xcompact3dConvention:
             chunks = {self._time_dim: 1}
         paths = self.files(directory)
         if variables is not None:
-            names = {path: self.reader(path).name for path in paths}
-            wanted = self._disk_names(variables, set(names.values()))
-            paths = [path for path in paths if names[path] in wanted]
+            wanted = self._disk_names(variables)
+            paths = [path for path in paths if self.reader(path).name in wanted]
         if not paths:
             msg = f"No binary field found in {os.fspath(directory)!r} for this convention."
             raise FileNotFoundError(msg)

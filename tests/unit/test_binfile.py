@@ -445,11 +445,17 @@ class TestReviewFixes:
         with pytest.raises(ValueError, match="letters, digits and underscores"):
             Xcompact3dConvention.from_parameters(prm).write(snapshots["pp"], root, file_prefix=prefix)
 
-    def test_variables_do_not_expand_names_that_exist_on_disk(self, case):
+    def test_only_u_and_phi_are_stacked(self, case):
+        """The stacks act on configured names only, like the old loader's is_velocity/is_scalar."""
         prm, root, snapshots, _ = case
         convention = Xcompact3dConvention.from_parameters(prm)
-        convention.write(snapshots["pp"], root, file_prefix="ppx", progress=lambda specs: specs)
+        for name in ("ppx", "vortx", "vorty", "vortz"):
+            convention.write(snapshots["pp"] * 2, root, file_prefix=name, progress=lambda specs: specs)
 
+        opened = convention.open(root)
+
+        assert sorted(opened.data_vars) == ["phi", "pp", "ppx", "u", "vortx", "vorty", "vortz"]
+        xr.testing.assert_allclose(opened["pp"].transpose(*snapshots["pp"].dims).load(), snapshots["pp"])
         assert sorted(convention.open(root, variables=["pp"]).data_vars) == ["pp"]
-        assert sorted(convention.open(root, variables=["ppx"]).data_vars) == ["ppx"]
         assert sorted(convention.open(root, variables=["u"]).data_vars) == ["u"]
+        assert {stack.names for stack in convention.stacks} == {("u",), ("phi",)}
