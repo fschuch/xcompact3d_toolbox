@@ -134,7 +134,8 @@ class Xcompact3dEntrypoint(RawBinaryEntrypoint):
             convention = Xcompact3dConvention.from_parameters(prm, **convention_kwargs)
         return super().open_dataset(filename_or_obj, read_specs_getter=convention.reader, drop_variables=drop_variables)
 
-    def guess_can_open(self, filename_or_obj: Any) -> bool:
+    @staticmethod
+    def guess_can_open(filename_or_obj: Any) -> bool:  # type: ignore[override]
         """Claim ``.bin`` files that have exactly one parameters file next to their data folder."""
         try:
             path = Path(filename_or_obj)

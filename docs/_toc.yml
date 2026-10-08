@@ -18,5 +18,6 @@ parts:
   - caption: References
     chapters:
       - file: references/api-reference.rst
+      - file: references/migration-guide.md
       - file: references/how-to-contribute.md
       - file: references/what-is-new.md

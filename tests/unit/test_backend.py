@@ -16,12 +16,10 @@ def case(tmp_path):
     mesh = prm.get_mesh()
     t = np.arange(3) * prm.dt * prm.ioutput
     rng = np.random.default_rng(1)
-    fields = xr.Dataset(
-        {
-            name: xr.DataArray(rng.random((3, 9, 9, 9)), coords={"t": t, **mesh}, attrs={"file_name": name})
-            for name in ("ux", "uy", "pp")
-        }
-    )
+    fields = xr.Dataset({
+        name: xr.DataArray(rng.random((3, 9, 9, 9)), coords={"t": t, **mesh}, attrs={"file_name": name})
+        for name in ("ux", "uy", "pp")
+    })
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         prm.write_dataset(fields)
