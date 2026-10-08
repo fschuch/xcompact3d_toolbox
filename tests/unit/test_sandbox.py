@@ -203,3 +203,37 @@ class TestInitDatasetFlowrateControl:
         ds = x3d.init_dataset(prm)
         assert "vol_frc" in ds.variables
         assert ds["vol_frc"].dims == ("x", "y", "z")
+
+
+class TestDataPathArgument:
+    """Sandbox and genepsi write through the lazy API; data_path is explicit."""
+
+    @pytest.fixture
+    def prm(self, tmp_path):
+        return x3d.Parameters(filename=(tmp_path / "input.i3d").as_posix(), nx=9, ny=9, nz=9, iibm=1, nclx1=2, nclxn=2)
+
+    def test_init_dataset_creates_the_given_data_path(self, prm, tmp_path):
+        target = tmp_path / "elsewhere"
+
+        x3d.init_dataset(prm, data_path=target)
+
+        assert target.is_dir()
+        assert not (tmp_path / "data").exists()
+
+    def test_init_epsi_and_gene_epsi_write_into_the_given_data_path(self, prm, tmp_path):
+        target = tmp_path / "elsewhere"
+        epsi = x3d.init_epsi(prm, data_path=target)
+        for key in epsi:
+            epsi[key] = epsi[key].geo.cylinder(x=0.5, y=0.5, radius=0.2)
+
+        x3d.gene_epsi_3d(epsi, prm, data_path=target)
+
+        assert (target / "geometry" / "epsilon.bin").exists()
+        lazy = prm.open_dataset(target, folders={"geometry": {"static": True}})
+        assert float(lazy["epsilon"].sum()) > 0
+
+    def test_defaults_to_the_data_folder_next_to_the_parameters_file(self, prm, tmp_path):
+        epsi = x3d.init_epsi(prm)
+        x3d.gene_epsi_3d(epsi, prm)
+
+        assert (tmp_path / "data" / "geometry" / "epsilon.bin").exists()

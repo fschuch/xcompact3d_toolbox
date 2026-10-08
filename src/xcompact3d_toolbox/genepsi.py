@@ -16,6 +16,9 @@ can approach the speeds of C or FORTRAN.
 
 """
 
+from __future__ import annotations
+
+import os
 import os.path
 
 import numba
@@ -26,7 +29,18 @@ from loguru import logger
 from xcompact3d_toolbox.param import ENCODING
 
 
-def gene_epsi_3d(epsi_in_dict, prm):
+def _data_folder(prm, data_path: str | os.PathLike[str] | None) -> str:
+    """The folder to write to: the argument, else the deprecated ``prm.dataset.data_path`` if changed, else the default."""
+    if data_path is not None:
+        return os.fspath(data_path)
+    # TODO(2.0): drop the fallback together with prm.dataset.
+    loader_path = prm.dataset.data_path
+    if os.path.normpath(loader_path) != os.path.normpath(prm.default_data_path):
+        return loader_path
+    return prm.default_data_path
+
+
+def gene_epsi_3d(epsi_in_dict, prm, data_path: str | os.PathLike[str] | None = None):
     """This function generates all the Auxiliary files necessary for our
     customize IBM, based on Lagrange reconstructions. The arrays can be
     initialized with :obj:`xcompact3d_toolbox.sandbox.init_epsi()`, then,
@@ -46,6 +60,12 @@ def gene_epsi_3d(epsi_in_dict, prm):
         A dictionary containing the epsi(s) array(s).
     prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
         Contains the computational and physical parameters.
+    data_path : str or path-like, optional
+        The data folder; the files go to its ``geometry/`` sub-folder. Defaults to
+        :obj:`xcompact3d_toolbox.parameters.Parameters.default_data_path`, or to
+        ``prm.dataset.data_path`` if that deprecated setting was changed.
+
+        .. versionadded:: 1.5.0
 
     Returns
     -------
@@ -234,8 +254,10 @@ def gene_epsi_3d(epsi_in_dict, prm):
             output_dtypes=[np.int64, np.int64, np.int64],
         )
 
+    folder = _data_folder(prm, data_path)
+
     if prm.iibm <= 1:
-        prm.dataset.write(epsi_in_dict["epsi"])
+        prm.write_dataset(epsi_in_dict["epsi"], folder)
         return None
 
     izap = prm.izap
@@ -289,28 +311,30 @@ def gene_epsi_3d(epsi_in_dict, prm):
 
         logger.debug(f"number of points with potential problem in {direction} : {ising.sum().values}")
 
-    write_geomcomplex(prm, ds)
+    write_geomcomplex(prm, ds, folder)
 
     return ds
 
 
-def write_geomcomplex(prm, ds) -> None:
+def write_geomcomplex(prm, ds, data_path: str | os.PathLike[str] | None = None) -> None:
+    geometry = os.path.join(_data_folder(prm, data_path), "geometry")
+
     def write_nobj(array, dim) -> None:
-        with open(os.path.join(data_path, f"nobj{dim}.dat"), "w", newline="\n", encoding=ENCODING) as file:
+        with open(os.path.join(geometry, f"nobj{dim}.dat"), "w", newline="\n", encoding=ENCODING) as file:
             for value in transpose_n_flatten(array):
                 file.write(f"{value:12d}\n")
 
     def write_nxipif(array1, array2, dim) -> None:
         _array1 = transpose_n_flatten(array1)
         _array2 = transpose_n_flatten(array2)
-        with open(os.path.join(data_path, f"n{dim}ifpif.dat"), "w", newline="\n", encoding=ENCODING) as file:
+        with open(os.path.join(geometry, f"n{dim}ifpif.dat"), "w", newline="\n", encoding=ENCODING) as file:
             for value1, value2 in zip(_array1, _array2, strict=True):
                 file.write(f"{value1:12d}{value2:12d}\n")
 
     def write_xixf(array1, array2, dim) -> None:
         _array1 = transpose_n_flatten(array1)
         _array2 = transpose_n_flatten(array2)
-        with open(os.path.join(data_path, f"{dim}i{dim}f.dat"), "w", newline="\n", encoding=ENCODING) as file:
+        with open(os.path.join(geometry, f"{dim}i{dim}f.dat"), "w", newline="\n", encoding=ENCODING) as file:
             for value1, value2 in zip(_array1, _array2, strict=True):
                 file.write(f"{value1:24.16E}{value2:24.16E}\n")
 
@@ -319,8 +343,7 @@ def write_geomcomplex(prm, ds) -> None:
             return array.values.transpose(1, 0, 2).flatten()
         return array.values.T.flatten()
 
-    data_path = os.path.join(prm.dataset.data_path, "geometry")
-    prm.dataset.write(ds["epsi"])
+    prm.write_dataset(ds["epsi"], os.path.dirname(geometry))
     for direction in ["x", "y", "z"]:
         write_nobj(ds[f"nobj_{direction}"], direction)
         write_nxipif(ds[f"nxipif_{direction}"], ds[f"nxfpif_{direction}"], direction)
