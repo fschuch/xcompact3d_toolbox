@@ -34,7 +34,7 @@ def _data_folder(prm, data_path: str | os.PathLike[str] | None) -> str:
     if data_path is not None:
         return os.fspath(data_path)
     # TODO(2.0): drop the fallback together with prm.dataset.
-    loader_path = prm.dataset.data_path
+    loader_path = prm._dataset.data_path  # noqa: SLF001  (no deprecation warning from inside the toolbox)
     if os.path.normpath(loader_path) != os.path.normpath(prm.default_data_path):
         return loader_path
     return prm.default_data_path

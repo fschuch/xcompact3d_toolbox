@@ -17,6 +17,7 @@ import warnings
 from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import partial
+from itertools import chain
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -28,6 +29,7 @@ from xarray_binfile.conventions import (
     FilenamePattern,
     FolderConventions,
     Layout,
+    LayoutMismatchError,
     PatternConventions,
     StaticFiles,
     StepIndexedFiles,
@@ -75,6 +77,16 @@ def _output_name(data_array: xr.DataArray) -> str:
     return str(name)
 
 
+def _primed(specs: Iterable[WriteSpecs]) -> Iterator[WriteSpecs]:
+    """Pull the first write spec now, so a rejected array raises before any file is touched."""
+    iterator = iter(specs)
+    try:
+        first = next(iterator)
+    except StopIteration:
+        return iter(())
+    return chain([first], iterator)
+
+
 def _filename_template(filename_properties: FilenameProperties) -> str:
     fp = filename_properties
     return f"{{name}}{fp.separator}{{step:0{fp.number_of_digits}d}}{fp.file_extension}"
@@ -101,6 +113,14 @@ class Xcompact3dConvention:
         Dimensions encoded in variable names (velocity components on ``i``,
         scalar fractions on ``n``).
 
+    Notes
+    -----
+    Static 2D planes of the layout (the sandbox inflow planes ``bxx1`` on ``(y, z)``
+    or ``byphi1`` on ``(n, x, z)``) are supported on write only: :obj:`write` stores
+    them as static files, while :obj:`files` and :obj:`open` skip files whose size is
+    that of a plane. Read them with :obj:`xcompact3d_toolbox.io.Dataset.load_array`
+    or :obj:`xarray.open_dataset` with a plane convention.
+
     .. _xarray-binfile: https://docs.fschuch.com/xarray-binfile/
     """
 
@@ -109,6 +129,7 @@ class Xcompact3dConvention:
     pattern: FilenamePattern
     stacks: tuple[VariableStack, ...]
     _time_dim: str = "t"
+    _planes: tuple[StaticFiles, ...] = ()
 
     FROM_PARAMETERS_KEYS = frozenset({
         "dtype",
@@ -262,10 +283,22 @@ class Xcompact3dConvention:
                 StaticFiles(
                     layout,
                     pattern=FilenamePattern(f"{{name}}{fp.file_extension}"),
+                    stacks=stacks,
                     names=static_names,
                     name_of=_output_name,
                 )
             )
+        static_pattern = FilenamePattern(f"{{name}}{fp.file_extension}")
+        planes = tuple(
+            StaticFiles(
+                Layout(prm.mesh.drop(*drop_coords, dim), dtype=layout.dtype, order="F", coord_attrs=COORD_ATTRS),
+                pattern=static_pattern,
+                stacks=stacks,
+                name_of=_output_name,
+            )
+            for dim in layout.dims
+            if len(layout.dims) > 1
+        )
         tree: dict[str, ConventionProtocol] = {".": PatternConventions(members)}
         for folder, spec in (folders or {}).items():
             if isinstance(spec, Mapping):
@@ -281,7 +314,14 @@ class Xcompact3dConvention:
             else:
                 tree[folder] = spec
         convention = FolderConventions(tree)
-        return cls(convention=convention, layout=layout, pattern=pattern, stacks=stacks, _time_dim=time_dim)
+        return cls(
+            convention=convention,
+            layout=layout,
+            pattern=pattern,
+            stacks=stacks,
+            _time_dim=time_dim,
+            _planes=planes,
+        )
 
     def reader(self, path: Path) -> ReadSpecs:
         """Read specs getter: decode one file (see the xarray-binfile read protocol)."""
@@ -296,7 +336,15 @@ class Xcompact3dConvention:
         """
         named = data_array.rename(_output_name(data_array))
         named.attrs = {k: v for k, v in data_array.attrs.items() if k != "file_name"}
-        return self.convention.writer(named)
+        try:
+            return _primed(self.convention.writer(named))
+        except LayoutMismatchError as error:
+            if not self._planes or self._time_dim in named.dims:
+                raise
+            try:
+                return _primed(PatternConventions(self._planes).writer(named))
+            except LayoutMismatchError:
+                raise error from None
 
     def write(
         self,
@@ -383,7 +431,15 @@ class Xcompact3dConvention:
         list of :obj:`pathlib.Path`
             The matching files, sorted.
         """
-        return self.convention.files(directory)  # type: ignore[attr-defined]
+        plane_bytes = {int(np.prod(plane.layout.shape)) * plane.layout.dtype.itemsize for plane in self._planes}
+        plane_bytes.discard(int(np.prod(self.layout.shape)) * self.layout.dtype.itemsize)
+
+        def is_plane(path: Path) -> bool:
+            # Only static files can be planes; a snapshot with a plane's size is truncated
+            # and must fail loudly when opened.
+            return path.stat().st_size in plane_bytes and self._time_dim not in self.reader(path).dims
+
+        return [path for path in self.convention.files(directory) if not is_plane(path)]  # type: ignore[attr-defined]
 
     def stack(self, dataset: xr.Dataset) -> xr.Dataset:
         """Rebuild ``u`` from ``ux``, ``uy``, ``uz`` and ``phi`` from ``phi1``, ``phi2``, ... (lazily).
@@ -464,13 +520,19 @@ class Xcompact3dConvention:
         """
         if chunks is None:
             chunks = {self._time_dim: 1}
+        paths = self.files(directory)
         if variables is not None:
-            variables = self._disk_names(variables)
-        return self.convention.open(  # type: ignore[attr-defined]
-            directory,
-            variables=variables,
-            stack=stack,
+            wanted = self._disk_names(variables)
+            paths = [path for path in paths if self.reader(path).name in wanted]
+        if not paths:
+            msg = f"No binary field found in {os.fspath(directory)!r} for this convention."
+            raise FileNotFoundError(msg)
+        dataset = xr.open_mfdataset(
+            paths,
+            engine="binfile",
+            read_specs_getter=self.reader,
             chunks=chunks,
             parallel=parallel,
             **open_mfdataset_kwargs,
         )
+        return self.stack(dataset) if stack else dataset

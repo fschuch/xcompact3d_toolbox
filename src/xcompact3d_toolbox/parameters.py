@@ -10,6 +10,7 @@ pre and post-processing.
 from __future__ import annotations
 
 import os.path
+import warnings
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -22,6 +23,13 @@ from xcompact3d_toolbox.param import COORDS, ENCODING, boundary_condition, param
 
 if TYPE_CHECKING:
     import xarray as xr
+
+
+DATASET_DEPRECATION = (
+    "prm.dataset is deprecated since xcompact3d-toolbox 1.5.0 and will be removed in 2.0.0. "
+    "Use prm.open_dataset() to read and prm.write_dataset() to write; see the migration guide: "
+    "https://docs.fschuch.com/xcompact3d_toolbox/references/migration-guide.html"
+)
 
 
 class ParametersBasicParam(traitlets.HasTraits):
@@ -638,133 +646,144 @@ class ParametersExtras(traitlets.HasTraits):
     """:obj:`xcompact3d_toolbox.mesh.Mesh3D`: Mesh object.
     """
 
-    dataset = traitlets.Instance(klass=Dataset)
-    """:obj:`xcompact3d_toolbox.io.Dataset`: An object that reads
-    and writes the raw binary files from XCompact3d on-demand.
+    _dataset = traitlets.Instance(klass=Dataset)
 
-    Notes
-    -----
+    @property
+    def dataset(self) -> Dataset:
+        """:obj:`xcompact3d_toolbox.io.Dataset`: An object that reads
+        and writes the raw binary files from XCompact3d on-demand.
 
-    All arrays are wrapped into Xarray objects (:obj:`xarray.DataArray`
-    or :obj:`xarray.Dataset`), take a look at xarray_'s documentation,
-    specially, see `Why xarray?`_
-    Xarray has many useful methods for indexing, comparisons, reshaping
-    and reorganizing, computations and plotting.
+        .. deprecated:: 1.5.0
+            ``prm.dataset`` will be removed in version 2.0.0. Use the lazy API instead:
+            :obj:`Parameters.open_dataset` to read and :obj:`Parameters.write_dataset`
+            to write, both built on `xarray-binfile`_. See the `migration guide`_.
+            ``write_xdmf`` and ``load_wind_turbine_data`` have no replacement yet and
+            stay available here until then.
 
-    Consider using hvPlot_ to explore your data interactively,
-    see how to plot `Gridded Data`_.
+        .. _xarray-binfile: https://docs.fschuch.com/xarray-binfile/
+        .. _`migration guide`: https://docs.fschuch.com/xcompact3d_toolbox/references/migration-guide.html
 
-    .. _xarray: http://docs.xarray.dev/en/stable
-    .. _`Why xarray?`: http://docs.xarray.dev/en/stable/why-xarray.html
-    .. _hvPlot: https://hvplot.holoviz.org/
-    .. _`Gridded Data`: https://hvplot.holoviz.org/user_guide/Gridded_Data.html
+        Notes
+        -----
 
-    Examples
-    --------
+        All arrays are wrapped into Xarray objects (:obj:`xarray.DataArray`
+        or :obj:`xarray.Dataset`), take a look at xarray_'s documentation,
+        specially, see `Why xarray?`_
+        Xarray has many useful methods for indexing, comparisons, reshaping
+        and reorganizing, computations and plotting.
 
-    The first step is specify the filename properties.
-    If the simulated fields are named like ``ux-000.bin``, they are in the default
-    configuration, there is no need to specify filename properties. But just in case,
-    it would be like:
+        Consider using hvPlot_ to explore your data interactively,
+        see how to plot `Gridded Data`_.
 
-    >>> prm = xcompact3d_toolbox.Parameters()
-    >>> prm.dataset.filename_properties.set(
-    ...     separator = "-",
-    ...     file_extension = ".bin",
-    ...     number_of_digits = 3
-    ... )
+        .. _xarray: http://docs.xarray.dev/en/stable
+        .. _`Why xarray?`: http://docs.xarray.dev/en/stable/why-xarray.html
+        .. _hvPlot: https://hvplot.holoviz.org/
+        .. _`Gridded Data`: https://hvplot.holoviz.org/user_guide/Gridded_Data.html
 
-    If the simulated fields are named like ``ux0000``, the parameters are:
+        Examples
+        --------
 
-    >>> prm = xcompact3d_toolbox.Parameters()
-    >>> prm.dataset.filename_properties.set(
-    ...     separator = "",
-    ...     file_extension = "",
-    ...     number_of_digits = 4
-    ... )
+        The first step is specify the filename properties.
+        If the simulated fields are named like ``ux-000.bin``, they are in the default
+        configuration, there is no need to specify filename properties. But just in case,
+        it would be like:
 
-    Data type is defined by :obj:`xcompact3d_toolbox.param`:
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> prm.dataset.filename_properties.set(
+        ...     separator="-", file_extension=".bin", number_of_digits=3
+        ... )
 
-    >>> import numpy
-    >>> xcompact3d_toolbox.param["mytype] = numpy.float64 # if double precision
-    >>> xcompact3d_toolbox.param["mytype] = numpy.float32 # if single precision
+        If the simulated fields are named like ``ux0000``, the parameters are:
 
-    Now it is possible to customize the way the dataset
-    will be handled:
+        >>> prm = xcompact3d_toolbox.Parameters()
+        >>> prm.dataset.filename_properties.set(
+        ...     separator="", file_extension="", number_of_digits=4
+        ... )
 
-    >>> prm.dataset.set(
-    ...     data_path = "./data/",
-    ...     drop_coords = "",
-    ...     set_of_variables = {"ux", "uy", "uz"},
-    ...     snapshot_step = "ioutput",
-    ...     snapshot_counting = "ilast",
-    ...     stack_scalar = True,
-    ...     stack_velocity = False,
-    ... )
+        Data type is defined by :obj:`xcompact3d_toolbox.param`:
 
-    .. note :: For convenience, ``data_path`` is set as
-       ``"./data/"`` relative to the ``filename`` of the parameters file
-       when creating a new instance of :obj:`Parameters`
-       (i.g., if ``filename = "./example/input.i3d"`` then
-       ``data_path = "./example/data/"``).
+        >>> import numpy
+        >>> xcompact3d_toolbox.param["mytype] = numpy.float64 # if double precision
+        >>> xcompact3d_toolbox.param["mytype] = numpy.float32 # if single precision
 
-    There are many ways to load the arrays produced by
-    your numerical simulation, so you can choose what
-    best suits your post-processing application.
-    See the examples:
+        Now it is possible to customize the way the dataset
+        will be handled:
 
-    * Load one array from the disc:
+        >>> prm.dataset.set(
+        ...     data_path="./data/",
+        ...     drop_coords="",
+        ...     set_of_variables={"ux", "uy", "uz"},
+        ...     snapshot_step="ioutput",
+        ...     snapshot_counting="ilast",
+        ...     stack_scalar=True,
+        ...     stack_velocity=False,
+        ... )
 
-      >>> ux = prm.dataset.load_array("ux-0000.bin")
+        .. note :: For convenience, ``data_path`` is set as
+           ``"./data/"`` relative to the ``filename`` of the parameters file
+           when creating a new instance of :obj:`Parameters`
+           (i.g., if ``filename = "./example/input.i3d"`` then
+           ``data_path = "./example/data/"``).
 
-    * Load the entire time series for a given variable:
+        There are many ways to load the arrays produced by
+        your numerical simulation, so you can choose what
+        best suits your post-processing application.
+        See the examples:
 
-      >>> ux = prm.dataset.load_time_series("ux")
-      >>> uy = prm.dataset.load_time_series("uy")
-      >>> uz = prm.dataset.load_time_series("uz")
+        * Load one array from the disc:
 
-      or just:
+          >>> ux = prm.dataset.load_array("ux-0000.bin")
 
-      >>> ux = prm.dataset["ux"]
-      >>> uy = prm.dataset["uy"]
-      >>> uz = prm.dataset["uz"]
+        * Load the entire time series for a given variable:
 
-      You can organize them using a dataset:
+          >>> ux = prm.dataset.load_time_series("ux")
+          >>> uy = prm.dataset.load_time_series("uy")
+          >>> uz = prm.dataset.load_time_series("uz")
 
-      >>> dataset = xarray.Dataset()
-      >>> for var in "ux uy uz".split():
-      ...     dataset[var] = prm.dataset[var]
+          or just:
 
-    * Load all variables from a given snapshot:
+          >>> ux = prm.dataset["ux"]
+          >>> uy = prm.dataset["uy"]
+          >>> uz = prm.dataset["uz"]
 
-      >>> snapshot = prm.dataset.load_snapshot(10)
+          You can organize them using a dataset:
 
-      or just:
+          >>> dataset = xarray.Dataset()
+          >>> for var in "ux uy uz".split():
+          ...     dataset[var] = prm.dataset[var]
 
-      >>> snapshot = prm.dataset[10]
+        * Load all variables from a given snapshot:
 
-    * Loop through all snapshots, loading them one by one:
+          >>> snapshot = prm.dataset.load_snapshot(10)
 
-      >>> for ds in prm.dataset:
-      ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-      ...     prm.dataset.write(data = vort, file_prefix = "w3")
+          or just:
 
-    * Loop through some snapshots, loading them one by one, with the same arguments
-      of a classic Python :obj:`range`, for instance, from 0 to 100 with a step of 5:
+          >>> snapshot = prm.dataset[10]
 
-      >>> for ds in prm.dataset(0, 101, 5):
-      ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
-      ...     prm.dataset.write(data = vort, file_prefix = "w3")
+        * Loop through all snapshots, loading them one by one:
 
-    * Or simply load all snapshots at once (if you have enough memory):
+          >>> for ds in prm.dataset:
+          ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+          ...     prm.dataset.write(data=vort, file_prefix="w3")
 
-      >>> ds = prm.dataset[:]
+        * Loop through some snapshots, loading them one by one, with the same arguments
+          of a classic Python :obj:`range`, for instance, from 0 to 100 with a step of 5:
 
-    And finally, it is possible to produce a new xdmf file, so all data
-    can be visualized on any external tool:
+          >>> for ds in prm.dataset(0, 101, 5):
+          ...     vort = ds.uy.x3d.first_derivative("x") - ds.ux.x3d.first_derivative("y")
+          ...     prm.dataset.write(data=vort, file_prefix="w3")
 
-    >>> prm.dataset.write_xdmf()
-    """
+        * Or simply load all snapshots at once (if you have enough memory):
+
+          >>> ds = prm.dataset[:]
+
+        And finally, it is possible to produce a new xdmf file, so all data
+        can be visualized on any external tool:
+
+        >>> prm.dataset.write_xdmf()
+        """
+        warnings.warn(DATASET_DEPRECATION, FutureWarning, stacklevel=2)
+        return self._dataset
 
     dx, dy, dz = (traitlets.Float().tag() for _ in COORDS)
     """float: Mesh resolution.
@@ -783,7 +802,7 @@ class ParametersExtras(traitlets.HasTraits):
         self.mesh = Mesh3D()
 
         self._link_mesh_and_parameters()
-        self.dataset = Dataset(_mesh=self.mesh, _prm=self)
+        self._dataset = Dataset(_mesh=self.mesh, _prm=self)
 
     def _link_mesh_and_parameters(self):
         for dim in "xyz":
@@ -915,8 +934,7 @@ class Parameters(
 
         self.set(raise_warning=raise_warning, **kwargs)
 
-        data_path = os.path.join(os.path.dirname(self.filename), "data")
-        self.dataset.set(data_path=data_path)
+        self._dataset.set(data_path=self.default_data_path)
 
     def __repr__(self):
         string = f"{self.__class__.__name__}(\n"

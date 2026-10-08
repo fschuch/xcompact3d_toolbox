@@ -5,6 +5,9 @@ import pytest
 
 import xcompact3d_toolbox as x3d
 
+# These tests exercise the deprecated on-demand loader on purpose.
+pytestmark = pytest.mark.filterwarnings("ignore:prm.dataset is deprecated:FutureWarning")
+
 
 @pytest.fixture(scope="session")
 def set_up(tmp_path_factory):

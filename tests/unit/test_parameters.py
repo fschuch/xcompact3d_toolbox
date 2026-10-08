@@ -1,7 +1,9 @@
 import os.path
+import warnings
 
 import pytest
 
+import xcompact3d_toolbox as x3d
 from xcompact3d_toolbox.gui import ParametersGui
 from xcompact3d_toolbox.param import COORDS
 from xcompact3d_toolbox.parameters import Parameters
@@ -96,7 +98,10 @@ class TestParameters:
     )
     def test_initial_datapath(self, base_class, i3d_path, data_path):
         prm = base_class(filename=i3d_path)
-        assert os.path.normpath(prm.dataset.data_path) == os.path.normpath(data_path)
+        with pytest.warns(FutureWarning, match="deprecated"):
+            loader_path = prm.dataset.data_path
+        assert os.path.normpath(loader_path) == os.path.normpath(data_path)
+        assert os.path.normpath(prm.default_data_path) == os.path.normpath(data_path)
 
     @pytest.mark.parametrize("ncores", [2, 4, 8, 16, 32, 64, 128])
     def test_observe_2decomp__ncores(self, parameters: Parameters, ncores: int):
@@ -112,3 +117,24 @@ class TestParameters:
         assert prm.ncores == 1
         assert prm.p_row == 0
         assert prm.p_col == 0
+
+
+class TestDatasetDeprecation:
+    @pytest.fixture
+    def prm(self, tmp_path):
+        return Parameters(filename=(tmp_path / "input.i3d").as_posix(), nx=9, ny=9, nz=9)
+
+    def test_dataset_access_warns_and_points_to_the_lazy_api(self, prm):
+        with pytest.warns(FutureWarning, match=r"prm\.dataset.*deprecated.*open_dataset.*migration-guide"):
+            loader = prm.dataset
+
+        assert loader.data_path == os.path.join(os.path.dirname(prm.filename), "data")
+
+    def test_toolbox_code_paths_do_not_trigger_the_warning(self, prm):
+        prm.set(iibm=1)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ds = x3d.init_dataset(prm)
+            prm.write_dataset(ds)
+            x3d.gene_epsi_3d(x3d.init_epsi(prm), prm)
+            prm.open_dataset(stack=False)

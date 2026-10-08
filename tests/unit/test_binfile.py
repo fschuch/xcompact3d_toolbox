@@ -4,10 +4,13 @@ from pathlib import Path
 import numpy as np
 import pytest
 import xarray as xr
-from xarray_binfile.conventions import Layout, StaticFiles
+from xarray_binfile.conventions import Layout, LayoutMismatchError, StaticFiles
 
 import xcompact3d_toolbox as x3d
 from xcompact3d_toolbox.binfile import Xcompact3dConvention
+
+# These tests exercise the deprecated on-demand loader on purpose.
+pytestmark = pytest.mark.filterwarnings("ignore:prm.dataset is deprecated:FutureWarning")
 
 
 @pytest.fixture
@@ -369,3 +372,56 @@ class TestWrite:
 
         assert sorted(prm.open_dataset(variables=["w3"]).data_vars) == ["w3"]
         assert sorted(prm.open_dataset(root / "copy").data_vars) == ["phi"]
+
+
+class TestStaticPlanes:
+    """Sandbox inflow planes (bxx1 on (y, z), byphi1 on (n, x, z)) are written, never opened."""
+
+    @pytest.fixture
+    def sandbox(self, prm):
+        prm.set(nclx1=2, nclxn=2, numscalar=2)
+        return x3d.init_dataset(prm)
+
+    def test_write_accepts_planes_and_splits_scalar_fractions(self, prm, sandbox, tmp_path):
+        out = tmp_path / "sandbox"
+        convention = Xcompact3dConvention.from_parameters(prm)
+
+        convention.write(sandbox, out)
+
+        names = sorted(p.name for p in out.glob("*.bin"))
+        assert {"bxx1.bin", "bxphi11.bin", "bxphi12.bin", "byphi11.bin", "ux.bin", "phi1.bin"} <= set(names)
+        assert (out / "bxx1.bin").stat().st_size == prm.ny * prm.nz * 8
+        assert (out / "byphi11.bin").stat().st_size == prm.nx * prm.nz * 8
+
+    def test_planes_are_read_back_by_the_on_demand_loader(self, prm, sandbox, tmp_path):
+        out = tmp_path / "sandbox"
+        Xcompact3dConvention.from_parameters(prm).write(sandbox, out)
+        prm._dataset.set(data_path=out.as_posix() + "/", drop_coords="x")  # noqa: SLF001
+
+        plane = prm._dataset.load_array(str(out / "bxx1.bin"), add_time=False)  # noqa: SLF001
+
+        np.testing.assert_array_equal(plane, sandbox["bxx1"])
+
+    def test_open_and_files_skip_planes(self, case):
+        prm, root, *_ = case
+        convention = Xcompact3dConvention.from_parameters(prm)
+        plane = _field(prm, "bxx1").isel(x=0, drop=True)
+        convention.write(plane, root)
+        convention.write(_field(prm, "byphi1", n=[1]).isel(y=0, drop=True), root)
+
+        assert not any(p.name.startswith("b") for p in convention.files(root))
+        assert sorted(convention.open(root).data_vars) == ["phi", "pp", "u"]
+
+    def test_truncated_snapshot_still_fails_loudly(self, case):
+        prm, root, *_ = case
+        target = root / "pp-002.bin"
+        target.write_bytes(target.read_bytes()[: prm.ny * prm.nz * 4])  # looks like a yz plane, but is a snapshot
+
+        with pytest.raises(ValueError, match="Size mismatch"):
+            Xcompact3dConvention.from_parameters(prm).open(root)
+
+    def test_planes_with_a_time_dimension_are_rejected(self, prm, tmp_path):
+        plane = _field(prm, "bxx1", t=[0.0]).isel(x=0, drop=True)
+
+        with pytest.raises(LayoutMismatchError):
+            Xcompact3dConvention.from_parameters(prm).write(plane, tmp_path)
