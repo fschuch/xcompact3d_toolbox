@@ -12,12 +12,17 @@ on-demand loader, and both read and write the same files.
 
 from __future__ import annotations
 
+import os
+import warnings
 from collections.abc import Mapping
 from dataclasses import dataclass
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+import xarray as xr
 import xarray_binfile  # noqa: F401  (registers the .binary_engine accessors)
+from tqdm.auto import tqdm
 from xarray_binfile.conventions import (
     ConventionProtocol,
     FilenamePattern,
@@ -32,11 +37,9 @@ from xarray_binfile.conventions import (
 from xcompact3d_toolbox.param import param
 
 if TYPE_CHECKING:
-    import os
-    from collections.abc import Iterable, Iterator, Sequence
+    from collections.abc import Callable, Iterable, Iterator, Sequence
     from pathlib import Path
 
-    import xarray as xr
     from xarray_binfile import ReadSpecs, WriteSpecs
 
     from xcompact3d_toolbox.io import FilenameProperties
@@ -50,15 +53,26 @@ COORD_ATTRS: dict[str, dict[str, str]] = {
     "i": {"name": "Velocity component", "long_name": r"$i$"},
     "n": {"name": "Scalar fraction", "long_name": r"$\ell$"},
 }
-"""Attributes attached to the coordinates of the lazy dataset, matching :obj:`xcompact3d_toolbox.sandbox.init_dataset`."""
+# Attributes attached to the coordinates of the lazy dataset, matching
+# xcompact3d_toolbox.sandbox.init_dataset.
 
 VELOCITY_COMPONENTS = ("x", "y", "z")
 SCALAR_FRACTIONS = range(1, 10)
 
 
 def _output_name(data_array: xr.DataArray) -> str:
-    """The name an array is written under: its ``file_name`` attribute, else its name."""
-    return str(data_array.attrs.get("file_name", data_array.name))
+    """The name an array is written under: its ``file_name`` attribute, else its name.
+
+    Raises
+    ------
+    ValueError
+        If the array has neither.
+    """
+    name = data_array.attrs.get("file_name", data_array.name)
+    if name is None:
+        msg = "Can't write an array with no name: set its name, its 'file_name' attribute, or pass file_prefix"
+        raise ValueError(msg)
+    return str(name)
 
 
 def _filename_template(filename_properties: FilenameProperties) -> str:
@@ -280,6 +294,76 @@ class Xcompact3dConvention:
         named = data_array.rename(_output_name(data_array))
         named.attrs = {k: v for k, v in data_array.attrs.items() if k != "file_name"}
         return self.convention.writer(named)
+
+    def write(
+        self,
+        data: xr.Dataset | xr.DataArray,
+        directory: str | os.PathLike[str],
+        *,
+        file_prefix: str | None = None,
+        progress: Callable[[Iterable[WriteSpecs]], Iterable[WriteSpecs]] | None = None,
+    ) -> None:
+        """Write an array or dataset to raw binary files, in the order XCompact3d expects.
+
+        It mirrors :obj:`xcompact3d_toolbox.io.Dataset.write`: from a dataset, only the
+        variables with a ``file_name`` attribute are written (a warning is issued for the
+        others); a data array is written under ``file_prefix``, its ``file_name`` attribute
+        or its name. ``u`` with coordinate ``i`` becomes ``ux``, ``uy``, ``uz``; ``phi``
+        with ``n`` becomes ``phi1``, ``phi2``, ...; ``t`` gives one file per snapshot.
+        Each file is written atomically, and Dask-backed arrays are computed one file at
+        a time.
+
+        Parameters
+        ----------
+        data : :obj:`xarray.Dataset` or :obj:`xarray.DataArray`
+            Data to be written.
+        directory : str or path-like
+            The data folder; it is created if needed, as are sub-folders named in
+            ``file_name`` (``"geometry/epsilon"``).
+        file_prefix : str, optional
+            Name for a data array, overriding its ``file_name`` attribute and its name.
+        progress : callable, optional
+            Wrapper applied to the sequence of files of each array, by default a
+            :obj:`tqdm.auto.tqdm` bar labelled with the array name.
+
+        Raises
+        ------
+        TypeError
+            If ``data`` is not an :obj:`xarray.Dataset` or :obj:`xarray.DataArray`.
+        ValueError
+            If a data array has no name at all.
+
+        Examples
+        --------
+
+        >>> convention = xcompact3d_toolbox.Xcompact3dConvention.from_parameters(prm)
+        >>> ds = convention.open(prm.dataset.data_path)
+        >>> vort = ds.u.sel(i="y").x3d.first_derivative("x") - ds.u.sel(
+        ...     i="x"
+        ... ).x3d.first_derivative("y")
+        >>> convention.write(vort, prm.dataset.data_path, file_prefix="w3")
+        """
+        if isinstance(data, xr.Dataset):
+            arrays = []
+            for name, array in data.data_vars.items():
+                if "file_name" in array.attrs:
+                    arrays.append(array)
+                else:
+                    warnings.warn(f"Can't write array {name}, no filename provided", stacklevel=2)
+        elif isinstance(data, xr.DataArray):
+            array = data
+            if file_prefix is not None:
+                array = array.copy(deep=False).assign_attrs(file_name=file_prefix)
+            _output_name(array)
+            arrays = [array]
+        else:
+            msg = "Invalid type for data, try with: xarray.Dataset or xarray.DataArray"
+            raise TypeError(msg)
+
+        os.makedirs(directory, exist_ok=True)
+        for array in arrays:
+            bar = progress if progress is not None else partial(tqdm, desc=_output_name(array))
+            array.binary_engine.to_file(self.writer, directory, progress=bar)
 
     def files(self, directory: str | os.PathLike[str]) -> list[Path]:
         """List the binary fields in ``directory`` that follow the convention.

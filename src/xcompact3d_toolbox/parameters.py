@@ -10,15 +10,18 @@ pre and post-processing.
 from __future__ import annotations
 
 import os.path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import traitlets
-import xarray as xr
 from loguru import logger
 
 from xcompact3d_toolbox.io import Dataset, i3d_to_dict, prm_to_dict
 from xcompact3d_toolbox.mesh import Istret, Mesh3D
 from xcompact3d_toolbox.param import COORDS, ENCODING, boundary_condition, param
+
+if TYPE_CHECKING:
+    import xarray as xr
 
 
 class ParametersBasicParam(traitlets.HasTraits):
@@ -1339,6 +1342,43 @@ class Parameters(
         convention_kwargs, open_kwargs = Xcompact3dConvention.split_kwargs(kwargs)
         convention = Xcompact3dConvention.from_parameters(self, **convention_kwargs)
         return convention.open(data_path or self.dataset.data_path, **open_kwargs)
+
+    def write_dataset(self, data: xr.Dataset | xr.DataArray, data_path: str | None = None, **kwargs) -> None:
+        """Write an array or dataset to raw binary files, the lazy counterpart of :obj:`dataset`'s ``write``.
+
+        See :obj:`xcompact3d_toolbox.binfile.Xcompact3dConvention.write` for the rules:
+        only variables with a ``file_name`` attribute are written from a dataset, a data
+        array is named by ``file_prefix``, its ``file_name`` attribute or its name, and
+        stacked ``u``, ``phi`` and ``t`` are split into one file each.
+
+        Parameters
+        ----------
+        data : :obj:`xarray.Dataset` or :obj:`xarray.DataArray`
+            Data to be written.
+        data_path : str, optional
+            The data folder. Defaults to ``prm.dataset.data_path``.
+        **kwargs
+            ``file_prefix`` and ``progress`` for :obj:`Xcompact3dConvention.write`, plus
+            options for :obj:`Xcompact3dConvention.from_parameters` (``dtype``,
+            ``drop_coords``, ``filename_properties``, ``folders``, ...).
+
+        Examples
+        --------
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> ds = prm.open_dataset()
+        >>> vort = ds.u.sel(i="y").x3d.first_derivative("x") - ds.u.sel(
+        ...     i="x"
+        ... ).x3d.first_derivative("y")
+        >>> prm.write_dataset(vort, file_prefix="w3")
+
+        .. versionadded:: 1.5.0
+        """
+        from xcompact3d_toolbox.binfile import Xcompact3dConvention  # noqa: PLC0415  (import cycle)
+
+        convention_kwargs, write_kwargs = Xcompact3dConvention.split_kwargs(kwargs)
+        convention = Xcompact3dConvention.from_parameters(self, **convention_kwargs)
+        convention.write(data, data_path or self.dataset.data_path, **write_kwargs)
 
     def get_mesh(self, *, refined_for_ibm: bool = False) -> dict:
         """Get mesh the three-dimensional coordinate system. The coordinates are stored

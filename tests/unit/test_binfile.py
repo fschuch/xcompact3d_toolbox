@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 import xarray as xr
+from xarray_binfile.conventions import Layout, StaticFiles
 
 import xcompact3d_toolbox as x3d
 from xcompact3d_toolbox.binfile import Xcompact3dConvention
@@ -237,7 +238,7 @@ class TestFolders:
         assert sorted(lazy.data_vars) == ["epsilon", "phi", "pp", "u"]
         np.testing.assert_array_equal(lazy["epsilon"].transpose(*epsi.dims), epsi)
 
-    def test_folder_spec_accepts_from_parameters_overrides(self, case, tmp_path):
+    def test_folder_spec_accepts_from_parameters_overrides(self, case):
         prm, root, *_ = case
         (root / "xy_planes").mkdir()
         plane = _field(prm, "ux", t=[0.0]).isel(z=0, drop=True)
@@ -250,8 +251,6 @@ class TestFolders:
         assert (root / "xy_planes" / "ux-000.bin").exists()
 
     def test_folder_accepts_a_ready_convention(self, case):
-        from xarray_binfile.conventions import Layout, StaticFiles
-
         prm, root, *_ = case
         custom = StaticFiles(Layout({"x": np.arange(3)}, dtype="<f8"), pattern="{name}.dat")
         convention = Xcompact3dConvention.from_parameters(prm, folders={"probes": custom})
@@ -292,3 +291,75 @@ class TestParametersOpenDataset:
 
     def test_convention_is_exported_at_top_level(self):
         assert x3d.Xcompact3dConvention is Xcompact3dConvention
+
+
+class TestWrite:
+    def test_write_dataset_only_writes_variables_with_file_name(self, case):
+        prm, root, snapshots, _ = case
+        convention = Xcompact3dConvention.from_parameters(prm)
+        out = root / "out"
+        derived = xr.Dataset({
+            "w3": snapshots["pp"].drop_attrs().assign_attrs(file_name="w3"),
+            "scratch": snapshots["pp"].drop_attrs(),
+        })
+
+        with pytest.warns(UserWarning, match="Can't write array scratch"):
+            convention.write(derived, out)
+
+        assert sorted(p.name for p in out.glob("*.bin")) == [f"w3-{k:03d}.bin" for k in range(5)]
+        loaded = prm.dataset.load_array(str(out / "w3-002.bin"))
+        xr.testing.assert_allclose(loaded, derived["w3"].isel(t=[2]).transpose(*loaded.dims))
+
+    def test_write_data_array_with_file_prefix_is_read_by_the_loader(self, case):
+        prm, root, snapshots, _ = case
+        convention = Xcompact3dConvention.from_parameters(prm)
+        vort = snapshots["u"].sel(i="y", drop=True).drop_attrs()
+
+        convention.write(vort, root, file_prefix="w3")
+
+        xr.testing.assert_allclose(prm.dataset["w3"], vort.transpose(*prm.dataset["w3"].dims))
+
+    def test_write_requires_a_name(self, case):
+        prm, root, snapshots, _ = case
+        convention = Xcompact3dConvention.from_parameters(prm)
+
+        with pytest.raises(ValueError, match="no name"):
+            convention.write(snapshots["pp"].drop_attrs().rename(None), root)
+
+    def test_write_creates_the_directory_and_folders(self, case):
+        prm, root, _, epsi = case
+        convention = Xcompact3dConvention.from_parameters(prm, folders={"geometry": {"static": True}})
+        out = root / "fresh"
+
+        convention.write(epsi, out)
+
+        assert (out / "geometry" / "epsilon.bin").exists()
+
+    def test_write_rejects_other_types(self, case):
+        prm, root, *_ = case
+
+        with pytest.raises(TypeError, match="xarray.Dataset or xarray.DataArray"):
+            Xcompact3dConvention.from_parameters(prm).write([1, 2, 3], root)
+
+    def test_write_reports_progress(self, case):
+        prm, root, snapshots, _ = case
+        seen = []
+
+        def progress(specs):
+            for spec in specs:
+                seen.append(spec.filename)
+                yield spec
+
+        Xcompact3dConvention.from_parameters(prm).write(snapshots["pp"], root / "p", progress=progress)
+
+        assert seen == [f"pp-{k:03d}.bin" for k in range(5)]
+
+    def test_parameters_write_dataset_mirrors_open_dataset(self, case):
+        prm, root, snapshots, _ = case
+        vort = snapshots["u"].sel(i="z", drop=True).drop_attrs()
+
+        prm.write_dataset(vort, file_prefix="w3")
+        prm.write_dataset(snapshots[["phi"]], root / "copy")
+
+        assert sorted(prm.open_dataset(variables=["w3"]).data_vars) == ["w3"]
+        assert sorted(prm.open_dataset(root / "copy").data_vars) == ["phi"]
