@@ -29,7 +29,6 @@ import numpy as np
 import stl
 import xarray as xr
 
-from xcompact3d_toolbox.genepsi import _data_folder
 from xcompact3d_toolbox.param import param
 
 if TYPE_CHECKING:
@@ -113,7 +112,7 @@ def init_epsi(
     if prm.iibm == 0:
         return epsi
 
-    makedirs(os.path.join(_data_folder(prm, data_path), "geometry"), exist_ok=True)
+    makedirs(os.path.join(prm._resolve_data_path(data_path), "geometry"), exist_ok=True)  # noqa: SLF001
 
     mesh = prm.get_mesh()
 
@@ -137,7 +136,7 @@ def init_epsi(
 
     # With 'file_name' attribute, we make sure that epsi will be written to disc,
     # while the refined versions are not needed
-    epsi["epsi"].attrs = {"file_name": os.path.join("geometry", "epsilon")}
+    epsi["epsi"].attrs = {"file_name": "geometry/epsilon"}  # POSIX separator on every platform
 
     # Turns on lazy parallel execution with dask arrays
     if dask is True:
@@ -206,7 +205,7 @@ def init_dataset(prm: Parameters, data_path: str | os.PathLike[str] | None = Non
     >>> prm.write_dataset(dataset)  # write the files to the disc
 
     """
-    makedirs(_data_folder(prm, data_path), exist_ok=True)
+    makedirs(prm._resolve_data_path(data_path), exist_ok=True)  # noqa: SLF001
 
     # Init dataset
     ds = xr.Dataset(coords=prm.get_mesh()).assign_coords(n=[n + 1 for n in range(prm.numscalar)])

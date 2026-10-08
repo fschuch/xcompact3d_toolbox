@@ -13,11 +13,13 @@ on-demand loader, and both read and write the same files.
 from __future__ import annotations
 
 import os
+import re
 import warnings
 from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import partial
 from itertools import chain
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -40,7 +42,6 @@ from xcompact3d_toolbox.param import param
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
-    from pathlib import Path
 
     from xarray_binfile import ReadSpecs, WriteSpecs
 
@@ -62,17 +63,29 @@ VELOCITY_COMPONENTS = ("x", "y", "z")
 SCALAR_FRACTIONS = range(1, 10)
 
 
+# Output names: a word, optionally under sub-folders. Separator, step and extension
+# come from the filename pattern, so '-' and '.' are not part of a name.
+_NAME_RULE = re.compile(r"(?:\w[\w.-]*/)*\w+")
+
+
 def _output_name(data_array: xr.DataArray) -> str:
     """The name an array is written under: its ``file_name`` attribute, else its name.
 
     Raises
     ------
     ValueError
-        If the array has neither.
+        If the array has neither, or if the name breaks the naming rule.
     """
     name = data_array.attrs.get("file_name", data_array.name)
     if name is None:
         msg = "Can't write an array with no name: set its name, its 'file_name' attribute, or pass file_prefix"
+        raise ValueError(msg)
+    if not _NAME_RULE.fullmatch(str(name)):
+        msg = (
+            f"Can't write an array named {name!r}: names are made of letters, digits and underscores, "
+            "optionally prefixed by sub-folders separated by '/' (for example 'w3_mean' or 'geometry/epsilon'); "
+            "the separator, counter and extension are added by the convention."
+        )
         raise ValueError(msg)
     return str(name)
 
@@ -237,7 +250,7 @@ class Xcompact3dConvention:
         ...         "geometry": {"static": True},
         ...     },
         ... )
-        >>> ds = convention.open(prm.dataset.data_path)
+        >>> ds = convention.open(prm.default_data_path)
         """
         from xcompact3d_toolbox.io import FilenameProperties  # noqa: PLC0415  (import cycle)
 
@@ -373,6 +386,10 @@ class Xcompact3dConvention:
             ``file_name`` (``"geometry/epsilon"``).
         file_prefix : str, optional
             Name for a data array, overriding its ``file_name`` attribute and its name.
+            Names are made of letters, digits and underscores, optionally under
+            sub-folders (``"geometry/epsilon"``); the separator, step counter and
+            extension are added by the convention, so ``"w3-mean"`` or ``"ux-000.bin"``
+            are rejected with a message saying so.
         progress : callable, optional
             Wrapper applied to the sequence of files of each array, by default a
             :obj:`tqdm.auto.tqdm` bar labelled with the array name.
@@ -388,11 +405,11 @@ class Xcompact3dConvention:
         --------
 
         >>> convention = xcompact3d_toolbox.Xcompact3dConvention.from_parameters(prm)
-        >>> ds = convention.open(prm.dataset.data_path)
+        >>> ds = convention.open(prm.default_data_path)
         >>> vort = ds.u.sel(i="y").x3d.first_derivative("x") - ds.u.sel(
         ...     i="x"
         ... ).x3d.first_derivative("y")
-        >>> convention.write(vort, prm.dataset.data_path, file_prefix="w3")
+        >>> convention.write(vort, prm.default_data_path, file_prefix="w3")
         """
         if isinstance(data, xr.Dataset):
             arrays = []
@@ -434,10 +451,17 @@ class Xcompact3dConvention:
         plane_bytes = {int(np.prod(plane.layout.shape)) * plane.layout.dtype.itemsize for plane in self._planes}
         plane_bytes.discard(int(np.prod(self.layout.shape)) * self.layout.dtype.itemsize)
 
+        root = Path(directory).resolve()
+
         def is_plane(path: Path) -> bool:
-            # Only static files can be planes; a snapshot with a plane's size is truncated
-            # and must fail loudly when opened.
-            return path.stat().st_size in plane_bytes and self._time_dim not in self.reader(path).dims
+            # Write-only planes live in the root; a registered sub-folder describes its own
+            # layout and is never filtered. Only static files can be planes: a snapshot with
+            # a plane's size is truncated and must fail loudly when opened.
+            return (
+                path.resolve().parent == root
+                and path.stat().st_size in plane_bytes
+                and self._time_dim not in self.reader(path).dims
+            )
 
         return [path for path in self.convention.files(directory) if not is_plane(path)]  # type: ignore[attr-defined]
 
@@ -456,18 +480,23 @@ class Xcompact3dConvention:
         """
         return self.convention.stack(dataset)  # type: ignore[attr-defined]
 
-    def _disk_names(self, variables: Iterable[str]) -> set[str]:
-        """Expand stacked names (``u``, ``phi``) into the names found on disk."""
+    def _disk_names(self, variables: Iterable[str], on_disk: set[str]) -> set[str]:
+        """Map requested names to names found on disk.
+
+        A name present on disk is taken as is; a missing one is read as a stacked
+        name (``u``, ``phi``) and expanded into its components (``ux``, ``uy``, ``uz``).
+        """
         names: set[str] = set()
         for variable in variables:
-            expanded = [
+            if variable in on_disk:
+                names.add(variable)
+                continue
+            names.update(
                 stack.template.format(name=variable, **{stack.dim: value})
                 for stack in self.stacks
                 if stack.names is None or variable in stack.names
                 for value in stack.values
-            ]
-            names.update(expanded or [variable])
-            names.add(variable)
+            )
         return names
 
     def open(
@@ -522,8 +551,9 @@ class Xcompact3dConvention:
             chunks = {self._time_dim: 1}
         paths = self.files(directory)
         if variables is not None:
-            wanted = self._disk_names(variables)
-            paths = [path for path in paths if self.reader(path).name in wanted]
+            names = {path: self.reader(path).name for path in paths}
+            wanted = self._disk_names(variables, set(names.values()))
+            paths = [path for path in paths if names[path] in wanted]
         if not paths:
             msg = f"No binary field found in {os.fspath(directory)!r} for this convention."
             raise FileNotFoundError(msg)

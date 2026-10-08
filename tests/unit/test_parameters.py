@@ -5,6 +5,7 @@ import pytest
 
 import xcompact3d_toolbox as x3d
 from xcompact3d_toolbox.gui import ParametersGui
+from xcompact3d_toolbox.io import Dataset
 from xcompact3d_toolbox.param import COORDS
 from xcompact3d_toolbox.parameters import Parameters
 
@@ -138,3 +139,15 @@ class TestDatasetDeprecation:
             prm.write_dataset(ds)
             x3d.gene_epsi_3d(x3d.init_epsi(prm), prm)
             prm.open_dataset(stack=False)
+
+    def test_dataset_can_still_be_assigned_with_a_warning(self, prm):
+        with pytest.warns(FutureWarning, match="deprecated"):
+            prm.dataset = Dataset(stack_velocity=True)
+        with pytest.warns(FutureWarning, match="deprecated"):
+            assert prm.dataset.stack_velocity is True
+
+    def test_resolve_data_path_prefers_argument_then_changed_loader_path(self, prm, tmp_path):
+        assert prm._resolve_data_path(tmp_path / "given") == (tmp_path / "given").as_posix()  # noqa: SLF001
+        assert prm._resolve_data_path(None) == prm.default_data_path  # noqa: SLF001
+        prm._dataset.set(data_path="/elsewhere/")  # noqa: SLF001
+        assert prm._resolve_data_path(None) == "/elsewhere/"  # noqa: SLF001

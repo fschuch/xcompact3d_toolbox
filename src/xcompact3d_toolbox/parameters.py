@@ -9,6 +9,7 @@ pre and post-processing.
 
 from __future__ import annotations
 
+import os
 import os.path
 import warnings
 from typing import TYPE_CHECKING
@@ -785,6 +786,11 @@ class ParametersExtras(traitlets.HasTraits):
         warnings.warn(DATASET_DEPRECATION, FutureWarning, stacklevel=2)
         return self._dataset
 
+    @dataset.setter
+    def dataset(self, value: Dataset) -> None:
+        warnings.warn(DATASET_DEPRECATION, FutureWarning, stacklevel=2)
+        self._dataset = value
+
     dx, dy, dz = (traitlets.Float().tag() for _ in COORDS)
     """float: Mesh resolution.
     """
@@ -1314,6 +1320,17 @@ class Parameters(
             msg = "Format error, only .i3d is supported"
             raise OSError(msg)
 
+    def _resolve_data_path(self, data_path: str | os.PathLike[str] | None) -> str:
+        """The folder to use: ``data_path`` if given, else ``prm.dataset.data_path`` when that
+        deprecated setting was changed, else :obj:`default_data_path`."""
+        if data_path is not None:
+            return os.fspath(data_path)
+        # TODO(2.0): drop the fallback together with prm.dataset.
+        loader_path = self._dataset.data_path
+        if os.path.normpath(loader_path) != os.path.normpath(self.default_data_path):
+            return loader_path
+        return self.default_data_path
+
     @property
     def default_data_path(self) -> str:
         """str: The ``data/`` folder next to the parameters file, where XCompact3d writes its fields.
@@ -1324,7 +1341,7 @@ class Parameters(
         """
         return os.path.join(os.path.dirname(self.filename), "data")
 
-    def open_dataset(self, data_path: str | None = None, **kwargs) -> xr.Dataset:
+    def open_dataset(self, data_path: str | os.PathLike[str] | None = None, **kwargs) -> xr.Dataset:
         """Open every snapshot of the simulation as one lazy, Dask-backed :obj:`xarray.Dataset`.
 
         It is the lazy counterpart of :obj:`dataset`, built on `xarray-binfile`_: nothing
@@ -1334,7 +1351,7 @@ class Parameters(
 
         Parameters
         ----------
-        data_path : str, optional
+        data_path : str or path-like, optional
             The data folder. Defaults to ``data/`` next to the parameters file
             (``prm.filename``), the folder XCompact3d writes to.
         **kwargs
@@ -1372,7 +1389,9 @@ class Parameters(
         convention = Xcompact3dConvention.from_parameters(self, **convention_kwargs)
         return convention.open(data_path or self.default_data_path, **open_kwargs)
 
-    def write_dataset(self, data: xr.Dataset | xr.DataArray, data_path: str | None = None, **kwargs) -> None:
+    def write_dataset(
+        self, data: xr.Dataset | xr.DataArray, data_path: str | os.PathLike[str] | None = None, **kwargs
+    ) -> None:
         """Write an array or dataset to raw binary files, the lazy counterpart of :obj:`dataset`'s ``write``.
 
         See :obj:`xcompact3d_toolbox.binfile.Xcompact3dConvention.write` for the rules:
@@ -1384,7 +1403,7 @@ class Parameters(
         ----------
         data : :obj:`xarray.Dataset` or :obj:`xarray.DataArray`
             Data to be written.
-        data_path : str, optional
+        data_path : str or path-like, optional
             The data folder. Defaults to ``data/`` next to the parameters file
             (``prm.filename``).
         **kwargs

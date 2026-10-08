@@ -29,17 +29,6 @@ from loguru import logger
 from xcompact3d_toolbox.param import ENCODING
 
 
-def _data_folder(prm, data_path: str | os.PathLike[str] | None) -> str:
-    """The folder to write to: the argument, else the deprecated ``prm.dataset.data_path`` if changed, else the default."""
-    if data_path is not None:
-        return os.fspath(data_path)
-    # TODO(2.0): drop the fallback together with prm.dataset.
-    loader_path = prm._dataset.data_path  # noqa: SLF001  (no deprecation warning from inside the toolbox)
-    if os.path.normpath(loader_path) != os.path.normpath(prm.default_data_path):
-        return loader_path
-    return prm.default_data_path
-
-
 def gene_epsi_3d(epsi_in_dict, prm, data_path: str | os.PathLike[str] | None = None):
     """This function generates all the Auxiliary files necessary for our
     customize IBM, based on Lagrange reconstructions. The arrays can be
@@ -254,7 +243,7 @@ def gene_epsi_3d(epsi_in_dict, prm, data_path: str | os.PathLike[str] | None = N
             output_dtypes=[np.int64, np.int64, np.int64],
         )
 
-    folder = _data_folder(prm, data_path)
+    folder = prm._resolve_data_path(data_path)  # noqa: SLF001
 
     if prm.iibm <= 1:
         prm.write_dataset(epsi_in_dict["epsi"], folder)
@@ -317,7 +306,7 @@ def gene_epsi_3d(epsi_in_dict, prm, data_path: str | os.PathLike[str] | None = N
 
 
 def write_geomcomplex(prm, ds, data_path: str | os.PathLike[str] | None = None) -> None:
-    geometry = os.path.join(_data_folder(prm, data_path), "geometry")
+    geometry = os.path.join(prm._resolve_data_path(data_path), "geometry")  # noqa: SLF001
 
     def write_nobj(array, dim) -> None:
         with open(os.path.join(geometry, f"nobj{dim}.dat"), "w", newline="\n", encoding=ENCODING) as file:

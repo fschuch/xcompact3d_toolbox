@@ -237,3 +237,6 @@ class TestDataPathArgument:
         x3d.gene_epsi_3d(epsi, prm)
 
         assert (tmp_path / "data" / "geometry" / "epsilon.bin").exists()
+
+    def test_epsi_file_name_uses_posix_separators(self, prm):
+        assert x3d.init_epsi(prm)["epsi"].attrs["file_name"] == "geometry/epsilon"

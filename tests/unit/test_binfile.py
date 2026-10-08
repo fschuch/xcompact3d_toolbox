@@ -425,3 +425,31 @@ class TestStaticPlanes:
 
         with pytest.raises(LayoutMismatchError):
             Xcompact3dConvention.from_parameters(prm).write(plane, tmp_path)
+
+
+class TestReviewFixes:
+    def test_registered_static_plane_folders_are_listed_and_opened(self, case):
+        prm, root, *_ = case
+        (root / "planes").mkdir()
+        convention = Xcompact3dConvention.from_parameters(prm, folders={"planes": {"static": True, "drop_coords": "z"}})
+        plane = _field(prm, "bxx1").isel(z=0, drop=True).assign_attrs(file_name="planes/bxx1")
+        convention.write(plane, root, progress=lambda specs: specs)
+
+        assert any(path.parent.name == "planes" for path in convention.files(root))
+        assert convention.open(root, variables=["bxx1"])["bxx1"].dims == ("x", "y")
+
+    @pytest.mark.parametrize("prefix", ["w3-mean", "ux-000.bin", "a b"])
+    def test_write_explains_the_name_rule(self, case, prefix):
+        prm, root, snapshots, _ = case
+
+        with pytest.raises(ValueError, match="letters, digits and underscores"):
+            Xcompact3dConvention.from_parameters(prm).write(snapshots["pp"], root, file_prefix=prefix)
+
+    def test_variables_do_not_expand_names_that_exist_on_disk(self, case):
+        prm, root, snapshots, _ = case
+        convention = Xcompact3dConvention.from_parameters(prm)
+        convention.write(snapshots["pp"], root, file_prefix="ppx", progress=lambda specs: specs)
+
+        assert sorted(convention.open(root, variables=["pp"]).data_vars) == ["pp"]
+        assert sorted(convention.open(root, variables=["ppx"]).data_vars) == ["ppx"]
+        assert sorted(convention.open(root, variables=["u"]).data_vars) == ["u"]

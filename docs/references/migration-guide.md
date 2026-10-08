@@ -15,27 +15,27 @@ Access to `prm.dataset` itself, and therefore all of its methods and settings. T
 
 ## Call by call
 
-| On-demand loader (deprecated) | Lazy API |
-|---|---|
-| `prm.dataset.set(data_path="./data/")` | pass `data_path` to `prm.open_dataset(...)` / `prm.write_dataset(...)`; the default is `data/` next to the parameters file (`prm.default_data_path`) |
-| `prm.dataset.filename_properties.set(separator="-", file_extension=".bin", number_of_digits=3)` | `prm.open_dataset(filename_properties={"separator": "-", "file_extension": ".bin", "number_of_digits": 3})`; the same defaults apply |
-| `prm.dataset.set(drop_coords="z")` | `prm.open_dataset(drop_coords="z")` |
-| `prm.dataset.set(snapshot_step="iprocessing")` | `prm.open_dataset(snapshot_step="iprocessing")` |
-| `prm.dataset.set(stack_velocity=True, stack_scalar=True)` | always stacked; `prm.open_dataset(stack=False)` to see `ux`, `uy`, `uz`, `phi1`, ... as on disk |
-| `prm.dataset.set(set_of_variables={"ux", "uy"})` | `prm.open_dataset(variables=["ux", "uy"])`, or `variables=["u"]` for the stacked name |
-| `x3d.param["mytype"] = np.float32` | still the default dtype; override per call with `prm.open_dataset(dtype=np.float32)` |
-| `prm.dataset["ux"]` (time series of one variable) | `prm.open_dataset(variables=["ux"], stack=False)["ux"]` |
-| `prm.dataset[10]` (one snapshot) | `prm.open_dataset().isel(t=10)` |
-| `prm.dataset[0:101:10]`, `prm.dataset[:]` | `prm.open_dataset().isel(t=slice(0, 101, 10))`, `prm.open_dataset()` |
-| `for ds in prm.dataset:` / `prm.dataset(0, 101, 5)` | iterate `prm.open_dataset().t`, or better, express the computation on the whole series and let Dask split the work |
-| `prm.dataset.load_array("ux-000.bin")` | `xr.open_dataset("data/ux-000.bin", engine="xcompact3d", prm=prm)` |
-| `prm.dataset.load_array("epsilon.bin", add_time=False)` | `prm.open_dataset(variables=["epsilon"])["epsilon"]` (static files are opened with the snapshots) |
-| `prm.dataset.load_snapshot(10, list_of_variables=["ux"])` | `prm.open_dataset(variables=["ux"]).isel(t=10)` |
-| `prm.dataset.load_time_series("ux")` | `prm.open_dataset(variables=["ux"], stack=False)["ux"]` |
-| `prm.dataset.write(vort, file_prefix="w3")` | `prm.write_dataset(vort, file_prefix="w3")` |
-| `prm.dataset.write(ds)` (variables with `file_name`) | `prm.write_dataset(ds)` (same rule, same warning for the others) |
-| `prm.dataset.write_xdmf()` | not migrated yet; keep calling `prm.dataset.write_xdmf()` (the warning is the only difference) |
-| `prm.dataset.load_wind_turbine_data()` | not migrated yet; keep calling it on `prm.dataset` |
+| On-demand loader (deprecated)                                                                   | Lazy API                                                                                                                                             |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `prm.dataset.set(data_path="./data/")`                                                          | pass `data_path` to `prm.open_dataset(...)` / `prm.write_dataset(...)`; the default is `data/` next to the parameters file (`prm.default_data_path`) |
+| `prm.dataset.filename_properties.set(separator="-", file_extension=".bin", number_of_digits=3)` | `prm.open_dataset(filename_properties={"separator": "-", "file_extension": ".bin", "number_of_digits": 3})`; the same defaults apply                 |
+| `prm.dataset.set(drop_coords="z")`                                                              | `prm.open_dataset(drop_coords="z")`                                                                                                                  |
+| `prm.dataset.set(snapshot_step="iprocessing")`                                                  | `prm.open_dataset(snapshot_step="iprocessing")`                                                                                                      |
+| `prm.dataset.set(stack_velocity=True, stack_scalar=True)`                                       | always stacked; `prm.open_dataset(stack=False)` to see `ux`, `uy`, `uz`, `phi1`, ... as on disk                                                      |
+| `prm.dataset.set(set_of_variables={"ux", "uy"})`                                                | `prm.open_dataset(variables=["ux", "uy"])`, or `variables=["u"]` for the stacked name                                                                |
+| `x3d.param["mytype"] = np.float32`                                                              | still the default dtype; override per call with `prm.open_dataset(dtype=np.float32)`                                                                 |
+| `prm.dataset["ux"]` (time series of one variable)                                               | `prm.open_dataset(variables=["ux"], stack=False)["ux"]`                                                                                              |
+| `prm.dataset[10]` (one snapshot)                                                                | `prm.open_dataset().isel(t=10)`                                                                                                                      |
+| `prm.dataset[0:101:10]`, `prm.dataset[:]`                                                       | `prm.open_dataset().isel(t=slice(0, 101, 10))`, `prm.open_dataset()`                                                                                 |
+| `for ds in prm.dataset:` / `prm.dataset(0, 101, 5)`                                             | iterate `prm.open_dataset().t`, or better, express the computation on the whole series and let Dask split the work                                   |
+| `prm.dataset.load_array("ux-000.bin")`                                                          | `xr.open_dataset("data/ux-000.bin", engine="xcompact3d", prm=prm)`                                                                                   |
+| `prm.dataset.load_array("epsilon.bin", add_time=False)`                                         | `prm.open_dataset(variables=["epsilon"])["epsilon"]` (static files are opened with the snapshots)                                                    |
+| `prm.dataset.load_snapshot(10, list_of_variables=["ux"])`                                       | `prm.open_dataset(variables=["ux"]).isel(t=10)`                                                                                                      |
+| `prm.dataset.load_time_series("ux")`                                                            | `prm.open_dataset(variables=["ux"], stack=False)["ux"]`                                                                                              |
+| `prm.dataset.write(vort, file_prefix="w3")`                                                     | `prm.write_dataset(vort, file_prefix="w3")`                                                                                                          |
+| `prm.dataset.write(ds)` (variables with `file_name`)                                            | `prm.write_dataset(ds)` (same rule, same warning for the others)                                                                                     |
+| `prm.dataset.write_xdmf()`                                                                      | not migrated yet; keep calling `prm.dataset.write_xdmf()` (the warning is the only difference)                                                       |
+| `prm.dataset.load_wind_turbine_data()`                                                          | not migrated yet; keep calling it on `prm.dataset`                                                                                                   |
 
 `len(prm.dataset)`, which guessed the number of snapshots from `ilast` and `ioutput`, has no equivalent: the lazy dataset lists what is on disk, `prm.open_dataset().sizes["t"]`.
 
@@ -63,6 +63,10 @@ Each entry is built from the same parameters with the given overrides, or it can
 
 `init_epsi`, `init_dataset` and `gene_epsi_3d` now write through the lazy API and accept an explicit `data_path`. Without it they default to `prm.default_data_path`, or to a changed `prm.dataset.data_path` while that setting exists.
 
-## Known difference
+## Known differences
+
+**Output names.** The old writer accepted any `file_prefix` and appended the extension when missing, so `prm.dataset.write(vort, "w3-mean")` or `"ux-000.bin"` worked. The lazy API derives the separator, step counter and extension from the filename pattern, so a name is a word made of letters, digits and underscores, optionally under sub-folders (`"geometry/epsilon"`). Other names are rejected with a message saying so: use `w3_mean` instead of `w3-mean`, and never include the counter or extension yourself.
+
+**Assigning `prm.dataset`.** Still possible (`prm.dataset = Dataset(...)`), with the same deprecation warning as reading it.
 
 The old writer computed the step of a snapshot as `int(t / dt)`, which truncates (`0.3 / 0.1` is `2.999...`) and could make two snapshots overwrite each other. The lazy API rounds and refuses values that are not within tolerance of an integer step.

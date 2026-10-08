@@ -1,3 +1,5 @@
+import os
+import time
 import warnings
 
 import numpy as np
@@ -5,6 +7,7 @@ import pytest
 import xarray as xr
 
 import xcompact3d_toolbox as x3d
+from xcompact3d_toolbox import backend
 from xcompact3d_toolbox.backend import Xcompact3dEntrypoint
 
 
@@ -30,10 +33,11 @@ class TestEngine:
     def test_engine_is_registered(self):
         assert "xcompact3d" in xr.backends.list_engines()
 
-    def test_open_mfdataset_with_prm_matches_open_dataset(self, case):
+    @pytest.mark.parametrize("parallel", [False, True])
+    def test_open_mfdataset_with_prm_matches_open_dataset(self, case, parallel):
         prm, data, fields = case
 
-        standard = xr.open_mfdataset(sorted(data.glob("*.bin")), engine="xcompact3d", prm=prm)
+        standard = xr.open_mfdataset(sorted(data.glob("*.bin")), engine="xcompact3d", prm=prm, parallel=parallel)
         toolbox = prm.open_dataset(stack=False)
 
         xr.testing.assert_allclose(standard.load(), toolbox.load())
@@ -102,3 +106,35 @@ class TestGuessCanOpen:
 
     def test_does_not_claim_non_paths(self):
         assert not self.entrypoint.guess_can_open(object())
+
+
+class TestParametersCache:
+    def test_parameters_file_is_parsed_once_per_run(self, case, monkeypatch):
+        prm, data, _ = case
+        calls = []
+        original = backend.Parameters
+
+        class Counting(original):
+            def __init__(self, *args, **kwargs):
+                calls.append(kwargs.get("loadfile"))
+                super().__init__(*args, **kwargs)
+
+        monkeypatch.setattr(backend, "Parameters", Counting)
+        backend.load_parameters.cache_clear()
+
+        xr.open_mfdataset(sorted(data.glob("*.bin")))
+        xr.open_mfdataset(sorted(data.glob("pp-*.bin")))
+
+        assert len(calls) == 1
+
+    def test_cache_refreshes_when_the_parameters_file_changes(self, case):
+
+        prm, data, _ = case
+        before = xr.open_dataset(data / "pp-001.bin")["t"].item()
+        prm.set(ioutput=50)
+        prm.write()
+        os.utime(prm.filename, ns=(time.time_ns(), time.time_ns() + 2_000_000_000))
+
+        after = xr.open_dataset(data / "pp-001.bin")["t"].item()
+
+        assert after == pytest.approx(2 * before)
