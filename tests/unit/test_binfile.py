@@ -459,3 +459,19 @@ class TestReviewFixes:
         assert sorted(convention.open(root, variables=["pp"]).data_vars) == ["pp"]
         assert sorted(convention.open(root, variables=["u"]).data_vars) == ["u"]
         assert {stack.names for stack in convention.stacks} == {("u",), ("phi",)}
+
+    def test_write_splits_by_dimension_whatever_the_name(self, case):
+        """Unstacking on write follows the dims i and n; pp has neither and is written as is."""
+        prm, root, snapshots, _ = case
+        convention = Xcompact3dConvention.from_parameters(prm)
+        vort = snapshots["u"].drop_attrs().rename("vort")  # carries i
+        conc = snapshots["phi"].drop_attrs().rename("conc")  # carries n
+        out = root / "derived"
+
+        for array in (vort, conc, snapshots["pp"]):
+            convention.write(array, out, progress=lambda specs: specs)
+
+        names = {path.name.split("-")[0] for path in out.glob("*.bin")}
+        assert names == {"vortx", "vorty", "vortz", "conc1", "conc2", "pp"}
+        # on read, only the configured names u and phi are stacked back
+        assert sorted(convention.open(out).data_vars) == ["conc1", "conc2", "pp", "vortx", "vorty", "vortz"]
