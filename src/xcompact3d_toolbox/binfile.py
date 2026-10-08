@@ -31,7 +31,8 @@ from xarray_binfile.conventions import (
 from xcompact3d_toolbox.param import param
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator, Mapping, Sequence
+    import os
+    from collections.abc import Iterable, Iterator, Mapping, Sequence
     from pathlib import Path
 
     import xarray as xr
@@ -92,6 +93,7 @@ class Xcompact3dConvention:
     layout: Layout
     pattern: FilenamePattern
     stacks: tuple[VariableStack, ...]
+    _time_dim: str = "t"
 
     @classmethod
     def from_parameters(
@@ -189,7 +191,7 @@ class Xcompact3dConvention:
                 )
             )
         convention = FolderConventions({".": PatternConventions(members)})
-        return cls(convention=convention, layout=layout, pattern=pattern, stacks=stacks)
+        return cls(convention=convention, layout=layout, pattern=pattern, stacks=stacks, _time_dim=time_dim)
 
     def reader(self, path: Path) -> ReadSpecs:
         """Read specs getter: decode one file (see the xarray-binfile read protocol)."""
@@ -198,3 +200,110 @@ class Xcompact3dConvention:
     def writer(self, data_array: xr.DataArray) -> Iterator[WriteSpecs]:
         """Write specs getter: split one array into files (see the xarray-binfile write protocol)."""
         return self.convention.writer(data_array)
+
+    def files(self, directory: str | os.PathLike[str]) -> list[Path]:
+        """List the binary fields in ``directory`` that follow the convention.
+
+        Unrelated files (``snapshots.xdmf``, notes, hidden files) are never listed.
+
+        Parameters
+        ----------
+        directory : str or path-like
+            The data folder.
+
+        Returns
+        -------
+        list of :obj:`pathlib.Path`
+            The matching files, sorted.
+        """
+        return self.convention.files(directory)  # type: ignore[attr-defined]
+
+    def stack(self, dataset: xr.Dataset) -> xr.Dataset:
+        """Rebuild ``u`` from ``ux``, ``uy``, ``uz`` and ``phi`` from ``phi1``, ``phi2``, ... (lazily).
+
+        Parameters
+        ----------
+        dataset : :obj:`xarray.Dataset`
+            A dataset as decoded by the ``binfile`` engine.
+
+        Returns
+        -------
+        :obj:`xarray.Dataset`
+            The dataset with the stacked arrays.
+        """
+        return self.convention.stack(dataset)  # type: ignore[attr-defined]
+
+    def _disk_names(self, variables: Iterable[str]) -> set[str]:
+        """Expand stacked names (``u``, ``phi``) into the names found on disk."""
+        names: set[str] = set()
+        for variable in variables:
+            expanded = [
+                stack.template.format(name=variable, **{stack.dim: value})
+                for stack in self.stacks
+                if stack.names is None or variable in stack.names
+                for value in stack.values
+            ]
+            names.update(expanded or [variable])
+            names.add(variable)
+        return names
+
+    def open(
+        self,
+        directory: str | os.PathLike[str],
+        *,
+        variables: Iterable[str] | None = None,
+        stack: bool = True,
+        chunks: Any = None,
+        parallel: bool = True,
+        **open_mfdataset_kwargs: Any,
+    ) -> xr.Dataset:
+        """Open every field in ``directory`` as one lazy, Dask-backed :obj:`xarray.Dataset`.
+
+        Nothing is read until values are needed; see `xarray's guide on Dask`_.
+
+        Parameters
+        ----------
+        directory : str or path-like
+            The data folder.
+        variables : iterable of str, optional
+            Names to load, either as found on disk (``"ux"``) or stacked (``"u"``, ``"phi"``).
+            By default every field is loaded.
+        stack : bool, optional
+            Rebuild ``u`` and ``phi`` from their components (default is :obj:`True`).
+        chunks : dict or str, optional
+            Dask chunking, forwarded to :obj:`xarray.open_mfdataset` and applied to each
+            file before they are combined, so a ``t`` chunk is at most one file. The
+            default, ``{"t": 1}``, is one task per file. Choose chunks for your workload:
+            spatial chunks for large planes, or ``.chunk({"t": 10})`` on the result for
+            time statistics over many snapshots.
+        parallel : bool, optional
+            Open files in parallel with Dask (default is :obj:`True`).
+        **open_mfdataset_kwargs
+            Other options for :obj:`xarray.open_mfdataset`.
+
+        Returns
+        -------
+        :obj:`xarray.Dataset`
+            The lazy dataset, with dims ``(x, y, z, t)`` plus ``i`` and ``n`` when stacked.
+
+        Raises
+        ------
+        FileNotFoundError
+            If no field is found.
+        ValueError
+            If a file size does not match the layout, for instance a wrong ``dtype``.
+
+        .. _`xarray's guide on Dask`: https://docs.xarray.dev/en/stable/user-guide/dask.html
+        """
+        if chunks is None:
+            chunks = {self._time_dim: 1}
+        if variables is not None:
+            variables = self._disk_names(variables)
+        return self.convention.open(  # type: ignore[attr-defined]
+            directory,
+            variables=variables,
+            stack=stack,
+            chunks=chunks,
+            parallel=parallel,
+            **open_mfdataset_kwargs,
+        )

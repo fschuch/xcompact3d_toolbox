@@ -1,3 +1,4 @@
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -132,3 +133,95 @@ class TestFromParametersFiles:
 
         assert [s.filename for s in convention.writer(vort)] == ["w3-000.bin"]
         assert [s.filename for s in convention.writer(epsi)] == ["geometry/epsilon.bin"]
+
+
+@pytest.fixture
+def case(prm, tmp_path, monkeypatch):
+    """Snapshots written by the on-demand loader, plus a static geometry file."""
+    monkeypatch.setitem(x3d.param, "mytype", np.float32)
+    prm.dataset.set(data_path=tmp_path.as_posix() + "/", stack_velocity=True, stack_scalar=True)
+    rng = np.random.default_rng(0)
+    t = np.arange(len(prm.dataset)) * prm.dt * prm.ioutput
+
+    def field(file_name, **extra):
+        array = _field(prm, file_name, **extra, t=t).assign_attrs(file_name=file_name)
+        array.values[...] = rng.random(array.shape, dtype=np.float32)
+        return array
+
+    snapshots = xr.Dataset({"u": field("u", i=["x", "y", "z"]), "phi": field("phi", n=[1, 2]), "pp": field("pp")})
+    epsi = _field(prm, "epsi").assign_attrs(file_name="geometry/epsilon")
+    epsi.values[...] = rng.random(epsi.shape, dtype=np.float32)
+    (tmp_path / "geometry").mkdir()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        prm.dataset.write(snapshots)
+        prm.dataset.write(epsi)
+    for extra in ("snapshots.xdmf", "notes.txt", "input.i3d", ".DS_Store"):
+        (tmp_path / extra).write_text("not a field")
+    return prm, tmp_path, snapshots, epsi
+
+
+class TestOpen:
+    def test_files_lists_only_the_binary_fields(self, case):
+        prm, root, *_ = case
+        files = Xcompact3dConvention.from_parameters(prm).files(root)
+
+        assert all(p.suffix == ".bin" and p.parent == root for p in files)
+        assert len(files) == 6 * 5
+
+    def test_open_matches_the_on_demand_loader(self, case):
+        prm, root, snapshots, _ = case
+        lazy = Xcompact3dConvention.from_parameters(prm).open(root)
+        eager = prm.dataset[:]
+
+        assert sorted(lazy.data_vars) == ["phi", "pp", "u"]
+        for name in ("u", "phi", "pp"):
+            xr.testing.assert_allclose(lazy[name].transpose(*eager[name].dims).load(), eager[name])
+        assert lazy["u"].dims == ("i", "x", "y", "z", "t")
+        assert lazy["t"].dtype == np.float32
+        assert lazy["x"].attrs["name"] == "Streamwise coordinate"
+        assert lazy["i"].attrs["name"] == "Velocity component"
+        assert lazy["n"].values.tolist() == [1, 2]
+
+    def test_open_is_lazy_with_one_file_per_chunk_by_default(self, case):
+        prm, root, *_ = case
+        lazy = Xcompact3dConvention.from_parameters(prm).open(root)
+
+        assert lazy["u"].chunks is not None
+        assert lazy["u"].chunks[-1] == (1,) * 5
+        spatial = Xcompact3dConvention.from_parameters(prm).open(root, chunks={"x": 3})
+        assert spatial["pp"].chunks[0] == (3, 3, 3)
+
+    def test_open_without_stacking_shows_the_files(self, case):
+        prm, root, *_ = case
+        raw = Xcompact3dConvention.from_parameters(prm).open(root, stack=False)
+
+        assert sorted(raw.data_vars) == ["phi1", "phi2", "pp", "ux", "uy", "uz"]
+
+    def test_stack_rebuilds_arrays_from_any_dataset(self, case):
+        prm, root, *_ = case
+        convention = Xcompact3dConvention.from_parameters(prm)
+        raw = xr.open_mfdataset(convention.files(root), engine="binfile", read_specs_getter=convention.reader)
+
+        assert sorted(convention.stack(raw).data_vars) == ["phi", "pp", "u"]
+
+    @pytest.mark.parametrize(
+        ("variables", "expected"),
+        [
+            (["pp"], ["pp"]),
+            (["ux", "uz"], ["u"]),
+            (["u"], ["u"]),
+            (["phi", "pp"], ["phi", "pp"]),
+        ],
+    )
+    def test_open_selects_variables_by_disk_or_stacked_name(self, case, variables, expected):
+        prm, root, *_ = case
+        lazy = Xcompact3dConvention.from_parameters(prm).open(root, variables=variables)
+
+        assert sorted(lazy.data_vars) == expected
+
+    def test_open_with_wrong_dtype_fails_early(self, case):
+        prm, root, *_ = case
+
+        with pytest.raises(ValueError, match="Size mismatch"):
+            Xcompact3dConvention.from_parameters(prm, dtype=np.float64).open(root)
