@@ -11,8 +11,10 @@ from xcompact3d_toolbox.binfile import Xcompact3dConvention
 
 
 @pytest.fixture
-def prm():
-    return x3d.Parameters(nx=9, ny=9, nz=9, numscalar=2, ilast=100, ioutput=25, dt=0.01)
+def prm(tmp_path):
+    return x3d.Parameters(
+        filename=(tmp_path / "input.i3d").as_posix(), nx=9, ny=9, nz=9, numscalar=2, ilast=100, ioutput=25, dt=0.01
+    )
 
 
 class TestFromParametersLayout:
@@ -56,14 +58,14 @@ class TestFromParametersFiles:
         assert convention.pattern.template == "{name}-{step:03d}.bin"
         assert convention.pattern.exact_width is True
 
-    def test_pattern_accepts_other_filename_properties(self, prm):
+    def test_pattern_is_decoupled_from_the_on_demand_loader(self, prm):
         prm.dataset.filename_properties.set(separator="", file_extension="", number_of_digits=4)
         default = Xcompact3dConvention.from_parameters(prm)
         explicit = Xcompact3dConvention.from_parameters(
             prm, filename_properties={"separator": ".", "file_extension": ".dat", "number_of_digits": 6}
         )
 
-        assert default.pattern.template == "{name}{step:04d}"
+        assert default.pattern.template == "{name}-{step:03d}.bin"
         assert explicit.pattern.template == "{name}.{step:06d}.dat"
 
     def test_reader_decodes_snapshots_with_time_from_step(self, prm, monkeypatch):
@@ -96,9 +98,9 @@ class TestFromParametersFiles:
                 convention.reader(Path(name))
 
     def test_no_root_static_member_without_extension_unless_named(self, prm):
-        prm.dataset.filename_properties.set(separator="", file_extension="", number_of_digits=4)
-        bare = Xcompact3dConvention.from_parameters(prm)
-        named = Xcompact3dConvention.from_parameters(prm, static_names=("epsilon",))
+        bare_names = {"separator": "", "file_extension": "", "number_of_digits": 4}
+        bare = Xcompact3dConvention.from_parameters(prm, filename_properties=bare_names)
+        named = Xcompact3dConvention.from_parameters(prm, filename_properties=bare_names, static_names=("epsilon",))
 
         assert bare.reader(Path("ux0001")).name == "ux"
         with pytest.raises(ValueError, match="No convention accepts"):
@@ -108,8 +110,8 @@ class TestFromParametersFiles:
             named.reader(Path("README"))
 
     def test_stacks_declare_velocity_and_scalars(self, prm):
-        prm.dataset.filename_properties.set(scalar_num_of_digits=2)
-        stacks = {s.dim: s for s in Xcompact3dConvention.from_parameters(prm).stacks}
+        convention = Xcompact3dConvention.from_parameters(prm, filename_properties={"scalar_num_of_digits": 2})
+        stacks = {s.dim: s for s in convention.stacks}
 
         assert stacks["i"].template == "{name}{i}"
         assert stacks["i"].values == ("x", "y", "z")
@@ -140,7 +142,9 @@ class TestFromParametersFiles:
 def case(prm, tmp_path, monkeypatch):
     """Snapshots written by the on-demand loader, plus a static geometry file."""
     monkeypatch.setitem(x3d.param, "mytype", np.float32)
-    prm.dataset.set(data_path=tmp_path.as_posix() + "/", stack_velocity=True, stack_scalar=True)
+    data_path = tmp_path / "data"  # the loader already points there: <prm dir>/data
+    data_path.mkdir()
+    prm.dataset.set(stack_velocity=True, stack_scalar=True)
     rng = np.random.default_rng(0)
     t = np.arange(len(prm.dataset)) * prm.dt * prm.ioutput
 
@@ -152,14 +156,14 @@ def case(prm, tmp_path, monkeypatch):
     snapshots = xr.Dataset({"u": field("u", i=["x", "y", "z"]), "phi": field("phi", n=[1, 2]), "pp": field("pp")})
     epsi = _field(prm, "epsi").assign_attrs(file_name="geometry/epsilon")
     epsi.values[...] = rng.random(epsi.shape, dtype=np.float32)
-    (tmp_path / "geometry").mkdir()
+    (data_path / "geometry").mkdir()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         prm.dataset.write(snapshots)
         prm.dataset.write(epsi)
     for extra in ("snapshots.xdmf", "notes.txt", "input.i3d", ".DS_Store"):
-        (tmp_path / extra).write_text("not a field")
-    return prm, tmp_path, snapshots, epsi
+        (data_path / extra).write_text("not a field")
+    return prm, data_path, snapshots, epsi
 
 
 class TestOpen:
@@ -266,10 +270,12 @@ class TestFolders:
 
 
 class TestParametersOpenDataset:
-    def test_open_dataset_defaults_to_the_loader_data_path(self, case):
+    def test_open_dataset_defaults_to_the_data_folder_next_to_the_parameters_file(self, case):
         prm, root, *_ = case
+        prm.dataset.set(data_path="/somewhere/else/")  # the lazy API never reads the loader's traits
 
         lazy = prm.open_dataset()
+        prm.dataset.set(data_path=root.as_posix() + "/")
         eager = prm.dataset[:]
 
         assert sorted(lazy.data_vars) == ["phi", "pp", "u"]

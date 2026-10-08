@@ -1296,6 +1296,16 @@ class Parameters(
             msg = "Format error, only .i3d is supported"
             raise OSError(msg)
 
+    @property
+    def default_data_path(self) -> str:
+        """str: The ``data/`` folder next to the parameters file, where XCompact3d writes its fields.
+
+        Used by :obj:`open_dataset` and :obj:`write_dataset` when no ``data_path`` is given.
+
+        .. versionadded:: 1.5.0
+        """
+        return os.path.join(os.path.dirname(self.filename), "data")
+
     def open_dataset(self, data_path: str | None = None, **kwargs) -> xr.Dataset:
         """Open every snapshot of the simulation as one lazy, Dask-backed :obj:`xarray.Dataset`.
 
@@ -1307,7 +1317,8 @@ class Parameters(
         Parameters
         ----------
         data_path : str, optional
-            The data folder. Defaults to ``prm.dataset.data_path``.
+            The data folder. Defaults to ``data/`` next to the parameters file
+            (``prm.filename``), the folder XCompact3d writes to.
         **kwargs
             Options for :obj:`Xcompact3dConvention.from_parameters` (``dtype``,
             ``drop_coords``, ``filename_properties``, ``snapshot_step``, ``static_names``,
@@ -1341,7 +1352,7 @@ class Parameters(
 
         convention_kwargs, open_kwargs = Xcompact3dConvention.split_kwargs(kwargs)
         convention = Xcompact3dConvention.from_parameters(self, **convention_kwargs)
-        return convention.open(data_path or self.dataset.data_path, **open_kwargs)
+        return convention.open(data_path or self.default_data_path, **open_kwargs)
 
     def write_dataset(self, data: xr.Dataset | xr.DataArray, data_path: str | None = None, **kwargs) -> None:
         """Write an array or dataset to raw binary files, the lazy counterpart of :obj:`dataset`'s ``write``.
@@ -1356,7 +1367,8 @@ class Parameters(
         data : :obj:`xarray.Dataset` or :obj:`xarray.DataArray`
             Data to be written.
         data_path : str, optional
-            The data folder. Defaults to ``prm.dataset.data_path``.
+            The data folder. Defaults to ``data/`` next to the parameters file
+            (``prm.filename``).
         **kwargs
             ``file_prefix`` and ``progress`` for :obj:`Xcompact3dConvention.write`, plus
             options for :obj:`Xcompact3dConvention.from_parameters` (``dtype``,
@@ -1378,7 +1390,7 @@ class Parameters(
 
         convention_kwargs, write_kwargs = Xcompact3dConvention.split_kwargs(kwargs)
         convention = Xcompact3dConvention.from_parameters(self, **convention_kwargs)
-        convention.write(data, data_path or self.dataset.data_path, **write_kwargs)
+        convention.write(data, data_path or self.default_data_path, **write_kwargs)
 
     def get_mesh(self, *, refined_for_ibm: bool = False) -> dict:
         """Get mesh the three-dimensional coordinate system. The coordinates are stored

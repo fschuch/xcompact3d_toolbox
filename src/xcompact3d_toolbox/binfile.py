@@ -174,8 +174,11 @@ class Xcompact3dConvention:
             Coordinate to drop when the files hold 2D planes: ``"x"``, ``"y"`` or ``"z"``
             (default is ``""``, for 3D fields).
         filename_properties : :obj:`xcompact3d_toolbox.io.FilenameProperties` or dict, optional
-            Naming of the files. Defaults to ``prm.dataset.filename_properties``; a dict
-            of its keyword arguments is accepted too.
+            Naming of the files, as a :obj:`xcompact3d_toolbox.io.FilenameProperties` or a
+            dict of its keyword arguments. Defaults to ``ux-000.bin`` style names: separator
+            ``"-"``, extension ``".bin"``, three digits, one digit for scalar fractions.
+            It is independent of ``prm.dataset``: the lazy API never reads the on-demand
+            loader's configuration.
         snapshot_step : str, optional
             The parameter giving the number of time steps between snapshots, ``"ioutput"``
             (default) or ``"iprocessing"``; with ``prm.dt`` it sets the ``t`` coordinate.
@@ -218,7 +221,7 @@ class Xcompact3dConvention:
         from xcompact3d_toolbox.io import FilenameProperties  # noqa: PLC0415  (import cycle)
 
         if filename_properties is None:
-            fp = prm.dataset.filename_properties
+            fp = FilenameProperties()
         elif isinstance(filename_properties, FilenameProperties):
             fp = filename_properties
         else:
