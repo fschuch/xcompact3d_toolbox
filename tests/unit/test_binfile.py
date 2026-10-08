@@ -119,7 +119,7 @@ class TestFromParametersFiles:
         assert stacks["i"].template == "{name}{i}"
         assert stacks["i"].values == ("x", "y", "z")
         assert stacks["n"].template == "{name}{n:02d}"
-        assert stacks["n"].names == ("phi",)
+        assert stacks["n"].names == {"phi"}
         assert stacks["n"].attrs["name"] == "Scalar fraction"
 
     def test_writer_splits_stacked_arrays_and_steps(self, prm):
@@ -458,7 +458,7 @@ class TestReviewFixes:
         xr.testing.assert_allclose(opened["pp"].transpose(*snapshots["pp"].dims).load(), snapshots["pp"])
         assert sorted(convention.open(root, variables=["pp"]).data_vars) == ["pp"]
         assert sorted(convention.open(root, variables=["u"]).data_vars) == ["u"]
-        assert {stack.names for stack in convention.stacks} == {("u",), ("phi",)}
+        assert {stack.names for stack in convention.stacks} == {frozenset({"u"}), frozenset({"phi"})}
 
     def test_write_splits_by_dimension_whatever_the_name(self, case):
         """Unstacking on write follows the dims i and n; pp has neither and is written as is."""
@@ -475,3 +475,43 @@ class TestReviewFixes:
         assert names == {"vortx", "vorty", "vortz", "conc1", "conc2", "pp"}
         # on read, only the configured names u and phi are stacked back
         assert sorted(convention.open(out).data_vars) == ["conc1", "conc2", "pp", "vortx", "vorty", "vortz"]
+
+
+class TestStackNames:
+    def test_default_stacks_u_and_phi_only(self, prm):
+        convention = Xcompact3dConvention.from_parameters(prm)
+
+        assert {stack.dim: stack.names for stack in convention.stacks} == {"i": {"u"}, "n": {"phi"}}
+
+    def test_extra_names_are_stacked_back(self, case):
+        prm, root, snapshots, _ = case
+        writer = Xcompact3dConvention.from_parameters(prm)
+        writer.write(snapshots["u"].drop_attrs().rename("vort"), root, progress=lambda specs: specs)
+        writer.write(snapshots["phi"].drop_attrs().rename("conc"), root, progress=lambda specs: specs)
+
+        opened = prm.open_dataset(root, stack_names={"i": {"u", "vort"}, "n": {"phi", "conc"}})
+
+        assert sorted(opened.data_vars) == ["conc", "phi", "pp", "u", "vort"]
+        assert opened["vort"].dims == ("i", "x", "y", "z", "t")
+        assert opened["conc"]["n"].values.tolist() == [1, 2]
+        assert sorted(prm.open_dataset(root, stack_names={"i": {"vort"}}, variables=["vort"]).data_vars) == ["vort"]
+
+    def test_a_dimension_can_be_left_unstacked(self, case):
+        prm, root, *_ = case
+
+        opened = prm.open_dataset(root, stack_names={"i": set()})
+
+        assert sorted(opened.data_vars) == ["phi", "pp", "ux", "uy", "uz"]
+
+    def test_unknown_dimension_is_rejected(self, prm):
+        with pytest.raises(ValueError, match="stack_names.*'i' and 'n'"):
+            Xcompact3dConvention.from_parameters(prm, stack_names={"j": {"u"}})
+
+    def test_stack_names_reach_folders(self, case):
+        prm, root, snapshots, _ = case
+        (root / "sub").mkdir()
+        convention = Xcompact3dConvention.from_parameters(prm, stack_names={"i": {"vort"}}, folders={"sub": {}})
+        vort = snapshots["u"].drop_attrs().rename("sub/vort")
+        convention.write(vort, root, progress=lambda specs: specs)
+
+        assert "vort" in convention.open(root).data_vars

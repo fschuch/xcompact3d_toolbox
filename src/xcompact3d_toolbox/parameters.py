@@ -1357,13 +1357,16 @@ class Parameters(
         **kwargs
             Options for :obj:`Xcompact3dConvention.from_parameters` (``dtype``,
             ``drop_coords``, ``filename_properties``, ``snapshot_step``, ``static_names``,
-            ``folders``) and for :obj:`Xcompact3dConvention.open` (``variables``, ``stack``,
+            ``stack_names``, ``folders``) and for :obj:`Xcompact3dConvention.open` (``variables``, ``stack``,
             ``chunks``, ``parallel`` and any :obj:`xarray.open_mfdataset` option).
 
         Returns
         -------
         :obj:`xarray.Dataset`
-            The lazy dataset.
+            The lazy dataset. It is an ordinary :obj:`xarray.Dataset`: when the defaults
+            do not fit your case, open with ``stack=False`` and shape it with xarray itself
+            (:obj:`xarray.concat`, :obj:`xarray.merge`, :obj:`xarray.combine_by_coords`,
+            :obj:`xarray.Dataset.stack`, ``rename``, ``chunk``, ...), all of it lazily.
 
         Examples
         --------
@@ -1371,6 +1374,10 @@ class Parameters(
         >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
         >>> ds = prm.open_dataset()
         >>> ds.u.sel(i="x").mean("t").compute()
+
+        Reassemble a derived vector field written as ``vortx``, ``vorty``, ``vortz``:
+
+        >>> ds = prm.open_dataset(stack_names={"i": {"u", "vort"}})
 
         Planes stored in a sub-folder and a geometry file:
 

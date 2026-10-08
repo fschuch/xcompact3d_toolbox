@@ -41,7 +41,7 @@ from xarray_binfile.conventions import (
 from xcompact3d_toolbox.param import param
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
 
     from xarray_binfile import ReadSpecs, WriteSpecs
 
@@ -61,6 +61,9 @@ COORD_ATTRS: dict[str, dict[str, str]] = {
 
 VELOCITY_COMPONENTS = ("x", "y", "z")
 SCALAR_FRACTIONS = range(1, 10)
+DEFAULT_STACK_NAMES: dict[str, frozenset[str]] = {"i": frozenset({"u"}), "n": frozenset({"phi"})}
+# Base names reassembled on read for each stacked dimension; writing splits any array
+# carrying the dimension, whatever its name.
 
 
 # Output names: a word, optionally under sub-folders. Separator, step and extension
@@ -152,6 +155,7 @@ class Xcompact3dConvention:
         "time_dim",
         "static",
         "static_names",
+        "stack_names",
         "folders",
     })
     """Keyword arguments of :obj:`from_parameters`, used by :obj:`split_kwargs`."""
@@ -186,6 +190,7 @@ class Xcompact3dConvention:
         time_dim: str = "t",
         static: bool = False,
         static_names: Sequence[str] | None = None,
+        stack_names: Mapping[str, Collection[str]] | None = None,
         folders: Mapping[str, Mapping[str, Any] | ConventionProtocol] | None = None,
     ) -> Xcompact3dConvention:
         """Build the convention from a :obj:`xcompact3d_toolbox.parameters.Parameters` instance.
@@ -196,7 +201,8 @@ class Xcompact3dConvention:
         (``phi`` from ``phi1``, ``phi2``, ...); the stacks act on those two names
         only, so a field such as ``vortx`` is left as it is on disk. The name an array is written
         under is its ``file_name`` attribute, falling back to its name, like
-        :obj:`xcompact3d_toolbox.io.Dataset.write`.
+        :obj:`xcompact3d_toolbox.io.Dataset.write`. Use ``stack_names`` to reassemble
+        other fields on read.
 
         Parameters
         ----------
@@ -227,6 +233,14 @@ class Xcompact3dConvention:
             when ``file_extension`` is set; with an empty extension, a bare name would also
             match unrelated files (``README``), so static files are only recognised when
             listed here.
+        stack_names : dict, optional
+            Which variables are reassembled on read, per stacked dimension: ``"i"``
+            (components ``x``, ``y``, ``z``) and ``"n"`` (scalar fractions ``1``..``9``).
+            Defaults to ``{"i": {"u"}, "n": {"phi"}}``, so ``ux``, ``uy``, ``uz`` become
+            ``u`` and ``phi1``, ``phi2`` become ``phi``. Add your own fields, for example
+            ``{"i": {"u", "vort"}}`` to get ``vort`` back from ``vortx``, ``vorty``,
+            ``vortz``; an empty set leaves that dimension unstacked. Writing always splits
+            an array carrying ``i`` or ``n``, whatever its name.
         folders : dict, optional
             Sub-folders of the data folder and what they hold. Each value is either a dict of
             keyword arguments for this method (the sub-convention is built from the same
@@ -269,13 +283,17 @@ class Xcompact3dConvention:
             coord_attrs=COORD_ATTRS,
         )
         pattern = FilenamePattern(_filename_template(fp), exact_width=True)
+        names = {**DEFAULT_STACK_NAMES, **{dim: frozenset(value) for dim, value in (stack_names or {}).items()}}
+        if unknown := set(names) - set(DEFAULT_STACK_NAMES):
+            msg = f"stack_names only accepts the dimensions 'i' and 'n', got {sorted(unknown)}."
+            raise ValueError(msg)
         stacks = (
-            VariableStack("i", "{name}{i}", values=VELOCITY_COMPONENTS, names=("u",), attrs=COORD_ATTRS["i"]),
+            VariableStack("i", "{name}{i}", values=VELOCITY_COMPONENTS, names=names["i"], attrs=COORD_ATTRS["i"]),
             VariableStack(
                 "n",
                 f"{{name}}{{n:0{fp.scalar_num_of_digits}d}}",
                 values=SCALAR_FRACTIONS,
-                names=("phi",),
+                names=names["n"],
                 attrs=COORD_ATTRS["n"],
             ),
         )
@@ -322,6 +340,7 @@ class Xcompact3dConvention:
                     "filename_properties": fp,
                     "snapshot_step": snapshot_step,
                     "time_dim": time_dim,
+                    "stack_names": names,
                     **spec,
                 }
                 tree[folder] = cls.from_parameters(prm, **overrides).convention
