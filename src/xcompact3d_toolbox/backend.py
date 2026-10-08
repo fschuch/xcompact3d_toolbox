@@ -23,6 +23,7 @@ stacked into ``u`` and ``phi``, or call ``convention.stack(ds)`` afterwards.
 
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -33,7 +34,6 @@ from xcompact3d_toolbox.binfile import Xcompact3dConvention
 from xcompact3d_toolbox.parameters import Parameters
 
 if TYPE_CHECKING:
-    import os
     from collections.abc import Iterable
 
     import xarray as xr
@@ -56,62 +56,68 @@ def find_parameters_file(path: str | os.PathLike[str]) -> Path | None:
     :obj:`pathlib.Path` or None
         The parameters file, or :obj:`None` when there is none or more than one.
     """
-    case = Path(path).resolve().parent.parent
+    case = Path(os.path.abspath(path)).parent.parent
     if not case.is_dir():
         return None
-    return _parameters_file_in(case, case.stat().st_mtime_ns)
-
-
-@lru_cache(maxsize=64)
-def _parameters_file_in(case: Path, mtime_ns: int) -> Path | None:  # noqa: ARG001  (mtime keys the cache)
     candidates = [p for p in case.iterdir() if p.is_file() and p.suffix in PARAMETERS_SUFFIXES]
     return candidates[0] if len(candidates) == 1 else None
 
 
 @lru_cache(maxsize=64)
-def _parameters_from(parameters_file: str, mtime_ns: int) -> Parameters:  # noqa: ARG001  (mtime keys the cache)
-    return Parameters(loadfile=parameters_file)
-
-
-def load_parameters(parameters_file: str | os.PathLike[str]) -> Parameters:
+def load_parameters(parameters_file: str, mtime_ns: int) -> Parameters:  # noqa: ARG001  (mtime keys the cache)
     """Load a parameters file, reusing the result while the file is unchanged.
 
     :obj:`xarray.open_mfdataset` opens every file through the backend, so without this
     cache a run with thousands of snapshots would parse the same ``.i3d`` thousands of
-    times. The cache key includes the modification time, so an edited file is reloaded.
+    times. The modification time is part of the key, so an edited file is reloaded.
 
     Parameters
     ----------
-    parameters_file : str or path-like
+    parameters_file : str
         The ``.i3d`` or ``.prm`` file.
+    mtime_ns : int
+        Its modification time, ``Path(parameters_file).stat().st_mtime_ns``.
 
     Returns
     -------
     :obj:`xcompact3d_toolbox.parameters.Parameters`
         The loaded parameters (shared between calls; treat it as read-only).
     """
-    file = Path(parameters_file)
-    return _parameters_from(file.as_posix(), file.stat().st_mtime_ns)
+    return Parameters(loadfile=parameters_file)
 
 
-load_parameters.cache_clear = _parameters_from.cache_clear  # type: ignore[attr-defined]
+def parameters_for(path: str | os.PathLike[Any]) -> Parameters:
+    """The parameters of the case a binary field belongs to.
+
+    Parameters
+    ----------
+    path : str or path-like
+        A binary field.
+
+    Returns
+    -------
+    :obj:`xcompact3d_toolbox.parameters.Parameters`
+        The parameters loaded from the single ``*.i3d`` or ``*.prm`` next to the data folder.
+
+    Raises
+    ------
+    ValueError
+        If there is no such file, or more than one.
+    """
+    parameters_file = find_parameters_file(path)
+    if parameters_file is None:
+        msg = (
+            f"Cannot open {path}: pass prm= (a Parameters instance) or convention= "
+            "(an Xcompact3dConvention), or keep exactly one *.i3d or *.prm file next to the data folder."
+        )
+        raise ValueError(msg)
+    return load_parameters(parameters_file.as_posix(), parameters_file.stat().st_mtime_ns)
 
 
 class Xcompact3dEntrypoint(RawBinaryEntrypoint):
     """Backend entry point registered as ``engine="xcompact3d"``.
 
-    Parameters accepted by :obj:`xarray.open_dataset` and :obj:`xarray.open_mfdataset`
-    on top of the usual ones:
-
-    * ``prm``: a :obj:`xcompact3d_toolbox.parameters.Parameters` instance;
-    * ``convention``: a ready :obj:`xcompact3d_toolbox.binfile.Xcompact3dConvention`,
-      taking precedence over ``prm``;
-    * any keyword of :obj:`Xcompact3dConvention.from_parameters` (``dtype``,
-      ``drop_coords``, ``filename_properties``, ``snapshot_step``, ``time_dim``,
-      ``static_names``, ``folders``), used with ``prm``.
-
-    Without ``prm`` and ``convention``, the parameters file next to the data folder
-    is loaded, if there is exactly one.
+    See :obj:`open_dataset` for the keywords it accepts on top of the usual ones.
 
     .. versionadded:: 1.5.0
     """
@@ -164,7 +170,7 @@ class Xcompact3dEntrypoint(RawBinaryEntrypoint):
         """
         if convention is None:
             if prm is None:
-                prm = self._load_parameters(filename_or_obj)
+                prm = parameters_for(filename_or_obj)
             convention = Xcompact3dConvention.from_parameters(prm, **convention_kwargs)
         return super().open_dataset(filename_or_obj, read_specs_getter=convention.reader, drop_variables=drop_variables)
 
@@ -176,14 +182,3 @@ class Xcompact3dEntrypoint(RawBinaryEntrypoint):
         except TypeError:
             return False
         return path.suffix == ".bin" and find_parameters_file(path) is not None
-
-    @staticmethod
-    def _load_parameters(filename_or_obj: str | os.PathLike[Any]) -> Parameters:
-        parameters_file = find_parameters_file(filename_or_obj)
-        if parameters_file is None:
-            msg = (
-                f"Cannot open {filename_or_obj}: pass prm= (a Parameters instance) or convention= "
-                "(an Xcompact3dConvention), or keep exactly one *.i3d or *.prm file next to the data folder."
-            )
-            raise ValueError(msg)
-        return load_parameters(parameters_file)

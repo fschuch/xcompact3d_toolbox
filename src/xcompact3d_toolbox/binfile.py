@@ -12,15 +12,16 @@ on-demand loader, and both read and write the same files.
 
 from __future__ import annotations
 
+import inspect
 import os
 import re
 import warnings
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import partial
 from itertools import chain
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import numpy as np
 import xarray as xr
@@ -38,26 +39,15 @@ from xarray_binfile.conventions import (
     VariableStack,
 )
 
-from xcompact3d_toolbox.param import param
+from xcompact3d_toolbox.param import COORD_ATTRS, param
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
 
-    from xarray_binfile import ReadSpecs, WriteSpecs
+    from xarray_binfile import WriteSpecs
 
     from xcompact3d_toolbox.io import FilenameProperties
     from xcompact3d_toolbox.parameters import Parameters
-
-COORD_ATTRS: dict[str, dict[str, str]] = {
-    "x": {"name": "Streamwise coordinate", "long_name": r"$x_1$"},
-    "y": {"name": "Vertical coordinate", "long_name": r"$x_2$"},
-    "z": {"name": "Spanwise coordinate", "long_name": r"$x_3$"},
-    "t": {"name": "Time", "long_name": r"$t$"},
-    "i": {"name": "Velocity component", "long_name": r"$i$"},
-    "n": {"name": "Scalar fraction", "long_name": r"$\ell$"},
-}
-# Attributes attached to the coordinates of the lazy dataset, matching
-# xcompact3d_toolbox.sandbox.init_dataset.
 
 VELOCITY_COMPONENTS = ("x", "y", "z")
 SCALAR_FRACTIONS = range(1, 10)
@@ -109,18 +99,20 @@ def _filename_template(filename_properties: FilenameProperties) -> str:
 
 
 @dataclass(frozen=True)
-class Xcompact3dConvention:
+class Xcompact3dConvention(FolderConventions):
     """Describes the binary files of a simulation for `xarray-binfile`_.
 
-    Build it with :obj:`from_parameters`. It implements the xarray-binfile
-    convention protocol (:obj:`reader` and :obj:`writer`), so it can be
-    handed to :obj:`xarray.open_mfdataset` and ``.binary_engine.to_file``
-    directly.
+    Build it with :obj:`from_parameters`. It is a
+    :obj:`xarray_binfile.conventions.FolderConventions` (and so a
+    :obj:`xarray_binfile.conventions.Convention`): the dataset root holds the
+    snapshots next to static fields, and ``folders`` adds sub-folders. It can be
+    handed to :obj:`xarray.open_mfdataset` and ``.binary_engine.to_file`` directly,
+    and offers :obj:`open`, :obj:`write`, :obj:`files` and :obj:`stack`.
 
     Parameters
     ----------
-    convention : :obj:`xarray_binfile.conventions.ConventionProtocol`
-        The composed xarray-binfile conventions doing the work.
+    conventions : mapping
+        The composed xarray-binfile conventions doing the work, by folder.
     layout : :obj:`xarray_binfile.conventions.Layout`
         Dimension order, coordinates, dtype and memory order of one file on disk.
     pattern : :obj:`xarray_binfile.conventions.FilenamePattern`
@@ -140,24 +132,14 @@ class Xcompact3dConvention:
     .. _xarray-binfile: https://docs.fschuch.com/xarray-binfile/
     """
 
-    convention: ConventionProtocol
-    layout: Layout
-    pattern: FilenamePattern
-    stacks: tuple[VariableStack, ...]
+    # The three fields below are always set by from_parameters; defaults only satisfy dataclass ordering.
+    layout: Layout = field(default=None)  # type: ignore[assignment]
+    pattern: FilenamePattern = field(default=None)  # type: ignore[assignment]
+    stacks: tuple[VariableStack, ...] = ()
     _time_dim: str = "t"
     _planes: tuple[StaticFiles, ...] = ()
 
-    FROM_PARAMETERS_KEYS = frozenset({
-        "dtype",
-        "drop_coords",
-        "filename_properties",
-        "snapshot_step",
-        "time_dim",
-        "static",
-        "static_names",
-        "stack_names",
-        "folders",
-    })
+    FROM_PARAMETERS_KEYS: ClassVar[frozenset[str]]
     """Keyword arguments of :obj:`from_parameters`, used by :obj:`split_kwargs`."""
 
     @classmethod
@@ -269,19 +251,14 @@ class Xcompact3dConvention:
         """
         from xcompact3d_toolbox.io import FilenameProperties  # noqa: PLC0415  (import cycle)
 
-        if filename_properties is None:
-            fp = FilenameProperties()
-        elif isinstance(filename_properties, FilenameProperties):
-            fp = filename_properties
-        else:
-            fp = FilenameProperties(**filename_properties)
-
-        layout = Layout(
-            prm.mesh.drop(*drop_coords),
-            dtype=np.dtype(param["mytype"] if dtype is None else dtype),
-            order="F",
-            coord_attrs=COORD_ATTRS,
+        fp = (
+            filename_properties
+            if isinstance(filename_properties, FilenameProperties)
+            else FilenameProperties(**(filename_properties or {}))
         )
+        coords = prm.mesh.drop(*drop_coords)
+        on_disk = np.dtype(param["mytype"] if dtype is None else dtype)
+        layout = Layout(coords, dtype=on_disk, order="F", coord_attrs=COORD_ATTRS)
         pattern = FilenamePattern(_filename_template(fp), exact_width=True)
         names = {**DEFAULT_STACK_NAMES, **{dim: frozenset(value) for dim, value in (stack_names or {}).items()}}
         if unknown := set(names) - set(DEFAULT_STACK_NAMES):
@@ -297,6 +274,7 @@ class Xcompact3dConvention:
                 attrs=COORD_ATTRS["n"],
             ),
         )
+        static_pattern = FilenamePattern(f"{{name}}{fp.file_extension}")
         members: list[ConventionProtocol] = []
         if not static:
             members.append(
@@ -312,53 +290,42 @@ class Xcompact3dConvention:
             )
         if static or fp.file_extension or static_names is not None:
             members.append(
-                StaticFiles(
-                    layout,
-                    pattern=FilenamePattern(f"{{name}}{fp.file_extension}"),
-                    stacks=stacks,
-                    names=static_names,
-                    name_of=_output_name,
-                )
+                StaticFiles(layout, pattern=static_pattern, stacks=stacks, names=static_names, name_of=_output_name)
             )
-        static_pattern = FilenamePattern(f"{{name}}{fp.file_extension}")
+        # Write-only planes: one static layout per dropped dimension, sharing the root pattern.
         planes = tuple(
             StaticFiles(
-                Layout(prm.mesh.drop(*drop_coords, dim), dtype=layout.dtype, order="F", coord_attrs=COORD_ATTRS),
+                Layout(
+                    {d: c for d, c in coords.items() if d != dim}, dtype=on_disk, order="F", coord_attrs=COORD_ATTRS
+                ),
                 pattern=static_pattern,
                 stacks=stacks,
                 name_of=_output_name,
             )
-            for dim in layout.dims
-            if len(layout.dims) > 1
+            for dim in (layout.dims if len(layout.dims) > 1 else ())
         )
+        base = {
+            "dtype": dtype,
+            "drop_coords": drop_coords,
+            "filename_properties": fp,
+            "snapshot_step": snapshot_step,
+            "time_dim": time_dim,
+            "stack_names": names,
+        }
         tree: dict[str, ConventionProtocol] = {".": PatternConventions(members)}
         for folder, spec in (folders or {}).items():
             if isinstance(spec, Mapping):
-                overrides = {
-                    "dtype": dtype,
-                    "drop_coords": drop_coords,
-                    "filename_properties": fp,
-                    "snapshot_step": snapshot_step,
-                    "time_dim": time_dim,
-                    "stack_names": names,
-                    **spec,
-                }
-                tree[folder] = cls.from_parameters(prm, **overrides).convention
+                tree[folder] = cls.from_parameters(prm, **{**base, **spec}).conventions["."]
             else:
                 tree[folder] = spec
-        convention = FolderConventions(tree)
         return cls(
-            convention=convention,
+            conventions=tree,
             layout=layout,
             pattern=pattern,
             stacks=stacks,
             _time_dim=time_dim,
             _planes=planes,
         )
-
-    def reader(self, path: Path) -> ReadSpecs:
-        """Read specs getter: decode one file (see the xarray-binfile read protocol)."""
-        return self.convention.reader(path)
 
     def writer(self, data_array: xr.DataArray) -> Iterator[WriteSpecs]:
         """Write specs getter: split one array into files (see the xarray-binfile write protocol).
@@ -370,7 +337,7 @@ class Xcompact3dConvention:
         named = data_array.rename(_output_name(data_array))
         named.attrs = {k: v for k, v in data_array.attrs.items() if k != "file_name"}
         try:
-            return _primed(self.convention.writer(named))
+            return _primed(super().writer(named))
         except LayoutMismatchError as error:
             if not self._planes or self._time_dim in named.dims:
                 raise
@@ -442,15 +409,15 @@ class Xcompact3dConvention:
             array = data
             if file_prefix is not None:
                 array = array.copy(deep=False).assign_attrs(file_name=file_prefix)
-            _output_name(array)
             arrays = [array]
         else:
             msg = "Invalid type for data, try with: xarray.Dataset or xarray.DataArray"
             raise TypeError(msg)
 
+        names = [_output_name(array) for array in arrays]  # validated before any file is touched
         os.makedirs(directory, exist_ok=True)
-        for array in arrays:
-            bar = progress if progress is not None else partial(tqdm, desc=_output_name(array))
+        for array, name in zip(arrays, names, strict=True):
+            bar = progress if progress is not None else partial(tqdm, desc=name)
             array.binary_engine.to_file(self.writer, directory, progress=bar)
 
     def files(self, directory: str | os.PathLike[str]) -> list[Path]:
@@ -468,37 +435,25 @@ class Xcompact3dConvention:
         list of :obj:`pathlib.Path`
             The matching files, sorted.
         """
+        paths = super().files(directory)
         plane_bytes = {int(np.prod(plane.layout.shape)) * plane.layout.dtype.itemsize for plane in self._planes}
         plane_bytes.discard(int(np.prod(self.layout.shape)) * self.layout.dtype.itemsize)
-
-        root = Path(directory).resolve()
+        if not plane_bytes:
+            return paths
+        root = Path(directory)
 
         def is_plane(path: Path) -> bool:
             # Write-only planes live in the root; a registered sub-folder describes its own
             # layout and is never filtered. Only static files can be planes: a snapshot with
-            # a plane's size is truncated and must fail loudly when opened.
+            # a plane's size is truncated and must fail loudly when opened. The stat runs
+            # first because it rejects nearly every file.
             return (
-                path.resolve().parent == root
-                and path.stat().st_size in plane_bytes
+                path.stat().st_size in plane_bytes
+                and path.parent == root
                 and self._time_dim not in self.reader(path).dims
             )
 
-        return [path for path in self.convention.files(directory) if not is_plane(path)]  # type: ignore[attr-defined]
-
-    def stack(self, dataset: xr.Dataset) -> xr.Dataset:
-        """Rebuild ``u`` from ``ux``, ``uy``, ``uz`` and ``phi`` from ``phi1``, ``phi2``, ... (lazily).
-
-        Parameters
-        ----------
-        dataset : :obj:`xarray.Dataset`
-            A dataset as decoded by the ``binfile`` engine.
-
-        Returns
-        -------
-        :obj:`xarray.Dataset`
-            The dataset with the stacked arrays.
-        """
-        return self.convention.stack(dataset)  # type: ignore[attr-defined]
+        return [path for path in paths if not is_plane(path)]
 
     def _disk_names(self, variables: Iterable[str]) -> set[str]:
         """Map requested names to names found on disk.
@@ -565,19 +520,13 @@ class Xcompact3dConvention:
         """
         if chunks is None:
             chunks = {self._time_dim: 1}
-        paths = self.files(directory)
         if variables is not None:
-            wanted = self._disk_names(variables)
-            paths = [path for path in paths if self.reader(path).name in wanted]
-        if not paths:
-            msg = f"No binary field found in {os.fspath(directory)!r} for this convention."
-            raise FileNotFoundError(msg)
-        dataset = xr.open_mfdataset(
-            paths,
-            engine="binfile",
-            read_specs_getter=self.reader,
-            chunks=chunks,
-            parallel=parallel,
-            **open_mfdataset_kwargs,
+            variables = self._disk_names(variables)
+        return super().open(
+            directory, variables=variables, stack=stack, chunks=chunks, parallel=parallel, **open_mfdataset_kwargs
         )
-        return self.stack(dataset) if stack else dataset
+
+
+Xcompact3dConvention.FROM_PARAMETERS_KEYS = frozenset(
+    inspect.signature(Xcompact3dConvention.from_parameters).parameters
+) - {"prm"}

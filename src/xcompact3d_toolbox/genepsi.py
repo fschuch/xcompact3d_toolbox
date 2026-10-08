@@ -305,8 +305,9 @@ def gene_epsi_3d(epsi_in_dict, prm, data_path: str | os.PathLike[str] | None = N
     return ds
 
 
-def write_geomcomplex(prm, ds, data_path: str | os.PathLike[str] | None = None) -> None:
-    geometry = os.path.join(prm._resolve_data_path(data_path), "geometry")  # noqa: SLF001
+def write_geomcomplex(prm, ds, folder: str) -> None:
+    """Write the geometry files for ``iibm == 2`` into ``folder/geometry``."""
+    geometry = os.path.join(folder, "geometry")
 
     def write_nobj(array, dim) -> None:
         with open(os.path.join(geometry, f"nobj{dim}.dat"), "w", newline="\n", encoding=ENCODING) as file:
@@ -332,7 +333,7 @@ def write_geomcomplex(prm, ds, data_path: str | os.PathLike[str] | None = None) 
             return array.values.transpose(1, 0, 2).flatten()
         return array.values.T.flatten()
 
-    prm.write_dataset(ds["epsi"], os.path.dirname(geometry))
+    prm.write_dataset(ds["epsi"], folder)
     for direction in ["x", "y", "z"]:
         write_nobj(ds[f"nobj_{direction}"], direction)
         write_nxipif(ds[f"nxipif_{direction}"], ds[f"nxfpif_{direction}"], direction)
