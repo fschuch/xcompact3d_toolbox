@@ -96,6 +96,36 @@ class Xcompact3dConvention:
     stacks: tuple[VariableStack, ...]
     _time_dim: str = "t"
 
+    FROM_PARAMETERS_KEYS = frozenset({
+        "dtype",
+        "drop_coords",
+        "filename_properties",
+        "snapshot_step",
+        "time_dim",
+        "static",
+        "static_names",
+        "folders",
+    })
+    """Keyword arguments of :obj:`from_parameters`, used by :obj:`split_kwargs`."""
+
+    @classmethod
+    def split_kwargs(cls, kwargs: Mapping[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+        """Split keyword arguments into those for :obj:`from_parameters` and the rest.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Mixed keyword arguments.
+
+        Returns
+        -------
+        tuple of dict
+            The :obj:`from_parameters` arguments and the remaining ones.
+        """
+        ours = {k: v for k, v in kwargs.items() if k in cls.FROM_PARAMETERS_KEYS}
+        others = {k: v for k, v in kwargs.items() if k not in cls.FROM_PARAMETERS_KEYS}
+        return ours, others
+
     @classmethod
     def from_parameters(
         cls,

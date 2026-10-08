@@ -13,6 +13,7 @@ import os.path
 
 import numpy as np
 import traitlets
+import xarray as xr
 from loguru import logger
 
 from xcompact3d_toolbox.io import Dataset, i3d_to_dict, prm_to_dict
@@ -1291,6 +1292,53 @@ class Parameters(
         else:
             msg = "Format error, only .i3d is supported"
             raise OSError(msg)
+
+    def open_dataset(self, data_path: str | None = None, **kwargs) -> xr.Dataset:
+        """Open every snapshot of the simulation as one lazy, Dask-backed :obj:`xarray.Dataset`.
+
+        It is the lazy counterpart of :obj:`dataset`, built on `xarray-binfile`_: nothing
+        is read until values are needed, velocity components are stacked on ``i`` and
+        scalar fractions on ``n``, and the files are the same ones :obj:`dataset` reads
+        and writes. See :obj:`xcompact3d_toolbox.binfile.Xcompact3dConvention`.
+
+        Parameters
+        ----------
+        data_path : str, optional
+            The data folder. Defaults to ``prm.dataset.data_path``.
+        **kwargs
+            Options for :obj:`Xcompact3dConvention.from_parameters` (``dtype``,
+            ``drop_coords``, ``filename_properties``, ``snapshot_step``, ``static_names``,
+            ``folders``) and for :obj:`Xcompact3dConvention.open` (``variables``, ``stack``,
+            ``chunks``, ``parallel`` and any :obj:`xarray.open_mfdataset` option).
+
+        Returns
+        -------
+        :obj:`xarray.Dataset`
+            The lazy dataset.
+
+        Examples
+        --------
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> ds = prm.open_dataset()
+        >>> ds.u.sel(i="x").mean("t").compute()
+
+        Planes stored in a sub-folder and a geometry file:
+
+        >>> ds = prm.open_dataset(
+        ...     folders={"xy_planes": {"drop_coords": "z"}, "geometry": {"static": True}},
+        ...     chunks={"x": 64},
+        ... )
+
+        .. _xarray-binfile: https://docs.fschuch.com/xarray-binfile/
+
+        .. versionadded:: 1.5.0
+        """
+        from xcompact3d_toolbox.binfile import Xcompact3dConvention  # noqa: PLC0415  (import cycle)
+
+        convention_kwargs, open_kwargs = Xcompact3dConvention.split_kwargs(kwargs)
+        convention = Xcompact3dConvention.from_parameters(self, **convention_kwargs)
+        return convention.open(data_path or self.dataset.data_path, **open_kwargs)
 
     def get_mesh(self, *, refined_for_ibm: bool = False) -> dict:
         """Get mesh the three-dimensional coordinate system. The coordinates are stored

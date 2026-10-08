@@ -264,3 +264,31 @@ class TestFolders:
         epsi = _field(prm, "epsi").assign_attrs(file_name="geometry/epsilon")
 
         assert [s.filename for s in convention.writer(epsi)] == ["geometry/epsilon.bin"]
+
+
+class TestParametersOpenDataset:
+    def test_open_dataset_defaults_to_the_loader_data_path(self, case):
+        prm, root, *_ = case
+
+        lazy = prm.open_dataset()
+        eager = prm.dataset[:]
+
+        assert sorted(lazy.data_vars) == ["phi", "pp", "u"]
+        xr.testing.assert_allclose(lazy["pp"].transpose(*eager["pp"].dims).load(), eager["pp"])
+
+    def test_open_dataset_forwards_convention_and_open_options(self, case):
+        prm, root, *_ = case
+
+        lazy = prm.open_dataset(
+            root,
+            folders={"geometry": {"static": True}},
+            variables=["u", "epsilon"],
+            stack=False,
+            chunks={"x": 3},
+        )
+
+        assert sorted(lazy.data_vars) == ["epsilon", "ux", "uy", "uz"]
+        assert lazy["ux"].chunks[0] == (3, 3, 3)
+
+    def test_convention_is_exported_at_top_level(self):
+        assert x3d.Xcompact3dConvention is Xcompact3dConvention
