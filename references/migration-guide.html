@@ -1,0 +1,711 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Migration guide: from prm.dataset to the lazy API &#8212; Xcompact3d-toolbox</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'references/migration-guide';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to Contribute" href="how-to-contribute.html" />
+    <link rel="prev" title="API reference" href="api-reference.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Xcompact3d-toolbox - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Xcompact3d-toolbox - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/io.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/computing_and_plotting.html">Computing and Plotting</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Sandbox Examples</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../examples/Axisymmetric_flow.html">Turbidity Current in Axisymmetric Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/Cylinder.html">Flow Around a Complex Body</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/Square.html">Flow Around a Square and Flow Visualization with Passive Scalar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/Heat-exchanger.html">Periodic Heat Exchanger</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="api-reference.html">API reference</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Migration guide: from <code class="docutils literal notranslate"><span class="pre">prm.dataset</span></code> to the lazy API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to-contribute.html">How to Contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="what-is-new.html">What’s New</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/fschuch/xcompact3d_toolbox" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fschuch/xcompact3d_toolbox/edit/main/docs/references/migration-guide.md" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fschuch/xcompact3d_toolbox/issues/new?title=Issue%20on%20page%20%2Freferences/migration-guide.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/references/migration-guide.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Migration guide: from prm.dataset to the lazy API</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why">Why</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-deprecated">What is deprecated</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#call-by-call">Call by call</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#it-is-a-plain-xarray-dataset">It is a plain xarray.Dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-in-sub-folders">Files in sub-folders</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#static-planes-from-the-sandbox">Static planes from the sandbox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sandbox-and-genepsi">Sandbox and genepsi</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#known-differences">Known differences</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="migration-guide-from-prm-dataset-to-the-lazy-api">
+<h1>Migration guide: from <code class="docutils literal notranslate"><span class="pre">prm.dataset</span></code> to the lazy API<a class="headerlink" href="#migration-guide-from-prm-dataset-to-the-lazy-api" title="Link to this heading">#</a></h1>
+<p>Version 1.5.0 introduces a lazy, Dask-backed way to read and write the raw binary files of XCompact3d, built on <a class="reference external" href="https://docs.fschuch.com/xarray-binfile/">xarray-binfile</a>. The on-demand loader <code class="docutils literal notranslate"><span class="pre">prm.dataset</span></code> keeps working in the 1.x series but emits a <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code>, and it will be removed in version 2.0. This page maps every call to its replacement.</p>
+<section id="why">
+<h2>Why<a class="headerlink" href="#why" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Lazy and parallel.</strong> <code class="docutils literal notranslate"><span class="pre">prm.open_dataset()</span></code> describes the whole simulation at once; values are read only when needed, one file per Dask task, so larger-than-memory workflows and parallel evaluation come for free.</p></li>
+<li><p><strong>One description of the files.</strong> Naming, byte order, dtype, mesh, time and the stacked <code class="docutils literal notranslate"><span class="pre">u</span></code>/<code class="docutils literal notranslate"><span class="pre">phi</span></code> are declared once, in <a class="reference internal" href="api-reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">Xcompact3dConvention</span></code></span></a>, and reused for reading, writing and discovery.</p></li>
+<li><p><strong>Standard xarray.</strong> The same convention is registered as the xarray engine <code class="docutils literal notranslate"><span class="pre">xcompact3d</span></code>, so <code class="docutils literal notranslate"><span class="pre">xarray.open_mfdataset</span></code> works out of the box.</p></li>
+<li><p><strong>Less toolbox-specific code.</strong> The file mechanics now live in xarray-binfile, which is shared with other solvers.</p></li>
+</ul>
+</section>
+<section id="what-is-deprecated">
+<h2>What is deprecated<a class="headerlink" href="#what-is-deprecated" title="Link to this heading">#</a></h2>
+<p>Access to <code class="docutils literal notranslate"><span class="pre">prm.dataset</span></code> itself, and therefore all of its methods and settings. The two APIs are independent: the lazy API never reads <code class="docutils literal notranslate"><span class="pre">prm.dataset.filename_properties</span></code>, <code class="docutils literal notranslate"><span class="pre">data_path</span></code>, <code class="docutils literal notranslate"><span class="pre">drop_coords</span></code>, <code class="docutils literal notranslate"><span class="pre">snapshot_step</span></code>, <code class="docutils literal notranslate"><span class="pre">stack_velocity</span></code> or <code class="docutils literal notranslate"><span class="pre">stack_scalar</span></code>. Configure one or the other, never both.</p>
+</section>
+<section id="call-by-call">
+<h2>Call by call<a class="headerlink" href="#call-by-call" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>On-demand loader (deprecated)</p></th>
+<th class="head"><p>Lazy API</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.set(data_path=&quot;./data/&quot;)</span></code></p></td>
+<td><p>pass <code class="docutils literal notranslate"><span class="pre">data_path</span></code> to <code class="docutils literal notranslate"><span class="pre">prm.open_dataset(...)</span></code> / <code class="docutils literal notranslate"><span class="pre">prm.write_dataset(...)</span></code>; the default is <code class="docutils literal notranslate"><span class="pre">data/</span></code> next to the parameters file (<code class="docutils literal notranslate"><span class="pre">prm.default_data_path</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.filename_properties.set(separator=&quot;-&quot;,</span> <span class="pre">file_extension=&quot;.bin&quot;,</span> <span class="pre">number_of_digits=3)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prm.open_dataset(filename_properties={&quot;separator&quot;:</span> <span class="pre">&quot;-&quot;,</span> <span class="pre">&quot;file_extension&quot;:</span> <span class="pre">&quot;.bin&quot;,</span> <span class="pre">&quot;number_of_digits&quot;:</span> <span class="pre">3})</span></code>; the same defaults apply</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.set(drop_coords=&quot;z&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prm.open_dataset(drop_coords=&quot;z&quot;)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.set(snapshot_step=&quot;iprocessing&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prm.open_dataset(snapshot_step=&quot;iprocessing&quot;)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.set(stack_velocity=True,</span> <span class="pre">stack_scalar=True)</span></code></p></td>
+<td><p>always stacked; <code class="docutils literal notranslate"><span class="pre">prm.open_dataset(stack=False)</span></code> to see <code class="docutils literal notranslate"><span class="pre">ux</span></code>, <code class="docutils literal notranslate"><span class="pre">uy</span></code>, <code class="docutils literal notranslate"><span class="pre">uz</span></code>, <code class="docutils literal notranslate"><span class="pre">phi1</span></code>, … as on disk. <code class="docutils literal notranslate"><span class="pre">stack_names={&quot;i&quot;:</span> <span class="pre">{&quot;u&quot;,</span> <span class="pre">&quot;vort&quot;}}</span></code> also reassembles your own fields (<code class="docutils literal notranslate"><span class="pre">vortx</span></code>, <code class="docutils literal notranslate"><span class="pre">vorty</span></code>, <code class="docutils literal notranslate"><span class="pre">vortz</span></code> into <code class="docutils literal notranslate"><span class="pre">vort</span></code>); writing splits any array carrying <code class="docutils literal notranslate"><span class="pre">i</span></code> or <code class="docutils literal notranslate"><span class="pre">n</span></code>, whatever its name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.set(set_of_variables={&quot;ux&quot;,</span> <span class="pre">&quot;uy&quot;})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prm.open_dataset(variables=[&quot;ux&quot;,</span> <span class="pre">&quot;uy&quot;])</span></code>, or <code class="docutils literal notranslate"><span class="pre">variables=[&quot;u&quot;]</span></code> for the stacked name</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">x3d.param[&quot;mytype&quot;]</span> <span class="pre">=</span> <span class="pre">np.float32</span></code></p></td>
+<td><p>still the default dtype; override per call with <code class="docutils literal notranslate"><span class="pre">prm.open_dataset(dtype=np.float32)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset[&quot;ux&quot;]</span></code> (time series of one variable)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prm.open_dataset(variables=[&quot;ux&quot;],</span> <span class="pre">stack=False)[&quot;ux&quot;]</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset[10]</span></code> (one snapshot)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ds.sel(t=10</span> <span class="pre">*</span> <span class="pre">prm.dt</span> <span class="pre">*</span> <span class="pre">prm.ioutput,</span> <span class="pre">method=\&quot;nearest\&quot;)</span></code> with <code class="docutils literal notranslate"><span class="pre">ds</span> <span class="pre">=</span> <span class="pre">prm.open_dataset()</span></code>: the loader indexed by file counter, the lazy dataset by time label. <code class="docutils literal notranslate"><span class="pre">ds.isel(t=10)</span></code> is positional and only equivalent when every snapshot from <code class="docutils literal notranslate"><span class="pre">000</span></code> is on disk</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset[0:101:10]</span></code>, <code class="docutils literal notranslate"><span class="pre">prm.dataset[:]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ds.sel(t=slice(0,</span> <span class="pre">100</span> <span class="pre">*</span> <span class="pre">prm.dt</span> <span class="pre">*</span> <span class="pre">prm.ioutput)).isel(t=slice(None,</span> <span class="pre">None,</span> <span class="pre">10))</span></code> (label range, then every tenth), <code class="docutils literal notranslate"><span class="pre">prm.open_dataset()</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">ds</span> <span class="pre">in</span> <span class="pre">prm.dataset:</span></code> / <code class="docutils literal notranslate"><span class="pre">prm.dataset(0,</span> <span class="pre">101,</span> <span class="pre">5)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ds</span> <span class="pre">=</span> <span class="pre">prm.open_dataset()</span></code> once, then <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">time</span> <span class="pre">in</span> <span class="pre">ds.t.values:</span> <span class="pre">snapshot</span> <span class="pre">=</span> <span class="pre">ds.sel(t=time)</span></code> (iterating <code class="docutils literal notranslate"><span class="pre">ds.t</span></code> yields time values, not datasets); or better, express the computation on the whole series and let Dask split the work</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.load_array(&quot;ux-000.bin&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">xr.open_dataset(&quot;data/ux-000.bin&quot;,</span> <span class="pre">engine=&quot;xcompact3d&quot;,</span> <span class="pre">prm=prm)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.load_array(&quot;epsilon.bin&quot;,</span> <span class="pre">add_time=False)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prm.open_dataset(variables=[&quot;epsilon&quot;])[&quot;epsilon&quot;]</span></code> (static files are opened with the snapshots)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.load_snapshot(10,</span> <span class="pre">list_of_variables=[&quot;ux&quot;])</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prm.open_dataset(variables=[&quot;ux&quot;]).isel(t=10)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.load_time_series(&quot;ux&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prm.open_dataset(variables=[&quot;ux&quot;],</span> <span class="pre">stack=False)[&quot;ux&quot;]</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.write(vort,</span> <span class="pre">file_prefix=&quot;w3&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prm.write_dataset(vort,</span> <span class="pre">file_prefix=&quot;w3&quot;)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.write(ds)</span></code> (variables with <code class="docutils literal notranslate"><span class="pre">file_name</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prm.write_dataset(ds)</span></code> (same rule, same warning for the others)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.write_xdmf()</span></code></p></td>
+<td><p>not migrated yet; keep calling <code class="docutils literal notranslate"><span class="pre">prm.dataset.write_xdmf()</span></code> (the warning is the only difference)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">prm.dataset.load_wind_turbine_data()</span></code></p></td>
+<td><p>not migrated yet; keep calling it on <code class="docutils literal notranslate"><span class="pre">prm.dataset</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">len(prm.dataset)</span></code>, which guessed the number of snapshots from <code class="docutils literal notranslate"><span class="pre">ilast</span></code> and <code class="docutils literal notranslate"><span class="pre">ioutput</span></code>, has no equivalent: the lazy dataset lists what is on disk, <code class="docutils literal notranslate"><span class="pre">prm.open_dataset().sizes[&quot;t&quot;]</span></code>.</p>
+</section>
+<section id="it-is-a-plain-xarray-dataset">
+<h2>It is a plain xarray.Dataset<a class="headerlink" href="#it-is-a-plain-xarray-dataset" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">prm.open_dataset()</span></code> returns an ordinary, lazy <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html"><code class="docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>. The toolbox cannot anticipate every case, so when the defaults do not fit, open with <code class="docutils literal notranslate"><span class="pre">stack=False</span></code> or with <code class="docutils literal notranslate"><span class="pre">xr.open_mfdataset(...,</span> <span class="pre">engine=&quot;xcompact3d&quot;,</span> <span class="pre">prm=prm)</span></code> and shape the result with xarray itself: <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.concat.html"><code class="docutils literal notranslate"><span class="pre">xr.concat</span></code></a> to stack components along a new dimension, <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.merge.html"><code class="docutils literal notranslate"><span class="pre">xr.merge</span></code></a> and <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.combine_by_coords.html"><code class="docutils literal notranslate"><span class="pre">xr.combine_by_coords</span></code></a> to join folders or runs, <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.stack.html"><code class="docutils literal notranslate"><span class="pre">Dataset.stack</span></code></a>, <code class="docutils literal notranslate"><span class="pre">rename</span></code>, <code class="docutils literal notranslate"><span class="pre">assign_coords</span></code>, <code class="docutils literal notranslate"><span class="pre">chunk</span></code>, <code class="docutils literal notranslate"><span class="pre">isel</span></code>/<code class="docutils literal notranslate"><span class="pre">sel</span></code>, and so on. Everything stays lazy until you compute.</p>
+</section>
+<section id="files-in-sub-folders">
+<h2>Files in sub-folders<a class="headerlink" href="#files-in-sub-folders" title="Link to this heading">#</a></h2>
+<p>XCompact3d versions and user cases lay files out differently, so no folder tree is assumed. Declare the ones you have:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">prm</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span>
+    <span class="n">folders</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"xy_planes"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"drop_coords"</span><span class="p">:</span> <span class="s2">"z"</span><span class="p">},</span>
+        <span class="s2">"3d"</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s2">"geometry"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"static"</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Each entry is built from the same parameters with the given overrides, or it can be a ready xarray-binfile convention. On write, an array named <code class="docutils literal notranslate"><span class="pre">geometry/epsilon</span></code> (through its <code class="docutils literal notranslate"><span class="pre">file_name</span></code> attribute) goes to that folder.</p>
+</section>
+<section id="static-planes-from-the-sandbox">
+<h2>Static planes from the sandbox<a class="headerlink" href="#static-planes-from-the-sandbox" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">init_dataset</span></code> produces inflow planes such as <code class="docutils literal notranslate"><span class="pre">bxx1</span></code> on <code class="docutils literal notranslate"><span class="pre">(y,</span> <span class="pre">z)</span></code>. <code class="docutils literal notranslate"><span class="pre">prm.write_dataset</span></code> writes them as static files, like the old writer did, but <code class="docutils literal notranslate"><span class="pre">prm.open_dataset</span></code> never lists 2D static files: it is a reader for the simulation output. Read a plane with <code class="docutils literal notranslate"><span class="pre">xr.open_dataset(path,</span> <span class="pre">engine=&quot;xcompact3d&quot;,</span> <span class="pre">prm=prm,</span> <span class="pre">drop_coords=&quot;x&quot;)</span></code>.</p>
+</section>
+<section id="sandbox-and-genepsi">
+<h2>Sandbox and genepsi<a class="headerlink" href="#sandbox-and-genepsi" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">init_epsi</span></code>, <code class="docutils literal notranslate"><span class="pre">init_dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">gene_epsi_3d</span></code> now write through the lazy API and accept an explicit <code class="docutils literal notranslate"><span class="pre">data_path</span></code>. Without it they default to <code class="docutils literal notranslate"><span class="pre">prm.default_data_path</span></code>, or to a changed <code class="docutils literal notranslate"><span class="pre">prm.dataset.data_path</span></code> while that setting exists.</p>
+</section>
+<section id="known-differences">
+<h2>Known differences<a class="headerlink" href="#known-differences" title="Link to this heading">#</a></h2>
+<p><strong>Output names.</strong> The old writer accepted any <code class="docutils literal notranslate"><span class="pre">file_prefix</span></code> and appended the extension when missing, so <code class="docutils literal notranslate"><span class="pre">prm.dataset.write(vort,</span> <span class="pre">&quot;w3-mean&quot;)</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ux-000.bin&quot;</span></code> worked. The lazy API derives the separator, step counter and extension from the filename pattern, so a name is a word made of letters, digits and underscores, optionally under sub-folders (<code class="docutils literal notranslate"><span class="pre">&quot;geometry/epsilon&quot;</span></code>). Other names are rejected with a message saying so: use <code class="docutils literal notranslate"><span class="pre">w3_mean</span></code> instead of <code class="docutils literal notranslate"><span class="pre">w3-mean</span></code>, and never include the counter or extension yourself.</p>
+<p><strong>Assigning <code class="docutils literal notranslate"><span class="pre">prm.dataset</span></code>.</strong> Still possible (<code class="docutils literal notranslate"><span class="pre">prm.dataset</span> <span class="pre">=</span> <span class="pre">Dataset(...)</span></code>), with the same deprecation warning as reading it.</p>
+<p>The old writer computed the step of a snapshot as <code class="docutils literal notranslate"><span class="pre">int(t</span> <span class="pre">/</span> <span class="pre">dt)</span></code>, which truncates (<code class="docutils literal notranslate"><span class="pre">0.3</span> <span class="pre">/</span> <span class="pre">0.1</span></code> is <code class="docutils literal notranslate"><span class="pre">2.999...</span></code>) and could make two snapshots overwrite each other. The lazy API rounds and refuses values that are not within tolerance of an integer step.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./references"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="api-reference.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">API reference</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="how-to-contribute.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">How to Contribute</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why">Why</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-deprecated">What is deprecated</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#call-by-call">Call by call</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#it-is-a-plain-xarray-dataset">It is a plain xarray.Dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-in-sub-folders">Files in sub-folders</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#static-planes-from-the-sandbox">Static planes from the sandbox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sandbox-and-genepsi">Sandbox and genepsi</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#known-differences">Known differences</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Felipe N. Schuch
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2021.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

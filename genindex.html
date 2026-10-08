@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
@@ -38,10 +38,10 @@
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
     <script src="_static/documentation_options.js?v=9eb32ce0"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
@@ -61,25 +61,32 @@
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -105,7 +112,47 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
     </header>
   
 
@@ -176,6 +223,7 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">References</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="references/api-reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references/migration-guide.html">Migration guide: from <code class="docutils literal notranslate"><span class="pre">prm.dataset</span></code> to the lazy API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references/how-to-contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references/what-is-new.html">What’s New</a></li>
 </ul>
@@ -491,7 +539,9 @@
 </li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.io.Dataset">Dataset (class in xcompact3d_toolbox.io)</a>
 </li>
-      <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.ParametersExtras.dataset">dataset (xcompact3d_toolbox.parameters.ParametersExtras attribute)</a>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.ParametersExtras.dataset">dataset (xcompact3d_toolbox.parameters.ParametersExtras property)</a>
+</li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.Parameters.default_data_path">default_data_path (xcompact3d_toolbox.parameters.Parameters property)</a>
 </li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.sandbox.DimensionNotFoundError">DimensionNotFoundError</a>
 </li>
@@ -517,11 +567,19 @@
 </li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.io.FilenameProperties">FilenameProperties (class in xcompact3d_toolbox.io)</a>
 </li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.binfile.Xcompact3dConvention.files">files() (xcompact3d_toolbox.binfile.Xcompact3dConvention method)</a>
+</li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.backend.find_parameters_file">find_parameters_file() (in module xcompact3d_toolbox.backend)</a>
+</li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.array.X3dDataArray.first_derivative">first_derivative() (xcompact3d_toolbox.array.X3dDataArray method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.Parameters.from_file">from_file() (xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.binfile.Xcompact3dConvention.from_parameters">from_parameters() (xcompact3d_toolbox.binfile.Xcompact3dConvention class method)</a>
+</li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.binfile.Xcompact3dConvention.FROM_PARAMETERS_KEYS">FROM_PARAMETERS_KEYS (xcompact3d_toolbox.binfile.Xcompact3dConvention attribute)</a>
 </li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.sandbox.Geometry.from_stl">from_stl() (xcompact3d_toolbox.sandbox.Geometry method)</a>
 </li>
@@ -558,6 +616,8 @@
       <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.ParametersBasicParam.gravy">gravy (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
 </li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.ParametersBasicParam.gravz">gravz (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
+</li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.backend.Xcompact3dEntrypoint.guess_can_open">guess_can_open() (xcompact3d_toolbox.backend.Xcompact3dEntrypoint static method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -639,6 +699,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.backend.load_parameters">load_parameters() (in module xcompact3d_toolbox.backend)</a>
+</li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.io.Dataset.load_snapshot">load_snapshot() (xcompact3d_toolbox.io.Dataset method)</a>
 </li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.io.Dataset.load_time_series">load_time_series() (xcompact3d_toolbox.io.Dataset method)</a>
@@ -664,6 +726,10 @@
 
       <ul>
         <li><a href="references/api-reference.html#module-xcompact3d_toolbox.array">xcompact3d_toolbox.array</a>
+</li>
+        <li><a href="references/api-reference.html#module-xcompact3d_toolbox.backend">xcompact3d_toolbox.backend</a>
+</li>
+        <li><a href="references/api-reference.html#module-xcompact3d_toolbox.binfile">xcompact3d_toolbox.binfile</a>
 </li>
         <li><a href="references/api-reference.html#module-xcompact3d_toolbox.genepsi">xcompact3d_toolbox.genepsi</a>
 </li>
@@ -740,8 +806,16 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="references/api-reference.html#xcompact3d_toolbox.tutorial.open_dataset">open_dataset() (in module xcompact3d_toolbox.tutorial)</a>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.binfile.Xcompact3dConvention.open">open() (xcompact3d_toolbox.binfile.Xcompact3dConvention method)</a>
 </li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.tutorial.open_dataset">open_dataset() (in module xcompact3d_toolbox.tutorial)</a>
+
+      <ul>
+        <li><a href="references/api-reference.html#xcompact3d_toolbox.backend.Xcompact3dEntrypoint.open_dataset">(xcompact3d_toolbox.backend.Xcompact3dEntrypoint method)</a>
+</li>
+        <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.Parameters.open_dataset">(xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -753,6 +827,8 @@
       <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.ParametersBasicParam.p_row">p_row (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
 </li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.Parameters">Parameters (class in xcompact3d_toolbox.parameters)</a>
+</li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.backend.parameters_for">parameters_for() (in module xcompact3d_toolbox.backend)</a>
 </li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.ParametersALMParam">ParametersALMParam (class in xcompact3d_toolbox.parameters)</a>
 </li>
@@ -848,6 +924,8 @@
 </li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.sandbox.Geometry.sphere">sphere() (xcompact3d_toolbox.sandbox.Geometry method)</a>
 </li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.binfile.Xcompact3dConvention.split_kwargs">split_kwargs() (xcompact3d_toolbox.binfile.Xcompact3dConvention class method)</a>
+</li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.sandbox.Geometry.square">square() (xcompact3d_toolbox.sandbox.Geometry method)</a>
 </li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.mesh.StretchedCoordinate">StretchedCoordinate (class in xcompact3d_toolbox.mesh)</a>
@@ -878,15 +956,23 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.ParametersLESModel.walecst">walecst (xcompact3d_toolbox.parameters.ParametersLESModel attribute)</a>
 </li>
-      <li><a href="references/api-reference.html#xcompact3d_toolbox.io.Dataset.write">write() (xcompact3d_toolbox.io.Dataset method)</a>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.binfile.Xcompact3dConvention.write">write() (xcompact3d_toolbox.binfile.Xcompact3dConvention method)</a>
 
       <ul>
+        <li><a href="references/api-reference.html#xcompact3d_toolbox.io.Dataset.write">(xcompact3d_toolbox.io.Dataset method)</a>
+</li>
         <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.Parameters.write">(xcompact3d_toolbox.parameters.Parameters method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.Parameters.write_dataset">write_dataset() (xcompact3d_toolbox.parameters.Parameters method)</a>
+</li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.genepsi.write_geomcomplex">write_geomcomplex() (in module xcompact3d_toolbox.genepsi)</a>
+</li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.io.Dataset.write_xdmf">write_xdmf() (xcompact3d_toolbox.io.Dataset method)</a>
+</li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.binfile.Xcompact3dConvention.writer">writer() (xcompact3d_toolbox.binfile.Xcompact3dConvention method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -906,6 +992,20 @@
 </li>
       </ul></li>
       <li>
+    xcompact3d_toolbox.backend
+
+      <ul>
+        <li><a href="references/api-reference.html#module-xcompact3d_toolbox.backend">module</a>
+</li>
+      </ul></li>
+      <li>
+    xcompact3d_toolbox.binfile
+
+      <ul>
+        <li><a href="references/api-reference.html#module-xcompact3d_toolbox.binfile">module</a>
+</li>
+      </ul></li>
+      <li>
     xcompact3d_toolbox.genepsi
 
       <ul>
@@ -919,6 +1019,8 @@
         <li><a href="references/api-reference.html#module-xcompact3d_toolbox.gui">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     xcompact3d_toolbox.io
 
@@ -926,8 +1028,6 @@
         <li><a href="references/api-reference.html#module-xcompact3d_toolbox.io">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     xcompact3d_toolbox.mesh
 
@@ -956,6 +1056,10 @@
         <li><a href="references/api-reference.html#module-xcompact3d_toolbox.tutorial">module</a>
 </li>
       </ul></li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.binfile.Xcompact3dConvention">Xcompact3dConvention (class in xcompact3d_toolbox.binfile)</a>
+</li>
+      <li><a href="references/api-reference.html#xcompact3d_toolbox.backend.Xcompact3dEntrypoint">Xcompact3dEntrypoint (class in xcompact3d_toolbox.backend)</a>
+</li>
       <li><a href="references/api-reference.html#xcompact3d_toolbox.parameters.ParametersBasicParam.xlx">xlx (xcompact3d_toolbox.parameters.ParametersBasicParam attribute)</a>
 </li>
   </ul></td>
@@ -1039,8 +1143,8 @@ By Felipe N. Schuch
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
 
   <footer class="bd-footer">
   </footer>
