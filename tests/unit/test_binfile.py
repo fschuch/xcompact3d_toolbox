@@ -109,8 +109,9 @@ class TestFromParametersFiles:
         convention = Xcompact3dConvention.from_parameters(prm)
 
         for name in ("snapshots.xdmf", "notes.txt", "ux-001.bin.bak"):
+            path = Path(name)
             with pytest.raises(ValueError, match="No convention accepts"):
-                convention.reader(Path(name))
+                convention.reader(path)
 
     def test_no_root_static_member_without_extension_unless_named(self, prm):
         """No root static member without extension unless named."""
@@ -119,11 +120,12 @@ class TestFromParametersFiles:
         named = Xcompact3dConvention.from_parameters(prm, filename_properties=bare_names, static_names=("epsilon",))
 
         assert bare.reader(Path("ux0001")).name == "ux"
+        readme = Path("README")
         with pytest.raises(ValueError, match="No convention accepts"):
-            bare.reader(Path("README"))
+            bare.reader(readme)
         assert named.reader(Path("epsilon")).dims == ("x", "y", "z")
         with pytest.raises(ValueError, match="No convention accepts"):
-            named.reader(Path("README"))
+            named.reader(readme)
 
     def test_stacks_declare_velocity_and_scalars(self, prm):
         """Stacks declare velocity and scalars."""
@@ -255,8 +257,10 @@ class TestOpen:
         """Open with wrong dtype fails early."""
         prm, root, *_ = case
 
+        convention = Xcompact3dConvention.from_parameters(prm, dtype=np.float64)
+
         with pytest.raises(ValueError, match="Size mismatch"):
-            Xcompact3dConvention.from_parameters(prm, dtype=np.float64).open(root)
+            convention.open(root)
 
 
 class TestFolders:
@@ -366,8 +370,10 @@ class TestWrite:
         prm, root, snapshots, _ = case
         convention = Xcompact3dConvention.from_parameters(prm)
 
+        unnamed = snapshots["pp"].drop_attrs().rename(None)
+
         with pytest.raises(ValueError, match="no name"):
-            convention.write(snapshots["pp"].drop_attrs().rename(None), root)
+            convention.write(unnamed, root)
 
     def test_write_creates_the_directory_and_folders(self, case):
         """Write creates the directory and folders."""
@@ -383,8 +389,10 @@ class TestWrite:
         """Write rejects other types."""
         prm, root, *_ = case
 
+        convention = Xcompact3dConvention.from_parameters(prm)
+
         with pytest.raises(TypeError, match="xarray.Dataset or xarray.DataArray"):
-            Xcompact3dConvention.from_parameters(prm).write([1, 2, 3], root)
+            convention.write([1, 2, 3], root)
 
     def test_write_reports_progress(self, case):
         """Write reports progress."""
@@ -461,15 +469,19 @@ class TestStaticPlanes:
         target = root / "pp-002.bin"
         target.write_bytes(target.read_bytes()[: prm.ny * prm.nz * 4])  # looks like a yz plane, but is a snapshot
 
+        convention = Xcompact3dConvention.from_parameters(prm)
+
         with pytest.raises(ValueError, match="Size mismatch"):
-            Xcompact3dConvention.from_parameters(prm).open(root)
+            convention.open(root)
 
     def test_planes_with_a_time_dimension_are_rejected(self, prm, tmp_path):
         """Planes with a time dimension are rejected."""
         plane = _field(prm, "bxx1", t=[0.0]).isel(x=0, drop=True)
 
+        convention = Xcompact3dConvention.from_parameters(prm)
+
         with pytest.raises(LayoutMismatchError):
-            Xcompact3dConvention.from_parameters(prm).write(plane, tmp_path)
+            convention.write(plane, tmp_path)
 
 
 class TestReviewFixes:
@@ -489,8 +501,10 @@ class TestReviewFixes:
         """Write explains the name rule."""
         prm, root, snapshots, _ = case
 
+        convention = Xcompact3dConvention.from_parameters(prm)
+
         with pytest.raises(ValueError, match="letters, digits and underscores"):
-            Xcompact3dConvention.from_parameters(prm).write(snapshots["pp"], root, file_prefix=prefix)
+            convention.write(snapshots["pp"], root, file_prefix=prefix)
 
     def test_only_u_and_phi_are_stacked(self, case):
         """The stacks act on configured names only, like the old loader's is_velocity/is_scalar."""
