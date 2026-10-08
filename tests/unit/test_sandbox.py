@@ -232,6 +232,18 @@ class TestDataPathArgument:
         lazy = prm.open_dataset(target, folders={"geometry": {"static": True}})
         assert float(lazy["epsilon"].sum()) > 0
 
+    def test_gene_epsi_creates_geometry_under_its_own_data_path(self, prm, tmp_path):
+        prm.set(iibm=2, nraf=2)
+        epsi = x3d.init_epsi(prm)  # creates <default>/geometry, not the folder used below
+        for key in epsi:
+            epsi[key] = epsi[key].geo.cylinder(x=0.5, y=0.5, radius=0.2)
+        other = tmp_path / "other"
+
+        x3d.gene_epsi_3d(epsi, prm, data_path=other)
+
+        assert (other / "geometry" / "epsilon.bin").exists()
+        assert (other / "geometry" / "nobjx.dat").exists()
+
     def test_defaults_to_the_data_folder_next_to_the_parameters_file(self, prm, tmp_path):
         epsi = x3d.init_epsi(prm)
         x3d.gene_epsi_3d(epsi, prm)

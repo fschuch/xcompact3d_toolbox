@@ -147,7 +147,7 @@ class TestDatasetDeprecation:
             assert prm.dataset.stack_velocity is True
 
     def test_resolve_data_path_prefers_argument_then_changed_loader_path(self, prm, tmp_path):
-        assert prm._resolve_data_path(tmp_path / "given") == (tmp_path / "given").as_posix()  # noqa: SLF001
+        assert prm._resolve_data_path(tmp_path / "given") == os.fspath(tmp_path / "given")  # noqa: SLF001
         assert prm._resolve_data_path(None) == prm.default_data_path  # noqa: SLF001
         prm._dataset.set(data_path="/elsewhere/")  # noqa: SLF001
         assert prm._resolve_data_path(None) == "/elsewhere/"  # noqa: SLF001

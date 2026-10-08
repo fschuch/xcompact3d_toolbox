@@ -308,6 +308,7 @@ def gene_epsi_3d(epsi_in_dict, prm, data_path: str | os.PathLike[str] | None = N
 def write_geomcomplex(prm, ds, folder: str) -> None:
     """Write the geometry files for ``iibm == 2`` into ``folder/geometry``."""
     geometry = os.path.join(folder, "geometry")
+    os.makedirs(geometry, exist_ok=True)  # data_path may differ from the one init_epsi created
 
     def write_nobj(array, dim) -> None:
         with open(os.path.join(geometry, f"nobj{dim}.dat"), "w", newline="\n", encoding=ENCODING) as file:
