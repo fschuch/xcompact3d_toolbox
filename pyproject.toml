@@ -36,7 +36,11 @@ dependencies = [
     "tqdm>=4.67",
     "traitlets>=5.14",
     "xarray>=2024.7",
+    "xarray-binfile>=0.3.0,<0.4.0",
 ]
+
+[project.entry-points."xarray.backends"]
+xcompact3d = "xcompact3d_toolbox.backend:Xcompact3dEntrypoint"
 
 [project.optional-dependencies]
 visu = [

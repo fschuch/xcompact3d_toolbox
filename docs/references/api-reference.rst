@@ -34,6 +34,17 @@ Reading and writing files
   :show-inheritance:
   :special-members:
 
+Lazy loading and the xarray backend
+-----------------------------------
+
+.. automodule:: xcompact3d_toolbox.binfile
+  :members:
+  :show-inheritance:
+
+.. automodule:: xcompact3d_toolbox.backend
+  :members:
+  :show-inheritance:
+
 Computation and Plotting
 ------------------------
 

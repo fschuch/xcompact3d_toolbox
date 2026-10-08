@@ -3,6 +3,7 @@ from loguru import logger
 from xcompact3d_toolbox import tutorial
 from xcompact3d_toolbox._version import __version__
 from xcompact3d_toolbox.array import X3dDataArray, X3dDataset
+from xcompact3d_toolbox.binfile import Xcompact3dConvention
 from xcompact3d_toolbox.genepsi import gene_epsi_3d
 from xcompact3d_toolbox.gui import ParametersGui
 from xcompact3d_toolbox.param import param

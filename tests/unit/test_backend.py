@@ -1,0 +1,153 @@
+import os
+import time
+import warnings
+
+import numpy as np
+import pytest
+import xarray as xr
+
+import xcompact3d_toolbox as x3d
+from xcompact3d_toolbox import backend
+from xcompact3d_toolbox.backend import Xcompact3dEntrypoint
+
+
+@pytest.fixture
+def case(tmp_path):
+    """A case folder: input.i3d next to data/ holding snapshots written by the lazy API."""
+    prm = x3d.Parameters(filename=(tmp_path / "input.i3d").as_posix(), nx=9, ny=9, nz=9, ilast=50, ioutput=25, dt=0.01)
+    prm.write()
+    mesh = prm.get_mesh()
+    t = np.arange(3) * prm.dt * prm.ioutput
+    rng = np.random.default_rng(1)
+    fields = xr.Dataset({
+        name: xr.DataArray(rng.random((3, 9, 9, 9)), coords={"t": t, **mesh}, attrs={"file_name": name})
+        for name in ("ux", "uy", "pp")
+    })
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        prm.write_dataset(fields)
+    return prm, tmp_path / "data", fields
+
+
+class TestEngine:
+    def test_engine_is_registered(self):
+        """Engine is registered."""
+        assert "xcompact3d" in xr.backends.list_engines()
+
+    @pytest.mark.parametrize("parallel", [False, True])
+    def test_open_mfdataset_with_prm_matches_open_dataset(self, case, parallel):
+        """Open open_mfdataset with prm matches open dataset."""
+        prm, data, fields = case
+
+        standard = xr.open_mfdataset(sorted(data.glob("*.bin")), engine="xcompact3d", prm=prm, parallel=parallel)
+        toolbox = prm.open_dataset(stack=False)
+
+        xr.testing.assert_allclose(standard.load(), toolbox.load())
+        assert sorted(standard.data_vars) == ["pp", "ux", "uy"]
+
+    def test_open_dataset_with_a_convention(self, case):
+        """Open dataset with a convention."""
+        prm, data, fields = case
+        convention = x3d.Xcompact3dConvention.from_parameters(prm)
+
+        single = xr.open_dataset(data / "pp-001.bin", engine="xcompact3d", convention=convention)
+
+        xr.testing.assert_allclose(single["pp"].transpose("t", "x", "y", "z"), fields["pp"].isel(t=[1]))
+
+    def test_convention_options_are_forwarded(self, case):
+        """Convention options are forwarded."""
+        prm, data, _ = case
+
+        single = xr.open_dataset(data / "pp-001.bin", engine="xcompact3d", prm=prm, time_dim="time")
+
+        assert "time" in single.dims
+
+    def test_without_prm_the_parameters_file_next_to_the_data_folder_is_loaded(self, case):
+        """Without prm the parameters file next to the data folder is loaded."""
+        prm, data, fields = case
+
+        guessed = xr.open_mfdataset(sorted(data.glob("pp-*.bin")))  # no engine, no prm
+
+        assert guessed["pp"].dims == ("x", "y", "z", "t")
+        np.testing.assert_allclose(guessed["t"], fields["t"])
+
+    def test_without_prm_and_without_parameters_file_it_refuses(self, case):
+        """Without prm and without parameters file it refuses."""
+        prm, data, _ = case
+        (data.parent / "input.i3d").unlink()
+
+        with pytest.raises(ValueError, match="prm=.*convention="):
+            xr.open_dataset(data / "pp-001.bin", engine="xcompact3d")
+
+
+class TestGuessCanOpen:
+    entrypoint = Xcompact3dEntrypoint()
+
+    def test_claims_bin_files_next_to_a_single_parameters_file(self, case):
+        """Claims bin files next to a single parameters file."""
+        _, data, _ = case
+
+        assert self.entrypoint.guess_can_open(data / "pp-001.bin")
+        assert self.entrypoint.guess_can_open(str(data / "pp-001.bin"))
+
+    def test_accepts_prm_files_too(self, case):
+        """Accepts prm files too."""
+        _, data, _ = case
+        (data.parent / "input.i3d").rename(data.parent / "case.prm")
+
+        assert self.entrypoint.guess_can_open(data / "pp-001.bin")
+
+    def test_does_not_claim_other_extensions(self, case):
+        """Does not claim other extensions."""
+        _, data, _ = case
+
+        assert not self.entrypoint.guess_can_open(data / "snapshots.xdmf")
+        assert not self.entrypoint.guess_can_open(data.parent / "input.i3d")
+
+    def test_does_not_claim_without_or_with_several_parameters_files(self, case):
+        """Does not claim without or with several parameters files."""
+        _, data, _ = case
+        (data.parent / "other.i3d").write_text("")
+        assert not self.entrypoint.guess_can_open(data / "pp-001.bin")
+
+        (data.parent / "other.i3d").unlink()
+        (data.parent / "input.i3d").unlink()
+        assert not self.entrypoint.guess_can_open(data / "pp-001.bin")
+
+    def test_does_not_claim_non_paths(self):
+        """Does not claim non paths."""
+        assert not self.entrypoint.guess_can_open(object())
+
+
+class TestParametersCache:
+    def test_parameters_file_is_parsed_once_per_run(self, case, monkeypatch):
+        """Parameters file is parsed once per run."""
+        prm, data, _ = case
+        calls = []
+        original = backend.Parameters
+
+        class Counting(original):
+            def __init__(self, *args, **kwargs):
+                """Count how many times the parameters file is parsed."""
+                calls.append(kwargs.get("loadfile"))
+                super().__init__(*args, **kwargs)
+
+        monkeypatch.setattr(backend, "Parameters", Counting)
+        backend.load_parameters.cache_clear()
+
+        xr.open_mfdataset(sorted(data.glob("*.bin")))
+        xr.open_mfdataset(sorted(data.glob("pp-*.bin")))
+
+        assert len(calls) == 1
+
+    def test_cache_refreshes_when_the_parameters_file_changes(self, case):
+        """Cache refreshes when the parameters file changes."""
+        prm, data, _ = case
+        before = xr.open_dataset(data / "pp-001.bin")["t"].item()
+        prm.set(ioutput=50)
+        prm.write()
+        os.utime(prm.filename, ns=(time.time_ns(), time.time_ns() + 2_000_000_000))
+
+        after = xr.open_dataset(data / "pp-001.bin")["t"].item()
+
+        assert after == pytest.approx(2 * before)

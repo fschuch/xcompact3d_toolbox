@@ -1,8 +1,11 @@
 import os.path
+import warnings
 
 import pytest
 
+import xcompact3d_toolbox as x3d
 from xcompact3d_toolbox.gui import ParametersGui
+from xcompact3d_toolbox.io import Dataset
 from xcompact3d_toolbox.param import COORDS
 from xcompact3d_toolbox.parameters import Parameters
 
@@ -13,11 +16,13 @@ PARAMETERS = (Parameters, ParametersGui)
 class TestParameters:
     @pytest.fixture
     def parameters(self, tmp_path, base_class) -> Parameters:
+        """A parameters object of the class under test, filed in tmp_path."""
         filename = (tmp_path / "test.i3d").as_posix()
         return base_class(filename=filename)
 
     @pytest.mark.parametrize("target_class", PARAMETERS)
     def test_io(self, parameters: Parameters, target_class: Parameters):
+        """Io."""
         prm1 = parameters
 
         expected_values = {k: v for k, v in prm1.trait_values().items() if prm1.trait_metadata(k, "group")}
@@ -32,6 +37,7 @@ class TestParameters:
 
     @pytest.mark.parametrize("dimension", COORDS)
     def test_observe_resolution_and_bc(self, parameters: Parameters, dimension: str):
+        """Observe resolution and bc."""
         prm = parameters
 
         # Default Values
@@ -95,11 +101,16 @@ class TestParameters:
         ],
     )
     def test_initial_datapath(self, base_class, i3d_path, data_path):
+        """Initial datapath."""
         prm = base_class(filename=i3d_path)
-        assert os.path.normpath(prm.dataset.data_path) == os.path.normpath(data_path)
+        with pytest.warns(FutureWarning, match="deprecated"):
+            loader_path = prm.dataset.data_path
+        assert os.path.normpath(loader_path) == os.path.normpath(data_path)
+        assert os.path.normpath(prm.default_data_path) == os.path.normpath(data_path)
 
     @pytest.mark.parametrize("ncores", [2, 4, 8, 16, 32, 64, 128])
     def test_observe_2decomp__ncores(self, parameters: Parameters, ncores: int):
+        """Observe 2decomp ncores."""
         prm = parameters
         prm.set(ncores=ncores)
         prm.set(p_row=2, p_col=int(ncores / 2))
@@ -112,3 +123,41 @@ class TestParameters:
         assert prm.ncores == 1
         assert prm.p_row == 0
         assert prm.p_col == 0
+
+
+class TestDatasetDeprecation:
+    @pytest.fixture
+    def prm(self, tmp_path):
+        """A small case whose parameters file lives in tmp_path."""
+        return Parameters(filename=(tmp_path / "input.i3d").as_posix(), nx=9, ny=9, nz=9)
+
+    def test_dataset_access_warns_and_points_to_the_lazy_api(self, prm):
+        """Dataset access warns and points to the lazy api."""
+        with pytest.warns(FutureWarning, match=r"prm\.dataset.*deprecated.*open_dataset.*migration-guide"):
+            loader = prm.dataset
+
+        assert loader.data_path == os.path.join(os.path.dirname(prm.filename), "data")
+
+    def test_toolbox_code_paths_do_not_trigger_the_warning(self, prm):
+        """Toolbox code paths do not trigger the warning."""
+        prm.set(iibm=1)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ds = x3d.init_dataset(prm)
+            prm.write_dataset(ds)
+            x3d.gene_epsi_3d(x3d.init_epsi(prm), prm)
+            prm.open_dataset(stack=False)
+
+    def test_dataset_can_still_be_assigned_with_a_warning(self, prm):
+        """Dataset can still be assigned with a warning."""
+        with pytest.warns(FutureWarning, match="deprecated"):
+            prm.dataset = Dataset(stack_velocity=True)
+        with pytest.warns(FutureWarning, match="deprecated"):
+            assert prm.dataset.stack_velocity is True
+
+    def test_resolve_data_path_prefers_argument_then_changed_loader_path(self, prm, tmp_path):
+        """Resolve data path prefers argument then changed loader path."""
+        assert prm._resolve_data_path(tmp_path / "given") == os.fspath(tmp_path / "given")  # noqa: SLF001
+        assert prm._resolve_data_path(None) == prm.default_data_path  # noqa: SLF001
+        prm._dataset.set(data_path="/elsewhere/")  # noqa: SLF001
+        assert prm._resolve_data_path(None) == "/elsewhere/"  # noqa: SLF001

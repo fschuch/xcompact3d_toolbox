@@ -19,6 +19,7 @@ For more details, see:
 from __future__ import annotations
 
 import math
+import os
 import os.path
 from os import makedirs
 from typing import TYPE_CHECKING
@@ -28,7 +29,7 @@ import numpy as np
 import stl
 import xarray as xr
 
-from xcompact3d_toolbox.param import param
+from xcompact3d_toolbox.param import COORD_ATTRS, param
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -57,7 +58,9 @@ def data_array_zeros(
     )
 
 
-def init_epsi(prm: Parameters, *, dask: bool = False) -> dict[str, xr.DataArray]:
+def init_epsi(
+    prm: Parameters, *, dask: bool = False, data_path: str | os.PathLike[str] | None = None
+) -> dict[str, xr.DataArray]:
     """Initializes the :math:`\\epsilon` arrays that define the solid geometry
     for the Immersed Boundary Method.
 
@@ -69,6 +72,12 @@ def init_epsi(prm: Parameters, *, dask: bool = False) -> dict[str, xr.DataArray]
     dask : bool
         Defines the lazy parallel execution with dask arrays.
         See :obj:`xcompact3d_toolbox.array.x3d.pencil_decomp()`.
+    data_path : str or path-like, optional
+        The data folder, where ``geometry/`` is created. Defaults to
+        :obj:`xcompact3d_toolbox.parameters.Parameters.default_data_path`, or to
+        ``prm.dataset.data_path`` if that deprecated setting was changed.
+
+        .. versionadded:: 1.5.0
 
     Returns
     -------
@@ -103,7 +112,7 @@ def init_epsi(prm: Parameters, *, dask: bool = False) -> dict[str, xr.DataArray]
     if prm.iibm == 0:
         return epsi
 
-    makedirs(os.path.join(prm.dataset.data_path, "geometry"), exist_ok=True)
+    makedirs(os.path.join(prm._resolve_data_path(data_path), "geometry"), exist_ok=True)  # noqa: SLF001
 
     mesh = prm.get_mesh()
 
@@ -127,7 +136,7 @@ def init_epsi(prm: Parameters, *, dask: bool = False) -> dict[str, xr.DataArray]
 
     # With 'file_name' attribute, we make sure that epsi will be written to disc,
     # while the refined versions are not needed
-    epsi["epsi"].attrs = {"file_name": os.path.join("geometry", "epsilon")}
+    epsi["epsi"].attrs = {"file_name": "geometry/epsilon"}  # POSIX separator on every platform
 
     # Turns on lazy parallel execution with dask arrays
     if dask is True:
@@ -143,7 +152,7 @@ def init_epsi(prm: Parameters, *, dask: bool = False) -> dict[str, xr.DataArray]
     return epsi
 
 
-def init_dataset(prm: Parameters) -> xr.Dataset:
+def init_dataset(prm: Parameters, data_path: str | os.PathLike[str] | None = None) -> xr.Dataset:
     """This function initializes a :obj:`xarray.Dataset` including all variables
     that should be provided to XCompact3d and the sandbox flow configuration,
     according to the computational and physical parameters.
@@ -152,6 +161,12 @@ def init_dataset(prm: Parameters) -> xr.Dataset:
     ----------
     prm : :obj:`xcompact3d_toolbox.parameters.Parameters`
         Contains the computational and physical parameters.
+    data_path : str or path-like, optional
+        The data folder, created if needed. Defaults to
+        :obj:`xcompact3d_toolbox.parameters.Parameters.default_data_path`, or to
+        ``prm.dataset.data_path`` if that deprecated setting was changed.
+
+        .. versionadded:: 1.5.0
 
     Returns
     -------
@@ -187,18 +202,16 @@ def init_dataset(prm: Parameters) -> xr.Dataset:
     >>> #
     >>> # Code here your customized flow configuration
     >>> #
-    >>> prm.dataset.write(dataset)  # write the files to the disc
+    >>> prm.write_dataset(dataset)  # write the files to the disc
 
     """
-    makedirs(prm.dataset.data_path, exist_ok=True)
+    makedirs(prm._resolve_data_path(data_path), exist_ok=True)  # noqa: SLF001
 
     # Init dataset
     ds = xr.Dataset(coords=prm.get_mesh()).assign_coords(n=[n + 1 for n in range(prm.numscalar)])
 
-    ds.x.attrs = {"name": "Streamwise coordinate", "long_name": r"$x_1$"}
-    ds.y.attrs = {"name": "Vertical coordinate", "long_name": r"$x_2$"}
-    ds.z.attrs = {"name": "Spanwise coordinate", "long_name": r"$x_3$"}
-    ds.n.attrs = {"name": "Scalar fraction", "long_name": r"$\ell$"}
+    for dim in ("x", "y", "z", "n"):
+        ds[dim].attrs = dict(COORD_ATTRS[dim])
 
     description = {0: "Streamwise", 1: "Vertical", 2: "Spanwise"}
 

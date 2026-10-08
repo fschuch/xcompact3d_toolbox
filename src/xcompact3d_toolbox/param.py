@@ -4,6 +4,15 @@ param = {"mytype": float64}
 
 
 COORDS = ["x", "y", "z"]
+COORD_ATTRS: dict[str, dict[str, str]] = {
+    "x": {"name": "Streamwise coordinate", "long_name": r"$x_1$"},
+    "y": {"name": "Vertical coordinate", "long_name": r"$x_2$"},
+    "z": {"name": "Spanwise coordinate", "long_name": r"$x_3$"},
+    "t": {"name": "Time", "long_name": r"$t$"},
+    "i": {"name": "Velocity component", "long_name": r"$i$"},
+    "n": {"name": "Scalar fraction", "long_name": r"$\ell$"},
+}
+# Attributes attached to the coordinates by init_dataset and the lazy dataset.
 ENCODING = "utf-8"
 
 
