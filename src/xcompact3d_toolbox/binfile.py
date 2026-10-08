@@ -17,11 +17,27 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import xarray_binfile  # noqa: F401  (registers the .binary_engine accessors)
-from xarray_binfile.conventions import Layout
+from xarray_binfile.conventions import (
+    ConventionProtocol,
+    FilenamePattern,
+    FolderConventions,
+    Layout,
+    PatternConventions,
+    StaticFiles,
+    StepIndexedFiles,
+    VariableStack,
+)
 
 from xcompact3d_toolbox.param import param
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator, Mapping, Sequence
+    from pathlib import Path
+
+    import xarray as xr
+    from xarray_binfile import ReadSpecs, WriteSpecs
+
+    from xcompact3d_toolbox.io import FilenameProperties
     from xcompact3d_toolbox.parameters import Parameters
 
 COORD_ATTRS: dict[str, dict[str, str]] = {
@@ -34,22 +50,48 @@ COORD_ATTRS: dict[str, dict[str, str]] = {
 }
 """Attributes attached to the coordinates of the lazy dataset, matching :obj:`xcompact3d_toolbox.sandbox.init_dataset`."""
 
+VELOCITY_COMPONENTS = ("x", "y", "z")
+SCALAR_FRACTIONS = range(1, 10)
+
+
+def _output_name(data_array: xr.DataArray) -> str:
+    """The name an array is written under: its ``file_name`` attribute, else its name."""
+    return str(data_array.attrs.get("file_name", data_array.name))
+
+
+def _filename_template(filename_properties: FilenameProperties) -> str:
+    fp = filename_properties
+    return f"{{name}}{fp.separator}{{step:0{fp.number_of_digits}d}}{fp.file_extension}"
+
 
 @dataclass(frozen=True)
 class Xcompact3dConvention:
     """Describes the binary files of a simulation for `xarray-binfile`_.
 
-    Build it with :obj:`from_parameters`.
+    Build it with :obj:`from_parameters`. It implements the xarray-binfile
+    convention protocol (:obj:`reader` and :obj:`writer`), so it can be
+    handed to :obj:`xarray.open_mfdataset` and ``.binary_engine.to_file``
+    directly.
 
     Parameters
     ----------
+    convention : :obj:`xarray_binfile.conventions.ConventionProtocol`
+        The composed xarray-binfile conventions doing the work.
     layout : :obj:`xarray_binfile.conventions.Layout`
         Dimension order, coordinates, dtype and memory order of one file on disk.
+    pattern : :obj:`xarray_binfile.conventions.FilenamePattern`
+        Filename pattern of the snapshots.
+    stacks : tuple of :obj:`xarray_binfile.conventions.VariableStack`
+        Dimensions encoded in variable names (velocity components on ``i``,
+        scalar fractions on ``n``).
 
     .. _xarray-binfile: https://docs.fschuch.com/xarray-binfile/
     """
 
+    convention: ConventionProtocol
     layout: Layout
+    pattern: FilenamePattern
+    stacks: tuple[VariableStack, ...]
 
     @classmethod
     def from_parameters(
@@ -58,8 +100,19 @@ class Xcompact3dConvention:
         *,
         dtype: Any = None,
         drop_coords: str = "",
+        filename_properties: FilenameProperties | Mapping[str, Any] | None = None,
+        snapshot_step: str = "ioutput",
+        time_dim: str = "t",
+        static_names: Sequence[str] | None = None,
     ) -> Xcompact3dConvention:
         """Build the convention from a :obj:`xcompact3d_toolbox.parameters.Parameters` instance.
+
+        The dataset root holds the snapshots (``ux-000.bin``) next to static
+        fields (``epsilon.bin``). Velocity components are stacked on ``i``
+        (``u`` from ``ux``, ``uy``, ``uz``) and scalar fractions on ``n``
+        (``phi`` from ``phi1``, ``phi2``, ...). The name an array is written
+        under is its ``file_name`` attribute, falling back to its name, like
+        :obj:`xcompact3d_toolbox.io.Dataset.write`.
 
         Parameters
         ----------
@@ -71,16 +124,77 @@ class Xcompact3dConvention:
         drop_coords : str, optional
             Coordinate to drop when the files hold 2D planes: ``"x"``, ``"y"`` or ``"z"``
             (default is ``""``, for 3D fields).
+        filename_properties : :obj:`xcompact3d_toolbox.io.FilenameProperties` or dict, optional
+            Naming of the files. Defaults to ``prm.dataset.filename_properties``; a dict
+            of its keyword arguments is accepted too.
+        snapshot_step : str, optional
+            The parameter giving the number of time steps between snapshots, ``"ioutput"``
+            (default) or ``"iprocessing"``; with ``prm.dt`` it sets the ``t`` coordinate.
+        time_dim : str, optional
+            Name of the time dimension (default is ``"t"``).
+        static_names : sequence of str, optional
+            Names of the static fields stored in the root. By default any name is accepted
+            when ``file_extension`` is set; with an empty extension, a bare name would also
+            match unrelated files (``README``), so static files are only recognised when
+            listed here.
 
         Returns
         -------
         :obj:`Xcompact3dConvention`
             The convention.
         """
+        from xcompact3d_toolbox.io import FilenameProperties  # noqa: PLC0415  (import cycle)
+
+        if filename_properties is None:
+            fp = prm.dataset.filename_properties
+        elif isinstance(filename_properties, FilenameProperties):
+            fp = filename_properties
+        else:
+            fp = FilenameProperties(**filename_properties)
+
         layout = Layout(
             prm.mesh.drop(*drop_coords),
             dtype=np.dtype(param["mytype"] if dtype is None else dtype),
             order="F",
             coord_attrs=COORD_ATTRS,
         )
-        return cls(layout=layout)
+        pattern = FilenamePattern(_filename_template(fp), exact_width=True)
+        stacks = (
+            VariableStack("i", "{name}{i}", values=VELOCITY_COMPONENTS, attrs=COORD_ATTRS["i"]),
+            VariableStack(
+                "n",
+                f"{{name}}{{n:0{fp.scalar_num_of_digits}d}}",
+                values=SCALAR_FRACTIONS,
+                names=("phi",),
+                attrs=COORD_ATTRS["n"],
+            ),
+        )
+        snapshots = StepIndexedFiles(
+            layout,
+            pattern=pattern,
+            time_dim=time_dim,
+            time_step=prm.dt * getattr(prm, snapshot_step),
+            time_dtype=layout.dtype,
+            stacks=stacks,
+            name_of=_output_name,
+        )
+        members: list[ConventionProtocol] = [snapshots]
+        if fp.file_extension or static_names is not None:
+            members.append(
+                StaticFiles(
+                    layout,
+                    pattern=FilenamePattern(f"{{name}}{fp.file_extension}"),
+                    names=static_names,
+                    name_of=_output_name,
+                )
+            )
+        convention = FolderConventions({".": PatternConventions(members)})
+        return cls(convention=convention, layout=layout, pattern=pattern, stacks=stacks)
+
+    def reader(self, path: Path) -> ReadSpecs:
+        """Read specs getter: decode one file (see the xarray-binfile read protocol)."""
+        return self.convention.reader(path)
+
+    def writer(self, data_array: xr.DataArray) -> Iterator[WriteSpecs]:
+        """Write specs getter: split one array into files (see the xarray-binfile write protocol)."""
+        return self.convention.writer(data_array)
