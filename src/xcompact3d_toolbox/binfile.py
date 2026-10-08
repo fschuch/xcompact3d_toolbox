@@ -12,6 +12,7 @@ on-demand loader, and both read and write the same files.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -32,7 +33,7 @@ from xcompact3d_toolbox.param import param
 
 if TYPE_CHECKING:
     import os
-    from collections.abc import Iterable, Iterator, Mapping, Sequence
+    from collections.abc import Iterable, Iterator, Sequence
     from pathlib import Path
 
     import xarray as xr
@@ -105,7 +106,9 @@ class Xcompact3dConvention:
         filename_properties: FilenameProperties | Mapping[str, Any] | None = None,
         snapshot_step: str = "ioutput",
         time_dim: str = "t",
+        static: bool = False,
         static_names: Sequence[str] | None = None,
+        folders: Mapping[str, Mapping[str, Any] | ConventionProtocol] | None = None,
     ) -> Xcompact3dConvention:
         """Build the convention from a :obj:`xcompact3d_toolbox.parameters.Parameters` instance.
 
@@ -134,16 +137,39 @@ class Xcompact3dConvention:
             (default) or ``"iprocessing"``; with ``prm.dt`` it sets the ``t`` coordinate.
         time_dim : str, optional
             Name of the time dimension (default is ``"t"``).
+        static : bool, optional
+            Describe only static fields, no snapshots (default is :obj:`False`). Meant for
+            ``folders`` entries such as ``{"geometry": {"static": True}}``.
         static_names : sequence of str, optional
             Names of the static fields stored in the root. By default any name is accepted
             when ``file_extension`` is set; with an empty extension, a bare name would also
             match unrelated files (``README``), so static files are only recognised when
             listed here.
+        folders : dict, optional
+            Sub-folders of the data folder and what they hold. Each value is either a dict of
+            keyword arguments for this method (the sub-convention is built from the same
+            ``prm`` and filename properties, with those overrides) or a ready xarray-binfile
+            convention. No folder is assumed by default, since XCompact3d versions and user
+            cases lay files out differently.
 
         Returns
         -------
         :obj:`Xcompact3dConvention`
             The convention.
+
+        Examples
+        --------
+
+        >>> prm = xcompact3d_toolbox.Parameters(loadfile="input.i3d")
+        >>> convention = xcompact3d_toolbox.Xcompact3dConvention.from_parameters(
+        ...     prm,
+        ...     folders={
+        ...         "xy_planes": {"drop_coords": "z"},
+        ...         "3d": {},
+        ...         "geometry": {"static": True},
+        ...     },
+        ... )
+        >>> ds = convention.open(prm.dataset.data_path)
         """
         from xcompact3d_toolbox.io import FilenameProperties  # noqa: PLC0415  (import cycle)
 
@@ -171,17 +197,20 @@ class Xcompact3dConvention:
                 attrs=COORD_ATTRS["n"],
             ),
         )
-        snapshots = StepIndexedFiles(
-            layout,
-            pattern=pattern,
-            time_dim=time_dim,
-            time_step=prm.dt * getattr(prm, snapshot_step),
-            time_dtype=layout.dtype,
-            stacks=stacks,
-            name_of=_output_name,
-        )
-        members: list[ConventionProtocol] = [snapshots]
-        if fp.file_extension or static_names is not None:
+        members: list[ConventionProtocol] = []
+        if not static:
+            members.append(
+                StepIndexedFiles(
+                    layout,
+                    pattern=pattern,
+                    time_dim=time_dim,
+                    time_step=prm.dt * getattr(prm, snapshot_step),
+                    time_dtype=layout.dtype,
+                    stacks=stacks,
+                    name_of=_output_name,
+                )
+            )
+        if static or fp.file_extension or static_names is not None:
             members.append(
                 StaticFiles(
                     layout,
@@ -190,7 +219,21 @@ class Xcompact3dConvention:
                     name_of=_output_name,
                 )
             )
-        convention = FolderConventions({".": PatternConventions(members)})
+        tree: dict[str, ConventionProtocol] = {".": PatternConventions(members)}
+        for folder, spec in (folders or {}).items():
+            if isinstance(spec, Mapping):
+                overrides = {
+                    "dtype": dtype,
+                    "drop_coords": drop_coords,
+                    "filename_properties": fp,
+                    "snapshot_step": snapshot_step,
+                    "time_dim": time_dim,
+                    **spec,
+                }
+                tree[folder] = cls.from_parameters(prm, **overrides).convention
+            else:
+                tree[folder] = spec
+        convention = FolderConventions(tree)
         return cls(convention=convention, layout=layout, pattern=pattern, stacks=stacks, _time_dim=time_dim)
 
     def reader(self, path: Path) -> ReadSpecs:
@@ -198,8 +241,15 @@ class Xcompact3dConvention:
         return self.convention.reader(path)
 
     def writer(self, data_array: xr.DataArray) -> Iterator[WriteSpecs]:
-        """Write specs getter: split one array into files (see the xarray-binfile write protocol)."""
-        return self.convention.writer(data_array)
+        """Write specs getter: split one array into files (see the xarray-binfile write protocol).
+
+        The output name is the ``file_name`` attribute, else the array name. A name
+        starting with a registered folder (``"geometry/epsilon"``) is written into that
+        folder.
+        """
+        named = data_array.rename(_output_name(data_array))
+        named.attrs = {k: v for k, v in data_array.attrs.items() if k != "file_name"}
+        return self.convention.writer(named)
 
     def files(self, directory: str | os.PathLike[str]) -> list[Path]:
         """List the binary fields in ``directory`` that follow the convention.

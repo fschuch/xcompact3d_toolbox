@@ -225,3 +225,42 @@ class TestOpen:
 
         with pytest.raises(ValueError, match="Size mismatch"):
             Xcompact3dConvention.from_parameters(prm, dtype=np.float64).open(root)
+
+
+class TestFolders:
+    def test_folder_spec_builds_a_sub_convention_from_the_same_parameters(self, case):
+        prm, root, _, epsi = case
+        convention = Xcompact3dConvention.from_parameters(prm, folders={"geometry": {"static": True}})
+
+        lazy = convention.open(root)
+
+        assert sorted(lazy.data_vars) == ["epsilon", "phi", "pp", "u"]
+        np.testing.assert_array_equal(lazy["epsilon"].transpose(*epsi.dims), epsi)
+
+    def test_folder_spec_accepts_from_parameters_overrides(self, case, tmp_path):
+        prm, root, *_ = case
+        (root / "xy_planes").mkdir()
+        plane = _field(prm, "ux", t=[0.0]).isel(z=0, drop=True)
+        convention = Xcompact3dConvention.from_parameters(prm, folders={"xy_planes": {"drop_coords": "z"}})
+        plane.binary_engine.to_file(convention.writer, root)
+
+        specs = convention.reader(root / "xy_planes" / "ux-000.bin")
+
+        assert specs.dims == ("x", "y", "t")
+        assert (root / "xy_planes" / "ux-000.bin").exists()
+
+    def test_folder_accepts_a_ready_convention(self, case):
+        from xarray_binfile.conventions import Layout, StaticFiles
+
+        prm, root, *_ = case
+        custom = StaticFiles(Layout({"x": np.arange(3)}, dtype="<f8"), pattern="{name}.dat")
+        convention = Xcompact3dConvention.from_parameters(prm, folders={"probes": custom})
+
+        assert convention.reader(root / "probes" / "p.dat").dims == ("x",)
+
+    def test_writer_sends_folder_prefixed_names_to_the_registered_folder(self, case):
+        prm, root, *_ = case
+        convention = Xcompact3dConvention.from_parameters(prm, folders={"geometry": {"static": True}})
+        epsi = _field(prm, "epsi").assign_attrs(file_name="geometry/epsilon")
+
+        assert [s.filename for s in convention.writer(epsi)] == ["geometry/epsilon.bin"]
