@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using the metadata from this file.
+type: software
+title: Xcompact3d-toolbox
+abstract: >-
+  Python package for pre and postprocessing of the high-order Navier-Stokes
+  solver XCompact3d, with traitlets-based parameters, xarray data structures
+  and Dask-powered parallel computing.
+authors:
+  - family-names: Schuch
+    given-names: Felipe N.
+    email: me@fschuch.com
+    orcid: https://orcid.org/0000-0002-6140-0273
+license: MIT
+repository-code: https://github.com/fschuch/xcompact3d_toolbox
+url: https://docs.fschuch.com/xcompact3d_toolbox/
+keywords:
+  - xcompact3d
+  - cfd
+  - navier-stokes
+  - xarray
+  - dask
+  - postprocessing
