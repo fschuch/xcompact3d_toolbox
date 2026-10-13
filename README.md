@@ -19,7 +19,7 @@
   [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
   [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
   [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-  [![PyPI - License](https://img.shields.io/pypi/l/xcompact3d-toolbox?color=blue)](https://github.com/fschuch/xcompact3d_toolbox/blob/master/LICENSE)
+  ![GitHub License](https://img.shields.io/github/license/fschuch/xcompact3d_toolbox?color=blue)
   [![EffVer Versioning](https://img.shields.io/badge/version_scheme-EffVer-0097a7)](https://jacobtomlinson.dev/effver)
 
 ______________________________________________________________________
@@ -187,5 +187,5 @@ Now, any change you make at the source code will be available at your local inst
 ## Copyright and License
 
 © 2020 [Felipe N. Schuch](https://github.com/fschuch).
-All content is under [MIT License](https://github.com/fschuch/xcompact3d_toolbox/blob/master/LICENSE).
+All content is under [MIT License](https://github.com/fschuch/xcompact3d_toolbox/blob/main/LICENSE).
 This project was previously distributed under the GPL-3.0 License and has since been relicensed under the MIT License.
