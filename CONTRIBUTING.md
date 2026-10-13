@@ -29,7 +29,7 @@ hatch run docs:serve     # live preview of the documentation
 1. Make sure `hatch run qa` passes locally.
 1. Open a pull request describing the motivation and the change.
 
-Continuous integration runs the same checks across all supported Python versions.
+Continuous integration runs the extended test suite across all supported Python versions.
 
 ## Code of conduct
 
