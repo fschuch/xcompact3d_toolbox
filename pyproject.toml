@@ -18,6 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering",
 ]
@@ -179,7 +180,7 @@ features = ["tests", "tests-extra"]
 extended = "test -n auto --reruns 7 --reruns-delay 1 {args}"
 
 [[tool.hatch.envs.test.matrix]]
-python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
+python = ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
 
 [tool.hatch.envs.docs]
 description = "Documentation environment"
